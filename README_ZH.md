@@ -7,8 +7,6 @@
 <p align="center"><a href="https://tailwindcss.com" target="_blank"><img src="https://tailwindcss.com/_next/static/media/tailwindcss-logotype-white.830c8e49.svg" width="400"></a></p>
 <p align="center"><a href="https://vuejs.org" target="_blank"><img src="https://vuejs.org/logo.svg" width="120"></a></p>
 
-## 🛠️ technology stack selection
-
 ## 🛠️ 技术栈选型
 
 | 层次       | 技术选型             | 说明                                    |
