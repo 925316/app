@@ -256,7 +256,7 @@ storage/logs:
 | `id`                       | BIGINT UNSIGNED              | PK, AI           | 主键                               |
 | `username`                 | VARCHAR(255)                 | UNIQUE, NOT NULL | 用户名                             |
 | `email`                    | VARCHAR(255)                 | UNIQUE, NOT NULL | 邮箱地址                           |
-| `password_hash`            | VARCHAR(255)                 | NOT NULL         | 密码哈希值                         |
+| `password`                 | VARCHAR(255)                 | NOT NULL         | 密码(后端加密)                     |
 | `privilege_level`          | ENUM('user', 'basic', 'vip') | DEFAULT 'user'   | 特权等级(0-普通用户,1-Basic,2-VIP) |
 | `preferred_language`       | VARCHAR(10)                  | DEFAULT 'en'     | 语言设置                           |
 | `last_ip_address`          | VARCHAR(45)                  | NULLABLE         | 最后登录 IP                        |
@@ -269,6 +269,14 @@ storage/logs:
 | `email_verified_at`        | TIMESTAMP                    | NULLABLE         | 邮箱验证时间                       |
 | `created_at`, `updated_at` | TIMESTAMP                    |                  | Laravel 时间戳                     |
 
+## 从Fortify抄一下认证字段
+也就是
+```php
+$table->timestamp('email_verified_at')->nullable();
+$table->text('two_factor_secret')->nullable();
+$table->text('two_factor_recovery_codes')->nullable();
+$table->timestamp('two_factor_confirmed_at')->nullable();
+```
 **索引优化**
 
 UNIQUE
