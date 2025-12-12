@@ -64,10 +64,10 @@ class License extends Model
         return $this->belongsTo(AccountDevice::class);
     }
 
-    // public function deviceBinding(): BelongsTo
-    // {
-    //     return $this->belongsTo(DeviceBinding::class);
-    // }
+    public function deviceBinding(): BelongsTo
+    {
+        return $this->belongsTo(DeviceBinding::class);
+    }
 
     public function upgradedTo(): BelongsTo
     {
@@ -84,15 +84,20 @@ class License extends Model
         return $this->hasMany(ActivationKey::class);
     }
 
-    // public function deviceBindings(): HasMany
-    // {
-    //     return $this->hasMany(DeviceBinding::class);
-    // }
+    public function scopeActive($query)
+    {
+        return $query->where('status', self::STATUS_ACTIVE);
+    }
 
-    // public function heartbeatLogs(): HasMany
-    // {
-    //     return $this->hasMany(HeartbeatLog::class);
-    // }
+    public function deviceBindings(): HasMany
+    {
+        return $this->hasMany(DeviceBinding::class);
+    }
+
+    public function heartbeatLogs(): HasMany
+    {
+        return $this->hasMany(HeartbeatLog::class);
+    }
 
     public function isExpired(): bool
     {

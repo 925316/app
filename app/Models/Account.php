@@ -95,18 +95,18 @@ class Account extends Authenticatable
     /**
      * Get the licenses associated with the account.
      */
-    // public function licenses(): HasMany
-    // {
-    //     return $this->hasMany(License::class, 'account_id');
-    // }
+    public function licenses(): HasMany
+    {
+        return $this->hasMany(License::class, 'account_id');
+    }
 
     /** 
      * Get the devices associated with the account.
      */
-    // public function devices(): HasMany
-    // {
-    //     return $this->hasMany(AccountDevice::class, 'account_id');
-    // }
+    public function devices(): HasMany
+    {
+        return $this->hasMany(AccountDevice::class, 'account_id');
+    }
 
     /** 
      * Get the active licenses associated with the account.

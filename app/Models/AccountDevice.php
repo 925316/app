@@ -51,10 +51,10 @@ class AccountDevice extends Model
         return $this->hasMany(License::class, 'account_device_id');
     }
 
-    //public function deviceBindings(): HasMany
-    //{
-    //    return $this->hasMany(DeviceBinding::class, 'account_device_id');
-    //}
+    public function deviceBindings(): HasMany
+    {
+       return $this->hasMany(DeviceBinding::class, 'account_device_id');
+    }
 
     public function isBanned(): bool
     {
