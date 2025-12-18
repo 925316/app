@@ -20,10 +20,6 @@ class PackageRelease extends Model
         'download_count',
     ];
 
-    protected $casts = [
-        'download_count' => 'integer',
-    ];
-
     const CHANNEL_STABLE = 'stable';
     const CHANNEL_DEV = 'dev';
 
@@ -75,5 +71,17 @@ class PackageRelease extends Model
         }
 
         return version_compare($latest->version, $currentVersion, '>');
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'download_count' => 'integer',
+        ];
     }
 }
