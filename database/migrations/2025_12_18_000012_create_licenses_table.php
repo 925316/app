@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('used_by')->nullable()->constrained('accounts');
             $table->unsignedTinyInteger('privilege')->default(0);
             $table->unsignedTinyInteger('status')->default(0);
-            $table->timestamp('expires_at');
+            $table->datetime('expires_at');
             $table->timestamp('activated_at')->nullable();
             $table->timestamp('suspended_at')->nullable();
             $table->string('created_from_ip', 45)->nullable();

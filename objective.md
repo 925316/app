@@ -1,6 +1,6 @@
 # License Management System - Development Requirements Manual
 
-- Laravel12 + Fortify + Inertia.js + Vue 3 + TypeScript
+- License Management System based on Laravel12 + Inertia(breeze) + Vue
 
 ## Database Design
 
@@ -47,7 +47,7 @@ laravel12 built-in authentication:
 `failed_jobs`
 | Name | Type | Constraints | Description |
 | ---- | ---- | ---- | ---- |
-| `id` | BIGINT UNSIGNED | PK, AI |  |
+| `id` | BIGINT UNSIGNED | PK, AI | |
 | `uuid` | VARCHAR(255) | unique | |
 | `connection` | TEXT | NOT NULL | |
 | `queue` | TEXT |NOT NULL | |
@@ -74,27 +74,27 @@ laravel12 built-in authentication:
 
 ### `accounts`
 
-| Name | Type | Constraints | Description |
-| --------------------------- | --------------- | ------------------------- | -------------------------- |
-| `id` | BIGINT UNSIGNED | PK, AI | Primary Key |
-| `username` | VARCHAR(255) | UNIQUE, NOT NULL | Username |
-| `email` | VARCHAR(255) | UNIQUE, NOT NULL | Email Address |
-| `password` | VARCHAR(255) | NOT NULL | Laravel default bcrypt |
-| `license_id` | BIGINT UNSIGNED | FK`licenses.id`, NULLABLE | Privilege determines account permission level |
-| `last_login_at` | TIMESTAMP | NULLABLE | Last Login Time |
-| `last_ip_address` | VARCHAR(45) | NULLABLE | Last Login IP Address |
-| `last_user_agent` | TEXT | NULLABLE | Last User-Agent Used |
-| `hwid_reset_count` | INT UNSIGNED | DEFAULT 0 | HWID Reset Count |
-| `hwid_last_reset_at` | TIMESTAMP | NULLABLE | Last HWID Reset Time |
-| `is_suspended` | BOOLEAN | DEFAULT FALSE | Account Suspension Status |
-| `suspension_reason` | VARCHAR(255) | NULLABLE | Account Suspension Reason |
-| `suspended_until` | TIMESTAMP | NULLABLE | Suspension End Time |
-| `email_verified_at` | TIMESTAMP | NULLABLE | Fortify Email Verification Time |
-| `two_factor_secret` | TEXT | NULLABLE | Fortify Two-Factor Secret Key |
-| `two_factor_recovery_codes` | TEXT | NULLABLE | Fortify Two-Factor Recovery Codes |
-| `two_factor_confirmed_at` | TIMESTAMP | NULLABLE | Fortify Two-Factor Confirmation Time |
-| `remember_token` | VARCHAR(100) | NULLABLE | Laravel Token |
-| `created_at`, `updated_at` | TIMESTAMP | | Laravel Timestamps |
+| Name                        | Type            | Constraints               | Description                                   |
+| --------------------------- | --------------- | ------------------------- | --------------------------------------------- |
+| `id`                        | BIGINT UNSIGNED | PK, AI                    | Primary Key                                   |
+| `username`                  | VARCHAR(255)    | UNIQUE, NOT NULL          | Username                                      |
+| `email`                     | VARCHAR(255)    | UNIQUE, NOT NULL          | Email Address                                 |
+| `password`                  | VARCHAR(255)    | NOT NULL                  | Laravel default bcrypt                        |
+| `license_id`                | BIGINT UNSIGNED | FK`licenses.id`, NULLABLE | Privilege determines account permission level |
+| `last_login_at`             | TIMESTAMP       | NULLABLE                  | Last Login Time                               |
+| `last_ip_address`           | VARCHAR(45)     | NULLABLE                  | Last Login IP Address                         |
+| `last_user_agent`           | TEXT            | NULLABLE                  | Last User-Agent Used                          |
+| `hwid_reset_count`          | INT UNSIGNED    | DEFAULT 0                 | HWID Reset Count                              |
+| `hwid_last_reset_at`        | TIMESTAMP       | NULLABLE                  | Last HWID Reset Time                          |
+| `is_suspended`              | BOOLEAN         | DEFAULT FALSE             | Account Suspension Status                     |
+| `suspension_reason`         | VARCHAR(255)    | NULLABLE                  | Account Suspension Reason                     |
+| `suspended_until`           | TIMESTAMP       | NULLABLE                  | Suspension End Time                           |
+| `email_verified_at`         | TIMESTAMP       | NULLABLE                  | Breeze Email Verification Time                |
+| `two_factor_secret`         | TEXT            | NULLABLE                  | Breeze Two-Factor Secret Key                  |
+| `two_factor_recovery_codes` | TEXT            | NULLABLE                  | Breeze Two-Factor Recovery Codes              |
+| `two_factor_confirmed_at`   | TIMESTAMP       | NULLABLE                  | Breeze Two-Factor Confirmation Time           |
+| `remember_token`            | VARCHAR(100)    | NULLABLE                  | Laravel Token                                 |
+| `created_at`, `updated_at`  | TIMESTAMP       |                           | Laravel Timestamps                            |
 
 **Optimization**
 
@@ -113,20 +113,20 @@ INDEX
 
 ### `account_devices`
 
-| Name | Type | Constraints | Description |
-| -------------------------- | --------------- | -------------------- | ----------------------- |
-| `id` | BIGINT UNSIGNED | PK, AI | Primary Key |
-| `account_id` | BIGINT UNSIGNED | FK`accounts.id`, NOT NULL | Associated Account ID |
-| `hwid_hash` | VARCHAR(64) | NOT NULL | Device Hardware ID Hash |
-| `user_agent` | TEXT | NULLABLE | User Agent |
-| `ip_address` | VARCHAR(45) | NOT NULL | IP Address |
-| `country_code` | CHAR(2) | NULLABLE | Country Code |
-| `device_fingerprint` | JSON | NULLABLE | Device Characteristic Information (JSON Format) |
-| `first_seen_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP, NOT NULL | First Seen Time |
-| `last_seen_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP, NOT NULL | Last Seen Time |
-| `bound_at` | TIMESTAMP | NULLABLE | Binding Time |
-| `unbound_at` | TIMESTAMP | NULLABLE | Unbinding Time |
-| `created_at`, `updated_at` | TIMESTAMP | | Laravel Timestamps |
+| Name                       | Type            | Constraints                         | Description                                     |
+| -------------------------- | --------------- | ----------------------------------- | ----------------------------------------------- |
+| `id`                       | BIGINT UNSIGNED | PK, AI                              | Primary Key                                     |
+| `account_id`               | BIGINT UNSIGNED | FK`accounts.id`, NOT NULL           | Associated Account ID                           |
+| `hwid_hash`                | VARCHAR(64)     | NOT NULL                            | Device Hardware ID Hash                         |
+| `user_agent`               | TEXT            | NULLABLE                            | User Agent                                      |
+| `ip_address`               | VARCHAR(45)     | NOT NULL                            | IP Address                                      |
+| `country_code`             | CHAR(2)         | NULLABLE                            | Country Code                                    |
+| `device_fingerprint`       | JSON            | NULLABLE                            | Device Characteristic Information (JSON Format) |
+| `first_seen_at`            | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP, NOT NULL | First Seen Time                                 |
+| `last_seen_at`             | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP, NOT NULL | Last Seen Time                                  |
+| `bound_at`                 | TIMESTAMP       | NULLABLE                            | Binding Time                                    |
+| `unbound_at`               | TIMESTAMP       | NULLABLE                            | Unbinding Time                                  |
+| `created_at`, `updated_at` | TIMESTAMP       |                                     | Laravel Timestamps                              |
 
 **Device Characteristic JSON Structure Example:**
 
@@ -150,22 +150,27 @@ INDEX
 
 ---
 
-### `licenses`
+### `licenses` `{seller_name}-{privilege}-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`(UPPERCASE)
 
-| Name | Type | Constraints | Description |
-| ------------------------- | ---------------- | ------------------------- | ---------------------------------------------------- |
-| `id` | BIGINT UNSIGNED | PK, AI | Primary Key |
-| `key` | VARCHAR(255) | UNIQUE, NOT NULL | License Key |
-| `type` | TINYINT UNSIGNED | NOT NULL, DEFAULT 1 | License Type (1=base, 2=upgrade) |
-| `used_by` | BIGINT UNSIGNED | FK`accounts.id`, NULLABLE | Owning Account ID |
-| `privilege` | TINYINT UNSIGNED | NOT NULL, DEFAULT 0 | License Tier (1=basic, 2=regular, 3=ultimate, 4=tester, 5=staff) |
-| `status` | TINYINT UNSIGNED | DEFAULT 0 | Current Status |
-| `expires_at` | TIMESTAMP | NOT NULL | Expiration Time (Default: now()->addYears(99)) |
-| `activated_at` | TIMESTAMP | NULLABLE | Activation Time |
-| `suspended_at` | TIMESTAMP | NULLABLE | Suspension Time |
-| `created_from_ip` | VARCHAR(45) | NULLABLE | Creation IP Address |
-| `notes` | TEXT | NULLABLE | Administrator Notes |
-| `created_at`,`updated_at` | TIMESTAMP | | Laravel Timestamps |
+The database should only record `XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`;
+everything else is for verification by the front end or the back end.
+`'^[A-Z0-9]{5}-[0-9A-F]{5}-[A-Z2-7]{5}-[A-Z3-8]{5}-[A-Z0-9]{5}$'`.
+
+
+| Name                      | Type             | Constraints               | Description                                                      |
+| ------------------------- | ---------------- | ------------------------- | ---------------------------------------------------------------- |
+| `id`                      | BIGINT UNSIGNED  | PK, AI                    | Primary Key                                                      |
+| `key`                     | VARCHAR(255)     | UNIQUE, NOT NULL          | License Key                                                      |
+| `type`                    | TINYINT UNSIGNED | NOT NULL, DEFAULT 1       | License Type (1=base, 2=upgrade)                                 |
+| `used_by`                 | BIGINT UNSIGNED  | FK`accounts.id`, NULLABLE | Owning Account ID                                                |
+| `privilege`               | TINYINT UNSIGNED | NOT NULL, DEFAULT 0       | License Tier (1=basic, 2=regular, 3=ultimate, 4=tester, 5=staff) |
+| `status`                  | TINYINT UNSIGNED | DEFAULT 0                 | Current Status                                                   |
+| `expires_at`              | DATETIME         | NOT NULL                  | Expiration Time (Default: now()->addYears(99))                   |
+| `activated_at`            | TIMESTAMP        | NULLABLE                  | Activation Time                                                  |
+| `suspended_at`            | TIMESTAMP        | NULLABLE                  | Suspension Time                                                  |
+| `created_from_ip`         | VARCHAR(45)      | NULLABLE                  | Creation IP Address                                              |
+| `notes`                   | TEXT             | NULLABLE                  | Administrator Notes                                              |
+| `created_at`,`updated_at` | TIMESTAMP        |                           | Laravel Timestamps                                               |
 
 **Status Transition Rules**:
 
@@ -194,16 +199,16 @@ INDEX
 
 ---
 
-### upgrades
+### `upgrades`
 
-| Name | Type | Constraints | Description |
-| -------------------------- | --------------- | ------------------------- | -------------- |
-| `id` | BIGINT UNSIGNED | PK, AI | Auto-increment Primary Key |
-| `account_id` | BIGINT UNSIGNED | FK`accounts.id`, ON DELETE CASCADE, NOT NULL | Account ID |
-| `license_from` | BIGINT UNSIGNED | FK`licenses.id`, NOT NULL | License Before Upgrade |
-| `license_to` | BIGINT UNSIGNED | FK`licenses.id`, NOT NULL | License After Upgrade |
-| `notes` | TEXT | NULLABLE | Administrator Notes |
-| `created_at`, `updated_at` | TIMESTAMP | | Laravel Timestamps |
+| Name                       | Type            | Constraints                                  | Description                |
+| -------------------------- | --------------- | -------------------------------------------- | -------------------------- |
+| `id`                       | BIGINT UNSIGNED | PK, AI                                       | Auto-increment Primary Key |
+| `account_id`               | BIGINT UNSIGNED | FK`accounts.id`, ON DELETE CASCADE, NOT NULL | Account ID                 |
+| `license_from`             | BIGINT UNSIGNED | FK`licenses.id`, NOT NULL                    | License Before Upgrade     |
+| `license_to`               | BIGINT UNSIGNED | FK`licenses.id`, NOT NULL                    | License After Upgrade      |
+| `notes`                    | TEXT            | NULLABLE                                     | Administrator Notes        |
+| `created_at`, `updated_at` | TIMESTAMP       |                                              | Laravel Timestamps         |
 
 **Optimization**
 INDEX
@@ -215,17 +220,17 @@ INDEX
 
 ### `event_logs`
 
-| Name | Type | Constraints | Description |
-| -------------------------- | ---------------- | ------------------------- | ----------------------------------- |
-| `id` | BIGINT UNSIGNED | PK, AI | Primary Key |
-| `event_type` | VARCHAR(255) | NOT NULL | Event Type e.g., `account.registered` |
-| `event_level` | TINYINT UNSIGNED | DEFAULT 0 | Event Level 0=info, 1=warn, 2=error |
-| `account_id` | BIGINT UNSIGNED | FK`accounts.id`, NULLABLE | Associated Account ID |
-| `license_id` | BIGINT UNSIGNED | FK`licenses.id`, NULLABLE | Associated License ID |
-| `ip_address` | VARCHAR(45) | NULLABLE | Operation IP Address |
-| `actor_id` | BIGINT UNSIGNED | FK`accounts.id`, NULLABLE | Actor ID (User who performed the operation) |
-| `details` | JSON | NULLABLE | Event Details |
-| `created_at`, `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Laravel Timestamps |
+| Name                       | Type             | Constraints               | Description                                 |
+| -------------------------- | ---------------- | ------------------------- | ------------------------------------------- |
+| `id`                       | BIGINT UNSIGNED  | PK, AI                    | Primary Key                                 |
+| `event_type`               | VARCHAR(255)     | NOT NULL                  | Event Type e.g., `account.registered`       |
+| `event_level`              | TINYINT UNSIGNED | DEFAULT 0                 | Event Level 0=info, 1=warn, 2=error         |
+| `account_id`               | BIGINT UNSIGNED  | FK`accounts.id`, NULLABLE | Associated Account ID                       |
+| `license_id`               | BIGINT UNSIGNED  | FK`licenses.id`, NULLABLE | Associated License ID                       |
+| `ip_address`               | VARCHAR(45)      | NULLABLE                  | Operation IP Address                        |
+| `actor_id`                 | BIGINT UNSIGNED  | FK`accounts.id`, NULLABLE | Actor ID (User who performed the operation) |
+| `details`                  | JSON             | NULLABLE                  | Event Details                               |
+| `created_at`, `updated_at` | TIMESTAMP        | DEFAULT CURRENT_TIMESTAMP | Laravel Timestamps                          |
 
 **Event Type Categories**:
 
@@ -253,16 +258,16 @@ INDEX
 
 ### `package_releases`
 
-| Name | Type | Constraints | Description |
-| -------------------------- | --------------------- | ---------------- | ------------------ |
-| `id` | BIGINT UNSIGNED | PK, AI | Primary Key |
-| `version` | VARCHAR(50) | UNIQUE, NOT NULL | Version Number (Semantic Versioning) |
-| `release_channel` | ENUM('stable', 'dev') | DEFAULT 'stable' | Release Channel |
-| `download_url` | VARCHAR(255) | NOT NULL | Download URL |
-| `checksum_sha256` | CHAR(64) | NULLABLE | File SHA256 Checksum |
-| `changelog` | TEXT | NULLABLE | Changelog |
-| `download_count` | INT UNSIGNED | DEFAULT 0 | Download Count |
-| `created_at`, `updated_at` | TIMESTAMP | | Laravel Timestamps |
+| Name                       | Type                  | Constraints      | Description                          |
+| -------------------------- | --------------------- | ---------------- | ------------------------------------ |
+| `id`                       | BIGINT UNSIGNED       | PK, AI           | Primary Key                          |
+| `version`                  | VARCHAR(50)           | UNIQUE, NOT NULL | Version Number (Semantic Versioning) |
+| `release_channel`          | ENUM('stable', 'dev') | DEFAULT 'stable' | Release Channel                      |
+| `download_url`             | VARCHAR(255)          | NOT NULL         | Download URL                         |
+| `checksum_sha256`          | CHAR(64)              | NULLABLE         | File SHA256 Checksum                 |
+| `changelog`                | TEXT                  | NULLABLE         | Changelog                            |
+| `download_count`           | INT UNSIGNED          | DEFAULT 0        | Download Count                       |
+| `created_at`, `updated_at` | TIMESTAMP             |                  | Laravel Timestamps                   |
 
 **Optimization**
 
@@ -274,18 +279,18 @@ UNIQUE
 
 ### `client_sessions`
 
-| Name | Type | Constraints | Description |
-| -------------------------- | --------------- | -------------------- | ------------------- |
-| `id` | BIGINT UNSIGNED | PK, AI | Primary Key |
-| `session_token` | VARCHAR(128) | UNIQUE, NOT NULL | Session Token |
-| `account_id` | BIGINT UNSIGNED | FK`accounts.id`, NOT NULL | Account ID |
-| `ip_address` | VARCHAR(45) | NOT NULL | Session IP Address |
-| `user_agent` | TEXT | NULLABLE | User-Agent |
-| `client_version` | VARCHAR(50) | NOT NULL | Client Version |
-| `language` | VARCHAR(10) | DEFAULT 'en' | Client Language |
-| `session_data` | JSON | NULLABLE | Session Data (JSON Format) |
-| `last_heartbeat_at` | TIMESTAMP | NULLABLE | Last Heartbeat Time |
-| `created_at`, `updated_at` | TIMESTAMP | | Laravel Timestamps |
+| Name                       | Type            | Constraints               | Description                |
+| -------------------------- | --------------- | ------------------------- | -------------------------- |
+| `id`                       | BIGINT UNSIGNED | PK, AI                    | Primary Key                |
+| `session_token`            | VARCHAR(128)    | UNIQUE, NOT NULL          | Session Token              |
+| `account_id`               | BIGINT UNSIGNED | FK`accounts.id`, NOT NULL | Account ID                 |
+| `ip_address`               | VARCHAR(45)     | NOT NULL                  | Session IP Address         |
+| `user_agent`               | TEXT            | NULLABLE                  | User-Agent                 |
+| `client_version`           | VARCHAR(50)     | NOT NULL                  | Client Version             |
+| `language`                 | VARCHAR(10)     | DEFAULT 'en'              | Client Language            |
+| `session_data`             | JSON            | NULLABLE                  | Session Data (JSON Format) |
+| `last_heartbeat_at`        | TIMESTAMP       | NULLABLE                  | Last Heartbeat Time        |
+| `created_at`, `updated_at` | TIMESTAMP       |                           | Laravel Timestamps         |
 
 **Optimization**
 
@@ -301,13 +306,13 @@ INDEX
 
 ### 使用统计表 `usage_statistics`
 
-| Name | Type | Constraints | Description |
-| -------------------------- | ---------------- | ------ | ---------------------------------------------- |
-| `id` | BIGINT UNSIGNED | PK, AI | Primary Key |
-| `stat_type` | TINYINT UNSIGNED | NOT NULL | Statistics Type 0=global, 1=user, 2=license, 3=server |
-| `stat_key` | VARCHAR(255) | NOT NULL | Statistics Key Name |
-| `stat_value` | DECIMAL(15,2) | NOT NULL | Statistics Key Value |
-| `created_at`, `updated_at` | TIMESTAMP | | Laravel Timestamps |
+| Name                       | Type             | Constraints | Description                                           |
+| -------------------------- | ---------------- | ----------- | ----------------------------------------------------- |
+| `id`                       | BIGINT UNSIGNED  | PK, AI      | Primary Key                                           |
+| `stat_type`                | TINYINT UNSIGNED | NOT NULL    | Statistics Type 0=global, 1=user, 2=license, 3=server |
+| `stat_key`                 | VARCHAR(255)     | NOT NULL    | Statistics Key Name                                   |
+| `stat_value`               | DECIMAL(15,2)    | NOT NULL    | Statistics Key Value                                  |
+| `created_at`, `updated_at` | TIMESTAMP        |             | Laravel Timestamps                                    |
 
 **Description**
 Need to display: Global login count 453459, Global total usage time 26y 4m 13d 20h 32m, User login count 650, User usage time 1y 1m 1d 20h 11m.
@@ -315,17 +320,17 @@ Therefore, the backend needs to calculate statistics by category; this table onl
 
 ### `ip_rate_limits`
 
-| Name | Type | Constraints | Description |
-| -------------------------- | --------------- | ------------- | -------------- |
-| `id` | BIGINT UNSIGNED | PK, AI | Primary Key |
-| `ip_address` | VARCHAR(45) | NOT NULL | IP Address |
-| `endpoint` | VARCHAR(255) | NOT NULL | API Endpoint |
-| `request_count` | INT UNSIGNED | DEFAULT 1 | Request Count |
-| `last_request_at` | TIMESTAMP | NOT NULL | Last Request Time |
-| `is_blocked` | BOOLEAN | DEFAULT FALSE | Blocked Status |
-| `blocked_until` | TIMESTAMP | NULLABLE | Block End Time |
-| `block_reason` | VARCHAR(255) | NULLABLE | Block Reason |
-| `created_at`, `updated_at` | TIMESTAMP | | Laravel Timestamps |
+| Name                       | Type            | Constraints   | Description        |
+| -------------------------- | --------------- | ------------- | ------------------ |
+| `id`                       | BIGINT UNSIGNED | PK, AI        | Primary Key        |
+| `ip_address`               | VARCHAR(45)     | NOT NULL      | IP Address         |
+| `endpoint`                 | VARCHAR(255)    | NOT NULL      | API Endpoint       |
+| `request_count`            | INT UNSIGNED    | DEFAULT 1     | Request Count      |
+| `last_request_at`          | TIMESTAMP       | NOT NULL      | Last Request Time  |
+| `is_blocked`               | BOOLEAN         | DEFAULT FALSE | Blocked Status     |
+| `blocked_until`            | TIMESTAMP       | NULLABLE      | Block End Time     |
+| `block_reason`             | VARCHAR(255)    | NULLABLE      | Block Reason       |
+| `created_at`, `updated_at` | TIMESTAMP       |               | Laravel Timestamps |
 
 **Optimization**
 
@@ -344,219 +349,6 @@ INDEX
 ---
 
 # Project Structure
-
-## Backend Structure (Laravel)
-
-```
-app/
-├── Console/
-│   ├── Commands/
-│   │   ├── License/
-│   │   │   ├── GenerateLicenses.php
-│   │   │   ├── CleanupExpiredLicenses.php
-│   │   │   ├── RevokeLicense.php
-│   │   │   └── ProcessHeartbeats.php
-│   │   ├── Security/
-│   │   │   ├── MonitorSuspiciousActivity.php
-│   │   │   ├── CleanupOldLogs.php
-│   │   │   └── CleanupRateLimits.php
-│   │   └── Analytics/
-│   │       └── CalculateUsageStatistics.php
-│   └── Kernel.php
-├── Events/
-│   ├── License/
-│   │   ├── LicenseActivated.php
-│   │   ├── LicenseSuspended.php
-│   │   ├── LicenseExpired.php
-│   │   ├── LicenseUpgraded.php
-│   │   └── LicenseRevoked.php
-│   ├── Account/
-│   │   ├── AccountRegistered.php
-│   │   ├── AccountSuspended.php
-│   │   ├── AccountVerified.php
-│   │   ├── DeviceBound.php
-│   │   └── DeviceUnbound.php
-│   └── Security/
-│       ├── SuspiciousActivityDetected.php
-│       ├── RateLimitExceeded.php
-│       └── LoginAnomalyDetected.php
-├── Exceptions/
-│   ├── License/
-│   │   ├── LicenseNotFoundException.php
-│   │   ├── LicenseActivationException.php
-│   │   ├── LicenseExpiredException.php
-│   │   ├── LicenseSuspendedException.php
-│   │   └── HWIDLimitExceededException.php
-│   ├── Account/
-│   │   ├── AccountSuspendedException.php
-│   │   ├── AccountNotVerifiedException.php
-│   │   └── DeviceLimitExceededException.php
-│   ├── Security/
-│   │   ├── RateLimitExceededException.php
-│   │   ├── IPBlockedException.php
-│   │   └── SuspiciousActivityException.php
-│   └── Api/
-│       ├── ApiException.php
-│       ├── UnauthorizedException.php
-│       ├── ForbiddenException.php
-│       └── ValidationException.php
-├── Http/
-│   ├── Controllers/
-│   │   ├── Api/
-│   │   │   ├── Auth/
-│   │   │   │   ├── AuthController.php
-│   │   │   │   ├── RegisterController.php
-│   │   │   │   ├── DeviceAuthController.php
-│   │   │   │   ├── TwoFactorController.php
-│   │   │   │   └── PasswordResetController.php
-│   │   │   ├── License/
-│   │   │   │   ├── LicenseController.php
-│   │   │   │   ├── ActivationController.php
-│   │   │   │   ├── UpgradeController.php
-│   │   │   │   └── HWIDController.php
-│   │   │   ├── Account/
-│   │   │   │   ├── ProfileController.php
-│   │   │   │   ├── DevicesController.php
-│   │   │   │   ├── SecurityController.php
-│   │   │   │   └── SessionsController.php
-│   │   │   ├── Software/
-│   │   │   │   ├── UpdateController.php
-│   │   │   │   └── DownloadController.php
-│   │   │   ├── Heartbeat/
-│   │   │   │   └── HeartbeatController.php
-│   │   │   ├── Admin/
-│   │   │   │   ├── LicenseManagementController.php
-│   │   │   │   ├── UserManagementController.php
-│   │   │   │   ├── AuditLogController.php
-│   │   │   │   └── AnalyticsController.php
-│   │   │   └── Statistics/
-│   │   │       └── UsageController.php
-│   │   └── Web/
-│   │       ├── DashboardController.php
-│   │       ├── SettingsController.php
-│   │       ├── LicenseController.php
-│   │       └── Admin/
-│   │           ├── DashboardController.php
-│   │           └── ManagementController.php
-│   ├── Middleware/
-│   │   ├── Api/
-│   │   │   ├── CheckLicenseStatus.php
-│   │   │   ├── ValidateHWID.php
-│   │   │   ├── RateLimitByIP.php
-│   │   │   ├── CheckPrivilegeLevel.php
-│   │   │   ├── CheckAccountStatus.php
-│   │   │   ├── ValidateClientVersion.php
-│   │   │   └── LogApiRequest.php
-│   │   └── Web/
-│   │       ├── Authenticate.php
-│   │       ├── RedirectIfAuthenticated.php
-│   │       ├── CheckLicense.php
-│   │       └── CheckAdmin.php
-│   ├── Requests/
-│   │   ├── Api/
-│   │   │   ├── Auth/
-│   │   │   │   ├── LoginRequest.php
-│   │   │   │   ├── RegisterRequest.php
-│   │   │   │   └── DeviceAuthRequest.php
-│   │   │   ├── License/
-│   │   │   │   ├── ActivateLicenseRequest.php
-│   │   │   │   ├── UpgradeLicenseRequest.php
-│   │   │   │   └── ResetHWIDRequest.php
-│   │   │   ├── Account/
-│   │   │   │   ├── UpdateProfileRequest.php
-│   │   │   │   └── UpdateSecurityRequest.php
-│   │   │   ├── Heartbeat/
-│   │   │   │   └── HeartbeatRequest.php
-│   │   │   └── Software/
-│   │   │       └── CheckUpdateRequest.php
-│   │   └── Admin/
-│   │       ├── GenerateLicensesRequest.php
-│   │       ├── ManageUserRequest.php
-│   │       ├── ManageLicenseRequest.php
-│   │       └── UpdateReleaseRequest.php
-│   └── Resources/
-│       ├── License/
-│       │   ├── LicenseResource.php
-│       │   ├── LicenseCollection.php
-│       │   └── LicenseDetailsResource.php
-│       ├── Account/
-│       │   ├── AccountResource.php
-│       │   ├── AccountCollection.php
-│       │   ├── DeviceResource.php
-│       │   └── SessionResource.php
-│       ├── Software/
-│       │   └── ReleaseResource.php
-│       ├── Admin/
-│       │   ├── AuditLogResource.php
-│       │   └── StatisticsResource.php
-│       └── Api/
-│           └── ApiResponse.php
-├── Models/
-│   ├── Account.php
-│   ├── AccountDevice.php
-│   ├── License.php
-│   ├── Upgrade.php
-│   ├── EventLog.php
-│   ├── PackageRelease.php
-│   ├── ClientSession.php
-│   ├── UsageStatistic.php
-│   ├── IpRateLimit.php
-│   └── PasswordResetToken.php
-├── Observers/
-│   ├── LicenseObserver.php
-│   ├── AccountObserver.php
-│   ├── AccountDeviceObserver.php
-│   └── EventLogObserver.php
-├── Policies/
-│   ├── LicensePolicy.php
-│   ├── AccountPolicy.php
-│   ├── DevicePolicy.php
-│   ├── AdminPolicy.php
-│   └── ReleasePolicy.php
-├── Services/
-│   ├── License/
-│   │   ├── LicenseService.php
-│   │   ├── ActivationService.php
-│   │   ├── UpgradeService.php
-│   │   ├── HWIDService.php
-│   │   └── GeneratorService.php
-│   ├── Security/
-│   │   ├── FraudDetectionService.php
-│   │   ├── RateLimitService.php
-│   │   ├── DeviceFingerprintService.php
-│   │   └── TwoFactorService.php
-│   ├── Software/
-│   │   ├── UpdateService.php
-│   │   └── ReleaseService.php
-│   ├── Analytics/
-│   │   ├── UsageAnalyticsService.php
-│   │   └── StatisticsService.php
-│   ├── Audit/
-│   │   └── EventLogService.php
-│   ├── Session/
-│   │   └── ClientSessionService.php
-│   └── Notification/
-│       ├── EmailService.php
-│       └── AlertService.php
-├── Traits/
-│   ├── Models/
-│   │   ├── HasLicenses.php
-│   │   ├── HasDevices.php
-│   │   ├── HasPrivileges.php
-│   │   ├── HasActivityLog.php
-│   │   └── HasSessions.php
-│   └── Controllers/
-│       ├── ApiResponseTrait.php
-│       └── ValidatesRequests.php
-└── Providers/
-    ├── AppServiceProvider.php
-    ├── AuthServiceProvider.php
-    ├── EventServiceProvider.php
-    ├── RouteServiceProvider.php
-    ├── LicenseServiceProvider.php
-    ├── SecurityServiceProvider.php
-    └── AnalyticsServiceProvider.php
-```
 
 ## Database Migrations & Seeders:
 
@@ -580,240 +372,68 @@ database/
 │   ├── 2025_12_18_000017_create_usage_statistics_table.php
 │   └── 2025_12_18_000018_create_ip_rate_limits_table.php
 ├── seeders/
-│   ├── AdminUserSeeder.php
-│   ├── LicenseTiersSeeder.php
-│   ├── DefaultSettingsSeeder.php
-│   ├── EventTypeSeeder.php
-│   ├── LicenseStatusSeeder.php
-│   ├── PrivilegeLevelSeeder.php
-│   ├── ReleaseChannelSeeder.php
-│   ├── TestDataSeeder.php
+|   ├── AccountDeviceSeeder.php
+│   ├── ClientSessionSeeder.php
+│   ├── EventLogSeeder.php
+│   ├── LicenseSeeder.php
+│   ├── UpgradeSeeder.php
+│   ├── AccountSeeder.php
+│   ├── IpRateLimitSeeder.php
+│   ├── PackageReleaseSeeder.php
+│   ├── UsageStatisticSeeder.php
 │   └── DatabaseSeeder.php
 └── factories/
     ├── AccountFactory.php
-    ├── LicenseFactory.php
     ├── AccountDeviceFactory.php
-    ├── UpgradeFactory.php
-    └── PackageReleaseFactory.php
+    ├── ClientSessionFactory.php
+    ├── IpRateLimitFactory.php
+    ├── PackageReleaseFactory.php
+    ├── UsageStatisticFactory.php
+    ├── EventLogFactory.php
+    ├── LicenseFactory.php
+    └── UpgradeFactory.php
 
+```
+
+## Backend Structure (Laravel)
+
+```
+app/Http/Controllers/
+├── LicenseController.php
+└── Admin/
+    ├── DashboardController.php
+    ├── LicenseAdminController.php
+    └── UserAdminController.php
+
+app/Services/
+├── LicenseService.php
+└── HwidService.php
+
+app/Http/Middleware/
+├── CheckLicense.php
+└── CheckAdmin.php
 ```
 
 ## Frontend Structure (Vue 3 + TypeScript)
 
 ```
+resources/js/pages/
+├── licenses/
+│   ├── Index.vue
+│   └── Activate.vue
+└── admin/
+    ├── Dashboard.vue
+    ├── Licenses.vue
+    └── Users.vue
+
+resources/js/components/
+├── license/
+│   ├── LicenseCard.vue
+│   └── ActivationForm.vue
+└── admin/
+    └── UserTable.vue
+
 resources/js/
-├── api/
-│   ├── client/
-│   │   ├── axios.ts
-│   │   ├── interceptors.ts
-│   │   └── websocket.ts
-│   ├── services/
-│   │   ├── auth.service.ts
-│   │   ├── license.service.ts
-│   │   ├── account.service.ts
-│   │   ├── software.service.ts
-│   │   ├── heartbeat.service.ts
-│   │   ├── upgrade.service.ts
-│   │   ├── session.service.ts
-│   │   ├── admin.service.ts
-│   │   └── analytics.service.ts
-│   └── types/
-│       ├── api.types.ts
-│       ├── license.types.ts
-│       ├── account.types.ts
-│       ├── device.types.ts
-│       └── admin.types.ts
-├── components/
-│   ├── layout/
-│   │   ├── AppLayout.vue
-│   │   ├── AdminLayout.vue
-│   │   ├── UserLayout.vue
-│   │   ├── GuestLayout.vue
-│   │   ├── Navigation/
-│   │   │   ├── Sidebar.vue
-│   │   │   ├── Topbar.vue
-│   │   │   └── Breadcrumb.vue
-│   │   └── Footer/
-│   │       └── AppFooter.vue
-│   ├── license/
-│   │   ├── LicenseCard.vue
-│   │   ├── LicenseStatus.vue
-│   │   ├── ActivationForm.vue
-│   │   ├── UpgradeForm.vue
-│   │   ├── HWIDResetRequest.vue
-│   │   └── LicenseDetailsModal.vue
-│   ├── account/
-│   │   ├── AccountProfile.vue
-│   │   ├── DeviceList.vue
-│   │   ├── SecuritySettings.vue
-│   │   ├── SessionManager.vue
-│   │   ├── PrivilegeBadge.vue
-│   │   └── TwoFactorSetup.vue
-│   ├── admin/
-│   │   ├── LicenseManager/
-│   │   │   ├── LicenseManager.vue
-│   │   │   ├── LicenseGenerator.vue
-│   │   │   └── LicenseBulkActions.vue
-│   │   ├── UserManager/
-│   │   │   ├── UserManager.vue
-│   │   │   ├── UserDetailsModal.vue
-│   │   │   └── SuspensionModal.vue
-│   │   ├── Analytics/
-│   │   │   ├── AnalyticsDashboard.vue
-│   │   │   ├── UsageCharts.vue
-│   │   │   └── ActivityLog.vue
-│   │   ├── Software/
-│   │   │   ├── ReleaseManager.vue
-│   │   │   └── UploadRelease.vue
-│   │   └── System/
-│   │       ├── SettingsPanel.vue
-│   │       └── AuditLog.vue
-│   ├── software/
-│   │   ├── UpdateChecker.vue
-│   │   ├── ReleaseNotes.vue
-│   │   ├── DownloadButton.vue
-│   │   └── VersionSelector.vue
-│   └── ui/
-│       ├── LicenseStatusBadge.vue
-│       ├── DeviceInfoCard.vue
-│       ├── CountdownTimer.vue
-│       ├── DataTable/
-│       │   ├── DataTable.vue
-│       │   ├── TableFilters.vue
-│       │   └── Pagination.vue
-│       ├── Form/
-│       │   ├── InputField.vue
-│       │   ├── SelectField.vue
-│       │   ├── CheckboxField.vue
-│       │   └── FormValidation.vue
-│       ├── Modal/
-│       │   ├── BaseModal.vue
-│       │   ├── ConfirmModal.vue
-│       │   └── AlertModal.vue
-│       └── Notification/
-│           ├── ToastNotification.vue
-│           ├── AlertBanner.vue
-│           └── NotificationCenter.vue
-├── composables/
-│   ├── useLicense.ts
-│   ├── useDevice.ts
-│   ├── useAuth.ts
-│   ├── useWebSocket.ts
-│   ├── useAnalytics.ts
-│   ├── useNotification.ts
-│   ├── useModal.ts
-│   └── useForm.ts
-├── stores/
-│   ├── auth.store.ts
-│   ├── license.store.ts
-│   ├── account.store.ts
-│   ├── software.store.ts
-│   ├── notification.store.ts
-│   ├── admin.store.ts
-│   ├── analytics.store.ts
-│   └── ui.store.ts
-├── pages/
-│   ├── auth/
-│   │   ├── Login.vue
-│   │   ├── Register.vue
-│   │   ├── TwoFactor.vue
-│   │   ├── ForgotPassword.vue
-│   │   └── ResetPassword.vue
-│   ├── dashboard/
-│   │   ├── UserDashboard.vue
-│   │   └── AdminDashboard.vue
-│   ├── license/
-│   │   ├── MyLicenses.vue
-│   │   ├── ActivateLicense.vue
-│   │   ├── LicenseDetails.vue
-│   │   ├── UpgradeLicense.vue
-│   │   └── HWIDReset.vue
-│   ├── account/
-│   │   ├── Profile.vue
-│   │   ├── Devices.vue
-│   │   ├── Security.vue
-│   │   ├── Sessions.vue
-│   │   └── Activity.vue
-│   ├── software/
-│   │   ├── Download.vue
-│   │   ├── Changelog.vue
-│   │   └── Support.vue
-│   └── admin/
-│       ├── LicensesManagement.vue
-│       ├── UsersManagement.vue
-│       ├── Analytics.vue
-│       ├── SoftwareReleases.vue
-│       ├── AuditLogs.vue
-│       └── SystemSettings.vue
-├── router/
-│   ├── index.ts
-│   ├── routes/
-│   │   ├── auth.routes.ts
-│   │   ├── user.routes.ts
-│   │   ├── admin.routes.ts
-│   │   ├── license.routes.ts
-│   │   └── software.routes.ts
-│   └── guards/
-│       ├── auth.guard.ts
-│       ├── license.guard.ts
-│       ├── admin.guard.ts
-│       └── guest.guard.ts
-├── utils/
-│   ├── license/
-│   │   ├── keyGenerator.ts
-│   │   ├── hwidUtils.ts
-│   │   ├── validation.ts
-│   │   └── statusHelpers.ts
-│   ├── security/
-│   │   ├── encryption.ts
-│   │   ├── fingerprint.ts
-│   │   └── hashUtils.ts
-│   ├── time/
-│   │   ├── format.ts
-│   │   ├── countdown.ts
-│   │   ├── timezone.ts
-│   │   └── duration.ts
-│   ├── validation/
-│   │   ├── schemas.ts
-│   │   ├── rules.ts
-│   │   └── validators.ts
-│   ├── formatters/
-│   │   ├── number.ts
-│   │   ├── currency.ts
-│   │   └── licenseKey.ts
-│   └── helpers/
-│       ├── arrayHelpers.ts
-│       ├── objectHelpers.ts
-│       └── stringHelpers.ts
-├── types/
-│   ├── models/
-│   │   ├── License.ts
-│   │   ├── Account.ts
-│   │   ├── Device.ts
-│   │   ├── Upgrade.ts
-│   │   ├── Session.ts
-│   │   └── Release.ts
-│   ├── api/
-│   │   ├── requests.ts
-│   │   ├── responses.ts
-│   │   └── errors.ts
-│   └── ui/
-│       ├── form.ts
-│       ├── table.ts
-│       └── notification.ts
-└── assets/
-    ├── styles/
-    │   ├── main.scss
-    │   ├── variables.scss
-    │   ├── components/
-    │   │   ├── buttons.scss
-    │   │   ├── forms.scss
-    │   │   ├── tables.scss
-    │   │   └── modals.scss
-    │   └── pages/
-    │       ├── auth.scss
-    │       ├── dashboard.scss
-    │       └── admin.scss
-    └── fonts/
-        └── custom
+└── api/
+    └── license.api.js
 ```

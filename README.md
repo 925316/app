@@ -45,10 +45,10 @@ DB_DATABASE=laravel
 DB_USERNAME=root
 DB_PASSWORD=
 
-php artisan migrate
+php artisan migrate --seed
 ```
 
-
 ```bash
+php artisan clear
 php artisan test
 ```
