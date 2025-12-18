@@ -47,3 +47,8 @@ DB_PASSWORD=
 
 php artisan migrate
 ```
+
+
+```bash
+php artisan test
+```
