@@ -26,10 +26,24 @@ composer global require laravel/installer
 laravel new example-app
 laravel/framework (v12.42.0)
 ```
+
 choose: `Vue starter kit` and `Laravel's built-in authentication`, then configure the database connection after everything is ready.
+
 ```bash
 cd example-app
+npm install && npm run dev
 npm install && npm run build
 ```
 
+Configure the database connection in `.env` file.
 
+```bash
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=
+
+php artisan migrate
+```

@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Account>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
  */
-class AccountFactory extends Factory
+class UserFactory extends Factory
 {
     /**
      * The current password being used by the factory.
@@ -24,12 +24,10 @@ class AccountFactory extends Factory
     public function definition(): array
     {
         return [
-            'username' => fake()->name(),
+            'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'privilege_level' => 'user',
-            'preferred_language' => 'en',
             'remember_token' => Str::random(10),
             'two_factor_secret' => Str::random(10),
             'two_factor_recovery_codes' => Str::random(10),
@@ -47,7 +45,7 @@ class AccountFactory extends Factory
         ]);
     }
 
-    /**s
+    /**
      * Indicate that the model does not have two-factor authentication configured.
      */
     public function withoutTwoFactor(): static

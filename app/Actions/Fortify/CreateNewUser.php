@@ -2,11 +2,10 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\Account;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
-use Illuminate\Support\Facades\Hash;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -17,26 +16,24 @@ class CreateNewUser implements CreatesNewUsers
      *
      * @param  array<string, string>  $input
      */
-    public function create(array $input): Account
+    public function create(array $input): User
     {
         Validator::make($input, [
-            'username' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
                 'string',
                 'email',
                 'max:255',
-                Rule::unique(Account::class),
+                Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return Account::create([
-            'username' => $input['username'],
+        return User::create([
+            'name' => $input['name'],
             'email' => $input['email'],
-            'password' => Hash::make($input['password']),
-            'privilege_level' => 'user',
-            'preferred_language' => 'en',
+            'password' => $input['password'],
         ]);
     }
 }

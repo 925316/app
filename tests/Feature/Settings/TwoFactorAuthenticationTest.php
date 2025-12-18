@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Account;
+use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
 
@@ -14,7 +14,7 @@ test('two factor settings page can be rendered', function () {
         'confirmPassword' => true,
     ]);
 
-    $user = Account::factory()->withoutTwoFactor()->create();
+    $user = User::factory()->withoutTwoFactor()->create();
 
     $this->actingAs($user)
         ->withSession(['auth.password_confirmed_at' => time()])
@@ -30,7 +30,7 @@ test('two factor settings page requires password confirmation when enabled', fun
         $this->markTestSkipped('Two-factor authentication is not enabled.');
     }
 
-    $user = Account::factory()->create();
+    $user = User::factory()->create();
 
     Features::twoFactorAuthentication([
         'confirm' => true,
@@ -48,7 +48,7 @@ test('two factor settings page does not requires password confirmation when disa
         $this->markTestSkipped('Two-factor authentication is not enabled.');
     }
 
-    $user = Account::factory()->create();
+    $user = User::factory()->create();
 
     Features::twoFactorAuthentication([
         'confirm' => true,
@@ -70,7 +70,7 @@ test('two factor settings page returns forbidden response when two factor is dis
 
     config(['fortify.features' => []]);
 
-    $user = Account::factory()->create();
+    $user = User::factory()->create();
 
     $this->actingAs($user)
         ->withSession(['auth.password_confirmed_at' => time()])

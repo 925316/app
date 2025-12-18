@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Account;
+use App\Models\User;
 
 test('profile page is displayed', function () {
-    $user = Account::factory()->create();
+    $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
@@ -13,12 +13,12 @@ test('profile page is displayed', function () {
 });
 
 test('profile information can be updated', function () {
-    $user = Account::factory()->create();
+    $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
         ->patch(route('profile.update'), [
-            'username' => 'Test User',
+            'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
 
@@ -28,18 +28,18 @@ test('profile information can be updated', function () {
 
     $user->refresh();
 
-    expect($user->username)->toBe('Test User');
+    expect($user->name)->toBe('Test User');
     expect($user->email)->toBe('test@example.com');
     expect($user->email_verified_at)->toBeNull();
 });
 
 test('email verification status is unchanged when the email address is unchanged', function () {
-    $user = Account::factory()->create();
+    $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
         ->patch(route('profile.update'), [
-            'username' => 'Test User',
+            'name' => 'Test User',
             'email' => $user->email,
         ]);
 
@@ -51,7 +51,7 @@ test('email verification status is unchanged when the email address is unchanged
 });
 
 test('user can delete their account', function () {
-    $user = Account::factory()->create();
+    $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
@@ -68,7 +68,7 @@ test('user can delete their account', function () {
 });
 
 test('correct password must be provided to delete account', function () {
-    $user = Account::factory()->create();
+    $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
