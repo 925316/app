@@ -48,5 +48,40 @@ class AccountSeeder extends Seeder
             'hwid_reset_count' => 3,
             'hwid_last_reset_at' => now()->subDays(10),
         ]);
+        
+        Account::factory()->suspended('Multiple Failed Login Attempts', now()->addDays(7))->create([
+            'username' => 'suspended_temp',
+            'email' => 'suspended_temp@example.com',
+            'password' => Hash::make('temp123'),
+            'email_verified_at' => now()->subMonths(2),
+        ]);
+        
+        Account::factory()->suspended('Violation of Terms of Service', null)->create([
+            'username' => 'banned_user',
+            'email' => 'banned@example.com',
+            'password' => Hash::make('banned123'),
+            'email_verified_at' => now()->subMonths(4),
+        ]);
+
+        // Create sample accounts with different states
+        Account::factory()->count(100)->create();
+        
+        // Create some verified accounts
+        Account::factory()->count(5)->verified()->create();
+        
+        // Create some accounts with 2FA enabled
+        Account::factory()->count(3)->withTwoFactor()->verified()->create();
+        
+        // Create some suspended accounts
+        Account::factory()->count(2)->suspended()->create();
+        
+        // Create some recently active accounts
+        Account::factory()->count(4)->recentlyActive()->verified()->create();
+        
+        // Create accounts with HWID resets
+        Account::factory()->count(3)->withHwidResets()->create();
+        
+        // Create unverified accounts
+        Account::factory()->count(3)->unverified()->create();
     }
 }

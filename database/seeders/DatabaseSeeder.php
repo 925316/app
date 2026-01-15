@@ -2,14 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Account;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
@@ -17,6 +14,12 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AccountSeeder::class,
+            AccountDeviceSeeder::class,
+            LicenseSeeder::class,
+            EventLogSeeder::class,
+            PackageReleaseSeeder::class,
+            ClientSessionSeeder::class,
+            UsageStatisticSeeder::class,
         ]);
     }
 }
