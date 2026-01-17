@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\EventType;
 
 class EventLog extends Model
 {
@@ -15,15 +16,6 @@ class EventLog extends Model
     public const LEVEL_INFO = 0;
     public const LEVEL_WARN = 1;
     public const LEVEL_ERROR = 2;
-
-    /**
-     * Event Type Constants
-     */
-    public const TYPE_ACCOUNT_ACTIVATED = 'account.activated';
-    public const TYPE_DEVICE_BOUND = 'device.bound';
-    public const TYPE_DEVICE_UNBOUND = 'device.unbound';
-    public const TYPE_LOGIN_ANOMALY = 'login.anomaly';
-    public const TYPE_ACCOUNT_SUSPENDED = 'account.suspended';
 
     /**
      * The attributes that are mass assignable.
@@ -122,6 +114,14 @@ class EventLog extends Model
     }
 
     /**
+     * Scope a query to only include events of a specific enum type.
+     */
+    public function scopeOfEventType($query, EventType $eventType)
+    {
+        return $query->where('event_type', $eventType->value);
+    }
+
+    /**
      * Scope a query to only include events for a specific account.
      */
     public function scopeForAccount($query, int $accountId)
@@ -162,6 +162,17 @@ class EventLog extends Model
     }
 
     /**
+     * Scope a query to only include events of a specific category.
+     */
+    public function scopeOfCategory($query, string $category)
+    {
+        $eventTypes = EventType::getCategoryEvents($category);        
+        $values = array_map(fn($type) => $type->value, $eventTypes);
+        
+        return $query->whereIn('event_type', $values);
+    }
+
+    /**
      * Get the event level as a human-readable string.
      *
      * @return string
@@ -198,14 +209,57 @@ class EventLog extends Model
      */
     public function getTypeLabelAttribute(): string
     {
-        return match ($this->event_type) {
-            self::TYPE_ACCOUNT_ACTIVATED => 'Account Activated',
-            self::TYPE_DEVICE_BOUND => 'Device Bound',
-            self::TYPE_DEVICE_UNBOUND => 'Device Unbound',
-            self::TYPE_LOGIN_ANOMALY => 'Login Anomaly',
-            self::TYPE_ACCOUNT_SUSPENDED => 'Account Suspended',
-            default => ucfirst(str_replace('.', ' ', $this->event_type)),
-        };
+        $eventType = EventType::tryFrom($this->event_type);
+        
+        if ($eventType) {
+            return $eventType->label();
+        }
+        
+        return ucfirst(str_replace('.', ' ', $this->event_type));
+    }
+
+    /**
+     * Get the event type as an enum instance.
+     *
+     * @return EventType|null
+     */
+    public function getEventTypeEnumAttribute(): ?EventType
+    {
+        return EventType::tryFrom($this->event_type);
+    }
+
+    /**
+     * Get the event category.
+     *
+     * @return string|null
+     */
+    public function getCategoryAttribute(): ?string
+    {
+        $eventType = EventType::tryFrom($this->event_type);
+        
+        if ($eventType) {
+            return $eventType->category();
+        }
+        
+        $parts = explode('.', $this->event_type, 2);
+        return $parts[0] ?? null;
+    }
+
+    /**
+     * Get the event action.
+     *
+     * @return string|null
+     */
+    public function getActionAttribute(): ?string
+    {
+        $eventType = EventType::tryFrom($this->event_type);
+        
+        if ($eventType) {
+            return $eventType->action();
+        }
+        
+        $parts = explode('.', $this->event_type, 2);
+        return $parts[1] ?? null;
     }
 
     /**
@@ -265,5 +319,65 @@ class EventLog extends Model
         }
 
         return $this->ip_address;
+    }
+
+    /**
+     * Log a new event.
+     *
+     * @param EventType $eventType
+     * @param int $level
+     * @param array $data
+     * @return EventLog
+     */
+    public static function log(
+        EventType $eventType,
+        int $level = self::LEVEL_INFO,
+        array $data = []
+    ): EventLog {
+        return self::create([
+            'event_type' => $eventType->value,
+            'event_level' => $level,
+            'account_id' => $data['account_id'] ?? null,
+            'license_id' => $data['license_id'] ?? null,
+            'ip_address' => $data['ip_address'] ?? null,
+            'actor_id' => $data['actor_id'] ?? null,
+            'details' => $data['details'] ?? [],
+        ]);
+    }
+
+    /**
+     * Log an info level event.
+     *
+     * @param EventType $eventType
+     * @param array $data
+     * @return EventLog
+     */
+    public static function info(EventType $eventType, array $data = []): EventLog
+    {
+        return self::log($eventType, self::LEVEL_INFO, $data);
+    }
+
+    /**
+     * Log a warning level event.
+     *
+     * @param EventType $eventType
+     * @param array $data
+     * @return EventLog
+     */
+    public static function warning(EventType $eventType, array $data = []): EventLog
+    {
+        return self::log($eventType, self::LEVEL_WARN, $data);
+    }
+
+    /**
+     * Log an error level event.
+     *
+     * @param EventType $eventType
+     * @param array $data
+     * @return EventLog
+     */
+    public static function error(EventType $eventType, array $data = []): EventLog
+    {
+        return self::log($eventType, self::LEVEL_ERROR, $data);
     }
 }

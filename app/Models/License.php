@@ -2,31 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\LicensePrivilege;
+use App\Enums\LicenseStatus;
+use App\Enums\LicenseType;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Builder;
 
 class License extends Model
 {
     use HasFactory;
-
-    const STATUS_UNUSED = 0;
-    const STATUS_ACTIVE = 1;
-    const STATUS_SUSPENDED = 2;
-    const STATUS_EXPIRED = 3;
-    const STATUS_UPGRADED = 4;
-    const STATUS_REVOKED = 5;
-
-    const TYPE_BASE = 1;
-    const TYPE_UPGRADE = 2;
-
-    const PRIVILEGE_DEFAULT = 0;
-    const PRIVILEGE_BASIC = 1;
-    const PRIVILEGE_REGULAR = 2;
-    const PRIVILEGE_ULTIMATE = 3;
-    const PRIVILEGE_TESTER = 4;
-    const PRIVILEGE_STAFF = 5;
 
     /**
      * The attributes that are mass assignable.
@@ -54,9 +40,9 @@ class License extends Model
     protected function casts(): array
     {
         return [
-            'type' => 'integer',
-            'privilege' => 'integer',
-            'status' => 'integer',
+            'type' => LicenseType::class,
+            'privilege' => LicensePrivilege::class,
+            'status' => LicenseStatus::class,
             'expires_at' => 'datetime',
             'activated_at' => 'datetime',
             'suspended_at' => 'datetime',
@@ -78,7 +64,7 @@ class License extends Model
      */
     public function scopeActive(Builder $query): void
     {
-        $query->where('status', 1);
+        $query->where('status', LicenseStatus::ACTIVE->value);
     }
 
     /**
@@ -86,7 +72,7 @@ class License extends Model
      */
     public function scopeUnused(Builder $query): void
     {
-        $query->where('status', 0);
+        $query->where('status', LicenseStatus::UNUSED->value);
     }
 
     /**
@@ -94,7 +80,7 @@ class License extends Model
      */
     public function scopeSuspended(Builder $query): void
     {
-        $query->where('status', 2);
+        $query->where('status', LicenseStatus::SUSPENDED->value);
     }
 
     /**
@@ -102,7 +88,7 @@ class License extends Model
      */
     public function scopeExpired(Builder $query): void
     {
-        $query->where('status', 3);
+        $query->where('status', LicenseStatus::EXPIRED->value);
     }
 
     /**
@@ -126,8 +112,46 @@ class License extends Model
      */
     public function scopeValid(Builder $query): void
     {
-        $query->where('status', 1)
-              ->where('expires_at', '>', now());
+        $query->where('status', LicenseStatus::ACTIVE->value)
+            ->where('expires_at', '>', now());
+    }
+
+    /**
+     * Scope a query to only include licenses expiring soon (within X days).
+     */
+    public function scopeExpiringSoon(Builder $query, int $days = 7): void
+    {
+        $query->where('status', LicenseStatus::ACTIVE->value)
+            ->whereBetween('expires_at', [now(), now()->addDays($days)]);
+    }
+
+    /**
+     * Scope a query to only include licenses that belong to an account.
+     */
+    public function scopeForAccount(Builder $query, int $accountId): void
+    {
+        $query->where('used_by', $accountId);
+    }
+
+    /**
+     * Scope a query to exclude licenses with certain statuses.
+     */
+    public function scopeExcludingStatuses(Builder $query, array $statuses): void
+    {
+        $query->whereNotIn('status', $statuses);
+    }
+
+    /**
+     * Scope a query to only include licenses created within a date range.
+     */
+    public function scopeCreatedBetween(Builder $query, ?string $start, ?string $end): void
+    {
+        if ($start) {
+            $query->where('created_at', '>=', $start);
+        }
+        if ($end) {
+            $query->where('created_at', '<=', $end);
+        }
     }
 
     /**
@@ -135,11 +159,11 @@ class License extends Model
      */
     public function activate(int $accountId, ?string $ip = null): bool
     {
-        if ($this->status !== self::STATUS_UNUSED) {
-            throw new \LogicException('Only unused licenses can be activated.');
+        if ($this->status !== LicenseStatus::UNUSED) {
+            return false;
         }
 
-        $this->status = self::STATUS_ACTIVE;
+        $this->status = LicenseStatus::ACTIVE;
         $this->used_by = $accountId;
         $this->activated_at = now();
 
@@ -155,7 +179,8 @@ class License extends Model
      */
     public function isExpired(): bool
     {
-        return $this->status === 3 || ($this->expires_at && $this->expires_at->isPast());
+        return $this->status === LicenseStatus::EXPIRED ||
+               ($this->expires_at && $this->expires_at->isPast());
     }
 
     /**
@@ -163,7 +188,7 @@ class License extends Model
      */
     public function isActive(): bool
     {
-        return $this->status === 1 && !$this->isExpired();
+        return $this->status === LicenseStatus::ACTIVE && ! $this->isExpired();
     }
 
     /**
@@ -171,27 +196,27 @@ class License extends Model
      */
     public function isSuspended(): bool
     {
-        return $this->status === 2;
+        return $this->status === LicenseStatus::SUSPENDED;
     }
 
     public function isUnused(): bool
     {
-        return $this->status === 0;
+        return $this->status === LicenseStatus::UNUSED;
     }
 
     public function isUpgraded(): bool
     {
-        return $this->status === self::STATUS_UPGRADED;
+        return $this->status === LicenseStatus::UPGRADED;
     }
 
     public function isRevoked(): bool
     {
-        return $this->status === self::STATUS_REVOKED;
+        return $this->status === LicenseStatus::REVOKED;
     }
 
     public function daysUntilExpiry(): int
     {
-        if (!$this->expires_at || $this->isExpired()) {
+        if (! $this->expires_at || $this->isExpired()) {
             return 0;
         }
 
@@ -200,25 +225,21 @@ class License extends Model
 
     /**
      * Check if an account has active license.
-     * @param int $accountId
-     * @return bool
      */
     public static function hasActiveLicense(int $accountId): bool
     {
         return self::where('used_by', $accountId)
-            ->where('status', self::STATUS_ACTIVE)
+            ->where('status', LicenseStatus::ACTIVE->value)
             ->exists();
     }
 
     /**
      * Get active license for an account.
-     * @param int $accountId
-     * @return License|null
      */
     public static function getActiveLicense(int $accountId): ?self
     {
         return self::where('used_by', $accountId)
-            ->where('status', self::STATUS_ACTIVE)
+            ->where('status', LicenseStatus::ACTIVE->value)
             ->first();
     }
 
@@ -227,15 +248,15 @@ class License extends Model
      */
     public function getStatusTextAttribute(): string
     {
-        return match($this->status) {
-            0 => 'unused',
-            1 => 'active',
-            2 => 'suspended',
-            3 => 'expired',
-            4 => 'upgraded',
-            5 => 'revoked',
-            default => 'unknown',
-        };
+        return $this->status->getLabel();
+    }
+
+    /**
+     * Get the status color.
+     */
+    public function getStatusColorAttribute(): string
+    {
+        return $this->status->getColor();
     }
 
     /**
@@ -243,11 +264,7 @@ class License extends Model
      */
     public function getTypeTextAttribute(): string
     {
-        return match($this->type) {
-            1 => 'base',
-            2 => 'upgrade',
-            default => 'unknown',
-        };
+        return $this->type?->getLabel() ?? 'unknown';
     }
 
     /**
@@ -255,14 +272,7 @@ class License extends Model
      */
     public function getPrivilegeTextAttribute(): string
     {
-        return match($this->privilege) {
-            1 => 'basic',
-            2 => 'regular',
-            3 => 'ultimate',
-            4 => 'tester',
-            5 => 'staff',
-            default => 'unknown',
-        };
+        return $this->privilege?->getLabel() ?? 'unknown';
     }
 
     /**
@@ -285,5 +295,10 @@ class License extends Model
             get: fn (?string $value) => $value,
             set: fn (?string $value) => filter_var($value, FILTER_VALIDATE_IP) ? $value : null,
         );
+    }
+
+    public function canActivate(): bool
+    {
+        return $this->status?->canActivate() ?? false;
     }
 }
