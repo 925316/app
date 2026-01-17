@@ -157,6 +157,21 @@ class Account extends Authenticatable // implements MustVerifyEmail
     }
 
     /**
+     * Get the privilege level from active license
+     */
+    public function getPrivilegeLevel(): int
+    {
+        // Get the highest privilege from active licenses
+        $activeLicense = $this->licenses()
+            ->where('status', \App\Enums\LicenseStatus::ACTIVE->value)
+            ->where('expires_at', '>', now())
+            ->orderBy('privilege', 'desc')
+            ->first();
+
+        return $activeLicense?->privilege?->value ?? 0;
+    }
+
+    /**
      * Get the last login IP in a formatted way.
      */
     protected function lastIpAddress(): Attribute
@@ -259,7 +274,7 @@ class Account extends Authenticatable // implements MustVerifyEmail
 
     public function licenses(): HasMany
     {
-        return $this->hasMany(License::class);
+        return $this->hasMany(License::class, 'used_by');
     }
 
     public function sessions(): HasMany
