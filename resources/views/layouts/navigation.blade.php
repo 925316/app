@@ -16,6 +16,11 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
+
+                <!-- Dark Mode Toggle -->
+                <div class="hidden sm:flex sm:items-center sm:ms-6">
+                    <x-dark-mode-toggle />
+                </div>
             </div>
 
             <!-- Settings Dropdown -->
@@ -80,6 +85,11 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                <!-- Dark Mode Toggle for Mobile -->
+                <div class="px-4 py-2">
+                    <x-dark-mode-toggle />
+                </div>
+                
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
