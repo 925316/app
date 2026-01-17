@@ -1,0 +1,355 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Enums\LicensePrivilege;
+use App\Enums\LicenseStatus;
+use App\Http\Requests\LicenseRequest;
+use App\Models\Account;
+use App\Models\License;
+use App\Services\LicenseService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class LicenseController extends Controller
+{
+    /**
+     * Display a listing of licenses.
+     */
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->hasPrivilege(5)) { // Admin - can see all licenses
+            $query = License::query();
+
+            // Filter by status
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
+
+            // Filter by type
+            if ($request->has('type')) {
+                $query->where('type', $request->type);
+            }
+
+            // Filter by privilege
+            if ($request->has('privilege')) {
+                $query->where('privilege', $request->privilege);
+            }
+
+            // Search by key or account
+            if ($request->has('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('key', 'like', "%{$search}%")
+                        ->orWhereHas('account', function ($q) use ($search) {
+                            $q->where('username', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $licenses = $query->with('account')
+                ->orderBy('created_at', 'desc')
+                ->paginate(25);
+
+            $statusOptions = LicenseStatus::options();
+            $typeOptions = \App\Enums\LicenseType::options();
+            $privilegeOptions = LicensePrivilege::options();
+
+            return view('licenses.index', [
+                'licenses' => $licenses,
+                'statusOptions' => $statusOptions,
+                'typeOptions' => $typeOptions,
+                'privilegeOptions' => $privilegeOptions,
+                'isAdmin' => true,
+            ]);
+        } else { // Regular user - can only see their own licenses
+            $licenses = License::where('used_by', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            return view('licenses.index', [
+                'licenses' => $licenses,
+                'isAdmin' => false,
+            ]);
+        }
+    }
+
+    /**
+     * Show the form for creating a new license.
+     */
+    public function create()
+    {
+        $this->authorizeAdmin();
+
+        $accounts = Account::orderBy('username')->get();
+        $statusOptions = LicenseStatus::options();
+        $typeOptions = \App\Enums\LicenseType::options();
+        $privilegeOptions = LicensePrivilege::options();
+
+        return view('licenses.create', [
+            'accounts' => $accounts,
+            'statusOptions' => $statusOptions,
+            'typeOptions' => $typeOptions,
+            'privilegeOptions' => $privilegeOptions,
+        ]);
+    }
+
+    /**
+     * Store a newly created license in storage.
+     */
+    public function store(LicenseRequest $request)
+    {
+        $this->authorizeAdmin();
+
+        $validated = $request->validated();
+
+        $license = LicenseService::createLicense(
+            $validated['type'],
+            $validated['privilege'],
+            $validated['used_by'] ?? null,
+            $validated['key'] ?? null,
+            $validated['expires_at'],
+            $validated['notes'] ?? null
+        );
+
+        // Log the event
+        event(new \App\Events\LicenseCreated($license));
+
+        return redirect()->route('licenses.show', $license)
+            ->with('success', 'License created successfully!');
+    }
+
+    /**
+     * Display the specified license.
+     */
+    public function show(License $license)
+    {
+        $user = Auth::user();
+
+        // Regular users can only view their own licenses
+        if (! $user->hasPrivilege(5) && $license->used_by !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $statusHistory = LicenseService::getLicenseStatusHistory($license);
+        $account = $license->account;
+
+        return view('licenses.show', [
+            'license' => $license,
+            'statusHistory' => $statusHistory,
+            'account' => $account,
+            'isAdmin' => $user->hasPrivilege(5),
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified license.
+     */
+    public function edit(License $license)
+    {
+        $this->authorizeAdmin();
+
+        $accounts = Account::orderBy('username')->get();
+        $statusOptions = LicenseStatus::options();
+        $typeOptions = \App\Enums\LicenseType::options();
+        $privilegeOptions = LicensePrivilege::options();
+
+        return view('licenses.edit', [
+            'license' => $license,
+            'accounts' => $accounts,
+            'statusOptions' => $statusOptions,
+            'typeOptions' => $typeOptions,
+            'privilegeOptions' => $privilegeOptions,
+        ]);
+    }
+
+    /**
+     * Update the specified license in storage.
+     */
+    public function update(LicenseRequest $request, License $license)
+    {
+        $this->authorizeAdmin();
+
+        $validated = $request->validated();
+
+        // Only allow certain fields to be updated
+        $updateData = [
+            'type' => $validated['type'],
+            'privilege' => $validated['privilege'],
+            'status' => $validated['status'],
+            'expires_at' => $validated['expires_at'],
+            'notes' => $validated['notes'],
+        ];
+
+        // Only allow used_by to be changed if license is unused
+        if ($license->status === LicenseStatus::UNUSED) {
+            $updateData['used_by'] = $validated['used_by'];
+        }
+
+        $license->update($updateData);
+
+        return redirect()->route('licenses.show', $license)
+            ->with('success', 'License updated successfully!');
+    }
+
+    /**
+     * Remove the specified license from storage.
+     */
+    public function destroy(License $license)
+    {
+        $this->authorizeAdmin();
+
+        $license->delete();
+
+        return redirect()->route('licenses.index')
+            ->with('success', 'License deleted successfully!');
+    }
+
+    /**
+     * Activate a license for the current user.
+     */
+    public function activate(Request $request, License $license)
+    {
+        $user = Auth::user();
+
+        try {
+            LicenseService::activateLicense($license, $user, $request->ip());
+
+            // Log the event
+            event(new \App\Events\LicenseActivated($license, $user));
+
+            return redirect()->route('licenses.show', $license)
+                ->with('success', 'License activated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+    }
+
+    /**
+     * Suspend a license.
+     */
+    public function suspend(Request $request, License $license)
+    {
+        $this->authorizeAdmin();
+
+        $request->validate([
+            'suspension_reason' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            LicenseService::suspendLicense($license, $request->suspension_reason);
+
+            // Log the event
+            event(new \App\Events\LicenseSuspended($license));
+
+            return redirect()->route('licenses.show', $license)
+                ->with('success', 'License suspended successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+    }
+
+    /**
+     * Reactivate a suspended license.
+     */
+    public function reactivate(License $license)
+    {
+        $this->authorizeAdmin();
+
+        try {
+            LicenseService::reactivateLicense($license);
+
+            // Log the event
+            event(new \App\Events\LicenseReactivated($license));
+
+            return redirect()->route('licenses.show', $license)
+                ->with('success', 'License reactivated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+    }
+
+    /**
+     * Revoke a license.
+     */
+    public function revoke(Request $request, License $license)
+    {
+        $this->authorizeAdmin();
+
+        $request->validate([
+            'revocation_reason' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            LicenseService::revokeLicense($license, $request->revocation_reason);
+
+            // Log the event
+            event(new \App\Events\LicenseRevoked($license));
+
+            return redirect()->route('licenses.show', $license)
+                ->with('success', 'License revoked successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+    }
+
+    /**
+     * Upgrade a license.
+     */
+    public function upgrade(Request $request, License $license)
+    {
+        $this->authorizeAdmin();
+
+        $request->validate([
+            'new_privilege' => 'required|integer|min:1|max:5',
+            'upgrade_notes' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            LicenseService::upgradeLicense($license, $request->new_privilege, $request->upgrade_notes);
+
+            // Log the event
+            event(new \App\Events\LicenseUpgraded($license));
+
+            return redirect()->route('licenses.show', $license)
+                ->with('success', 'License upgraded successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+    }
+
+    /**
+     * Extend license expiration.
+     */
+    public function extend(Request $request, License $license)
+    {
+        $this->authorizeAdmin();
+
+        $request->validate([
+            'days' => 'required|integer|min:1|max:365',
+        ]);
+
+        try {
+            LicenseService::extendLicenseExpiration($license, $request->days);
+
+            return redirect()->route('licenses.show', $license)
+                ->with('success', 'License expiration extended successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+    }
+
+    /**
+     * Authorize admin access.
+     */
+    protected function authorizeAdmin()
+    {
+        $user = Auth::user();
+        if (! $user->hasPrivilege(5)) {
+            abort(403, 'Unauthorized action. Admin privileges required.');
+        }
+    }
+}

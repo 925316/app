@@ -1,0 +1,115 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\EventLog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class LogController extends Controller
+{
+    /**
+     * Display a listing of event logs.
+     */
+    public function index(Request $request)
+    {
+        $this->authorizeAdmin();
+
+        $query = EventLog::with(['account', 'license'])
+            ->orderBy('created_at', 'desc');
+
+        // Filter by event type
+        if ($request->has('event_type')) {
+            $query->where('event_type', $request->event_type);
+        }
+
+        // Filter by event level
+        if ($request->has('event_level')) {
+            $query->where('event_level', $request->event_level);
+        }
+
+        // Filter by account
+        if ($request->has('account_id')) {
+            $query->where('account_id', $request->account_id);
+        }
+
+        // Filter by date range
+        if ($request->has('start_date') && $request->start_date) {
+            $query->where('created_at', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date') && $request->end_date) {
+            $query->where('created_at', '<=', $request->end_date.' 23:59:59');
+        }
+
+        // Search functionality
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('event_type', 'like', "%{$search}%")
+                    ->orWhere('ip_address', 'like', "%{$search}%")
+                    ->orWhereHas('account', function ($q) use ($search) {
+                        $q->where('username', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $logs = $query->paginate(25);
+
+        // Get filter options
+        $eventTypes = EventLog::select('event_type')->distinct()->pluck('event_type');
+        $eventLevels = [
+            0 => 'Info',
+            1 => 'Warning',
+            2 => 'Error',
+        ];
+
+        return view('logs.index', [
+            'logs' => $logs,
+            'eventTypes' => $eventTypes,
+            'eventLevels' => $eventLevels,
+            'filters' => $request->all(),
+        ]);
+    }
+
+    /**
+     * Show the details of a specific log entry.
+     */
+    public function show(EventLog $log)
+    {
+        $this->authorizeAdmin();
+
+        return view('logs.show', [
+            'log' => $log,
+        ]);
+    }
+
+    /**
+     * Clear old log entries.
+     */
+    public function clear(Request $request)
+    {
+        $this->authorizeAdmin();
+
+        $request->validate([
+            'days' => 'required|integer|min:1|max:365',
+        ]);
+
+        $days = $request->days;
+        $deleted = EventLog::where('created_at', '<=', now()->subDays($days))->delete();
+
+        return back()->with('success', "Deleted {$deleted} log entries older than {$days} days.");
+    }
+
+    /**
+     * Authorize admin access.
+     */
+    protected function authorizeAdmin()
+    {
+        $user = Auth::user();
+        if (! $user->hasPrivilege(5)) {
+            abort(403, 'Unauthorized action. Admin privileges required.');
+        }
+    }
+}
