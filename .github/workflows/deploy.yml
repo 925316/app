@@ -1,0 +1,70 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, dom, fileinfo, pdo_mysql
+        coverage: none
+
+    - name: Install dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader --no-dev
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install npm dependencies
+      run: npm ci
+
+    - name: Build assets
+      run: npm run build
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: production-files
+        path: |
+          app/
+          bootstrap/
+          config/
+          database/
+          public/
+          resources/
+          routes/
+          storage/
+          vendor/
+          .env.example
+          artisan
+          composer.json
+          composer.lock
+          package.json
+          package-lock.json
+          phpunit.xml
+          postcss.config.js
+          tailwind.config.js
+          vite.config.js
+
+    - name: Deploy to production
+      run: |
+        echo "Deploy to your production server here"
+        echo "This is where you would typically use SSH, rsync, or your deployment tool of choice"
+        echo "For example:"
+        echo "  ssh user@server 'cd /path/to/app && git pull && composer install --no-dev && npm run build'"
+        echo "  or use a deployment service like Laravel Forge, Envoyer, etc."

@@ -1,0 +1,77 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, Blade ]
+  pull_request:
+    branches: [ main, Blade ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, dom, fileinfo, pdo_mysql
+        coverage: none
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+
+    - name: Install dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+    - name: Run PHPStan
+      run: vendor/bin/phpstan analyse
+
+    - name: Run Laravel Pint
+      run: vendor/bin/pint --test
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install npm dependencies
+      run: npm ci
+
+    - name: Run ESLint
+      run: npm run lint
+      continue-on-error: true
+
+    - name: Run Prettier check
+      run: npm run format:check
+      continue-on-error: true
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, dom, fileinfo, pdo_mysql
+        coverage: none
+
+    - name: Install dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+    - name: Run security check
+      run: composer audit
+
+    - name: Run PHPStan security analysis
+      run: vendor/bin/phpstan analyse --level=max --error-format=gitlab
