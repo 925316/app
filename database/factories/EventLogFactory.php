@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\EventLog;
 use App\Models\Account;
+use App\Models\EventLog;
 use App\Models\License;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
@@ -27,17 +27,18 @@ class EventLogFactory extends Factory
     public function definition(): array
     {
         $eventTypes = [
-            EventLog::TYPE_ACCOUNT_ACTIVATED,
-            EventLog::TYPE_DEVICE_BOUND,
-            EventLog::TYPE_DEVICE_UNBOUND,
-            EventLog::TYPE_LOGIN_ANOMALY,
-            EventLog::TYPE_ACCOUNT_SUSPENDED,
+            \App\Enums\EventType::ACCOUNT_REGISTERED->value,
+            \App\Enums\EventType::ACCOUNT_LOGIN->value,
+            \App\Enums\EventType::LICENSE_ACTIVATED->value,
+            \App\Enums\EventType::DEVICE_BOUND->value,
+            \App\Enums\EventType::DEVICE_UNBOUND->value,
+            \App\Enums\EventType::SYSTEM_PACKAGE_UPLOADED->value,
         ];
 
         $eventLevels = [
-            EventLog::LEVEL_INFO,
-            EventLog::LEVEL_WARN,
-            EventLog::LEVEL_ERROR,
+            0, // info
+            1, // warning
+            2, // error
         ];
 
         // Randomly decide if we should use existing account/license or null
@@ -48,15 +49,15 @@ class EventLogFactory extends Factory
         return [
             'event_type' => $this->faker->randomElement($eventTypes),
             'event_level' => $this->faker->randomElement($eventLevels),
-            'account_id' => $useAccount && Account::count() > 0 
-                ? Account::inRandomOrder()->first()->id 
+            'account_id' => $useAccount && Account::count() > 0
+                ? Account::inRandomOrder()->first()->id
                 : null,
-            'license_id' => $useLicense && License::count() > 0 
-                ? License::inRandomOrder()->first()->id 
+            'license_id' => $useLicense && License::count() > 0
+                ? License::inRandomOrder()->first()->id
                 : null,
             'ip_address' => $this->faker->ipv4(),
-            'actor_id' => $useActor && Account::count() > 0 
-                ? Account::inRandomOrder()->first()->id 
+            'actor_id' => $useActor && Account::count() > 0
+                ? Account::inRandomOrder()->first()->id
                 : null,
             'details' => $this->generateEventDetails(),
             'created_at' => $this->faker->dateTimeBetween('-6 months', 'now'),
@@ -69,21 +70,21 @@ class EventLogFactory extends Factory
     private function generateEventDetails(): array
     {
         $eventType = $this->faker->randomElement([
-            EventLog::TYPE_ACCOUNT_ACTIVATED,
-            EventLog::TYPE_DEVICE_BOUND,
-            EventLog::TYPE_DEVICE_UNBOUND,
-            EventLog::TYPE_LOGIN_ANOMALY,
-            EventLog::TYPE_ACCOUNT_SUSPENDED,
+            \App\Enums\EventType::LICENSE_ACTIVATED->value,
+            \App\Enums\EventType::DEVICE_BOUND->value,
+            \App\Enums\EventType::DEVICE_UNBOUND->value,
+            \App\Enums\EventType::ACCOUNT_LOGIN->value,
+            \App\Enums\EventType::LICENSE_SUSPENDED->value,
         ]);
 
         return match ($eventType) {
-            EventLog::TYPE_ACCOUNT_ACTIVATED => [
+            \App\Enums\EventType::LICENSE_ACTIVATED->value => [
                 'license_key' => strtoupper($this->faker->bothify('??##-??##-??##-??##')),
                 'activation_date' => $this->faker->dateTimeThisYear()->format('Y-m-d H:i:s'),
                 'device_count' => $this->faker->numberBetween(1, 5),
                 'plan_type' => $this->faker->randomElement(['basic', 'pro', 'enterprise']),
             ],
-            EventLog::TYPE_DEVICE_BOUND => [
+            \App\Enums\EventType::DEVICE_BOUND->value => [
                 'device_id' => $this->faker->uuid(),
                 'device_name' => $this->faker->randomElement([
                     'iPhone 13 Pro',
@@ -96,7 +97,7 @@ class EventLogFactory extends Factory
                 'os_version' => $this->faker->randomElement(['iOS 16.4', 'Android 13', 'Windows 11', 'macOS 13.2']),
                 'binding_time' => $this->faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
             ],
-            EventLog::TYPE_DEVICE_UNBOUND => [
+            \App\Enums\EventType::DEVICE_UNBOUND->value => [
                 'device_id' => $this->faker->uuid(),
                 'device_name' => $this->faker->randomElement([
                     'iPhone 12',
@@ -112,9 +113,9 @@ class EventLogFactory extends Factory
                 ]),
                 'unbind_time' => $this->faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
             ],
-            EventLog::TYPE_LOGIN_ANOMALY => [
-                'attempted_location' => $this->faker->city() . ', ' . $this->faker->country(),
-                'usual_location' => $this->faker->city() . ', ' . $this->faker->country(),
+            \App\Enums\EventType::ACCOUNT_LOGIN->value => [
+                'attempted_location' => $this->faker->city().', '.$this->faker->country(),
+                'usual_location' => $this->faker->city().', '.$this->faker->country(),
                 'attempt_time' => $this->faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
                 'user_agent' => $this->faker->userAgent(),
                 'action_taken' => $this->faker->randomElement([
@@ -124,7 +125,7 @@ class EventLogFactory extends Factory
                     'no_action',
                 ]),
             ],
-            EventLog::TYPE_ACCOUNT_SUSPENDED => [
+            \App\Enums\EventType::LICENSE_SUSPENDED->value => [
                 'suspension_reason' => $this->faker->randomElement([
                     'multiple_failed_logins',
                     'violation_of_tos',
@@ -155,7 +156,7 @@ class EventLogFactory extends Factory
     public function info(): Factory
     {
         return $this->state(fn (array $attributes) => [
-            'event_level' => EventLog::LEVEL_INFO,
+            'event_level' => 0,
         ]);
     }
 
@@ -165,7 +166,7 @@ class EventLogFactory extends Factory
     public function warning(): Factory
     {
         return $this->state(fn (array $attributes) => [
-            'event_level' => EventLog::LEVEL_WARN,
+            'event_level' => 1,
         ]);
     }
 
@@ -175,7 +176,7 @@ class EventLogFactory extends Factory
     public function error(): Factory
     {
         return $this->state(fn (array $attributes) => [
-            'event_level' => EventLog::LEVEL_ERROR,
+            'event_level' => 2,
         ]);
     }
 
@@ -185,8 +186,8 @@ class EventLogFactory extends Factory
     public function accountActivated(): Factory
     {
         return $this->state(fn (array $attributes) => [
-            'event_type' => EventLog::TYPE_ACCOUNT_ACTIVATED,
-            'event_level' => EventLog::LEVEL_INFO,
+            'event_type' => \App\Enums\EventType::LICENSE_ACTIVATED->value,
+            'event_level' => 0,
         ]);
     }
 
@@ -196,8 +197,8 @@ class EventLogFactory extends Factory
     public function loginAnomaly(): Factory
     {
         return $this->state(fn (array $attributes) => [
-            'event_type' => EventLog::TYPE_LOGIN_ANOMALY,
-            'event_level' => EventLog::LEVEL_WARN,
+            'event_type' => \App\Enums\EventType::ACCOUNT_LOGIN->value,
+            'event_level' => 1,
         ]);
     }
 

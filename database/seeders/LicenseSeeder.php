@@ -120,9 +120,9 @@ class LicenseSeeder extends Seeder
                     ])
                     ->state(function (array $attributes) {
                         $status = fake()->randomElement([
-                            License::STATUS_UPGRADED,
-                            License::STATUS_EXPIRED,
-                            License::STATUS_REVOKED,
+                            \App\Enums\LicenseStatus::UPGRADED->value,
+                            \App\Enums\LicenseStatus::EXPIRED->value,
+                            \App\Enums\LicenseStatus::REVOKED->value,
                         ]);
 
                         return ['status' => $status];

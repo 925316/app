@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AccountSeeder::class,
+            AdminAccountSeeder::class,
             AccountDeviceSeeder::class,
             LicenseSeeder::class,
             EventLogSeeder::class,

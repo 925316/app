@@ -15,8 +15,9 @@ class EventLogSeeder extends Seeder
     public function run(): void
     {
         // Skip seeding if we already have event logs (for production safety)
-        if (EventLog::count() > 0 && !app()->environment('local')) {
+        if (EventLog::count() > 0 && ! app()->environment('local')) {
             $this->command->info('Event logs already exist. Skipping seeding.');
+
             return;
         }
 
@@ -50,7 +51,7 @@ class EventLogSeeder extends Seeder
         // Device binding events
         EventLog::factory()
             ->count(30)
-            ->state(['event_type' => EventLog::TYPE_DEVICE_BOUND])
+            ->state(['event_type' => \App\Enums\EventType::DEVICE_BOUND->value])
             ->sequence(fn ($sequence) => [
                 'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
                 'license_id' => $licenses->isNotEmpty() ? $licenses->random()->id : null,
@@ -61,7 +62,7 @@ class EventLogSeeder extends Seeder
         // Device unbinding events
         EventLog::factory()
             ->count(20)
-            ->state(['event_type' => EventLog::TYPE_DEVICE_UNBOUND])
+            ->state(['event_type' => \App\Enums\EventType::DEVICE_UNBOUND->value])
             ->sequence(fn ($sequence) => [
                 'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
                 'license_id' => $licenses->isNotEmpty() ? $licenses->random()->id : null,
@@ -112,7 +113,7 @@ class EventLogSeeder extends Seeder
         EventLog::factory()
             ->count(10)
             ->error()
-            ->state(['event_type' => EventLog::TYPE_ACCOUNT_SUSPENDED])
+            ->state(['event_type' => \App\Enums\EventType::LICENSE_SUSPENDED->value])
             ->sequence(fn ($sequence) => [
                 'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
                 'actor_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
@@ -168,15 +169,15 @@ class EventLogSeeder extends Seeder
     {
         $anomalousCountries = ['RU', 'CN', 'BR', 'NG', 'TR'];
         $country = $anomalousCountries[array_rand($anomalousCountries)];
-        
+
         // Generate realistic IP ranges for different countries
         return match ($country) {
-            'RU' => '195.' . rand(10, 240) . '.' . rand(1, 254) . '.' . rand(1, 254),
-            'CN' => '120.' . rand(10, 240) . '.' . rand(1, 254) . '.' . rand(1, 254),
-            'BR' => '200.' . rand(10, 240) . '.' . rand(1, 254) . '.' . rand(1, 254),
-            'NG' => '105.' . rand(10, 240) . '.' . rand(1, 254) . '.' . rand(1, 254),
-            'TR' => '88.' . rand(10, 240) . '.' . rand(1, 254) . '.' . rand(1, 254),
-            default => '192.168.' . rand(1, 254) . '.' . rand(1, 254),
+            'RU' => '195.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
+            'CN' => '120.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
+            'BR' => '200.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
+            'NG' => '105.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
+            'TR' => '88.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
+            default => '192.168.'.rand(1, 254).'.'.rand(1, 254),
         };
     }
 
@@ -185,7 +186,7 @@ class EventLogSeeder extends Seeder
      */
     private function generateRandomIp(): string
     {
-        return rand(1, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(1, 254);
+        return rand(1, 255).'.'.rand(0, 255).'.'.rand(0, 255).'.'.rand(1, 254);
     }
 
     /**
@@ -200,7 +201,7 @@ class EventLogSeeder extends Seeder
             'credential_stuffing',
             'session_hijacking_attempt',
         ];
-        
+
         return $patterns[array_rand($patterns)];
     }
 
@@ -217,7 +218,7 @@ class EventLogSeeder extends Seeder
             'suspicious_activity',
             'spam_behavior',
         ];
-        
+
         return $reasons[array_rand($reasons)];
     }
 }
