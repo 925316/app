@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\UsageStatistic
@@ -23,16 +23,22 @@ class UsageStatistic extends Model
      * Statistics type constants
      */
     const TYPE_GLOBAL = 0;
+
     const TYPE_USER = 1;
+
     const TYPE_LICENSE = 2;
+
     const TYPE_SERVER = 3;
 
     /**
      * Stat key constants for common usage statistics
      */
     const KEY_LOGIN_COUNT = 'login_count';
+
     const KEY_USAGE_TIME = 'usage_time';
+
     const KEY_TOTAL_REQUESTS = 'total_requests';
+
     const KEY_ACTIVE_SESSIONS = 'active_sessions';
 
     /**
@@ -64,8 +70,7 @@ class UsageStatistic extends Model
     /**
      * Scope a query to only include statistics of a specific type.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $type
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeOfType($query, int $type)
@@ -76,7 +81,7 @@ class UsageStatistic extends Model
     /**
      * Scope a query to only include global statistics.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeGlobal($query)
@@ -87,7 +92,7 @@ class UsageStatistic extends Model
     /**
      * Scope a query to only include user statistics.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeUser($query)
@@ -98,7 +103,7 @@ class UsageStatistic extends Model
     /**
      * Scope a query to only include license statistics.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeLicense($query)
@@ -109,7 +114,7 @@ class UsageStatistic extends Model
     /**
      * Scope a query to only include server statistics.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeServer($query)
@@ -120,8 +125,7 @@ class UsageStatistic extends Model
     /**
      * Scope a query to only include statistics with a specific key.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $key
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithKey($query, string $key)
@@ -132,7 +136,7 @@ class UsageStatistic extends Model
     /**
      * Scope a query to only include login count statistics.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeLoginCount($query)
@@ -143,7 +147,7 @@ class UsageStatistic extends Model
     /**
      * Scope a query to only include usage time statistics.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeUsageTime($query)
@@ -155,12 +159,10 @@ class UsageStatistic extends Model
 
     /**
      * Get the type name as a string.
-     *
-     * @return string
      */
     public function getTypeNameAttribute(): string
     {
-        return match($this->stat_type) {
+        return match ($this->stat_type) {
             self::TYPE_GLOBAL => 'global',
             self::TYPE_USER => 'user',
             self::TYPE_LICENSE => 'license',
@@ -172,8 +174,6 @@ class UsageStatistic extends Model
     /**
      * Get a human-readable representation of the stat value.
      * This is specifically for usage time formatting.
-     *
-     * @return string
      */
     public function getFormattedValueAttribute(): string
     {
@@ -192,8 +192,6 @@ class UsageStatistic extends Model
 
     /**
      * Get a descriptive label for this statistic.
-     *
-     * @return string
      */
     public function getLabelAttribute(): string
     {
@@ -222,40 +220,44 @@ class UsageStatistic extends Model
     /**
      * Format usage time from minutes to human-readable format.
      * Example: 26y 4m 13d 20h 32m
-     *
-     * @param float $minutes
-     * @return string
      */
     protected function formatUsageTime(float $minutes): string
     {
         $years = floor($minutes / (365 * 24 * 60));
         $minutes -= $years * 365 * 24 * 60;
-        
+
         $months = floor($minutes / (30 * 24 * 60));
         $minutes -= $months * 30 * 24 * 60;
-        
+
         $days = floor($minutes / (24 * 60));
         $minutes -= $days * 24 * 60;
-        
+
         $hours = floor($minutes / 60);
         $minutes -= $hours * 60;
-        
+
         $parts = [];
-        
-        if ($years > 0) $parts[] = $years . 'y';
-        if ($months > 0) $parts[] = $months . 'm';
-        if ($days > 0) $parts[] = $days . 'd';
-        if ($hours > 0) $parts[] = $hours . 'h';
-        if ($minutes > 0 || empty($parts)) $parts[] = round($minutes) . 'm';
-        
+
+        if ($years > 0) {
+            $parts[] = $years.'y';
+        }
+        if ($months > 0) {
+            $parts[] = $months.'m';
+        }
+        if ($days > 0) {
+            $parts[] = $days.'d';
+        }
+        if ($hours > 0) {
+            $parts[] = $hours.'h';
+        }
+        if ($minutes > 0 || empty($parts)) {
+            $parts[] = round($minutes).'m';
+        }
+
         return implode(' ', $parts);
     }
 
     /**
      * Check if this statistic is of a specific type.
-     *
-     * @param int $type
-     * @return bool
      */
     public function isType(int $type): bool
     {
@@ -264,9 +266,6 @@ class UsageStatistic extends Model
 
     /**
      * Check if this statistic has a specific key.
-     *
-     * @param string $key
-     * @return bool
      */
     public function hasKey(string $key): bool
     {

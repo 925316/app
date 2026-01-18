@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\EventType;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Enums\EventType;
 
 class EventLog extends Model
 {
@@ -15,7 +15,9 @@ class EventLog extends Model
      * Event Level Constants
      */
     public const LEVEL_INFO = 0;
+
     public const LEVEL_WARN = 1;
+
     public const LEVEL_ERROR = 2;
 
     /**
@@ -178,16 +180,14 @@ class EventLog extends Model
      */
     public function scopeOfCategory($query, string $category)
     {
-        $eventTypes = EventType::getCategoryEvents($category);        
-        $values = array_map(fn($type) => $type->value, $eventTypes);
-        
+        $eventTypes = EventType::getCategoryEvents($category);
+        $values = array_map(fn ($type) => $type->value, $eventTypes);
+
         return $query->whereIn('event_type', $values);
     }
 
     /**
      * Get the event level as a human-readable string.
-     *
-     * @return string
      */
     public function getLevelTextAttribute(): string
     {
@@ -201,8 +201,6 @@ class EventLog extends Model
 
     /**
      * Get the event level CSS class for UI display.
-     *
-     * @return string
      */
     public function getLevelClassAttribute(): string
     {
@@ -216,24 +214,20 @@ class EventLog extends Model
 
     /**
      * Get the event type in a human-readable format.
-     *
-     * @return string
      */
     public function getTypeLabelAttribute(): string
     {
         $eventType = EventType::tryFrom($this->event_type);
-        
+
         if ($eventType) {
             return $eventType->label();
         }
-        
+
         return ucfirst(str_replace('.', ' ', $this->event_type));
     }
 
     /**
      * Get the event type as an enum instance.
-     *
-     * @return EventType|null
      */
     public function getEventTypeEnumAttribute(): ?EventType
     {
@@ -242,42 +236,38 @@ class EventLog extends Model
 
     /**
      * Get the event category.
-     *
-     * @return string|null
      */
     public function getCategoryAttribute(): ?string
     {
         $eventType = EventType::tryFrom($this->event_type);
-        
+
         if ($eventType) {
             return $eventType->category();
         }
-        
+
         $parts = explode('.', $this->event_type, 2);
+
         return $parts[0] ?? null;
     }
 
     /**
      * Get the event action.
-     *
-     * @return string|null
      */
     public function getActionAttribute(): ?string
     {
         $eventType = EventType::tryFrom($this->event_type);
-        
+
         if ($eventType) {
             return $eventType->action();
         }
-        
+
         $parts = explode('.', $this->event_type, 2);
+
         return $parts[1] ?? null;
     }
 
     /**
      * Check if this is an informational event.
-     *
-     * @return bool
      */
     public function getIsInfoAttribute(): bool
     {
@@ -286,8 +276,6 @@ class EventLog extends Model
 
     /**
      * Check if this is a warning event.
-     *
-     * @return bool
      */
     public function getIsWarningAttribute(): bool
     {
@@ -296,8 +284,6 @@ class EventLog extends Model
 
     /**
      * Check if this is an error event.
-     *
-     * @return bool
      */
     public function getIsErrorAttribute(): bool
     {
@@ -306,12 +292,10 @@ class EventLog extends Model
 
     /**
      * Get the IP address in a safe format.
-     *
-     * @return string|null
      */
     public function getSafeIpAttribute(): ?string
     {
-        if (!$this->ip_address) {
+        if (! $this->ip_address) {
             return null;
         }
 
@@ -326,6 +310,7 @@ class EventLog extends Model
             if (count($parts) > 4) {
                 $parts = array_slice($parts, 0, 4);
                 $parts[] = 'xxxx';
+
                 return implode(':', $parts);
             }
         }
@@ -335,11 +320,6 @@ class EventLog extends Model
 
     /**
      * Log a new event.
-     *
-     * @param EventType $eventType
-     * @param int $level
-     * @param array $data
-     * @return EventLog
      */
     public static function log(
         EventType $eventType,
@@ -359,10 +339,6 @@ class EventLog extends Model
 
     /**
      * Log an info level event.
-     *
-     * @param EventType $eventType
-     * @param array $data
-     * @return EventLog
      */
     public static function info(EventType $eventType, array $data = []): EventLog
     {
@@ -371,10 +347,6 @@ class EventLog extends Model
 
     /**
      * Log a warning level event.
-     *
-     * @param EventType $eventType
-     * @param array $data
-     * @return EventLog
      */
     public static function warning(EventType $eventType, array $data = []): EventLog
     {
@@ -383,10 +355,6 @@ class EventLog extends Model
 
     /**
      * Log an error level event.
-     *
-     * @param EventType $eventType
-     * @param array $data
-     * @return EventLog
      */
     public static function error(EventType $eventType, array $data = []): EventLog
     {

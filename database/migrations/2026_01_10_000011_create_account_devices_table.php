@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('account_devices', function (Blueprint $table) {
             $table->id();
-            
+
             $table->foreignId('account_id')
                 ->constrained('accounts')
                 ->onDelete('cascade');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('last_seen_at')->useCurrent();
             $table->timestamp('bound_at')->nullable();
             $table->timestamp('unbound_at')->nullable();
-            
+
             $table->timestamps();
 
             $table->unique(['account_id', 'hwid_hash']);

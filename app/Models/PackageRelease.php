@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class PackageRelease extends Model
 {
@@ -49,7 +49,7 @@ class PackageRelease extends Model
     /**
      * Scope a query to only include stable releases.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeStable($query)
@@ -60,7 +60,7 @@ class PackageRelease extends Model
     /**
      * Scope a query to only include development releases.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeDev($query)
@@ -71,7 +71,7 @@ class PackageRelease extends Model
     /**
      * Scope a query to order by latest version.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeLatestVersion($query)
@@ -83,8 +83,6 @@ class PackageRelease extends Model
 
     /**
      * Check if the release is stable.
-     *
-     * @return bool
      */
     public function getIsStableAttribute(): bool
     {
@@ -93,8 +91,6 @@ class PackageRelease extends Model
 
     /**
      * Check if the release is a development release.
-     *
-     * @return bool
      */
     public function getIsDevAttribute(): bool
     {
@@ -103,43 +99,37 @@ class PackageRelease extends Model
 
     /**
      * Get the major version number.
-     *
-     * @return string|null
      */
     public function getMajorVersionAttribute(): ?string
     {
         if (preg_match('/^(\d+)\./', $this->version, $matches)) {
             return $matches[1];
         }
-        
+
         return null;
     }
 
     /**
      * Get the minor version number.
-     *
-     * @return string|null
      */
     public function getMinorVersionAttribute(): ?string
     {
         if (preg_match('/^\d+\.(\d+)/', $this->version, $matches)) {
             return $matches[1];
         }
-        
+
         return null;
     }
 
     /**
      * Get the patch version number.
-     *
-     * @return string|null
      */
     public function getPatchVersionAttribute(): ?string
     {
         if (preg_match('/^\d+\.\d+\.(\d+)/', $this->version, $matches)) {
             return $matches[1];
         }
-        
+
         return null;
     }
 }

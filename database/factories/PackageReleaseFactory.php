@@ -20,28 +20,28 @@ class PackageReleaseFactory extends Factory
         $major = $this->faker->numberBetween(1, 10);
         $minor = $this->faker->numberBetween(0, 20);
         $patch = $this->faker->numberBetween(0, 100);
-        
+
         $version = "{$major}.{$minor}.{$patch}";
-        
+
         // Randomly add pre-release tag
         if ($this->faker->boolean(20)) {
-            $version .= '-' . $this->faker->randomElement(['alpha', 'beta', 'rc']);
+            $version .= '-'.$this->faker->randomElement(['alpha', 'beta', 'rc']);
         }
-        
+
         // Randomly add build metadata
         if ($this->faker->boolean(10)) {
-            $version .= '+' . Str::random(8);
+            $version .= '+'.Str::random(8);
         }
 
         return [
             'version' => $version,
             'release_channel' => $this->faker->randomElement(['stable', 'dev']),
             'download_url' => $this->faker->url(),
-            'checksum_sha256' => $this->faker->boolean(80) 
-                ? hash('sha256', $this->faker->text(50)) 
+            'checksum_sha256' => $this->faker->boolean(80)
+                ? hash('sha256', $this->faker->text(50))
                 : null,
-            'changelog' => $this->faker->boolean(70) 
-                ? $this->generateChangelog() 
+            'changelog' => $this->faker->boolean(70)
+                ? $this->generateChangelog()
                 : null,
             'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
@@ -79,7 +79,6 @@ class PackageReleaseFactory extends Factory
     /**
      * Indicate a specific major version.
      *
-     * @param int $major
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function majorVersion(int $major)
@@ -87,7 +86,7 @@ class PackageReleaseFactory extends Factory
         return $this->state(function (array $attributes) use ($major) {
             $minor = $this->faker->numberBetween(0, 20);
             $patch = $this->faker->numberBetween(0, 100);
-            
+
             return [
                 'version' => "{$major}.{$minor}.{$patch}",
             ];
@@ -96,8 +95,6 @@ class PackageReleaseFactory extends Factory
 
     /**
      * Generate realistic changelog content.
-     *
-     * @return string
      */
     private function generateChangelog(): string
     {
@@ -106,31 +103,31 @@ class PackageReleaseFactory extends Factory
         $improvements = $this->faker->sentences($this->faker->numberBetween(1, 3));
 
         $changelog = "## Changelog\n\n";
-        
-        if (!empty($features)) {
+
+        if (! empty($features)) {
             $changelog .= "### New Features\n";
             foreach ($features as $feature) {
                 $changelog .= "- {$feature}\n";
             }
             $changelog .= "\n";
         }
-        
-        if (!empty($fixes)) {
+
+        if (! empty($fixes)) {
             $changelog .= "### Bug Fixes\n";
             foreach ($fixes as $fix) {
                 $changelog .= "- {$fix}\n";
             }
             $changelog .= "\n";
         }
-        
-        if (!empty($improvements)) {
+
+        if (! empty($improvements)) {
             $changelog .= "### Improvements\n";
             foreach ($improvements as $improvement) {
                 $changelog .= "- {$improvement}\n";
             }
             $changelog .= "\n";
         }
-        
+
         return $changelog;
     }
 }

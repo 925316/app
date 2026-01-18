@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\UsageStatistic;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
@@ -41,7 +41,7 @@ class UsageStatisticFactory extends Factory
         $statKey = $this->faker->randomElement($statKeys);
 
         // Generate appropriate values based on the stat key
-        $statValue = match($statKey) {
+        $statValue = match ($statKey) {
             UsageStatistic::KEY_LOGIN_COUNT => $this->faker->numberBetween(100, 1000000),
             UsageStatistic::KEY_USAGE_TIME => $this->faker->numberBetween(60, 5256000), // 1 minute to 10 years in minutes
             UsageStatistic::KEY_TOTAL_REQUESTS => $this->faker->numberBetween(1000, 10000000),
@@ -64,8 +64,6 @@ class UsageStatisticFactory extends Factory
 
     /**
      * Indicate that the statistic is a global statistic.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function global(): Factory
     {
@@ -78,8 +76,6 @@ class UsageStatisticFactory extends Factory
 
     /**
      * Indicate that the statistic is a user statistic.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function user(): Factory
     {
@@ -92,8 +88,6 @@ class UsageStatisticFactory extends Factory
 
     /**
      * Indicate that the statistic is a license statistic.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function license(): Factory
     {
@@ -106,8 +100,6 @@ class UsageStatisticFactory extends Factory
 
     /**
      * Indicate that the statistic is a server statistic.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function server(): Factory
     {
@@ -120,8 +112,6 @@ class UsageStatisticFactory extends Factory
 
     /**
      * Indicate that the statistic is for login count.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function loginCount(): Factory
     {
@@ -135,8 +125,6 @@ class UsageStatisticFactory extends Factory
 
     /**
      * Indicate that the statistic is for usage time.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function usageTime(): Factory
     {
@@ -150,11 +138,6 @@ class UsageStatisticFactory extends Factory
 
     /**
      * Create a statistic with specific type and key.
-     *
-     * @param int $type
-     * @param string $key
-     * @param float $value
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function withSpecific(int $type, string $key, float $value): Factory
     {

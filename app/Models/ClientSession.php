@@ -51,8 +51,6 @@ class ClientSession extends Model
 
     /**
      * Get the account that owns the session.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function account(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -61,8 +59,6 @@ class ClientSession extends Model
 
     /**
      * Get the device that owns the session.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function device(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -72,36 +68,31 @@ class ClientSession extends Model
     /**
      * Scope a query to only include active sessions (with recent heartbeat).
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $minutesThreshold
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
     public function scopeActive($query, int $minutesThreshold = 5): \Illuminate\Database\Eloquent\Builder
     {
         return $query->whereNotNull('last_heartbeat_at')
-                     ->where('last_heartbeat_at', '>=', now()->subMinutes($minutesThreshold));
+            ->where('last_heartbeat_at', '>=', now()->subMinutes($minutesThreshold));
     }
 
     /**
      * Scope a query to only include expired sessions.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $minutesThreshold
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
     public function scopeExpired($query, int $minutesThreshold = 5): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where(function ($q) use ($minutesThreshold) {
             $q->whereNull('last_heartbeat_at')
-              ->orWhere('last_heartbeat_at', '<', now()->subMinutes($minutesThreshold));
+                ->orWhere('last_heartbeat_at', '<', now()->subMinutes($minutesThreshold));
         });
     }
 
     /**
      * Scope a query to order by last heartbeat (most recent first).
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
     public function scopeOrderByRecent($query): \Illuminate\Database\Eloquent\Builder
     {
@@ -111,9 +102,7 @@ class ClientSession extends Model
     /**
      * Scope a query to filter by account.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $accountId
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
     public function scopeForAccount($query, int $accountId): \Illuminate\Database\Eloquent\Builder
     {
@@ -123,9 +112,7 @@ class ClientSession extends Model
     /**
      * Scope a query to filter by device.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $deviceId
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
     public function scopeForDevice($query, int $deviceId): \Illuminate\Database\Eloquent\Builder
     {
@@ -134,24 +121,19 @@ class ClientSession extends Model
 
     /**
      * Check if the session is active.
-     *
-     * @param int $minutesThreshold
-     * @return bool
      */
     public function isActive(int $minutesThreshold = 5): bool
     {
-        return $this->last_heartbeat_at && 
+        return $this->last_heartbeat_at &&
                $this->last_heartbeat_at->gte(now()->subMinutes($minutesThreshold));
     }
 
     /**
      * Get the session age in minutes.
-     *
-     * @return float|null
      */
     public function getAgeInMinutesAttribute(): ?float
     {
-        if (!$this->created_at) {
+        if (! $this->created_at) {
             return null;
         }
 
@@ -160,12 +142,10 @@ class ClientSession extends Model
 
     /**
      * Get the time since last heartbeat in minutes.
-     *
-     * @return float|null
      */
     public function getTimeSinceLastHeartbeatAttribute(): ?float
     {
-        if (!$this->last_heartbeat_at) {
+        if (! $this->last_heartbeat_at) {
             return null;
         }
 

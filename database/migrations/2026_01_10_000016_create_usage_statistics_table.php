@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('usage_statistics', function (Blueprint $table) {
             $table->id();
-            
+
             $table->tinyInteger('stat_type')->unsigned()->nullable(false);
             $table->string('stat_key', 255)->nullable(false);
             $table->decimal('stat_value', 15, 2)->nullable(false);
-            
+
             $table->timestamps();
 
             $table->index(['stat_type', 'stat_key']);

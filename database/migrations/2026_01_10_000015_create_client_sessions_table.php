@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('client_sessions', function (Blueprint $table) {
             $table->id();
-            
+
             $table->string('session_token', 128)->unique()->nullable(false);
             $table->foreignId('account_id')
                 ->constrained('accounts')
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->binary('ip_address', 16)->nullable(false);
             $table->string('client_version', 50)->nullable(false);
             $table->timestamp('last_heartbeat_at')->nullable();
-            
+
             $table->timestamps();
 
             $table->index('last_heartbeat_at');

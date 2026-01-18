@@ -33,7 +33,7 @@ enum EventType: string
     {
         return array_filter(
             self::cases(),
-            fn($case) => str_starts_with($case->value, $category . '.')
+            fn ($case) => str_starts_with($case->value, $category.'.')
         );
     }
 
@@ -63,17 +63,17 @@ enum EventType: string
             self::ACCOUNT_LOGIN => 'Login',
             self::ACCOUNT_LOGOUT => 'Logout',
             self::ACCOUNT_PROFILE_UPDATED => 'Profile Updated',
-            
+
             self::LICENSE_CREATED => 'License Created',
             self::LICENSE_ACTIVATED => 'License Activated',
             self::LICENSE_SUSPENDED => 'License Suspended',
             self::LICENSE_REVOKED => 'License Revoked',
             self::LICENSE_EXPIRED => 'License Expired',
-            
+
             self::DEVICE_BOUND => 'Device Bound',
             self::DEVICE_UNBOUND => 'Device Unbound',
             self::DEVICE_HWID_CHANGED => 'HWID Changed',
-            
+
             self::SYSTEM_PACKAGE_UPLOADED => 'Package Uploaded',
             self::SYSTEM_STATISTICS_UPDATED => 'Statistics Updated',
         };
@@ -85,15 +85,15 @@ enum EventType: string
     public static function groupedByCategory(): array
     {
         $grouped = [];
-        
+
         foreach (self::cases() as $case) {
             $category = $case->category();
-            if (!isset($grouped[$category])) {
+            if (! isset($grouped[$category])) {
                 $grouped[$category] = [];
             }
             $grouped[$category][] = $case;
         }
-        
+
         return $grouped;
     }
 

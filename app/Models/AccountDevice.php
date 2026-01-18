@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 
 class AccountDevice extends Model
 {
@@ -69,8 +69,6 @@ class AccountDevice extends Model
 
     /**
      * Get the account that owns the device.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function account(): BelongsTo
     {
@@ -79,21 +77,15 @@ class AccountDevice extends Model
 
     /**
      * Scope a query to only include currently bound devices.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeBound(Builder $query): Builder
     {
         return $query->whereNotNull('bound_at')
-                     ->whereNull('unbound_at');
+            ->whereNull('unbound_at');
     }
 
     /**
      * Scope a query to only include unbound devices.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeUnbound(Builder $query): Builder
     {
@@ -102,10 +94,6 @@ class AccountDevice extends Model
 
     /**
      * Scope a query to only include active devices (seen within the last 30 days).
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $days
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive(Builder $query, int $days = 30): Builder
     {
@@ -114,9 +102,6 @@ class AccountDevice extends Model
 
     /**
      * Scope a query to order by last seen time (most recent first).
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeLatestSeen(Builder $query): Builder
     {
@@ -125,18 +110,14 @@ class AccountDevice extends Model
 
     /**
      * Determine if the device is currently bound.
-     *
-     * @return bool
      */
     public function isBound(): bool
     {
-        return !is_null($this->bound_at) && is_null($this->unbound_at);
+        return ! is_null($this->bound_at) && is_null($this->unbound_at);
     }
 
     /**
      * Check if the account has any bound device.
-     * @param int $accountId
-     * @return bool
      */
     public static function hasBoundDevice(int $accountId): bool
     {
@@ -148,9 +129,6 @@ class AccountDevice extends Model
 
     /**
      * Get the bound device for a specific account.
-     *
-     * @param int $accountId
-     * @return ?self
      */
     public static function getBoundDevice(int $accountId): ?self
     {
@@ -162,8 +140,6 @@ class AccountDevice extends Model
 
     /**
      * Get the device binding status.
-     *
-     * @return string
      */
     public function getBindingStatusAttribute(): string
     {
@@ -176,8 +152,6 @@ class AccountDevice extends Model
 
     /**
      * Get the device age in days.
-     *
-     * @return int
      */
     public function getDeviceAgeInDaysAttribute(): int
     {
@@ -186,8 +160,6 @@ class AccountDevice extends Model
 
     /**
      * Get the last activity in human readable format.
-     *
-     * @return string
      */
     public function getLastActivityHumanAttribute(): string
     {

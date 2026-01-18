@@ -1,9 +1,9 @@
 <?php
 
+use App\Enums\LicensePrivilege;
+use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\License;
-use App\Enums\LicenseStatus;
-use App\Enums\LicensePrivilege;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

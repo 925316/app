@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
@@ -78,12 +77,12 @@ class LicenseFactory extends Factory
         for ($i = $min; $i <= $max; $i++) {
             $characters .= strtoupper(base_convert($i, 10, 32));
         }
-        
+
         $result = '';
         for ($i = 0; $i < $length; $i++) {
             $result .= $characters[random_int(0, strlen($characters) - 1)];
         }
-        
+
         return $result;
     }
 

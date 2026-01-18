@@ -4,14 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\PackageRelease;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class PackageReleaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
     public function run(): void
     {
@@ -20,12 +17,12 @@ class PackageReleaseSeeder extends Seeder
 
         // Create initial stable releases
         PackageRelease::factory()->count(5)->stable()->create([
-            'version' => fn() => $this->generateStableVersion(),
+            'version' => fn () => $this->generateStableVersion(),
         ]);
 
         // Create some development releases
         PackageRelease::factory()->count(3)->dev()->create([
-            'version' => fn() => $this->generateDevVersion(),
+            'version' => fn () => $this->generateDevVersion(),
         ]);
 
         // Create specific milestone releases
@@ -34,38 +31,32 @@ class PackageReleaseSeeder extends Seeder
 
     /**
      * Generate a stable version number.
-     *
-     * @return string
      */
     private function generateStableVersion(): string
     {
         $major = rand(1, 3);
         $minor = rand(0, 5);
         $patch = rand(0, 20);
-        
+
         return "{$major}.{$minor}.{$patch}";
     }
 
     /**
      * Generate a development version number.
-     *
-     * @return string
      */
     private function generateDevVersion(): string
     {
         $major = rand(4, 5);
         $minor = rand(0, 2);
         $patch = rand(0, 10);
-        
+
         $preRelease = rand(0, 1) ? '-alpha' : '-beta';
-        
+
         return "{$major}.{$minor}.{$patch}{$preRelease}";
     }
 
     /**
      * Create specific milestone releases.
-     *
-     * @return void
      */
     private function createMilestoneReleases(): void
     {
@@ -100,23 +91,18 @@ class PackageReleaseSeeder extends Seeder
 
     /**
      * Generate a detailed milestone changelog.
-     *
-     * @param string $version
-     * @param bool $isInitial
-     * @param bool $isReleaseCandidate
-     * @return string
      */
     private function generateMilestoneChangelog(
         string $version,
         bool $isInitial = false,
         bool $isReleaseCandidate = false
     ): string {
-        $title = $isInitial 
-            ? "🎉 Initial Release {$version}" 
-            : ($isReleaseCandidate 
-                ? "🚀 Release Candidate {$version}" 
+        $title = $isInitial
+            ? "🎉 Initial Release {$version}"
+            : ($isReleaseCandidate
+                ? "🚀 Release Candidate {$version}"
                 : "✨ Major Release {$version}");
-        
+
         return <<<CHANGELOG
         # {$title}
         

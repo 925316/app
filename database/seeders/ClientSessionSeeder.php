@@ -5,15 +5,12 @@ namespace Database\Seeders;
 use App\Models\Account;
 use App\Models\AccountDevice;
 use App\Models\ClientSession;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ClientSessionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
     public function run(): void
     {
@@ -22,11 +19,11 @@ class ClientSessionSeeder extends Seeder
 
         $accounts->each(function ($account) use ($devices) {
             $accountDevices = $devices->where('account_id', $account->id);
-            
+
             if ($accountDevices->isNotEmpty()) {
                 $accountDevices->each(function ($device) {
                     $sessionCount = rand(0, 2);
-                    
+
                     ClientSession::factory()
                         ->count($sessionCount)
                         ->forDevice($device)
@@ -62,7 +59,7 @@ class ClientSessionSeeder extends Seeder
         }
 
         $testIps = ['192.168.1.100', '10.0.0.50', '172.16.0.25'];
-        
+
         foreach ($testIps as $ip) {
             ClientSession::factory()
                 ->count(2)
@@ -83,8 +80,6 @@ class ClientSessionSeeder extends Seeder
 
     /**
      * Clean up old sessions before seeding
-     *
-     * @return void
      */
     private function cleanupOldSessions(): void
     {

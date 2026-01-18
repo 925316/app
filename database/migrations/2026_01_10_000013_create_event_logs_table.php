@@ -29,7 +29,7 @@ return new class extends Migration
                 ->constrained('accounts')
                 ->nullOnDelete();
             $table->json('details')->nullable();
-           
+
             $table->timestamps();
 
             $table->index('actor_id');

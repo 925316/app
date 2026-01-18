@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('licenses', function (Blueprint $table) {
             $table->id();
-            
+
             $table->string('key', 50)->unique()->nullable(false);
             $table->tinyInteger('type')->unsigned()->nullable(false)->default(1);
             $table->tinyInteger('privilege')->unsigned()->nullable(false)->default(0);
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->timestamp('suspended_at')->nullable();
             $table->string('created_from_ip', 45)->nullable();
             $table->text('notes')->nullable();
-            
+
             $table->timestamps();
 
             $table->index('activated_at');

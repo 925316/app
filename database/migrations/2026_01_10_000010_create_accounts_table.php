@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_suspended')->default(false);
             $table->string('suspension_reason', 255)->nullable();
             $table->timestamp('suspended_until')->nullable();
-            
+
             $table->timestamp('email_verified_at')->nullable();
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();
