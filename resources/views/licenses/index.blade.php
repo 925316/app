@@ -28,6 +28,60 @@
                         @endif
                     </div>
 
+                    <!-- License Activation Form for Regular Users -->
+                    @if(!$isAdmin ?? false)
+                        <div class="mb-8 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-800/50 p-6 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
+                            <div class="flex items-start space-x-4">
+                                <div class="p-3 bg-blue-500/20 rounded-full">
+                                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">Activate License</h4>
+                                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                                        Enter your license key below to activate premium features. License keys follow the format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+                                    </p>
+
+                                    <form method="POST" action="{{ route('licenses.activate-by-key') }}" class="space-y-4">
+                                        @csrf
+
+                                        <div>
+                                            <label for="license_key" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                License Key
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="license_key"
+                                                name="license_key"
+                                                value="{{ old('license_key') }}"
+                                                placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
+                                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200 text-center font-mono text-lg tracking-wider uppercase @error('license_key') border-red-500 @enderror"
+                                                maxlength="29"
+                                                required
+                                            >
+                                            @error('license_key')
+                                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="flex justify-end">
+                                            <button
+                                                type="submit"
+                                                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md font-medium"
+                                            >
+                                                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                                </svg>
+                                                Activate License
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     @if($isAdmin ?? false)
                         <!-- Admin filters -->
                         <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
