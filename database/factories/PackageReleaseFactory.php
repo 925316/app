@@ -17,35 +17,49 @@ class PackageReleaseFactory extends Factory
      */
     public function definition(): array
     {
-        $major = $this->faker->numberBetween(1, 10);
+        // Generate release date between 2 years ago and now
+        $releaseDate = $this->faker->dateTimeBetween('-2 years', 'now');
+
+        return [
+            'version' => $this->generateVersion(),
+            'release_channel' => $this->faker->randomElement(['stable', 'dev']),
+            'download_url' => $this->faker->url(),
+            'checksum_sha256' => $this->faker->boolean(90)
+                ? hash('sha256', $this->faker->text(50))
+                : null,
+            'changelog' => $this->faker->boolean(80)
+                ? $this->generateChangelog()
+                : null,
+            'created_at' => $releaseDate,
+            'updated_at' => $releaseDate,
+        ];
+    }
+
+    /**
+     * Generate a semantic version number.
+     */
+    private function generateVersion(): string
+    {
+        $major = $this->faker->numberBetween(1, 5);
         $minor = $this->faker->numberBetween(0, 20);
-        $patch = $this->faker->numberBetween(0, 100);
+        $patch = $this->faker->numberBetween(0, 50);
 
         $version = "{$major}.{$minor}.{$patch}";
 
-        // Randomly add pre-release tag
-        if ($this->faker->boolean(20)) {
+        // Less frequently add pre-release tag
+        if ($this->faker->boolean(15)) {
             $version .= '-'.$this->faker->randomElement(['alpha', 'beta', 'rc']);
+            if ($this->faker->boolean(50)) {
+                $version .= '.'.$this->faker->numberBetween(1, 10);
+            }
         }
 
-        // Randomly add build metadata
-        if ($this->faker->boolean(10)) {
+        // Rarely add build metadata
+        if ($this->faker->boolean(5)) {
             $version .= '+'.Str::random(8);
         }
 
-        return [
-            'version' => $version,
-            'release_channel' => $this->faker->randomElement(['stable', 'dev']),
-            'download_url' => $this->faker->url(),
-            'checksum_sha256' => $this->faker->boolean(80)
-                ? hash('sha256', $this->faker->text(50))
-                : null,
-            'changelog' => $this->faker->boolean(70)
-                ? $this->generateChangelog()
-                : null,
-            'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
-        ];
+        return $version;
     }
 
     /**

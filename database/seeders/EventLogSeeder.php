@@ -14,21 +14,15 @@ class EventLogSeeder extends Seeder
      */
     public function run(): void
     {
-        // Skip seeding if we already have event logs (for production safety)
-        if (EventLog::count() > 0 && ! app()->environment('local')) {
-            $this->command->info('Event logs already exist. Skipping seeding.');
-
-            return;
-        }
-
         // Get existing accounts and licenses for realistic relationships
-        $accounts = Account::take(20)->get();
-        $licenses = License::take(15)->get();
+        $accounts = Account::take(10)->get();
+        $licenses = License::take(10)->get();
 
         // Create a variety of event logs
         $this->createInfoEvents($accounts, $licenses);
         $this->createWarningEvents($accounts, $licenses);
         $this->createErrorEvents($accounts, $licenses);
+        $this->displayEventLogStats();
     }
 
     /**
@@ -36,39 +30,86 @@ class EventLogSeeder extends Seeder
      */
     private function createInfoEvents($accounts, $licenses): void
     {
-        // Account activation events
-        EventLog::factory()
-            ->count(50)
-            ->accountActivated()
-            ->sequence(fn ($sequence) => [
-                'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
-                'license_id' => $licenses->isNotEmpty() ? $licenses->random()->id : null,
-                'actor_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
-                'created_at' => now()->subDays(rand(0, 180)),
-            ])
-            ->create();
+        // Account activation events - correlate with license activation dates
+        $activeLicenses = $licenses->where('status', 1)->whereNotNull('activated_at')->whereNotNull('used_by');
+        if ($activeLicenses->isNotEmpty()) {
+            EventLog::factory()
+                ->count(min(15, $activeLicenses->count()))
+                ->accountActivated()
+                ->sequence(function ($sequence) use ($activeLicenses) {
+                    $license = $activeLicenses->values()->get($sequence->index % $activeLicenses->count());
+                    $eventDate = $license->activated_at ?? now()->subDays(rand(1, 365));
 
-        // Device binding events
-        EventLog::factory()
-            ->count(30)
-            ->state(['event_type' => \App\Enums\EventType::DEVICE_BOUND->value])
-            ->sequence(fn ($sequence) => [
-                'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
-                'license_id' => $licenses->isNotEmpty() ? $licenses->random()->id : null,
-                'created_at' => now()->subDays(rand(0, 90)),
-            ])
-            ->create();
+                    return [
+                        'account_id' => $license->used_by,
+                        'license_id' => $license->id,
+                        'actor_id' => $license->used_by,
+                        'created_at' => $eventDate,
+                        'details' => [
+                            'license_key' => $license->key,
+                            'activation_method' => 'user_activation',
+                            'device_count' => 1,
+                        ],
+                    ];
+                })
+                ->create();
+        }
 
-        // Device unbinding events
-        EventLog::factory()
-            ->count(20)
-            ->state(['event_type' => \App\Enums\EventType::DEVICE_UNBOUND->value])
-            ->sequence(fn ($sequence) => [
-                'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
-                'license_id' => $licenses->isNotEmpty() ? $licenses->random()->id : null,
-                'created_at' => now()->subDays(rand(0, 60)),
-            ])
-            ->create();
+        // Device binding events - correlate with license activation
+        if ($activeLicenses->isNotEmpty()) {
+            EventLog::factory()
+                ->count(min(12, $activeLicenses->count()))
+                ->state(['event_type' => \App\Enums\EventType::DEVICE_BOUND->value])
+                ->sequence(function ($sequence) use ($activeLicenses) {
+                    $license = $activeLicenses->values()->get($sequence->index % $activeLicenses->count());
+                    $activationDate = $license->activated_at ?? now()->subDays(rand(1, 365));
+                    $bindDate = $activationDate->copy()->addMinutes(rand(1, 1440)); // Within 24 hours of activation
+
+                    return [
+                        'account_id' => $license->used_by,
+                        'license_id' => $license->id,
+                        'created_at' => $bindDate,
+                        'details' => [
+                            'device_id' => fake()->uuid(),
+                            'device_name' => fake()->randomElement([
+                                'Windows Desktop',
+                                'MacBook Pro',
+                                'Ubuntu Server',
+                                'iPhone 14',
+                                'Android Tablet',
+                            ]),
+                            'binding_method' => 'automatic',
+                        ],
+                    ];
+                })
+                ->create();
+        }
+
+        // Device unbinding events - more recent
+        if ($activeLicenses->isNotEmpty()) {
+            EventLog::factory()
+                ->count(min(6, $activeLicenses->count()))
+                ->state(['event_type' => \App\Enums\EventType::DEVICE_UNBOUND->value])
+                ->sequence(function ($sequence) use ($activeLicenses) {
+                    $license = $activeLicenses->values()->get($sequence->index % $activeLicenses->count());
+                    $unbindDate = now()->subDays(rand(1, 90)); // Within last 3 months
+
+                    return [
+                        'account_id' => $license->used_by,
+                        'license_id' => $license->id,
+                        'created_at' => $unbindDate,
+                        'details' => [
+                            'device_id' => fake()->uuid(),
+                            'unbind_reason' => fake()->randomElement([
+                                'user_initiated',
+                                'license_expired',
+                                'device_limit_reached',
+                            ]),
+                        ],
+                    ];
+                })
+                ->create();
+        }
     }
 
     /**
@@ -78,7 +119,7 @@ class EventLogSeeder extends Seeder
     {
         // Login anomaly events
         EventLog::factory()
-            ->count(25)
+            ->count(8)
             ->loginAnomaly()
             ->sequence(fn ($sequence) => [
                 'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
@@ -89,7 +130,7 @@ class EventLogSeeder extends Seeder
 
         // Suspicious activity warnings
         EventLog::factory()
-            ->count(15)
+            ->count(5)
             ->warning()
             ->state(['event_type' => 'security.suspicious_activity'])
             ->sequence(fn ($sequence) => [
@@ -111,7 +152,7 @@ class EventLogSeeder extends Seeder
     {
         // Account suspension events
         EventLog::factory()
-            ->count(10)
+            ->count(3)
             ->error()
             ->state(['event_type' => \App\Enums\EventType::LICENSE_SUSPENDED->value])
             ->sequence(fn ($sequence) => [
@@ -129,7 +170,7 @@ class EventLogSeeder extends Seeder
 
         // License validation errors
         EventLog::factory()
-            ->count(8)
+            ->count(3)
             ->error()
             ->state(['event_type' => 'license.validation_failed'])
             ->sequence(fn ($sequence) => [
@@ -146,7 +187,7 @@ class EventLogSeeder extends Seeder
 
         // API rate limit errors
         EventLog::factory()
-            ->count(12)
+            ->count(4)
             ->error()
             ->state(['event_type' => 'api.rate_limit_exceeded'])
             ->sequence(fn ($sequence) => [
@@ -160,6 +201,48 @@ class EventLogSeeder extends Seeder
                 'created_at' => now()->subHours(rand(1, 48)),
             ])
             ->create();
+    }
+
+    /**
+     * Display event log statistics.
+     */
+    private function displayEventLogStats(): void
+    {
+        $this->command->info(str_repeat('-', 50));
+        $this->command->info('EVENT LOG STATISTICS');
+        $this->command->info(str_repeat('-', 50));
+
+        $total = EventLog::count();
+        $info = EventLog::where('event_level', 0)->count();
+        $warning = EventLog::where('event_level', 1)->count();
+        $error = EventLog::where('event_level', 2)->count();
+        $withAccount = EventLog::whereNotNull('account_id')->count();
+        $withLicense = EventLog::whereNotNull('license_id')->count();
+        $withActor = EventLog::whereNotNull('actor_id')->count();
+
+        $this->command->info("Total event logs: {$total}");
+        $this->command->info("Info level events: {$info}");
+        $this->command->info("Warning level events: {$warning}");
+        $this->command->info("Error level events: {$error}");
+        $this->command->info("Events with account: {$withAccount}");
+        $this->command->info("Events with license: {$withLicense}");
+        $this->command->info("Events with actor: {$withActor}");
+
+        // Show event type distribution
+        $eventTypes = EventLog::selectRaw('event_type, count(*) as count')
+            ->groupBy('event_type')
+            ->orderByDesc('count')
+            ->get();
+
+        if ($eventTypes->isNotEmpty()) {
+            $this->command->info('');
+            $this->command->info('Event type distribution:');
+            foreach ($eventTypes as $row) {
+                $this->command->info("  {$row->event_type}: {$row->count}");
+            }
+        }
+
+        $this->command->info(str_repeat('-', 50));
     }
 
     /**

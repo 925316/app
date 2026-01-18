@@ -15,20 +15,51 @@ class UsageStatisticSeeder extends Seeder
         // Clear existing statistics
         UsageStatistic::truncate();
 
-        // Create global statistics
+        // Create statistics
         $this->createGlobalStatistics();
-
-        // Create user statistics
         $this->createUserStatistics();
-
-        // Create license statistics
         $this->createLicenseStatistics();
-
-        // Create server statistics
         $this->createServerStatistics();
-
-        // Create additional random statistics for testing
         $this->createRandomStatistics();
+        $this->displayStatisticStats();
+    }
+
+    /**
+     * Display usage statistic statistics.
+     */
+    private function displayStatisticStats(): void
+    {
+        $this->command->info(str_repeat('-', 50));
+        $this->command->info('USAGE STATISTIC STATISTICS');
+        $this->command->info(str_repeat('-', 50));
+
+        $total = UsageStatistic::count();
+        $global = UsageStatistic::where('stat_type', UsageStatistic::TYPE_GLOBAL)->count();
+        $user = UsageStatistic::where('stat_type', UsageStatistic::TYPE_USER)->count();
+        $license = UsageStatistic::where('stat_type', UsageStatistic::TYPE_LICENSE)->count();
+        $server = UsageStatistic::where('stat_type', UsageStatistic::TYPE_SERVER)->count();
+
+        $this->command->info("Total statistics: {$total}");
+        $this->command->info("Global statistics: {$global}");
+        $this->command->info("User statistics: {$user}");
+        $this->command->info("License statistics: {$license}");
+        $this->command->info("Server statistics: {$server}");
+
+        // Show key distribution
+        $keyStats = UsageStatistic::selectRaw('stat_key, count(*) as count')
+            ->groupBy('stat_key')
+            ->orderByDesc('count')
+            ->get();
+
+        if ($keyStats->isNotEmpty()) {
+            $this->command->info('');
+            $this->command->info('Key distribution:');
+            foreach ($keyStats as $stat) {
+                $this->command->info("  {$stat->stat_key}: {$stat->count}");
+            }
+        }
+
+        $this->command->info(str_repeat('-', 50));
     }
 
     /**

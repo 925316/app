@@ -14,9 +14,34 @@ class ClientSessionSeeder extends Seeder
      */
     public function run(): void
     {
-        $accounts = Account::take(15)->get();
+        // Get existing accounts and devices for realistic relationships
+        $accounts = Account::take(10)->get();
         $devices = AccountDevice::whereIn('account_id', $accounts->pluck('id'))->get();
 
+        // Create active sessions
+        $this->createActiveSessions($accounts, $devices);
+
+        // Create expired sessions
+        $this->createExpiredSessions($accounts);
+
+        // Create sessions with no heartbeat
+        $this->createNoHeartbeatSessions($accounts);
+
+        // Create version-specific sessions
+        $this->createVersionSessions();
+
+        // Create IP-specific sessions
+        $this->createIpSessions();
+
+        // Display session statistics
+        $this->displaySessionStats();
+    }
+
+    /**
+     * Create active client sessions.
+     */
+    private function createActiveSessions($accounts, $devices): void
+    {
         $accounts->each(function ($account) use ($devices) {
             $accountDevices = $devices->where('account_id', $account->id);
 
@@ -32,19 +57,37 @@ class ClientSessionSeeder extends Seeder
                 });
             }
         });
+    }
 
-        $expiredCount = max(10, $accounts->count() * 2);
+    /**
+     * Create expired client sessions.
+     */
+    private function createExpiredSessions($accounts): void
+    {
+        $expiredCount = max(5, $accounts->count() * 2);
         ClientSession::factory()
             ->count($expiredCount)
             ->expired()
             ->create();
+    }
 
+    /**
+     * Create sessions with no heartbeat.
+     */
+    private function createNoHeartbeatSessions($accounts): void
+    {
         $noHeartbeatCount = max(5, $accounts->count());
         ClientSession::factory()
             ->count($noHeartbeatCount)
             ->noHeartbeat()
             ->create();
+    }
 
+    /**
+     * Create version-specific sessions.
+     */
+    private function createVersionSessions(): void
+    {
         $testVersions = [
             '1.0.0' => 3,
             '2.0.0' => 4,
@@ -57,8 +100,14 @@ class ClientSessionSeeder extends Seeder
                 ->version($version)
                 ->create();
         }
+    }
 
-        $testIps = ['192.168.1.100', '10.0.0.50', '172.16.0.25'];
+    /**
+     * Create IP-specific sessions.
+     */
+    private function createIpSessions(): void
+    {
+        $testIps = ['16.59.46.1', '72.22.3.1', '1.56.19.46'];
 
         foreach ($testIps as $ip) {
             ClientSession::factory()
@@ -67,22 +116,46 @@ class ClientSessionSeeder extends Seeder
                 ->active()
                 ->create();
         }
+    }
+
+    /**
+     * Display session statistics.
+     */
+    private function displaySessionStats(): void
+    {
+        $this->command->info(str_repeat('-', 50));
+        $this->command->info('CLIENT SESSION STATISTICS');
+        $this->command->info(str_repeat('-', 50));
+
+        $total = ClientSession::count();
+        $active = ClientSession::where('last_heartbeat_at', '>=', now()->subMinutes(30))->count();
+        $expired = ClientSession::where('last_heartbeat_at', '<', now()->subMinutes(30))->count();
+        $noHeartbeat = ClientSession::whereNull('last_heartbeat_at')->count();
 
         $this->command->table(
             ['Status', 'Count'],
             [
-                ['Active Sessions', ClientSession::active()->count()],
-                ['Expired Sessions', ClientSession::expired()->count()],
-                ['Total Sessions', ClientSession::count()],
+                ['Active Sessions', $active],
+                ['Expired Sessions', $expired],
+                ['No Heartbeat Sessions', $noHeartbeat],
+                ['Total Sessions', $total],
             ]
         );
-    }
 
-    /**
-     * Clean up old sessions before seeding
-     */
-    private function cleanupOldSessions(): void
-    {
-        ClientSession::where('created_at', '<', now()->subDays(30))->delete();
+        // Show version distribution
+        $versionStats = ClientSession::selectRaw('client_version, count(*) as count')
+            ->groupBy('client_version')
+            ->orderByDesc('count')
+            ->get();
+
+        if ($versionStats->isNotEmpty()) {
+            $this->command->info('');
+            $this->command->info('Version distribution:');
+            foreach ($versionStats as $stat) {
+                $this->command->info("  {$stat->client_version}: {$stat->count}");
+            }
+        }
+
+        $this->command->info(str_repeat('-', 50));
     }
 }

@@ -36,30 +36,35 @@ class LicenseFactory extends Factory
      */
     private function generateLicenseKey(): string
     {
+        // Segment 1: A-Z0-9 (5 chars)
         $segment1 = '';
         $chars1 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         for ($i = 0; $i < 5; $i++) {
             $segment1 .= $chars1[random_int(0, strlen($chars1) - 1)];
         }
 
+        // Segment 2: 0-9A-F (5 chars)
         $segment2 = '';
         $chars2 = '0123456789ABCDEF';
         for ($i = 0; $i < 5; $i++) {
             $segment2 .= $chars2[random_int(0, strlen($chars2) - 1)];
         }
 
+        // Segment 3: A-Z2-7 (5 chars)
         $segment3 = '';
         $chars3 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
         for ($i = 0; $i < 5; $i++) {
             $segment3 .= $chars3[random_int(0, strlen($chars3) - 1)];
         }
 
+        // Segment 4: A-Z3-8 (5 chars)
         $segment4 = '';
         $chars4 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ345678';
         for ($i = 0; $i < 5; $i++) {
             $segment4 .= $chars4[random_int(0, strlen($chars4) - 1)];
         }
 
+        // Segment 5: A-Z0-9 (5 chars)
         $segment5 = '';
         for ($i = 0; $i < 5; $i++) {
             $segment5 .= $chars1[random_int(0, strlen($chars1) - 1)];
@@ -104,12 +109,25 @@ class LicenseFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => 1,
-            'activated_at' => fake()->dateTimeBetween('-1 year', '-1 day'),
-            'expires_at' => fake()->dateTimeBetween('+1 month', '+2 years'),
-            'suspended_at' => null,
-        ]);
+        return $this->state(function (array $attributes) {
+            // Activated between 1-365 days ago
+            $activatedAt = fake()->dateTimeBetween('-365 days', '-1 day');
+
+            // Expires between 1 day from activation and 2 years from activation
+            $minExpiry = clone $activatedAt;
+            $minExpiry->modify('+1 day');
+            $maxExpiry = clone $activatedAt;
+            $maxExpiry->modify('+2 years');
+
+            $expiresAt = fake()->dateTimeBetween($minExpiry, $maxExpiry);
+
+            return [
+                'status' => 1,
+                'activated_at' => $activatedAt,
+                'expires_at' => $expiresAt,
+                'suspended_at' => null,
+            ];
+        });
     }
 
     /**
@@ -128,10 +146,19 @@ class LicenseFactory extends Factory
      */
     public function expired(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => 3,
-            'expires_at' => fake()->dateTimeBetween('-1 year', '-1 day'),
-        ]);
+        return $this->state(function (array $attributes) {
+            $expiresAt = fake()->dateTimeBetween('-1 year', '-1 day');
+            $activatedAt = fake()->dateTimeBetween(
+                $expiresAt->modify('-2 years')->format('Y-m-d H:i:s'),
+                $expiresAt->modify('+1 year')->format('Y-m-d H:i:s')
+            );
+
+            return [
+                'status' => 3,
+                'activated_at' => $activatedAt,
+                'expires_at' => $expiresAt,
+            ];
+        });
     }
 
     /**
