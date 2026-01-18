@@ -209,6 +209,84 @@ class LicenseController extends Controller
     }
 
     /**
+     * Activate a license by key for the current user.
+     */
+    public function activateByKey(Request $request)
+    {
+        $request->validate([
+            'license_key' => 'required|string|regex:/^[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$/',
+        ]);
+
+        $user = Auth::user();
+        $licenseKey = strtoupper($request->license_key);
+
+        try {
+            $license = LicenseService::getLicenseByKey($licenseKey);
+
+            if (! $license) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'license_key' => 'Invalid license key. Please check your license key and try again.',
+                ]);
+            }
+
+            // Check if license can be activated
+            if ($license->isExpired()) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'license_key' => 'License has expired.',
+                ]);
+            }
+
+            if (! $license->canActivate()) {
+                $reason = 'License cannot be activated.';
+                if ($license->status->value === LicenseStatus::REVOKED->value) {
+                    $reason = 'License has been revoked.';
+                } elseif ($license->status->value === LicenseStatus::SUSPENDED->value) {
+                    $reason = 'License has been suspended.';
+                } elseif ($license->status->value === LicenseStatus::ACTIVE->value) {
+                    $reason = 'License is already active and in use by another account.';
+                } elseif ($license->status->value === LicenseStatus::UPGRADED->value) {
+                    $reason = 'License has been upgraded and cannot be reactivated.';
+                }
+
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'license_key' => $reason,
+                ]);
+            }
+
+            // Check license upgrade/activation rules
+            $currentPrivilege = $user->getPrivilegeLevel();
+
+            if ($currentPrivilege > 0 && $license->privilege->value <= $currentPrivilege) {
+                // User has equal or higher privilege - prevent activation
+                $currentLevelName = LicensePrivilege::tryFrom($currentPrivilege)?->getLabel() ?? 'unknown';
+                $newLevelName = $license->privilege?->getLabel() ?? 'unknown';
+
+                $errorMessage = $license->privilege->value == $currentPrivilege
+                    ? "You already have an active {$currentLevelName} license. You cannot activate another license of the same level."
+                    : "You already have an active {$currentLevelName} license. You cannot downgrade to {$newLevelName}.";
+
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'license_key' => $errorMessage,
+                ]);
+            }
+
+            // Allow activation if:
+            // 1. User has no active license (currentPrivilege = 0), OR
+            // 2. New license has higher privilege than current license
+
+            LicenseService::activateLicense($license, $user, $request->ip());
+
+            // Log the event
+            event(new \App\Events\LicenseActivated($license, $user));
+
+            return redirect()->route('licenses.show', $license)
+                ->with('success', 'License activated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+    }
+
+    /**
      * Activate a license for the current user.
      */
     public function activate(Request $request, License $license)

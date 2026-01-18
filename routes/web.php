@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Licenses
     Route::resource('licenses', LicenseController::class);
+    Route::post('/licenses/activate-by-key', [LicenseController::class, 'activateByKey'])->name('licenses.activate-by-key');
     Route::post('/licenses/{license}/activate', [LicenseController::class, 'activate'])->name('licenses.activate');
     Route::post('/licenses/{license}/suspend', [LicenseController::class, 'suspend'])->name('licenses.suspend');
     Route::post('/licenses/{license}/reactivate', [LicenseController::class, 'reactivate'])->name('licenses.reactivate');

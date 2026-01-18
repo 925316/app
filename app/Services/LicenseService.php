@@ -58,6 +58,7 @@ class LicenseService
 
     /**
      * Activate a license for an account
+     * Note: Privilege level checks should be done by the controller, not here
      */
     public static function activateLicense(License $license, Account $account, ?string $ipAddress = null): bool
     {
@@ -67,12 +68,8 @@ class LicenseService
             ]);
         }
 
-        // Check if account already has an active license
-        if (License::hasActiveLicense($account->id)) {
-            throw ValidationException::withMessages([
-                'license' => 'Account already has an active license.',
-            ]);
-        }
+        // Note: We no longer check for existing active licenses here
+        // The controller should handle privilege level upgrade/downgrade logic
 
         return $license->activate($account->id, $ipAddress);
     }
@@ -167,7 +164,7 @@ class LicenseService
             return false;
         }
 
-        return $license->isValid();
+        return $license->canActivate();
     }
 
     /**
