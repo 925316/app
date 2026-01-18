@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,6 +36,17 @@ class ClientSession extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the IP address in a formatted way.
+     */
+    protected function ipAddress(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? inet_ntop($value) : null,
+            set: fn (?string $value) => $value ? inet_pton($value) : null,
+        );
     }
 
     /**

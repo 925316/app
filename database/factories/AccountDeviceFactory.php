@@ -2,9 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Account;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
@@ -20,29 +19,42 @@ class AccountDeviceFactory extends Factory
     {
         $firstSeen = $this->faker->dateTimeBetween('-1 year', '-1 month');
         $lastSeen = Carbon::parse($firstSeen)->addDays(rand(0, 30));
-        
+
         $isBound = $this->faker->boolean(80);
-        $boundAt = $isBound 
+        $boundAt = $isBound
             ? Carbon::parse($firstSeen)->addDays(rand(0, 7))
             : null;
-        
+
         $isUnbound = $isBound && $this->faker->boolean(30);
-        $unboundAt = $isUnbound 
+        $unboundAt = $isUnbound
             ? Carbon::parse($boundAt)->addDays(rand(1, 60))
             : null;
-  
+
         return [
-            'account_id'    => \App\Models\Account::factory(),
-            'hwid_hash'     => hash('sha256', $this->faker->uuid() . microtime()),
-            'ip_address'    => $this->faker->ipv4(),
-            'country_code'  => $this->faker->countryCode(),
+            'account_id' => \App\Models\Account::factory(),
+            'hwid_hash' => hash('sha256', $this->faker->uuid().microtime()),
+            'ip_address' => $this->generateValidIpv4(),
+            'country_code' => $this->faker->countryCode(),
             'first_seen_at' => $firstSeen,
-            'last_seen_at'  => $lastSeen,
-            'bound_at'      => $boundAt,
-            'unbound_at'    => $unboundAt,
-            'created_at'    => $firstSeen,
-            'updated_at'    => $lastSeen,
+            'last_seen_at' => $lastSeen,
+            'bound_at' => $boundAt,
+            'unbound_at' => $unboundAt,
+            'created_at' => $firstSeen,
+            'updated_at' => $lastSeen,
         ];
+    }
+
+    /**
+     * Generate a valid IPv4 address string.
+     */
+    private function generateValidIpv4(): string
+    {
+        return sprintf('%d.%d.%d.%d',
+            rand(1, 255),
+            rand(0, 255),
+            rand(0, 255),
+            rand(0, 255)
+        );
     }
 
     /**
@@ -53,7 +65,7 @@ class AccountDeviceFactory extends Factory
     public function bound(): static
     {
         return $this->state(fn (array $attributes) => [
-            'bound_at'   => Carbon::parse($attributes['first_seen_at'])->addDays(rand(0, 7)),
+            'bound_at' => Carbon::parse($attributes['first_seen_at'])->addDays(rand(0, 7)),
             'unbound_at' => null,
         ]);
     }
@@ -66,7 +78,7 @@ class AccountDeviceFactory extends Factory
     public function unbound(): static
     {
         return $this->state(fn (array $attributes) => [
-            'bound_at'   => Carbon::parse($attributes['first_seen_at'])->addDays(rand(0, 7)),
+            'bound_at' => Carbon::parse($attributes['first_seen_at'])->addDays(rand(0, 7)),
             'unbound_at' => Carbon::now()->subDays(rand(1, 30)),
         ]);
     }
@@ -79,7 +91,7 @@ class AccountDeviceFactory extends Factory
     public function neverBound(): static
     {
         return $this->state(fn (array $attributes) => [
-            'bound_at'   => null,
+            'bound_at' => null,
             'unbound_at' => null,
         ]);
     }
@@ -99,7 +111,6 @@ class AccountDeviceFactory extends Factory
     /**
      * Indicate that the device is inactive.
      *
-     * @param int $days
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function inactive(int $days = 60): static
@@ -112,7 +123,6 @@ class AccountDeviceFactory extends Factory
     /**
      * Indicate a specific country for the device.
      *
-     * @param string $countryCode
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function country(string $countryCode): static
@@ -130,7 +140,7 @@ class AccountDeviceFactory extends Factory
     public function localNetwork(): static
     {
         return $this->state(fn (array $attributes) => [
-            'ip_address' => $this->faker->ipv4('192.168.0.0/16'),
+            'ip_address' => sprintf('192.168.%d.%d', rand(0, 255), rand(1, 254)),
         ]);
     }
 }

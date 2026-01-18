@@ -23,7 +23,7 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('licenses')
                 ->nullOnDelete();
-            $table->string('ip_address', 45)->nullable();
+            $table->binary('ip_address', 16)->nullable();
             $table->foreignId('actor_id')
                 ->nullable()
                 ->constrained('accounts')

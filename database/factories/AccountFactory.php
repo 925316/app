@@ -31,7 +31,7 @@ class AccountFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'password' => Hash::make('password'), // Default test password
             'last_login_at' => $this->faker->optional(0.7)->dateTimeBetween($createdAt, 'now'),
-            'last_ip_address' => $this->faker->optional()->ipv4(),
+            'last_ip_address' => $this->faker->optional() ? $this->generateValidIpv4() : null,
             'last_user_agent' => $this->faker->optional()->userAgent(),
             'hwid_reset_count' => $this->faker->numberBetween(0, 5),
             'hwid_last_reset_at' => $this->faker->optional(0.3)->dateTimeBetween($createdAt, 'now'),
@@ -41,7 +41,7 @@ class AccountFactory extends Factory
                 'Suspicious activity detected',
                 'Payment issue',
                 'Manual suspension by admin',
-                'Multiple failed login attempts'
+                'Multiple failed login attempts',
             ]) : null,
             'suspended_until' => $suspended ? $this->faker->optional(0.5)->dateTimeBetween('now', '+30 days') : null,
             'email_verified_at' => $this->faker->optional(0.8)->dateTimeBetween($createdAt, 'now'),
@@ -52,6 +52,19 @@ class AccountFactory extends Factory
             'created_at' => $createdAt,
             'updated_at' => $this->faker->dateTimeBetween($createdAt, 'now'),
         ];
+    }
+
+    /**
+     * Generate a valid IPv4 address string.
+     */
+    private function generateValidIpv4(): string
+    {
+        return sprintf('%d.%d.%d.%d',
+            rand(1, 255),
+            rand(0, 255),
+            rand(0, 255),
+            rand(0, 255)
+        );
     }
 
     /**
@@ -89,7 +102,7 @@ class AccountFactory extends Factory
     /**
      * Indicate that the account is suspended.
      */
-    public function suspended(string $reason = null): static
+    public function suspended(?string $reason = null): static
     {
         return $this->state(fn (array $attributes) => [
             'is_suspended' => true,
@@ -120,7 +133,7 @@ class AccountFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'last_login_at' => now()->subMinutes($this->faker->numberBetween(1, 60)),
-            'last_ip_address' => $this->faker->ipv4(),
+            'last_ip_address' => $this->generateValidIpv4(),
             'last_user_agent' => $this->faker->userAgent(),
         ]);
     }

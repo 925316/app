@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->timestamp('last_login_at')->nullable();
-            $table->string('last_ip_address', 45)->nullable();
+            $table->binary('last_ip_address', 16)->nullable();
             $table->text('last_user_agent')->nullable();
             $table->unsignedInteger('hwid_reset_count')->default(0);
             $table->timestamp('hwid_last_reset_at')->nullable();

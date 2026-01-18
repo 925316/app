@@ -39,13 +39,25 @@ class ClientSessionFactory extends Factory
             'session_token' => Str::random(64),
             'account_id' => Account::factory(),
             'device_id' => AccountDevice::factory(),
-            'ip_address' => $this->faker->ipv4(),
+            'ip_address' => $this->generateValidIpv4(),
             'client_version' => $this->faker->randomElement($clientVersions),
             'last_heartbeat_at' => $this->faker->randomElement($heartbeatOptions),
             'created_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
-            'updated_at' => fn (array $attributes) => 
-                $this->faker->dateTimeBetween($attributes['created_at'], 'now'),
+            'updated_at' => fn (array $attributes) => $this->faker->dateTimeBetween($attributes['created_at'], 'now'),
         ];
+    }
+
+    /**
+     * Generate a valid IPv4 address string.
+     */
+    private function generateValidIpv4(): string
+    {
+        return sprintf('%d.%d.%d.%d',
+            rand(1, 255),
+            rand(0, 255),
+            rand(0, 255),
+            rand(0, 255)
+        );
     }
 
     /**
@@ -65,7 +77,6 @@ class ClientSessionFactory extends Factory
     /**
      * Indicate that the session is expired.
      *
-     * @param int $minutesAgo
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function expired(int $minutesAgo = 30): static
@@ -94,7 +105,6 @@ class ClientSessionFactory extends Factory
     /**
      * Indicate a specific client version.
      *
-     * @param string $version
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function version(string $version): static
@@ -109,7 +119,6 @@ class ClientSessionFactory extends Factory
     /**
      * Indicate a specific IP address.
      *
-     * @param string $ip
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function ip(string $ip): static
@@ -124,7 +133,6 @@ class ClientSessionFactory extends Factory
     /**
      * Indicate a specific account.
      *
-     * @param Account $account
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function forAccount(Account $account): static
@@ -139,7 +147,6 @@ class ClientSessionFactory extends Factory
     /**
      * Indicate a specific device.
      *
-     * @param AccountDevice $device
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function forDevice(AccountDevice $device): static

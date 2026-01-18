@@ -34,7 +34,7 @@ test('profile information can be updated', function () {
 });
 
 test('email verification status is unchanged when the email address is unchanged', function () {
-    $user = Account::factory()->create();
+    $user = Account::factory()->verified()->create();
 
     $response = $this
         ->actingAs($user)

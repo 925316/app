@@ -55,13 +55,26 @@ class EventLogFactory extends Factory
             'license_id' => $useLicense && License::count() > 0
                 ? License::inRandomOrder()->first()->id
                 : null,
-            'ip_address' => $this->faker->ipv4(),
+            'ip_address' => $this->generateValidIpv4(),
             'actor_id' => $useActor && Account::count() > 0
                 ? Account::inRandomOrder()->first()->id
                 : null,
             'details' => $this->generateEventDetails(),
             'created_at' => $this->faker->dateTimeBetween('-6 months', 'now'),
         ];
+    }
+
+    /**
+     * Generate a valid IPv4 address string.
+     */
+    private function generateValidIpv4(): string
+    {
+        return sprintf('%d.%d.%d.%d',
+            rand(1, 255),
+            rand(0, 255),
+            rand(0, 255),
+            rand(0, 255)
+        );
     }
 
     /**

@@ -18,7 +18,7 @@ return new class extends Migration
                 ->constrained('accounts')
                 ->onDelete('cascade');
             $table->string('hwid_hash', 64)->nullable(false);
-            $table->string('ip_address', 45)->nullable(false);
+            $table->binary('ip_address', 16)->nullable(false);
             $table->char('country_code', 2)->nullable();
             $table->json('characteristics')->nullable();
             $table->timestamp('first_seen_at')->useCurrent();

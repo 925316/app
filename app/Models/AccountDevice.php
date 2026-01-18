@@ -30,7 +30,7 @@ class AccountDevice extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -42,6 +42,17 @@ class AccountDevice extends Model
             'bound_at' => 'datetime',
             'unbound_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the IP address in a formatted way.
+     */
+    protected function ipAddress(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? inet_ntop($value) : null,
+            set: fn (?string $value) => $value ? inet_pton($value) : null,
+        );
     }
 
     /**

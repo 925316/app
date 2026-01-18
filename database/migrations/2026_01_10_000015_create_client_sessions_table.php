@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('device_id')
                 ->constrained('account_devices')
                 ->onDelete('cascade');
-            $table->string('ip_address', 45)->nullable(false);
+            $table->binary('ip_address', 16)->nullable(false);
             $table->string('client_version', 50)->nullable(false);
             $table->timestamp('last_heartbeat_at')->nullable();
             
