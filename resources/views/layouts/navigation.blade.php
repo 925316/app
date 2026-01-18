@@ -27,10 +27,6 @@
                     </x-nav-link>
                 </div>
 
-                <!-- Dark Mode Toggle -->
-                <div class="hidden sm:flex sm:items-center sm:ms-6">
-                    <x-dark-mode-toggle />
-                </div>
             </div>
 
             <!-- Settings Dropdown -->
@@ -69,7 +65,14 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
+
+                <!-- Dark Mode Toggle -->
+                <div class="hidden sm:flex sm:items-center sm:ms-6">
+                    <x-dark-mode-toggle />
+                </div>
             </div>
+
+
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden z-10">
