@@ -12,11 +12,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Dark mode test route
-Route::get('/test-dark-mode', function () {
-    return view('test-dark-mode');
-})->middleware(['auth', 'verified'])->name('test-dark-mode');
-
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
