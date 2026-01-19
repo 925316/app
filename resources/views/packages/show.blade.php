@@ -68,23 +68,12 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">File Size:</span>
-                                    <span class="font-medium">
-                                        @php
-                                            $filePath = $release->download_url ? storage_path('app/public/' . $release->download_url) : null;
-                                            $fileSize = $filePath && file_exists($filePath) ? filesize($filePath) : 0;
-                                            $formattedSize = $fileSize > 0 ? \App\Services\PackageService::formatFileSize($fileSize) : 'Unknown';
-                                        @endphp
-                                        {{ $formattedSize }}
-                                    </span>
+                                    <span class="font-medium">Remote file (size not available)</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Checksum Verified:</span>
                                     <span class="font-medium">
-                                        @if(\App\Services\PackageService::verifyChecksum($release))
-                                            <span class="text-green-600 dark:text-green-400">✓ Valid</span>
-                                        @else
-                                            <span class="text-red-600 dark:text-red-400">✗ Invalid</span>
-                                        @endif
+                                        <span class="text-gray-600 dark:text-gray-400">Not applicable for remote files</span>
                                     </span>
                                 </div>
                             </div>

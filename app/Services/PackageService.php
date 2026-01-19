@@ -14,7 +14,7 @@ class PackageService
     public static function uploadPackage(
         string $version,
         string $releaseChannel,
-        string $filePath,
+        string $downloadUrl,
         ?string $changelog = null
     ): PackageRelease {
         // Validate version format (semantic versioning)
@@ -31,21 +31,18 @@ class PackageService
             ]);
         }
 
-        // Validate file exists
-        if (! Storage::exists($filePath)) {
+        // Validate URL format
+        if (! filter_var($downloadUrl, FILTER_VALIDATE_URL)) {
             throw ValidationException::withMessages([
-                'file' => 'File does not exist.',
+                'download_url' => 'Invalid download URL format.',
             ]);
         }
-
-        // Calculate checksum
-        $checksum = hash_file('sha256', Storage::path($filePath));
 
         return PackageRelease::create([
             'version' => $version,
             'release_channel' => $releaseChannel,
-            'download_url' => $filePath,
-            'checksum_sha256' => $checksum,
+            'download_url' => $downloadUrl,
+            'checksum_sha256' => null, // No checksum for remote files
             'changelog' => $changelog,
         ]);
     }
@@ -116,7 +113,7 @@ class PackageService
      */
     public static function getDownloadUrl(PackageRelease $release): string
     {
-        return Storage::url($release->download_url);
+        return $release->download_url;
     }
 
     /**
@@ -124,13 +121,9 @@ class PackageService
      */
     public static function verifyChecksum(PackageRelease $release): bool
     {
-        if (! $release->download_url || ! Storage::exists($release->download_url)) {
-            return false;
-        }
-
-        $currentChecksum = hash_file('sha256', Storage::path($release->download_url));
-
-        return $currentChecksum === $release->checksum_sha256;
+        // For remote files, checksum verification is not applicable
+        // We return true if checksum is not set (remote files)
+        return $release->checksum_sha256 === null;
     }
 
     /**

@@ -158,7 +158,7 @@
                 <a href="{{ route('packages.upload') }}" class="group p-6 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-green-400/50">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h5 class="font-semibold text-lg mb-1">Upload Package</h5>
+                            <h5 class="font-semibold text-lg mb-1">Add Package</h5>
                             <p class="text-green-100 text-sm">Add new software packages</p>
                         </div>
                         <svg class="w-8 h-8 opacity-80 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

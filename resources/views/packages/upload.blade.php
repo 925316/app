@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Upload Package') }}
+            {{ __('Add Package') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form method="POST" action="{{ route('packages.store') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('packages.store') }}">
                         @csrf
 
                         <!-- Version -->
@@ -38,16 +38,17 @@
                             @enderror
                         </div>
 
-                        <!-- File Upload -->
+                        <!-- Download URL -->
                         <div class="mb-4">
-                            <label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Package File</label>
-                            <input type="file" name="file" id="file"
-                                   class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                            @error('file')
+                            <label for="download_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Download URL</label>
+                            <input type="url" name="download_url" id="download_url" value="{{ old('download_url') }}"
+                                   class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                                   placeholder="https://example.com/downloads/package.zip">
+                            @error('download_url')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                Supported formats: ZIP, TAR, GZ, RAR, 7Z. Max size: 100MB.
+                                Enter the direct download URL for the package file.
                             </p>
                         </div>
 
@@ -68,7 +69,7 @@
                                 Cancel
                             </a>
                             <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                                Upload Package
+                                Add Package
                             </button>
                         </div>
                     </form>

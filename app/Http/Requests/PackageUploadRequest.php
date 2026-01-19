@@ -40,11 +40,10 @@ class PackageUploadRequest extends FormRequest
                 'string',
                 Rule::in(['stable', 'dev']),
             ],
-            'file' => [
+            'download_url' => [
                 'required',
-                'file',
-                'mimes:zip,tar,gz,rar,7z',
-                'max:102400', // 100MB
+                'url',
+                'max:255',
             ],
             'changelog' => [
                 'nullable',
@@ -64,9 +63,9 @@ class PackageUploadRequest extends FormRequest
             'version.unique' => 'This version already exists.',
             'release_channel.required' => 'The release channel is required.',
             'release_channel.in' => 'The release channel must be either stable or dev.',
-            'file.required' => 'The package file is required.',
-            'file.mimes' => 'The package file must be a valid archive (zip, tar, gz, rar, 7z).',
-            'file.max' => 'The package file may not be greater than 100MB.',
+            'download_url.required' => 'The download URL is required.',
+            'download_url.url' => 'The download URL must be a valid URL.',
+            'download_url.max' => 'The download URL may not be greater than 255 characters.',
             'changelog.max' => 'The changelog cannot exceed 65535 characters.',
         ];
     }

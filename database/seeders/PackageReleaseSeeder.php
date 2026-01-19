@@ -54,7 +54,7 @@ class PackageReleaseSeeder extends Seeder
                 'version' => $release[0],
                 'release_channel' => $release[1],
                 'download_url' => $release[2],
-                'checksum_sha256' => hash('sha256', $release[0]),
+                'checksum_sha256' => null, // No checksum for remote files
                 'changelog' => $release[3],
             ]);
         }
@@ -161,21 +161,21 @@ class PackageReleaseSeeder extends Seeder
                 'version' => '1.0.0',
                 'release_channel' => 'stable',
                 'download_url' => 'https://example.com/downloads/v1.0.0/package.zip',
-                'checksum_sha256' => hash('sha256', 'initial-release-v1.0.0'),
+                'checksum_sha256' => null, // No checksum for remote files
                 'changelog' => $this->generateMilestoneChangelog('1.0.0', true),
             ],
             [
                 'version' => '2.0.0',
                 'release_channel' => 'stable',
                 'download_url' => 'https://example.com/downloads/v2.0.0/package.zip',
-                'checksum_sha256' => hash('sha256', 'major-release-v2.0.0'),
+                'checksum_sha256' => null, // No checksum for remote files
                 'changelog' => $this->generateMilestoneChangelog('2.0.0'),
             ],
             [
                 'version' => '2.1.0-rc',
                 'release_channel' => 'dev',
                 'download_url' => 'https://example.com/downloads/v2.1.0-rc/package.zip',
-                'checksum_sha256' => hash('sha256', 'release-candidate-v2.1.0-rc'),
+                'checksum_sha256' => null, // No checksum for remote files
                 'changelog' => $this->generateMilestoneChangelog('2.1.0-rc', false, true),
             ],
         ];

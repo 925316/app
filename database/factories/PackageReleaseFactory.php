@@ -24,9 +24,7 @@ class PackageReleaseFactory extends Factory
             'version' => $this->generateVersion(),
             'release_channel' => $this->faker->randomElement(['stable', 'dev']),
             'download_url' => $this->faker->url(),
-            'checksum_sha256' => $this->faker->boolean(90)
-                ? hash('sha256', $this->faker->text(50))
-                : null,
+            'checksum_sha256' => null, // No checksum for remote files
             'changelog' => $this->faker->boolean(80)
                 ? $this->generateChangelog()
                 : null,

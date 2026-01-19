@@ -16,7 +16,7 @@
                         @if($isAdmin ?? false)
                             <div class="flex gap-2">
                                 <a href="{{ route('packages.upload') }}" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                                    Upload New Package
+                                    Add New Package
                                 </a>
                                 <a href="{{ route('packages.versions') }}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
                                     Manage Versions

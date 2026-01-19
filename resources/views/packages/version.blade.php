@@ -13,7 +13,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-medium">Manage Package Versions</h3>
                         <a href="{{ route('packages.upload') }}" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                            Upload New Package
+                            Add New Package
                         </a>
                     </div>
 

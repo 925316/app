@@ -53,13 +53,10 @@ class PackageController extends Controller
 
         $validated = $request->validated();
 
-        // Store the uploaded file
-        $filePath = $request->file('file')->store('packages', 'public');
-
         $release = PackageService::uploadPackage(
             $validated['version'],
             $validated['release_channel'],
-            $filePath,
+            $validated['download_url'],
             $validated['changelog'] ?? null
         );
 
@@ -67,7 +64,7 @@ class PackageController extends Controller
         event(new \App\Events\PackageUploaded($release));
 
         return redirect()->route('packages.index')
-            ->with('success', 'Package uploaded successfully!');
+            ->with('success', 'Package added successfully!');
     }
 
     /**
@@ -99,12 +96,8 @@ class PackageController extends Controller
             abort(403, 'You need a valid license to download packages.');
         }
 
-        // Verify checksum before download
-        if (! PackageService::verifyChecksum($release)) {
-            abort(404, 'Package file integrity check failed.');
-        }
-
-        return Storage::download($release->download_url);
+        // Redirect to the actual download URL
+        return redirect()->away($release->download_url);
     }
 
     /**
