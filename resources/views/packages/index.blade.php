@@ -108,7 +108,7 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $release->created_at->format('Y-m-d H:i:s') }}
+                                            {{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 break-all">
                                             {{ $release->checksum_sha256 }}
@@ -117,9 +117,9 @@
                                             <a href="{{ route('packages.show', $release) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
                                                 Details
                                             </a>
-                                            @if($canDownload ?? false)
+                                            @if($canDownload ?? false && $release->id)
                                                 <span class="mx-2 text-gray-400">|</span>
-                                                <a href="{{ route('packages.download', $release) }}" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
+                                                <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
                                                     Download
                                                 </a>
                                             @endif

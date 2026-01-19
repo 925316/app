@@ -42,12 +42,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/devices/reset-hwid', [DeviceController::class, 'resetHwid'])->name('devices.reset-hwid');
 
     // Packages
-    Route::resource('packages', PackageController::class);
-    Route::get('/packages/download/{package}', [PackageController::class, 'download'])->name('packages.download');
+    Route::get('/packages/download/{release}', [PackageController::class, 'download'])->name('packages.download');
     Route::get('/packages/upload', [PackageController::class, 'upload'])->name('packages.upload');
     Route::post('/packages/upload', [PackageController::class, 'store'])->name('packages.store');
     Route::get('/packages/versions', [PackageController::class, 'versions'])->name('packages.versions');
-    Route::post('/packages/{package}/update-changelog', [PackageController::class, 'updateChangelog'])->name('packages.update-changelog');
+    Route::post('/packages/{release}/update-changelog', [PackageController::class, 'updateChangelog'])->name('packages.update-changelog');
+    Route::resource('packages', PackageController::class)->parameters(['packages' => 'release']);
 
     // Admin-only routes
     Route::middleware('admin')->group(function () {

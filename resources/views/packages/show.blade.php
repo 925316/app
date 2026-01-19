@@ -50,7 +50,7 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Released At:</span>
-                                    <span class="font-medium">{{ $release->created_at->format('Y-m-d H:i:s') }}</span>
+                                    <span class="font-medium">{{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">SHA256 Checksum:</span>
@@ -70,8 +70,8 @@
                                     <span class="text-gray-600 dark:text-gray-300">File Size:</span>
                                     <span class="font-medium">
                                         @php
-                                            $filePath = storage_path('app/public/' . $release->download_url);
-                                            $fileSize = file_exists($filePath) ? filesize($filePath) : 0;
+                                            $filePath = $release->download_url ? storage_path('app/public/' . $release->download_url) : null;
+                                            $fileSize = $filePath && file_exists($filePath) ? filesize($filePath) : 0;
                                             $formattedSize = $fileSize > 0 ? \App\Services\PackageService::formatFileSize($fileSize) : 'Unknown';
                                         @endphp
                                         {{ $formattedSize }}
@@ -107,8 +107,8 @@
                     <div class="mb-6">
                         <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">Download</h4>
                         <div class="flex flex-col sm:flex-row gap-3">
-                            @if($canDownload ?? false)
-                                <a href="{{ route('packages.download', $release) }}" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition text-center">
+                            @if($canDownload ?? false && $release->id)
+                                <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition text-center">
                                     Download Package
                                 </a>
                             @else

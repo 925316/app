@@ -52,7 +52,7 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $release->created_at->format('Y-m-d H:i:s') }}
+                                            {{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 break-all">
                                             {{ $release->checksum_sha256 }}

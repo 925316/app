@@ -124,7 +124,7 @@ class PackageService
      */
     public static function verifyChecksum(PackageRelease $release): bool
     {
-        if (! Storage::exists($release->download_url)) {
+        if (! $release->download_url || ! Storage::exists($release->download_url)) {
             return false;
         }
 
