@@ -83,9 +83,6 @@
                                         Released
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Checksum
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Hash Verification
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -98,26 +95,23 @@
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                             {{ $release->version }}
-                                            @if($release->version === ($stats['latest_stable']?->version ?? null))
-                                                <span class="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
-                                                    Latest Stable
-                                                </span>
-                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                                             <span class="px-2 py-1 rounded-full text-xs font-medium
                                                 {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' }}">
                                                 {{ ucfirst($release->release_channel) }}
                                             </span>
+                                            @if($release->version === ($stats['latest_stable']?->version ?? null))
+                                                <span class="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
+                                                    Latest Stable
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                             {{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 break-all">
-                                            {{ $release->checksum_sha256 }}
-                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            @if($release->virus_detection_link)
+                                            @if($release->virus_detection_url)
                                                 <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                                                     Available
                                                 </span>

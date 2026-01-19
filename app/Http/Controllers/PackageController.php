@@ -58,7 +58,7 @@ class PackageController extends Controller
             $validated['release_channel'],
             $validated['download_url'],
             $validated['changelog'] ?? null,
-            $validated['virus_detection_link'] ?? null
+            $validated['virus_detection_url'] ?? null
         );
 
         // Log the event

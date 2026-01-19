@@ -32,9 +32,6 @@
                                         Released
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Checksum
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Hash Verification
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -57,11 +54,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                             {{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 break-all">
-                                            {{ $release->checksum_sha256 }}
-                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            @if($release->virus_detection_link)
+                                            @if($release->virus_detection_url)
                                                 <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                                                     Available
                                                 </span>
@@ -76,7 +70,7 @@
                                                 View
                                             </a>
                                             <span class="mx-2 text-gray-400">|</span>
-                                            <form action="{{ route('packages.destroy', $release) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this package release? This action cannot be undone.')">
+                                            <form class="inline" action="{{ route('packages.destroy', $release) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this package release? This action cannot be undone.')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">

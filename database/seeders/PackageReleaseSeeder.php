@@ -54,7 +54,7 @@ class PackageReleaseSeeder extends Seeder
                 'version' => $release[0],
                 'release_channel' => $release[1],
                 'download_url' => $release[2],
-                'virus_detection_link' => null, // No virus detection link for seeded data
+                'virus_detection_url' => null, // No virus detection link for seeded data
                 'changelog' => $release[3],
             ]);
         }
@@ -74,7 +74,7 @@ class PackageReleaseSeeder extends Seeder
         $total = PackageRelease::count();
         $stable = PackageRelease::where('release_channel', 'stable')->count();
         $dev = PackageRelease::where('release_channel', 'dev')->count();
-        $withVirusDetection = PackageRelease::whereNotNull('virus_detection_link')->count();
+        $withVirusDetection = PackageRelease::whereNotNull('virus_detection_url')->count();
         $withChangelog = PackageRelease::whereNotNull('changelog')->count();
 
         $this->command->info("Total package releases: {$total}");
@@ -161,21 +161,21 @@ class PackageReleaseSeeder extends Seeder
                 'version' => '1.0.0',
                 'release_channel' => 'stable',
                 'download_url' => 'https://example.com/downloads/v1.0.0/package.zip',
-                'virus_detection_link' => null, // No virus detection link for seeded data
+                'virus_detection_url' => null, // No virus detection link for seeded data
                 'changelog' => $this->generateMilestoneChangelog('1.0.0', true),
             ],
             [
                 'version' => '2.0.0',
                 'release_channel' => 'stable',
                 'download_url' => 'https://example.com/downloads/v2.0.0/package.zip',
-                'virus_detection_link' => null, // No virus detection link for seeded data
+                'virus_detection_url' => null, // No virus detection link for seeded data
                 'changelog' => $this->generateMilestoneChangelog('2.0.0'),
             ],
             [
                 'version' => '2.1.0-rc',
                 'release_channel' => 'dev',
                 'download_url' => 'https://example.com/downloads/v2.1.0-rc/package.zip',
-                'virus_detection_link' => null, // No virus detection link for seeded data
+                'virus_detection_url' => null, // No virus detection link for seeded data
                 'changelog' => $this->generateMilestoneChangelog('2.1.0-rc', false, true),
             ],
         ];

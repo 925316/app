@@ -18,7 +18,7 @@ class PackageRelease extends Model
         'version',
         'release_channel',
         'download_url',
-        'virus_detection_link',
+        'virus_detection_url',
         'changelog',
     ];
 

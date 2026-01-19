@@ -43,7 +43,7 @@ class PackageService
             'version' => $version,
             'release_channel' => $releaseChannel,
             'download_url' => $downloadUrl,
-            'virus_detection_link' => $virusDetectionLink,
+            'virus_detection_url' => $virusDetectionLink,
             'changelog' => $changelog,
         ]);
     }
@@ -115,16 +115,6 @@ class PackageService
     public static function getDownloadUrl(PackageRelease $release): string
     {
         return $release->download_url;
-    }
-
-    /**
-     * Verify package checksum
-     */
-    public static function verifyChecksum(PackageRelease $release): bool
-    {
-        // For remote files, checksum verification is not applicable
-        // We return true if checksum is not set (remote files)
-        return $release->checksum_sha256 === null;
     }
 
     /**

@@ -52,10 +52,6 @@
                                     <span class="text-gray-600 dark:text-gray-300">Released At:</span>
                                     <span class="font-medium">{{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}</span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-300">SHA256 Checksum:</span>
-                                    <span class="font-medium break-all">{{ $release->checksum_sha256 ?? 'N/A' }}</span>
-                                </div>
                             </div>
                         </div>
 
@@ -76,7 +72,7 @@
                                         <span class="text-gray-600 dark:text-gray-400">Not applicable for remote files</span>
                                     </span>
                                 </div>
-                                @if($release->virus_detection_link)
+                                @if($release->virus_detection_url)
                                     <div class="flex justify-between">
                                         <span class="text-gray-600 dark:text-gray-300">Virus Detection:</span>
                                         <span class="font-medium">
@@ -101,13 +97,13 @@
                     @endif
 
                     <!-- Virus Detection Links -->
-                    @if($release->virus_detection_link)
+                    @if($release->virus_detection_url)
                         <div class="mb-6">
                             <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">Virus Detection</h4>
                             <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                                 <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Verify package safety using these links:</p>
                                 <div class="space-y-2">
-                                    @foreach(explode("\n", $release->virus_detection_link) as $url)
+                                    @foreach(explode("\n", $release->virus_detection_url) as $url)
                                         @if(trim($url))
                                             <div class="flex items-center gap-2">
                                                 <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

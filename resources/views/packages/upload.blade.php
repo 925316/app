@@ -54,11 +54,11 @@
 
                         <!-- Virus Detection Link -->
                         <div class="mb-4">
-                            <label for="virus_detection_link" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Virus Detection Link (Optional)</label>
-                            <textarea name="virus_detection_link" id="virus_detection_link" rows="3"
+                            <label for="virus_detection_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Virus Detection Link (Optional)</label>
+                            <textarea name="virus_detection_url" id="virus_detection_url" rows="3"
                                       class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                                      placeholder="https://www.virustotal.com/gui/file/abc123&#10;https://www.hybrid-analysis.com/sample/def456&#10;https://www.joesandbox.com/analysis/789">{{ old('virus_detection_link') }}</textarea>
-                            @error('virus_detection_link')
+                                      placeholder="https://www.virustotal.com/gui/file/abc123&#10;https://www.hybrid-analysis.com/sample/def456&#10;https://www.joesandbox.com/analysis/789">{{ old('virus_detection_url') }}</textarea>
+                            @error('virus_detection_url')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">

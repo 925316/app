@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('version', 50)->unique()->nullable(false);
             $table->enum('release_channel', ['stable', 'dev'])->default('stable');
             $table->string('download_url', 255)->nullable(false);
-            $table->text('virus_detection_link')->nullable();
+            $table->text('virus_detection_url')->nullable();
             $table->text('changelog')->nullable();
 
             $table->timestamps();
