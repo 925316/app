@@ -15,7 +15,8 @@ class PackageService
         string $version,
         string $releaseChannel,
         string $downloadUrl,
-        ?string $changelog = null
+        ?string $changelog = null,
+        ?string $virusDetectionLink = null
     ): PackageRelease {
         // Validate version format (semantic versioning)
         if (! self::isValidSemanticVersion($version)) {
@@ -42,7 +43,7 @@ class PackageService
             'version' => $version,
             'release_channel' => $releaseChannel,
             'download_url' => $downloadUrl,
-            'checksum_sha256' => null, // No checksum for remote files
+            'virus_detection_link' => $virusDetectionLink,
             'changelog' => $changelog,
         ]);
     }

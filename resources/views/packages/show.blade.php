@@ -54,7 +54,7 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">SHA256 Checksum:</span>
-                                    <span class="font-medium break-all">{{ $release->checksum_sha256 }}</span>
+                                    <span class="font-medium break-all">{{ $release->checksum_sha256 ?? 'N/A' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -76,6 +76,14 @@
                                         <span class="text-gray-600 dark:text-gray-400">Not applicable for remote files</span>
                                     </span>
                                 </div>
+                                @if($release->virus_detection_link)
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-300">Virus Detection:</span>
+                                        <span class="font-medium">
+                                            <span class="text-gray-600 dark:text-gray-400">Available</span>
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -87,6 +95,30 @@
                             <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                                 <div class="prose dark:prose-invert max-w-none text-sm">
                                     {!! nl2br(e($release->changelog)) !!}
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Virus Detection Links -->
+                    @if($release->virus_detection_link)
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">Virus Detection</h4>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Verify package safety using these links:</p>
+                                <div class="space-y-2">
+                                    @foreach(explode("\n", $release->virus_detection_link) as $url)
+                                        @if(trim($url))
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 00-5.656-5.656l-1.1 1.1"></path>
+                                                </svg>
+                                                <a href="{{ trim($url) }}" target="_blank" rel="noopener noreferrer" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline break-all">
+                                                    {{ trim($url) }}
+                                                </a>
+                                            </div>
+                                        @endif
+                                    @endforeach
                                 </div>
                             </div>
                         </div>

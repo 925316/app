@@ -45,6 +45,11 @@ class PackageUploadRequest extends FormRequest
                 'url',
                 'max:255',
             ],
+            'virus_detection_link' => [
+                'nullable',
+                'string',
+                'max:2000',
+            ],
             'changelog' => [
                 'nullable',
                 'string',

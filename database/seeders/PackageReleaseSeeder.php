@@ -54,7 +54,7 @@ class PackageReleaseSeeder extends Seeder
                 'version' => $release[0],
                 'release_channel' => $release[1],
                 'download_url' => $release[2],
-                'checksum_sha256' => null, // No checksum for remote files
+                'virus_detection_link' => null, // No virus detection link for seeded data
                 'changelog' => $release[3],
             ]);
         }
@@ -74,13 +74,13 @@ class PackageReleaseSeeder extends Seeder
         $total = PackageRelease::count();
         $stable = PackageRelease::where('release_channel', 'stable')->count();
         $dev = PackageRelease::where('release_channel', 'dev')->count();
-        $withChecksum = PackageRelease::whereNotNull('checksum_sha256')->count();
+        $withVirusDetection = PackageRelease::whereNotNull('virus_detection_link')->count();
         $withChangelog = PackageRelease::whereNotNull('changelog')->count();
 
         $this->command->info("Total package releases: {$total}");
         $this->command->info("Stable releases: {$stable}");
         $this->command->info("Development releases: {$dev}");
-        $this->command->info("Releases with checksum: {$withChecksum}");
+        $this->command->info("Releases with virus detection: {$withVirusDetection}");
         $this->command->info("Releases with changelog: {$withChangelog}");
 
         // Show latest releases
@@ -161,21 +161,21 @@ class PackageReleaseSeeder extends Seeder
                 'version' => '1.0.0',
                 'release_channel' => 'stable',
                 'download_url' => 'https://example.com/downloads/v1.0.0/package.zip',
-                'checksum_sha256' => null, // No checksum for remote files
+                'virus_detection_link' => null, // No virus detection link for seeded data
                 'changelog' => $this->generateMilestoneChangelog('1.0.0', true),
             ],
             [
                 'version' => '2.0.0',
                 'release_channel' => 'stable',
                 'download_url' => 'https://example.com/downloads/v2.0.0/package.zip',
-                'checksum_sha256' => null, // No checksum for remote files
+                'virus_detection_link' => null, // No virus detection link for seeded data
                 'changelog' => $this->generateMilestoneChangelog('2.0.0'),
             ],
             [
                 'version' => '2.1.0-rc',
                 'release_channel' => 'dev',
                 'download_url' => 'https://example.com/downloads/v2.1.0-rc/package.zip',
-                'checksum_sha256' => null, // No checksum for remote files
+                'virus_detection_link' => null, // No virus detection link for seeded data
                 'changelog' => $this->generateMilestoneChangelog('2.1.0-rc', false, true),
             ],
         ];
