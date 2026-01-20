@@ -45,8 +45,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/packages/download/{release}', [PackageController::class, 'download'])->name('packages.download');
     Route::get('/packages/upload', [PackageController::class, 'upload'])->name('packages.upload');
     Route::post('/packages/upload', [PackageController::class, 'store'])->name('packages.store');
-    Route::get('/packages/versions', [PackageController::class, 'versions'])->name('packages.versions');
+    Route::get('/packages/manage', [PackageController::class, 'manage'])->name('packages.manage');
     Route::post('/packages/{release}/update-changelog', [PackageController::class, 'updateChangelog'])->name('packages.update-changelog');
+    Route::delete('/packages/bulk-delete', [PackageController::class, 'bulkDelete'])->name('packages.bulk-delete');
     Route::resource('packages', PackageController::class)->parameters(['packages' => 'release']);
 
     // Admin-only routes

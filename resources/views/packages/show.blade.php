@@ -24,8 +24,8 @@
 
                             <div class="flex gap-2">
                                 @if($isAdmin ?? false)
-                                    <a href="{{ route('packages.versions') }}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
-                                        Manage Versions
+                                    <a href="{{ route('packages.manage') }}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                                        Manage Packages
                                     </a>
                                 @endif
                                 <a href="{{ route('packages.index') }}" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">

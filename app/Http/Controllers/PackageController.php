@@ -102,16 +102,28 @@ class PackageController extends Controller
     }
 
     /**
-     * Show version management page.
+     * Show package management page with inline actions.
      */
-    public function versions()
+    public function manage()
     {
-        $this->authorizeAdmin();
+        $user = Auth::user();
+        $isAdmin = $user->hasPrivilege(5);
 
-        $releases = PackageRelease::orderBy('version', 'desc')->paginate(20);
+        $query = PackageRelease::orderBy('version', 'desc');
 
-        return view('packages.version', [
+        // Filter by channel
+        if (request()->has('channel')) {
+            $query->where('release_channel', request()->channel);
+        }
+
+        $releases = $query->paginate(20);
+
+        $stats = PackageService::getPackageStatistics();
+
+        return view('packages.manage', [
             'releases' => $releases,
+            'stats' => $stats,
+            'isAdmin' => $isAdmin,
         ]);
     }
 
@@ -127,8 +139,26 @@ class PackageController extends Controller
 
         $release->delete();
 
-        return redirect()->route('packages.versions')
+        return redirect()->route('packages.manage')
             ->with('success', 'Package release deleted successfully!');
+    }
+
+    /**
+     * Bulk delete package releases.
+     */
+    public function bulkDelete(Request $request)
+    {
+        $this->authorizeAdmin();
+
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:package_releases,id',
+        ]);
+
+        $deletedCount = PackageRelease::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('packages.manage')
+            ->with('success', "Successfully deleted {$deletedCount} package(s)!");
     }
 
     /**
