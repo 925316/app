@@ -2,29 +2,15 @@
     x-data="{
         dark: false,
         init() {
-            // Check for saved theme preference or default to light mode
-            const savedTheme = localStorage.getItem('theme');
+            // Synchronize Alpine.js state with the HTML class applied by the early script
+            this.dark = document.documentElement.classList.contains('dark');
+            
+            // Listen for system theme changes (only when no explicit preference is set)
             const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-
-            // Apply theme based on preference
-            if (savedTheme === 'dark' || (savedTheme === null && prefersDarkScheme.matches)) {
-                this.dark = true;
-                document.documentElement.classList.add('dark');
-            } else {
-                this.dark = false;
-                document.documentElement.classList.remove('dark');
-            }
-
-            // Listen for system theme changes
             prefersDarkScheme.addEventListener('change', (e) => {
                 const currentTheme = localStorage.getItem('theme');
                 if (currentTheme === null) {
                     this.dark = e.matches;
-                    if (e.matches) {
-                        document.documentElement.classList.add('dark');
-                    } else {
-                        document.documentElement.classList.remove('dark');
-                    }
                 }
             });
         },
@@ -39,6 +25,7 @@
             }
         }
     }"
+    x-cloak
     @click="toggle"
     class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
     aria-label="Toggle dark mode"
