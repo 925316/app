@@ -182,7 +182,7 @@ class PackageReleaseSeeder extends Seeder
 
         foreach ($milestones as $milestone) {
             // Check if this version already exists to make the seeder idempotent
-            if (!PackageRelease::where('version', $milestone['version'])->exists()) {
+            if (! PackageRelease::where('version', $milestone['version'])->exists()) {
                 // Track milestone versions to avoid conflicts
                 $this->usedVersions[] = $milestone['version'];
                 PackageRelease::factory()->create($milestone);
@@ -311,7 +311,7 @@ class PackageReleaseSeeder extends Seeder
         // Create the releases
         foreach ($releases as $release) {
             // Check if this version already exists to make the seeder idempotent
-            if (!PackageRelease::where('version', $release['version'])->exists()) {
+            if (! PackageRelease::where('version', $release['version'])->exists()) {
                 PackageRelease::factory()->create($release);
             }
         }

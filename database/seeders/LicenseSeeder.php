@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\License;
-use App\Enums\LicenseStatus;
 use Illuminate\Database\Seeder;
 
 class LicenseSeeder extends Seeder
@@ -158,7 +158,7 @@ class LicenseSeeder extends Seeder
         License::factory()
             ->count(10)
             ->active()
-            ->state(['used_by' => fn() => $accounts[array_rand($accounts)]])
+            ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
             ->base()
             ->privilege(2) // regular
             ->create();
@@ -166,7 +166,7 @@ class LicenseSeeder extends Seeder
         License::factory()
             ->count(10)
             ->active()
-            ->state(['used_by' => fn() => $accounts[array_rand($accounts)]])
+            ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
             ->base()
             ->privilege(3) // ultimate
             ->create();
@@ -175,7 +175,7 @@ class LicenseSeeder extends Seeder
         License::factory()
             ->count(2)
             ->active()
-            ->state(['used_by' => fn() => $accounts[array_rand($accounts)]])
+            ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
             ->base()
             ->privilege(4) // tester
             ->create();
@@ -183,7 +183,7 @@ class LicenseSeeder extends Seeder
         License::factory()
             ->count(2)
             ->active()
-            ->state(['used_by' => fn() => $accounts[array_rand($accounts)]])
+            ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
             ->base()
             ->privilege(5) // staff
             ->create();
@@ -192,7 +192,7 @@ class LicenseSeeder extends Seeder
         License::factory()
             ->count(10)
             ->suspended()
-            ->state(['used_by' => fn() => $accounts[array_rand($accounts)]])
+            ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
             ->base()
             ->privilege(2) // regular
             ->create();
@@ -201,7 +201,7 @@ class LicenseSeeder extends Seeder
         License::factory()
             ->count(10)
             ->expired()
-            ->state(['used_by' => fn() => $accounts[array_rand($accounts)]])
+            ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
             ->base()
             ->privilege(2) // regular
             ->create();
