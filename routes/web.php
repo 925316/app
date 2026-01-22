@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\LicenseController;
@@ -52,6 +53,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin-only routes
     Route::middleware('admin')->group(function () {
+        // Accounts
+        Route::resource('accounts', AccountController::class);
+        Route::post('/accounts/{account}/suspend', [AccountController::class, 'suspend'])->name('accounts.suspend');
+        Route::post('/accounts/{account}/unsuspend', [AccountController::class, 'unsuspend'])->name('accounts.unsuspend');
+        Route::post('/accounts/{account}/reset-hwid', [AccountController::class, 'resetHwid'])->name('accounts.reset-hwid');
+        Route::post('/accounts/{account}/verify-email', [AccountController::class, 'verifyEmail'])->name('accounts.verify-email');
+
         // Logs
         Route::resource('logs', LogController::class)->only(['index', 'show']);
         Route::post('/logs/clear', [LogController::class, 'clear'])->name('logs.clear');

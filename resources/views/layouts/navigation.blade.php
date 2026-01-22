@@ -16,6 +16,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if (Auth::user()->hasPrivilege(7))
+                        <x-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
+                            {{ __('Accounts') }}
+                        </x-nav-link>
+                    @endif
                     <x-nav-link :href="route('licenses.index')" :active="request()->routeIs('licenses.*')">
                         {{ __('Licenses') }}
                     </x-nav-link>
@@ -76,6 +81,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @if (Auth::user()->hasPrivilege(7))
+                <x-responsive-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
+                    {{ __('Accounts') }}
+                </x-responsive-nav-link>
+            @endif
             <x-responsive-nav-link :href="route('licenses.index')" :active="request()->routeIs('licenses.*')">
                 {{ __('Licenses') }}
             </x-responsive-nav-link>
