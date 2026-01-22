@@ -10,8 +10,7 @@
 
 - **DO NOT** add `is_admin`, `role`, or any permission fields to the `accounts` table
 - Administrator permissions are determined **SOLELY** by the `privilege` field in `licenses` table:
-    - Users with `privilege = 5 (staff)` are administrators
-    - A user must have at least one **active** license with `privilege = 5` to have admin privileges
+    - Users with `privilege = 7 (staff)` are administrators
 - Permission check logic: Query user's valid licenses to determine their highest privilege level
 
 ### 2. Routing & Access Control
@@ -161,24 +160,23 @@ INDEX
 
 ### `licenses` `XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`(ALL-UPPERCASE)
 
-Users with `privilege = 5` have admin rights.
+Users with `privilege = 7` have admin rights.
 
 `'^[A-Z0-9]{5}-[0-9A-F]{5}-[A-Z2-7]{5}-[A-Z3-8]{5}-[A-Z0-9]{5}$'`.
 
-| Name                      | Type             | Constraints               | Description                                                      |
-| ------------------------- | ---------------- | ------------------------- | ---------------------------------------------------------------- |
-| `id`                      | BIGINT UNSIGNED  | PK, AI                    | Primary Key                                                      |
-| `key`                     | VARCHAR(50)      | UNIQUE, NOT NULL          | License Key                                                      |
-| `type`                    | TINYINT UNSIGNED | NOT NULL, DEFAULT 1       | License Type (1=base, 2=upgrade)                                 |
-| `privilege`               | TINYINT UNSIGNED | NOT NULL, DEFAULT 0       | License Tier (1=basic, 2=regular, 3=ultimate, 4=tester, 5=staff) |
-| `status`                  | TINYINT UNSIGNED | DEFAULT 0                 | Current Status                                                   |
-| `used_by`                 | BIGINT UNSIGNED  | FK`accounts.id`, NULLABLE | Owning Account ID                                                |
-| `expires_at`              | DATETIME         | NOT NULL                  | Expiration Time (Default: now()->addDay())                       |
-| `activated_at`            | TIMESTAMP        | NULLABLE                  | Activation Time                                                  |
-| `suspended_at`            | TIMESTAMP        | NULLABLE                  | Suspension Time                                                  |
-| `created_from_ip`         | VARCHAR(45)      | NULLABLE                  | Creation IP Address                                              |
-| `notes`                   | TEXT             | NULLABLE                  | Administrator Notes                                              |
-| `created_at`,`updated_at` | TIMESTAMP        |                           | Laravel Timestamps                                               |
+| Name                      | Type             | Constraints               | Description                                                         |
+| ------------------------- | ---------------- | ------------------------- | ------------------------------------------------------------------- |
+| `id`                      | BIGINT UNSIGNED  | PK, AI                    | Primary Key                                                         |
+| `key`                     | VARCHAR(50)      | UNIQUE, NOT NULL          | License Key                                                         |
+| `privilege`               | TINYINT UNSIGNED | NOT NULL, DEFAULT 0       | License Tier (1=standard, 2=upgrade, 3=ultimate, 6=tester, 7=staff) |
+| `status`                  | TINYINT UNSIGNED | DEFAULT 0                 | Current Status                                                      |
+| `used_by`                 | BIGINT UNSIGNED  | FK`accounts.id`, NULLABLE | Owning Account ID                                                   |
+| `expires_at`              | DATETIME         | NOT NULL                  | Expiration Time (Default: now()->addDay())                          |
+| `activated_at`            | TIMESTAMP        | NULLABLE                  | Activation Time                                                     |
+| `suspended_at`            | TIMESTAMP        | NULLABLE                  | Suspension Time                                                     |
+| `created_from_ip`         | VARCHAR(45)      | NULLABLE                  | Creation IP Address                                                 |
+| `notes`                   | TEXT             | NULLABLE                  | Administrator Notes                                                 |
+| `created_at`,`updated_at` | TIMESTAMP        |                           | Laravel Timestamps                                                  |
 
 **Status Transition Rules**:
 
@@ -253,7 +251,7 @@ INDEX
 | `version`                  | VARCHAR(50)           | UNIQUE, NOT NULL | Version Number (Semantic Versioning) |
 | `release_channel`          | ENUM('stable', 'dev') | DEFAULT 'stable' | Release Channel                      |
 | `download_url`             | VARCHAR(255)          | NOT NULL         | Download URL                         |
-| `virus_detection_url`      | CHAR(64)              | NULLABLE         | Virus detection engine               |
+| `virus_detection_url`      | VARCHAR(255)          | NULLABLE         | Virus detection report URL           |
 | `changelog`                | TEXT                  | NULLABLE         | Changelog                            |
 | `created_at`, `updated_at` | TIMESTAMP             |                  | Laravel Timestamps                   |
 
@@ -346,7 +344,7 @@ C:\code\HTML\app\
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   ├── Api/                     # Dedicated API Controllers for C++ Client
+│   │   |   ├── Api/                     # Dedicated API Controllers for C++ Client
 │   │   │   ├── ClientLicenseController.php
 │   │   │   │   # Handles: /api/license/activate
 │   │   │   │   # Handles: /api/license/check (Heartbeat)
@@ -474,9 +472,12 @@ C:\code\HTML\app\
 │   │   │   # Used with $casts in models for type safety.
 │   │   │   # Can add methods: getLabel(), getColor(), etc.
 │   │   │
-│   │   ├── LicenseType.php              # License Type Enum
-│   │   │   # Defines: 1=base, 2=upgrade
-│   │   │   # Used with the privilege field.
+│   │   ├── LicensePrivilege.php         # License Privilege Enum
+│   │   │   # 1 = Standard (Can be activated directly)
+│   │   │   # 2 = Upgrade (Cannot be activated alone; Upgrades Std -> Ult)
+│   │   │   # 3 = Ultimate (Can be activated directly)
+│   │   │   # 6 = tester (Internal use, grants access to test functions)
+│   │   │   # 7 = Staff/Admin (full admin access)
 │   │   │
 │   │   └── EventType.php                # Event Type Enum
 │   │       # Defines system event types.
@@ -551,7 +552,7 @@ C:\code\HTML\app\
 │   │   │   # Display in table or card format, showing key information.
 │   │   │
 │   │   ├── create.blade.php            # Create New License Page (Admin only)
-│   │   │   # Form: Select user (optional), license type, privilege level, validity period.
+│   │   │   # Form: Select user (optional), license privilege level, validity period.
 │   │   │   # Can pre-generate license key or leave blank for auto-generation.
 │   │   │
 │   │   ├── show.blade.php              # License Detail Page
@@ -614,7 +615,7 @@ C:\code\HTML\app\
 └── routes/
    ├── api.php                         # API Route Definitions
    │   # Group: middleware: 'throttle:api'
-   |   # GET  /account/login     -> AccountController@login
+   |   # POST /account/login     -> AccountController@login
    │   # POST /license/activate  -> ClientLicenseController@activate
    │   # POST /license/check     -> ClientLicenseController@check
    │   # POST /license/unbind    -> ClientLicenseController@unbind
@@ -666,7 +667,6 @@ C:\code\HTML\app\
 
 2. **Create enum classes**:
    - LicenseStatus.php (statuses 0–5)
-   - LicenseType.php (1=base, 2=upgrade)
    - EventType.php (classified system events)
 
 ### **Phase Three: Business Logic Layer**
