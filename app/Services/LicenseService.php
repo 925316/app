@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Enums\LicensePrivilege;
 use App\Enums\LicenseStatus;
-use App\Enums\LicenseType;
 use App\Models\Account;
 use App\Models\License;
 use Illuminate\Support\Str;
@@ -38,7 +37,6 @@ class LicenseService
      * Create a new license
      */
     public static function createLicense(
-        int $type = LicenseType::BASE->value,
         int $privilege = LicensePrivilege::DEFAULT->value,
         ?int $accountId = null,
         ?string $key = null,
@@ -47,7 +45,6 @@ class LicenseService
     ): License {
         return License::create([
             'key' => $key ?? self::generateLicenseKey(),
-            'type' => $type,
             'privilege' => $privilege,
             'status' => LicenseStatus::UNUSED->value,
             'used_by' => $accountId,

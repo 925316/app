@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\LicensePrivilege;
 use App\Enums\LicenseStatus;
-use App\Enums\LicenseType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +20,6 @@ class License extends Model
      */
     protected $fillable = [
         'key',
-        'type',
         'privilege',
         'status',
         'used_by',
@@ -40,7 +38,6 @@ class License extends Model
     protected function casts(): array
     {
         return [
-            'type' => LicenseType::class,
             'privilege' => LicensePrivilege::class,
             'status' => LicenseStatus::class,
             'expires_at' => 'datetime',
@@ -91,13 +88,6 @@ class License extends Model
         $query->where('status', LicenseStatus::EXPIRED->value);
     }
 
-    /**
-     * Scope a query to only include licenses of a specific type.
-     */
-    public function scopeType(Builder $query, int $type): void
-    {
-        $query->where('type', $type);
-    }
 
     /**
      * Scope a query to only include licenses with specific privilege.
@@ -257,14 +247,6 @@ class License extends Model
     public function getStatusColorAttribute(): string
     {
         return $this->status->getColor();
-    }
-
-    /**
-     * Get the type as a human-readable string.
-     */
-    public function getTypeTextAttribute(): string
-    {
-        return $this->type?->getLabel() ?? 'unknown';
     }
 
     /**

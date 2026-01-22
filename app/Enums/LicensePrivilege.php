@@ -5,18 +5,18 @@ namespace App\Enums;
 enum LicensePrivilege: int
 {
     case DEFAULT = 0;
-    case BASIC = 1;
-    case REGULAR = 2;
+    case STANDARD = 1;
+    case STANDARD2ULTIMATE = 2;
     case ULTIMATE = 3;
-    case TESTER = 4;
-    case STAFF = 5;
+    case TESTER = 6;
+    case STAFF = 7;
 
     public function getLabel(): string
     {
         return match ($this) {
             self::DEFAULT => 'none',
-            self::BASIC => 'basic',
-            self::REGULAR => 'regular',
+            self::STANDARD => 'standard',
+            self::STANDARD2ULTIMATE => 'standard2ultimate',
             self::ULTIMATE => 'ultimate',
             self::TESTER => 'tester',
             self::STAFF => 'staff',

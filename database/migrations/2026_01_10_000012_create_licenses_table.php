@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
 
             $table->string('key', 50)->unique()->nullable(false);
-            $table->tinyInteger('type')->unsigned()->nullable(false)->default(1);
             $table->tinyInteger('privilege')->unsigned()->nullable(false)->default(0);
             $table->tinyInteger('status')->unsigned()->nullable(false)->default(0);
             $table->foreignId('used_by')
