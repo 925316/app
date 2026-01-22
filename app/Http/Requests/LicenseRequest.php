@@ -37,7 +37,7 @@ class LicenseRequest extends FormRequest
             'privilege' => [
                 'required',
                 'integer',
-                Rule::in([0, 1, 2, 3, 6, 7]), // 0=none, 1=standard, 2=standard2ultimate, 3=ultimate, 6=tester, 7=staff
+                Rule::in([0, 1, 2, 3, 6, 7]), // 0=none, 1=standard, 2=upgrade, 3=ultimate, 6=tester, 7=staff
             ],
             'status' => [
                 'required',

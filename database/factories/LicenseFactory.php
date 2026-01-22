@@ -206,9 +206,9 @@ class LicenseFactory extends Factory
     }
 
     /**
-     * State for standard2ultimate privilege tier.
+     * State for upgrade privilege tier.
      */
-    public function standard2ultimate(): static
+    public function upgrade(): static
     {
         return $this->state(fn (array $attributes) => [
             'privilege' => 2,

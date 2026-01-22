@@ -20,7 +20,7 @@ class LicenseController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasPrivilege(7)) { // Admin - can see all licenses
+        if ($user->getPrivilegeLevel() >= 7) { // Admin - can see all licenses
             $query = License::query();
 
             // Filter by status
@@ -128,7 +128,7 @@ class LicenseController extends Controller
         $user = Auth::user();
 
         // Regular users can only view their own licenses
-        if (! $user->hasPrivilege(7) && $license->used_by !== $user->id) {
+        if ($user->getPrivilegeLevel() < 7 && $license->used_by !== $user->id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -139,7 +139,7 @@ class LicenseController extends Controller
             'license' => $license,
             'statusHistory' => $statusHistory,
             'account' => $account,
-            'isAdmin' => $user->hasPrivilege(7),
+            'isAdmin' => $user->getPrivilegeLevel() >= 7,
         ]);
     }
 
@@ -263,6 +263,13 @@ class LicenseController extends Controller
 
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'license_key' => $errorMessage,
+                ]);
+            }
+
+            // Check if license can be activated based on privilege level
+            if (! $license->canActivateByPrivilege()) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'license_key' => 'License upgrade cannot be activated alone. It must be used to upgrade a standard license.',
                 ]);
             }
 
@@ -422,7 +429,7 @@ class LicenseController extends Controller
     protected function authorizeAdmin()
     {
         $user = Auth::user();
-        if (! $user->hasPrivilege(7)) {
+        if ($user->getPrivilegeLevel() < 7) {
             abort(403, 'Unauthorized action. Admin privileges required.');
         }
     }

@@ -6,7 +6,7 @@ enum LicensePrivilege: int
 {
     case DEFAULT = 0;
     case STANDARD = 1;
-    case STANDARD2ULTIMATE = 2;
+    case UPGRADE = 2;
     case ULTIMATE = 3;
     case TESTER = 6;
     case STAFF = 7;
@@ -16,7 +16,7 @@ enum LicensePrivilege: int
         return match ($this) {
             self::DEFAULT => 'none',
             self::STANDARD => 'standard',
-            self::STANDARD2ULTIMATE => 'standard2ultimate',
+            self::UPGRADE => 'upgrade',
             self::ULTIMATE => 'ultimate',
             self::TESTER => 'tester',
             self::STAFF => 'staff',

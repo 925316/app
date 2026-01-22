@@ -11,9 +11,10 @@ it('can activate license by key', function () {
     // Create an account
     $account = Account::factory()->create();
 
-    // Create an unused license
+    // Create an unused license with privilege level 1 (standard)
     $license = License::factory()->create([
         'status' => LicenseStatus::UNUSED->value,
+        'privilege' => 1, // standard
         'expires_at' => now()->addYear(),
     ]);
 

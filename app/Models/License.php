@@ -283,4 +283,18 @@ class License extends Model
     {
         return $this->status?->canActivate() ?? false;
     }
+
+    /**
+     * Check if the license can be activated based on privilege level
+     */
+    public function canActivateByPrivilege(): bool
+    {
+        // Level 2 (UPGRADE) cannot be activated alone
+        if ($this->privilege === LicensePrivilege::UPGRADE) {
+            return false;
+        }
+        
+        // Other levels can be activated directly
+        return true;
+    }
 }

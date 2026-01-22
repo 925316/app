@@ -65,6 +65,13 @@ class LicenseService
             ]);
         }
 
+        // Check if the license can be activated based on privilege level
+        if (! $license->canActivateByPrivilege()) {
+            throw ValidationException::withMessages([
+                'license' => 'License upgrade cannot be activated alone. It must be used to upgrade a standard license.',
+            ]);
+        }
+
         // Note: We no longer check for existing active licenses here
         // The controller should handle privilege level upgrade/downgrade logic
 

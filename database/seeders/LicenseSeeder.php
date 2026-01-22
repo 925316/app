@@ -37,13 +37,13 @@ class LicenseSeeder extends Seeder
             'notes' => 'Test: Standard license for activation',
         ]);
 
-        // Test Case 2: Standard2Ultimate license (privilege 2) - UNUSED
+        // Test Case 2: Upgrade license (privilege 2) - UNUSED
         License::create([
             'key' => 'STD2U-67890-BCDEF-GHIJK-LMNOP',
-            'privilege' => 2, // standard2ultimate
+            'privilege' => 2, // upgrade
             'status' => 0, // unused
             'expires_at' => now()->addYear(),
-            'notes' => 'Test: Standard2Ultimate license for activation',
+            'notes' => 'Test: Upgrade license for activation',
         ]);
 
         // Test Case 3: Ultimate license (privilege 3) - UNUSED
@@ -105,7 +105,7 @@ class LicenseSeeder extends Seeder
         if ($testAccount) {
             License::create([
                 'key' => 'ACTIVE-11111-22222-33333-44444',
-                'privilege' => 2, // standard2ultimate
+                'privilege' => 2, // upgrade
                 'status' => 1, // active
                 'used_by' => $testAccount->id,
                 'activated_at' => now(),
@@ -133,7 +133,7 @@ class LicenseSeeder extends Seeder
         License::factory()
             ->count(10)
             ->unused()
-            ->standard2ultimate()
+            ->upgrade()
             ->create();
 
         License::factory()
@@ -147,7 +147,7 @@ class LicenseSeeder extends Seeder
             ->count(10)
             ->active()
             ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
-            ->standard2ultimate()
+            ->upgrade()
             ->create();
 
         License::factory()
@@ -177,7 +177,7 @@ class LicenseSeeder extends Seeder
             ->count(10)
             ->suspended()
             ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
-            ->standard2ultimate()
+            ->upgrade()
             ->create();
 
         // Create expired licenses
@@ -185,7 +185,7 @@ class LicenseSeeder extends Seeder
             ->count(10)
             ->expired()
             ->state(['used_by' => fn () => $accounts[array_rand($accounts)]])
-            ->standard2ultimate()
+            ->upgrade()
             ->create();
 
     }
@@ -244,14 +244,14 @@ class LicenseSeeder extends Seeder
 
         $testLicenses = [
             ['STAND-12345-ABCDE-FGHIJ-KLMNO', 'Standard (1)', 'Can activate'],
-            ['STD2U-67890-BCDEF-GHIJK-LMNOP', 'Standard2Ultimate (2)', 'Can activate'],
+            ['STD2U-67890-BCDEF-GHIJK-LMNOP', 'Upgrade (2)', 'Can activate'],
             ['ULTIM-13579-CDEFG-HIJKL-MNOPQ', 'Ultimate (3)', 'Can activate'],
             ['STAFF-24680-DEFGH-IJKLM-NOPQR', 'Staff (7)', 'Can activate (gives admin)'],
-            ['UPGRA-11223-34567-89ABC-DEFGH', 'Upgrade (3)', 'Can activate'],
+            ['UPGRA-11223-34567-89ABC-DEFGH', 'Ultimate (3)', 'Can activate'],
             ['EXPIR-44556-67890-ABCDE-FGHIJ', 'Standard (1)', 'EXPIRED - Cannot activate'],
             ['REVOK-77889-90123-45678-9ABCD', 'Standard (1)', 'REVOKED - Cannot activate'],
             ['SUSPE-12345-67890-ABCDE-FGHIJ', 'Standard (1)', 'SUSPENDED - Cannot activate'],
-            ['ACTIV-11111-22222-33333-44444', 'Standard2Ultimate (2)', 'ALREADY ACTIVE - Cannot activate'],
+            ['ACTIV-11111-22222-33333-44444', 'Upgrade (2)', 'ALREADY ACTIVE - Cannot activate'],
         ];
 
         $headers = ['License Key', 'Privilege', 'Status'];
@@ -260,9 +260,9 @@ class LicenseSeeder extends Seeder
         $this->command->info('');
         $this->command->comment('Testing Scenarios:');
         $this->command->comment('1. Start with no active license → Try activating any UNUSED license');
-        $this->command->comment('2. Have Standard → Try upgrading to Standard2Ultimate/Ultimate/Staff');
-        $this->command->comment('3. Have Standard2Ultimate → Try upgrading to Ultimate/Staff (should work)');
-        $this->command->comment('4. Have Standard2Ultimate → Try downgrading to Standard (should fail)');
+        $this->command->comment('2. Have Standard → Try upgrading to Upgrade/Ultimate/Staff');
+        $this->command->comment('3. Have Upgrade → Try upgrading to Ultimate/Staff (should work)');
+        $this->command->comment('4. Have Upgrade → Try downgrading to Standard (should fail)');
         $this->command->comment('5. Try activating expired/revoked/suspended licenses (should fail)');
         $this->command->comment('6. Try activating already active licenses (should fail)');
         $this->command->info('');
@@ -289,7 +289,7 @@ class LicenseSeeder extends Seeder
         $privileges = [
             0 => 'default',
             1 => 'standard',
-            2 => 'standard2ultimate',
+            2 => 'upgrade',
             3 => 'ultimate',
             6 => 'tester',
             7 => 'staff',
