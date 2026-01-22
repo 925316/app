@@ -22,7 +22,7 @@ class AdminMiddleware
         }
 
         // Check if user has admin privileges (privilege level 5 = staff/admin)
-        if (! $user->hasPrivilege(5)) {
+        if (! $user->hasPrivilege(7)) {
             abort(403, 'Unauthorized action. Admin privileges required.');
         }
 

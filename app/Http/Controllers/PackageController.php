@@ -30,7 +30,7 @@ class PackageController extends Controller
         return view('packages.index', [
             'releases' => $releases,
             'stats' => $stats,
-            'isAdmin' => Auth::user()->hasPrivilege(5),
+            'isAdmin' => Auth::user()->hasPrivilege(7),
         ]);
     }
 
@@ -81,7 +81,7 @@ class PackageController extends Controller
         return view('packages.show', [
             'release' => $release,
             'canDownload' => $canDownload,
-            'isAdmin' => $user->hasPrivilege(5),
+            'isAdmin' => $user->hasPrivilege(7),
         ]);
     }
 
@@ -107,7 +107,7 @@ class PackageController extends Controller
     public function manage()
     {
         $user = Auth::user();
-        $isAdmin = $user->hasPrivilege(5);
+        $isAdmin = $user->hasPrivilege(7);
 
         $query = PackageRelease::orderBy('version', 'desc');
 
@@ -183,7 +183,7 @@ class PackageController extends Controller
     protected function authorizeAdmin()
     {
         $user = Auth::user();
-        if (! $user->hasPrivilege(5)) {
+        if (! $user->hasPrivilege(7)) {
             abort(403, 'Unauthorized action. Admin privileges required.');
         }
     }

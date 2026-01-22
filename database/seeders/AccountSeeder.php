@@ -41,8 +41,7 @@ class AccountSeeder extends Seeder
         // Create administrator license
         License::create([
             'key' => 'ADMIN-00000-00000-00000-00000',
-            'type' => 1, // base
-            'privilege' => 5, // staff
+            'privilege' => 7, // staff
             'status' => 1, // active
             'used_by' => $admin->id,
             'expires_at' => now()->addYears(10),
@@ -72,24 +71,13 @@ class AccountSeeder extends Seeder
 
         License::create([
             'key' => 'TESTD-00000-00000-00000-00000',
-            'type' => 1, // base
-            'privilege' => 4, // tester
+            'privilege' => 6, // tester
             'status' => 1, // active
             'used_by' => $accountWith2FA->id,
             'expires_at' => now()->addYears(10),
             'activated_at' => now(),
             'created_from_ip' => '127.0.0.1',
             'notes' => 'Tester license with full privileges',
-        ]);
-
-        // Test account with HWID resets
-        $accountWithHwidResets = Account::create([
-            'username' => 'hwid_user',
-            'email' => 'hwid@example.com',
-            'password' => Hash::make('hwid123'),
-            'email_verified_at' => now()->subMonths(3),
-            'hwid_reset_count' => 3,
-            'hwid_last_reset_at' => now()->subDays(10),
         ]);
 
         // Temporarily suspended account

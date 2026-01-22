@@ -108,7 +108,7 @@ class LogController extends Controller
     protected function authorizeAdmin()
     {
         $user = Auth::user();
-        if (! $user->hasPrivilege(5)) {
+        if (! $user->hasPrivilege(7)) {
             abort(403, 'Unauthorized action. Admin privileges required.');
         }
     }

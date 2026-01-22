@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         // Get statistics based on user type
-        if ($user->hasPrivilege(5)) { // Admin
+        if ($user->hasPrivilege(7)) { // Admin
             $stats = StatisticsService::getSystemHealth();
             $recentActivity = StatisticsService::getRecentActivity();
 
@@ -50,7 +50,7 @@ class DashboardController extends Controller
      */
     public function adminPanel()
     {
-        if (! Auth::user()->hasPrivilege(5)) {
+        if (! Auth::user()->hasPrivilege(7)) {
             abort(403, 'Unauthorized action. Admin privileges required.');
         }
 

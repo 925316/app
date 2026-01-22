@@ -28,9 +28,6 @@
                                 <span class="px-3 py-1 text-sm font-medium rounded-full bg-green-500/20 text-green-800 dark:text-green-200 border border-green-500/30">
                                     {{ $activeLicense->getStatusTextAttribute() }}
                                 </span>
-                                <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-500/20 text-blue-800 dark:text-blue-200 border border-blue-500/30">
-                                    {{ $activeLicense->getTypeTextAttribute() }}
-                                </span>
                                 <span class="px-3 py-1 text-sm font-medium rounded-full bg-purple-500/20 text-purple-800 dark:text-purple-200 border border-purple-500/30">
                                     {{ $activeLicense->getPrivilegeTextAttribute() }}
                                 </span>
