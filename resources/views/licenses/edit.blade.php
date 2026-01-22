@@ -42,35 +42,19 @@
                             @enderror
                         </div>
 
-                        <!-- Type and Privilege -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">License Type</label>
-                                <select name="type" id="type" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                                    @foreach($typeOptions as $value => $label)
-                                        <option value="{{ $value }}" {{ old('type', $license->type->value) == $value ? 'selected' : '' }}>
-                                            {{ ucfirst($label) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('type')
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label for="privilege" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Privilege Level</label>
-                                <select name="privilege" id="privilege" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                                    @foreach($privilegeOptions as $value => $label)
-                                        <option value="{{ $value }}" {{ old('privilege', $license->privilege->value) == $value ? 'selected' : '' }}>
-                                            {{ ucfirst($label) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('privilege')
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        <!-- Privilege -->
+                        <div class="mb-4">
+                            <label for="privilege" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Privilege Level</label>
+                            <select name="privilege" id="privilege" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                @foreach($privilegeOptions as $value => $label)
+                                    <option value="{{ $value }}" {{ old('privilege', $license->privilege->value) == $value ? 'selected' : '' }}>
+                                        {{ ucfirst($label) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('privilege')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Status -->

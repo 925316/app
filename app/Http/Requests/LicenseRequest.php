@@ -34,15 +34,10 @@ class LicenseRequest extends FormRequest
                     }
                 },
             ],
-            'type' => [
-                'required',
-                'integer',
-                Rule::in([1, 2]), // 1=base, 2=upgrade
-            ],
             'privilege' => [
                 'required',
                 'integer',
-                Rule::in([0, 1, 2, 3, 4, 5]), // 0=none, 1=basic, 2=regular, 3=ultimate, 4=tester, 5=staff
+                Rule::in([0, 1, 2, 3, 6, 7]), // 0=none, 1=standard, 2=standard2ultimate, 3=ultimate, 6=tester, 7=staff
             ],
             'status' => [
                 'required',
@@ -91,8 +86,6 @@ class LicenseRequest extends FormRequest
             'key.required' => 'The license key is required.',
             'key.unique' => 'This license key is already in use.',
             'key.exists' => 'The specified license key does not exist.',
-            'type.required' => 'The license type is required.',
-            'type.in' => 'The license type must be either base (1) or upgrade (2).',
             'privilege.required' => 'The license privilege is required.',
             'privilege.in' => 'The license privilege must be a valid value (0-5).',
             'status.required' => 'The license status is required.',

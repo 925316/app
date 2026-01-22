@@ -50,7 +50,7 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Type:</span>
-                                    <span class="font-medium">{{ $license->getTypeTextAttribute() }}</span>
+                                    <span class="font-medium">N/A (deprecated)</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Privilege:</span>

@@ -20,7 +20,7 @@ class LicenseController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasPrivilege(5)) { // Admin - can see all licenses
+        if ($user->hasPrivilege(7)) { // Admin - can see all licenses
             $query = License::query();
 
             // Filter by status
@@ -55,7 +55,7 @@ class LicenseController extends Controller
                 ->paginate(25);
 
             $statusOptions = LicenseStatus::options();
-            $typeOptions = \App\Enums\LicenseType::options();
+            $typeOptions = [];
             $privilegeOptions = LicensePrivilege::options();
 
             return view('licenses.index', [
@@ -86,13 +86,11 @@ class LicenseController extends Controller
 
         $accounts = Account::orderBy('username')->get();
         $statusOptions = LicenseStatus::options();
-        $typeOptions = \App\Enums\LicenseType::options();
         $privilegeOptions = LicensePrivilege::options();
 
         return view('licenses.create', [
             'accounts' => $accounts,
             'statusOptions' => $statusOptions,
-            'typeOptions' => $typeOptions,
             'privilegeOptions' => $privilegeOptions,
         ]);
     }
@@ -130,7 +128,7 @@ class LicenseController extends Controller
         $user = Auth::user();
 
         // Regular users can only view their own licenses
-        if (! $user->hasPrivilege(5) && $license->used_by !== $user->id) {
+        if (! $user->hasPrivilege(7) && $license->used_by !== $user->id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -141,7 +139,7 @@ class LicenseController extends Controller
             'license' => $license,
             'statusHistory' => $statusHistory,
             'account' => $account,
-            'isAdmin' => $user->hasPrivilege(5),
+            'isAdmin' => $user->hasPrivilege(7),
         ]);
     }
 
@@ -154,14 +152,12 @@ class LicenseController extends Controller
 
         $accounts = Account::orderBy('username')->get();
         $statusOptions = LicenseStatus::options();
-        $typeOptions = \App\Enums\LicenseType::options();
         $privilegeOptions = LicensePrivilege::options();
 
         return view('licenses.edit', [
             'license' => $license,
             'accounts' => $accounts,
             'statusOptions' => $statusOptions,
-            'typeOptions' => $typeOptions,
             'privilegeOptions' => $privilegeOptions,
         ]);
     }
@@ -382,7 +378,7 @@ class LicenseController extends Controller
         $this->authorizeAdmin();
 
         $request->validate([
-            'new_privilege' => 'required|integer|min:1|max:5',
+            'new_privilege' => 'required|integer|min:1|max:7',
             'upgrade_notes' => 'nullable|string|max:255',
         ]);
 
@@ -426,7 +422,7 @@ class LicenseController extends Controller
     protected function authorizeAdmin()
     {
         $user = Auth::user();
-        if (! $user->hasPrivilege(5)) {
+        if (! $user->hasPrivilege(7)) {
             abort(403, 'Unauthorized action. Admin privileges required.');
         }
     }

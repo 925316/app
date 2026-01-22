@@ -18,8 +18,7 @@ class LicenseFactory extends Factory
     {
         return [
             'key' => $this->generateLicenseKey(),
-            'type' => fake()->randomElement([1, 2]),
-            'privilege' => fake()->randomElement([0, 1, 2, 3, 4, 5]),
+            'privilege' => fake()->randomElement([0, 1, 2, 3, 6, 7]),
             'status' => fake()->randomElement([0, 1, 2, 3, 4, 5]),
             'used_by' => null,
             'expires_at' => fake()->dateTimeBetween('now', '+2 years'),
@@ -184,22 +183,7 @@ class LicenseFactory extends Factory
     /**
      * State for base licenses (type 1).
      */
-    public function base(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'type' => 1,
-        ]);
-    }
-
-    /**
-     * State for upgrade licenses (type 2).
-     */
-    public function upgrade(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'type' => 2,
-        ]);
-    }
+    // Type states removed as type field is deprecated
 
     /**
      * State for specific privilege tiers.
@@ -212,9 +196,9 @@ class LicenseFactory extends Factory
     }
 
     /**
-     * State for basic privilege tier.
+     * State for standard privilege tier.
      */
-    public function basic(): static
+    public function standard(): static
     {
         return $this->state(fn (array $attributes) => [
             'privilege' => 1,
@@ -222,9 +206,9 @@ class LicenseFactory extends Factory
     }
 
     /**
-     * State for regular privilege tier.
+     * State for standard2ultimate privilege tier.
      */
-    public function regular(): static
+    public function standard2ultimate(): static
     {
         return $this->state(fn (array $attributes) => [
             'privilege' => 2,
@@ -247,7 +231,7 @@ class LicenseFactory extends Factory
     public function tester(): static
     {
         return $this->state(fn (array $attributes) => [
-            'privilege' => 4,
+            'privilege' => 6,
         ]);
     }
 
@@ -257,7 +241,7 @@ class LicenseFactory extends Factory
     public function staff(): static
     {
         return $this->state(fn (array $attributes) => [
-            'privilege' => 5,
+            'privilege' => 7,
         ]);
     }
 
