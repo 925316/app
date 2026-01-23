@@ -18,28 +18,58 @@ class LicenseController extends Controller
      */
     public function index(Request $request)
     {
+        $queryParams = $request->all();
+        $cleanParams = array_filter($queryParams, function ($value) {
+            return $value !== null && $value !== '' && trim($value) !== '';
+        });
+
+        if (count($queryParams) !== count($cleanParams)) {
+            $cleanUrl = route('licenses.index').(count($cleanParams) ? '?'.http_build_query($cleanParams) : '');
+
+            return redirect($cleanUrl);
+        }
+
         $user = Auth::user();
 
         if ($user->getPrivilegeLevel() >= 7) { // Admin - can see all licenses
             $query = License::query();
 
-            // Filter by status
-            if ($request->has('status')) {
-                $query->where('status', $request->status);
+            // Filter by status (supports both enum labels and values)
+            if ($request->filled('status')) {
+                $statusValue = array_search(
+                    ucfirst(strtolower($request->status)),
+                    array_map('strtolower', LicenseStatus::options())
+                );
+
+                if ($statusValue === false) {
+                    $statusValue = $request->status;
+                }
+
+                $status = LicenseStatus::tryFrom($statusValue);
+                if ($status) {
+                    $query->where('status', $status->value);
+                }
             }
 
-            // Filter by type
-            if ($request->has('type')) {
-                $query->where('type', $request->type);
-            }
+            // Filter by privilege (supports both labels and values)
+            if ($request->filled('privilege')) {
+                $privilegeValue = array_search(
+                    ucfirst(strtolower($request->privilege)),
+                    array_map('strtolower', LicensePrivilege::options())
+                );
 
-            // Filter by privilege
-            if ($request->has('privilege')) {
-                $query->where('privilege', $request->privilege);
+                if ($privilegeValue === false) {
+                    $privilegeValue = $request->privilege;
+                }
+
+                $privilege = LicensePrivilege::tryFrom($privilegeValue);
+                if ($privilege) {
+                    $query->where('privilege', $privilege->value);
+                }
             }
 
             // Search by key or account
-            if ($request->has('search')) {
+            if ($request->filled('search')) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('key', 'like', "%{$search}%")
@@ -105,7 +135,6 @@ class LicenseController extends Controller
         $validated = $request->validated();
 
         $license = LicenseService::createLicense(
-            $validated['type'],
             $validated['privilege'],
             $validated['used_by'] ?? null,
             $validated['key'] ?? null,
@@ -173,7 +202,6 @@ class LicenseController extends Controller
 
         // Only allow certain fields to be updated
         $updateData = [
-            'type' => $validated['type'],
             'privilege' => $validated['privilege'],
             'status' => $validated['status'],
             'expires_at' => $validated['expires_at'],
