@@ -20,20 +20,43 @@ class AccountController extends Controller
 
         $query = Account::query();
 
-        // Filter by status
-        if ($request->has('status')) {
-            $status = $request->status;
-            if ($status === 'active') {
-                $query->active();
-            } elseif ($status === 'suspended') {
-                $query->suspended();
-            } elseif ($status === 'verified') {
-                $query->verified();
-            } elseif ($status === 'unverified') {
-                $query->unverified();
-            } elseif ($status === '2fa-enabled') {
-                $query->hasTwoFactorEnabled();
-            }
+        // Filter by status (multiple checkboxes)
+        if ($request->has('status') && !empty($request->status)) {
+            $statuses = is_array($request->status) ? $request->status : [$request->status];
+            
+            $query->where(function($q) use ($statuses) {
+                $first = true;
+                foreach ($statuses as $status) {
+                    if ($first) {
+                        if ($status === 'active') {
+                            $q->active();
+                        } elseif ($status === 'suspended') {
+                            $q->suspended();
+                        } elseif ($status === 'verified') {
+                            $q->verified();
+                        } elseif ($status === 'unverified') {
+                            $q->unverified();
+                        }
+                        $first = false;
+                    } else {
+                        if ($status === 'active') {
+                            $q->orWhereHas('licenses', function($q) {
+                                $q->where('status', \App\Enums\LicenseStatus::ACTIVE->value)
+                                    ->where('expires_at', '>', now());
+                            });
+                        } elseif ($status === 'suspended') {
+                            $q->orWhere(function($q) {
+                                $q->where('suspended_until', '>', now())
+                                    ->orWhere('suspended_until', null);
+                            });
+                        } elseif ($status === 'verified') {
+                            $q->orWhereNotNull('email_verified_at');
+                        } elseif ($status === 'unverified') {
+                            $q->orWhereNull('email_verified_at');
+                        }
+                    }
+                }
+            });
         }
 
         // Filter by privilege level
