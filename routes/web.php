@@ -42,6 +42,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/devices/unbind', [DeviceController::class, 'unbind'])->name('devices.unbind');
     Route::post('/devices/reset-hwid', [DeviceController::class, 'resetHwid'])->name('devices.reset-hwid');
 
+    // Admin-only routes
+    Route::middleware('admin')->group(function () {
+        Route::get('/devices/admin', [DeviceController::class, 'adminIndex'])->name('devices.admin');
+        Route::post('/devices/{device}/admin-unbind', [DeviceController::class, 'adminUnbind'])->name('devices.admin.unbind');
+        Route::post('/devices/account/{account}/admin-reset-hwid', [DeviceController::class, 'adminResetHwid'])->name('devices.admin.reset-hwid');
+        Route::post('/devices/admin/bulk-unbind', [DeviceController::class, 'bulkUnbind'])->name('devices.admin.bulk-unbind');
+        Route::post('/devices/admin/bulk-reset-hwid', [DeviceController::class, 'bulkResetHwid'])->name('devices.admin.bulk-reset-hwid');
+        Route::get('/devices/admin/export', [DeviceController::class, 'export'])->name('devices.admin.export');
+    });
+
     // Packages
     Route::get('/packages/download/{release}', [PackageController::class, 'download'])->name('packages.download');
     Route::get('/packages/upload', [PackageController::class, 'upload'])->name('packages.upload');
