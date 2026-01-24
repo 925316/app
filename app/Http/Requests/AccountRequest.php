@@ -29,14 +29,14 @@ class AccountRequest extends FormRequest
                 'string',
                 'max:255',
                 'regex:/^[a-zA-Z0-9_]+$/', // Only letters, numbers, and underscores
-                $accountId ? 'unique:accounts,username,' . $accountId : 'unique:accounts,username',
+                $accountId ? 'unique:accounts,username,'.$accountId : 'unique:accounts,username',
             ],
             'email' => [
                 'required',
                 'string',
                 'email',
                 'max:255',
-                $accountId ? 'unique:accounts,email,' . $accountId : 'unique:accounts,email',
+                $accountId ? 'unique:accounts,email,'.$accountId : 'unique:accounts,email',
             ],
             'password' => [
                 $accountId ? 'nullable' : 'required',

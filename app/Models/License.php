@@ -88,7 +88,6 @@ class License extends Model
         $query->where('status', LicenseStatus::EXPIRED->value);
     }
 
-
     /**
      * Scope a query to only include licenses with specific privilege.
      */
@@ -293,7 +292,7 @@ class License extends Model
         if ($this->privilege === LicensePrivilege::UPGRADE) {
             return false;
         }
-        
+
         // Other levels can be activated directly
         return true;
     }

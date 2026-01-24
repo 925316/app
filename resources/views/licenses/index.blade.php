@@ -195,8 +195,7 @@
                                     request()->filled('privilege') ||
                                     request()->filled('search'))
                                 <div class="mt-4 flex items-center space-x-3">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Active
-                                        filters:</span>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Active filters:</span>
                                     <div class="flex flex-wrap gap-2">
                                         @if (request()->filled('status'))
                                             @php

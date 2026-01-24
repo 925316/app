@@ -18,17 +18,6 @@ class LicenseController extends Controller
      */
     public function index(Request $request)
     {
-        $queryParams = $request->all();
-        $cleanParams = array_filter($queryParams, function ($value) {
-            return $value !== null && $value !== '' && trim($value) !== '';
-        });
-
-        if (count($queryParams) !== count($cleanParams)) {
-            $cleanUrl = route('licenses.index').(count($cleanParams) ? '?'.http_build_query($cleanParams) : '');
-
-            return redirect($cleanUrl);
-        }
-
         $user = Auth::user();
 
         if ($user->getPrivilegeLevel() >= 7) { // Admin - can see all licenses

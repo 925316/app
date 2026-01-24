@@ -21,10 +21,10 @@ class AccountController extends Controller
         $query = Account::query();
 
         // Filter by status (multiple checkboxes)
-        if ($request->has('status') && !empty($request->status)) {
+        if ($request->has('status') && ! empty($request->status)) {
             $statuses = is_array($request->status) ? $request->status : [$request->status];
-            
-            $query->where(function($q) use ($statuses) {
+
+            $query->where(function ($q) use ($statuses) {
                 $first = true;
                 foreach ($statuses as $status) {
                     if ($first) {
@@ -40,12 +40,12 @@ class AccountController extends Controller
                         $first = false;
                     } else {
                         if ($status === 'active') {
-                            $q->orWhereHas('licenses', function($q) {
+                            $q->orWhereHas('licenses', function ($q) {
                                 $q->where('status', \App\Enums\LicenseStatus::ACTIVE->value)
                                     ->where('expires_at', '>', now());
                             });
                         } elseif ($status === 'suspended') {
-                            $q->orWhere(function($q) {
+                            $q->orWhere(function ($q) {
                                 $q->where('suspended_until', '>', now())
                                     ->orWhere('suspended_until', null);
                             });
@@ -64,8 +64,8 @@ class AccountController extends Controller
             $privilege = (int) $request->privilege;
             $query->whereHas('licenses', function ($q) use ($privilege) {
                 $q->where('status', \App\Enums\LicenseStatus::ACTIVE->value)
-                  ->where('privilege', $privilege)
-                  ->where('expires_at', '>', now());
+                    ->where('privilege', $privilege)
+                    ->where('expires_at', '>', now());
             });
         }
 
@@ -74,10 +74,10 @@ class AccountController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('username', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhereHas('licenses', function ($q) use ($search) {
-                      $q->where('key', 'like', "%{$search}%");
-                  });
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('licenses', function ($q) use ($search) {
+                        $q->where('key', 'like', "%{$search}%");
+                    });
             });
         }
 

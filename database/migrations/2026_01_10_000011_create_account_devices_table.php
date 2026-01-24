@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('account_id')
                 ->constrained('accounts')
                 ->onDelete('cascade');
-            $table->string('hwid_hash', 64)->nullable(false);
+            $table->string('hwid_hash', 64)->nullable();
             $table->binary('ip_address', 16)->nullable(false);
             $table->char('country_code', 2)->nullable();
             $table->json('characteristics')->nullable();
