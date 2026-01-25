@@ -17,6 +17,12 @@ class DeviceController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        // Check if user has at least standard privilege to access devices
+        if (! $user->hasPrivilege(1)) {
+            abort(403, 'You need a valid license to access devices.');
+        }
+
         $isAdmin = $user->hasPrivilege(7); // Admin privilege level
 
         if ($isAdmin) {
@@ -157,6 +163,11 @@ class DeviceController extends Controller
     {
         $user = Auth::user();
 
+        // Check if user has at least standard privilege to access device management
+        if (! $user->hasPrivilege(1)) {
+            abort(403, 'You need a valid license to access device management.');
+        }
+
         $currentDevice = $user->devices()
             ->whereNotNull('bound_at')
             ->whereNull('unbound_at')
@@ -180,6 +191,11 @@ class DeviceController extends Controller
     public function bind(DeviceRequest $request)
     {
         $user = Auth::user();
+
+        // Check if user has at least standard privilege to bind devices
+        if (! $user->hasPrivilege(1)) {
+            abort(403, 'You need a valid license to bind devices.');
+        }
 
         // Check if user already has a bound device
         if ($user->getBoundDeviceCount() >= 1) {
@@ -226,6 +242,11 @@ class DeviceController extends Controller
     {
         $user = Auth::user();
 
+        // Check if user has at least standard privilege to unbind devices
+        if (! $user->hasPrivilege(1)) {
+            abort(403, 'You need a valid license to unbind devices.');
+        }
+
         $device = $user->devices()
             ->whereNotNull('bound_at')
             ->whereNull('unbound_at')
@@ -261,6 +282,11 @@ class DeviceController extends Controller
     public function resetHwid(Request $request)
     {
         $user = Auth::user();
+
+        // Check if user has at least standard privilege to reset HWID
+        if (! $user->hasPrivilege(1)) {
+            abort(403, 'You need a valid license to reset HWID.');
+        }
 
         if (! $user->canResetHwid()) {
             return back()->withErrors([

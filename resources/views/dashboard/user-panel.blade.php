@@ -200,6 +200,7 @@
                         </svg>
                     </div>
                 </a>
+                @if (Auth::user()->hasPrivilege(1))
                 <a href="{{ route('devices.index') }}" class="group p-6 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-green-400/50">
                     <div class="flex items-center justify-between">
                         <div>
@@ -211,6 +212,8 @@
                         </svg>
                     </div>
                 </a>
+                @endif
+                @if (Auth::user()->hasPrivilege(1))
                 <a href="{{ route('packages.index') }}" class="group p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-purple-400/50">
                     <div class="flex items-center justify-between">
                         <div>
@@ -222,6 +225,7 @@
                         </svg>
                     </div>
                 </a>
+                @endif
                 <a href="{{ route('profile.edit') }}" class="group p-6 bg-gradient-to-br from-gray-500 to-gray-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-400/50">
                     <div class="flex items-center justify-between">
                         <div>

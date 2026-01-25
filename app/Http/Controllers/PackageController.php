@@ -16,6 +16,13 @@ class PackageController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+
+        // Check if user has at least standard privilege to access packages
+        if (! $user->hasPrivilege(1)) {
+            abort(403, 'You need a valid license to access packages.');
+        }
+
         $query = PackageRelease::orderBy('version', 'desc');
 
         // Filter by channel
@@ -30,7 +37,7 @@ class PackageController extends Controller
         return view('packages.index', [
             'releases' => $releases,
             'stats' => $stats,
-            'isAdmin' => Auth::user()->hasPrivilege(7),
+            'isAdmin' => $user->hasPrivilege(7),
         ]);
     }
 
@@ -75,6 +82,11 @@ class PackageController extends Controller
     {
         $user = Auth::user();
 
+        // Check if user has at least standard privilege to view packages
+        if (! $user->hasPrivilege(1)) {
+            abort(403, 'You need a valid license to view packages.');
+        }
+
         // Check if user has a valid license to download
         $canDownload = $user->hasPrivilege(1); // At least basic privilege
 
@@ -107,6 +119,12 @@ class PackageController extends Controller
     public function manage()
     {
         $user = Auth::user();
+
+        // Check if user has at least standard privilege to access package management
+        if (! $user->hasPrivilege(1)) {
+            abort(403, 'You need a valid license to access package management.');
+        }
+
         $isAdmin = $user->hasPrivilege(7);
 
         $query = PackageRelease::orderBy('version', 'desc');

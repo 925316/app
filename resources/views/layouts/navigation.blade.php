@@ -11,26 +11,30 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+            <!-- Navigation Links -->
+            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-nav-link>
+                @if (Auth::user()->hasPrivilege(7))
+                    <x-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
+                        {{ __('Accounts') }}
                     </x-nav-link>
-                    @if (Auth::user()->hasPrivilege(7))
-                        <x-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
-                            {{ __('Accounts') }}
-                        </x-nav-link>
-                    @endif
-                    <x-nav-link :href="route('licenses.index')" :active="request()->routeIs('licenses.*')">
-                        {{ __('Licenses') }}
-                    </x-nav-link>
+                @endif
+                <x-nav-link :href="route('licenses.index')" :active="request()->routeIs('licenses.*')">
+                    {{ __('Licenses') }}
+                </x-nav-link>
+                @if (Auth::user()->hasPrivilege(1))
                     <x-nav-link :href="route('devices.index')" :active="request()->routeIs('devices.*')">
                         {{ __('Devices') }}
                     </x-nav-link>
+                @endif
+                @if (Auth::user()->hasPrivilege(1))
                     <x-nav-link :href="route('packages.index')" :active="request()->routeIs('packages.*')">
                         {{ __('Packages') }}
                     </x-nav-link>
-                </div>
+                @endif
+            </div>
 
             </div>
 
@@ -75,27 +79,31 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            @if (Auth::user()->hasPrivilege(7))
-                <x-responsive-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
-                    {{ __('Accounts') }}
+        <!-- Responsive Navigation Menu -->
+        <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
+            <div class="pt-2 pb-3 space-y-1">
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
                 </x-responsive-nav-link>
-            @endif
-            <x-responsive-nav-link :href="route('licenses.index')" :active="request()->routeIs('licenses.*')">
-                {{ __('Licenses') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('devices.index')" :active="request()->routeIs('devices.*')">
-                {{ __('Devices') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('packages.index')" :active="request()->routeIs('packages.*')">
-                {{ __('Packages') }}
-            </x-responsive-nav-link>
-        </div>
+                @if (Auth::user()->hasPrivilege(7))
+                    <x-responsive-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
+                        {{ __('Accounts') }}
+                    </x-responsive-nav-link>
+                @endif
+                <x-responsive-nav-link :href="route('licenses.index')" :active="request()->routeIs('licenses.*')">
+                    {{ __('Licenses') }}
+                </x-responsive-nav-link>
+                @if (Auth::user()->hasPrivilege(1))
+                    <x-responsive-nav-link :href="route('devices.index')" :active="request()->routeIs('devices.*')">
+                        {{ __('Devices') }}
+                    </x-responsive-nav-link>
+                @endif
+                @if (Auth::user()->hasPrivilege(1))
+                    <x-responsive-nav-link :href="route('packages.index')" :active="request()->routeIs('packages.*')">
+                        {{ __('Packages') }}
+                    </x-responsive-nav-link>
+                @endif
+            </div>
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-cool-200/50 dark:border-cool-700/50">
