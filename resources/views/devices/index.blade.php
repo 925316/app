@@ -30,7 +30,10 @@
                                     @if($currentDevice)
                                         <h4 class="font-medium text-blue-800 dark:text-blue-200">Currently Bound Device</h4>
                                         <div class="text-sm text-blue-600 dark:text-blue-300">
-                                            {{ $currentDevice->hwid_hash }} | {{ $currentDevice->ip_address }} | {{ $currentDevice->country_code ?? 'Unknown' }}
+                                            <span title="{{ $currentDevice->hwid_hash }}" class="cursor-help">
+                                                {{ substr($currentDevice->hwid_hash, 0, 8) }}...
+                                            </span>
+                                            | {{ $currentDevice->ip_address }} | {{ $currentDevice->country_code ?? 'Unknown' }}
                                         </div>
                                     @else
                                         <h4 class="font-medium text-yellow-800 dark:text-yellow-200">No Device Bound</h4>
@@ -79,7 +82,13 @@
                                 @forelse($devices as $device)
                                     <tr>
                                         <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100 break-all">
-                                            {{ $device->hwid_hash }}
+                                            @if($device->hwid_hash)
+                                                <span title="{{ $device->hwid_hash }}" class="cursor-help">
+                                                    {{ substr($device->hwid_hash, 0, 8) }}...
+                                                </span>
+                                            @else
+                                                N/A
+                                            @endif
                                         </td>
                                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                             {{ $device->ip_address }}
