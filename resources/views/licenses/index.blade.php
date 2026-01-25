@@ -263,29 +263,29 @@
                             <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         License Key
                                     </th>
                                     @if ($isAdmin ?? false)
                                         <th scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Account
                                         </th>
                                     @endif
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Privilege
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Status
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Expires
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -294,39 +294,42 @@
                                 @forelse($licenses as $license)
                                     <tr>
                                         <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                             {{ $license->key }}
                                         </td>
                                         @if ($isAdmin ?? false)
                                             <td
-                                                class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                                 {{ $license->account?->username ?? 'Unassigned' }}
                                             </td>
                                         @endif
                                         <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                             {{ $license->getPrivilegeTextAttribute() }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
                                             <span
-                                                class="px-2 py-1 rounded-full text-xs font-medium {{ $license->getStatusColorAttribute() }}">
+                                                class="px-2 py-0.5 rounded text-xs font-medium {{ $license->getStatusColorAttribute() }}">
                                                 {{ $license->getStatusTextAttribute() }}
                                             </span>
                                         </td>
                                         <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                             {{ $license->expires_at->format('Y-m-d') }}
                                             @if ($license->isActive() && !$license->isExpired())
-                                                ({{ $license->daysUntilExpiry() }} days)
+                                                <br>
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                    ({{ $license->daysUntilExpiry() }} days)
+                                                </span>
                                             @endif
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                                             <a href="{{ route('licenses.show', $license) }}"
                                                 class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
                                                 View
                                             </a>
                                             @if ($isAdmin ?? false)
-                                                <span class="mx-2 text-gray-400">|</span>
+                                                <span class="mx-1 text-gray-400">|</span>
                                                 <a href="{{ route('licenses.edit', $license) }}"
                                                     class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                                                     Edit
@@ -337,7 +340,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="{{ $isAdmin ? 7 : 6 }}"
-                                            class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-300">
+                                            class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
                                             No licenses found.
                                         </td>
                                     </tr>
