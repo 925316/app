@@ -562,7 +562,7 @@ class DeviceController extends Controller
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($devices) {
+        $callback = function () use ($devices) {
             $file = fopen('php://output', 'w');
 
             // Add CSV header
