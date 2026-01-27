@@ -1,17 +1,13 @@
-<x-app-layout>
+<x-app-sidebar-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        {{ __('Dashboard') }}
     </x-slot>
 
-    <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            @if($isAdmin ?? false)
-                @include('dashboard.admin-panel')
-            @else
-                @include('dashboard.user-panel')
-            @endif
-        </div>
+    <div class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+        @if($isAdmin ?? false)
+            @include('dashboard.admin-panel')
+        @else
+            @include('dashboard.user-panel')
+        @endif
     </div>
-</x-app-layout>
+</x-app-sidebar-layout>
