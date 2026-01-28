@@ -51,17 +51,36 @@
             })();
         </script>
 
+        <!-- x-cloak styles to hide elements until Alpine.js initializes -->
+        <style>
+            [x-cloak] { display: none !important; }
+        </style>
+
+        <!-- Initialize Alpine store for sidebar state -->
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.store('sidebar', {
+                    open: localStorage.getItem('sidebar-collapsed') === 'true' ? false : true,
+                    toggle() {
+                        this.open = !this.open;
+                        localStorage.setItem('sidebar-collapsed', !this.open);
+                    }
+                });
+            });
+        </script>
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-gradient-to-br from-cool-50 to-cool-100 dark:from-cool-900 dark:to-cool-800 min-h-screen transition-colors duration-300">
-        <div class="flex min-h-screen">
+        <div class="flex min-h-screen" x-data>
             <!-- Sidebar Navigation -->
             @include('layouts.sidebar')
 
             <!-- Main Content Area -->
             <div class="flex-1 flex flex-col transition-all duration-300"
-                 style="margin-left: var(--sidebar-width, 16rem);">
+                 :style="{ marginLeft: $store.sidebar.open ? '16rem' : '4rem' }"
+                 x-cloak>
                 <!-- Top Header -->
                 <header class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm border-b border-cool-200/50 dark:border-cool-700/50 shadow-sm">
                     <div class="flex items-center justify-between px-6 py-4">

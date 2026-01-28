@@ -27,7 +27,7 @@ $classes = ($active ?? false)
     </svg>
     
     <!-- Text -->
-    <span class="ml-3 truncate" x-show="open">
+    <span class="ml-3 truncate" x-show="$store.sidebar.open">
         {{ $slot }}
     </span>
 </a>
