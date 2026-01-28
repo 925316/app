@@ -15,10 +15,8 @@ Route::get('/', function () {
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
+    // Dashboard - unified route, controller handles permission-based content
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/admin-panel', [DashboardController::class, 'adminPanel'])->name('dashboard.admin-panel');
-    Route::get('/dashboard/user-panel', [DashboardController::class, 'userPanel'])->name('dashboard.user-panel');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -35,22 +33,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/licenses/{license}/upgrade', [LicenseController::class, 'upgrade'])->name('licenses.upgrade');
     Route::post('/licenses/{license}/extend', [LicenseController::class, 'extend'])->name('licenses.extend');
 
-    // Devices
-    Route::resource('devices', DeviceController::class)->only(['index', 'manage']);
+    // Devices - unified routes, controller handles permission-based content
+    Route::get('/devices', [DeviceController::class, 'index'])->name('devices.index');
     Route::get('/devices/manage', [DeviceController::class, 'manage'])->name('devices.manage');
     Route::post('/devices/bind', [DeviceController::class, 'bind'])->name('devices.bind');
     Route::post('/devices/unbind', [DeviceController::class, 'unbind'])->name('devices.unbind');
     Route::post('/devices/reset-hwid', [DeviceController::class, 'resetHwid'])->name('devices.reset-hwid');
+    Route::get('/devices/export', [DeviceController::class, 'export'])->name('devices.export');
 
-    // Admin-only routes
-    Route::middleware('admin')->group(function () {
-        Route::get('/devices/admin', [DeviceController::class, 'adminIndex'])->name('devices.admin');
-        Route::post('/devices/{device}/admin-unbind', [DeviceController::class, 'adminUnbind'])->name('devices.admin.unbind');
-        Route::post('/devices/account/{account}/admin-reset-hwid', [DeviceController::class, 'adminResetHwid'])->name('devices.admin.reset-hwid');
-        Route::post('/devices/admin/bulk-unbind', [DeviceController::class, 'bulkUnbind'])->name('devices.admin.bulk-unbind');
-        Route::post('/devices/admin/bulk-reset-hwid', [DeviceController::class, 'bulkResetHwid'])->name('devices.admin.bulk-reset-hwid');
-        Route::get('/devices/admin/export', [DeviceController::class, 'export'])->name('devices.admin.export');
-    });
+    // Admin-specific device operations (POST only with -admin suffix)
+    Route::post('/devices/{device}/unbind-admin', [DeviceController::class, 'adminUnbind'])->name('devices.unbind-admin');
+    Route::post('/devices/account/{account}/reset-hwid-admin', [DeviceController::class, 'adminResetHwid'])->name('devices.reset-hwid-admin');
+    Route::post('/devices/bulk-unbind-admin', [DeviceController::class, 'bulkUnbind'])->name('devices.bulk-unbind-admin');
+    Route::post('/devices/bulk-reset-hwid-admin', [DeviceController::class, 'bulkResetHwid'])->name('devices.bulk-reset-hwid-admin');
 
     // Packages
     Route::get('/packages/download/{release}', [PackageController::class, 'download'])->name('packages.download');
@@ -61,19 +56,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/packages/bulk-delete', [PackageController::class, 'bulkDelete'])->name('packages.bulk-delete');
     Route::resource('packages', PackageController::class)->parameters(['packages' => 'release']);
 
-    // Admin-only routes
-    Route::middleware('admin')->group(function () {
-        // Accounts
-        Route::resource('accounts', AccountController::class);
-        Route::post('/accounts/{account}/suspend', [AccountController::class, 'suspend'])->name('accounts.suspend');
-        Route::post('/accounts/{account}/unsuspend', [AccountController::class, 'unsuspend'])->name('accounts.unsuspend');
-        Route::post('/accounts/{account}/reset-hwid', [AccountController::class, 'resetHwid'])->name('accounts.reset-hwid');
-        Route::post('/accounts/{account}/verify-email', [AccountController::class, 'verifyEmail'])->name('accounts.verify-email');
+    // Accounts - unified routes, controller handles permission-based content
+    Route::resource('accounts', AccountController::class);
+    Route::post('/accounts/{account}/suspend', [AccountController::class, 'suspend'])->name('accounts.suspend');
+    Route::post('/accounts/{account}/unsuspend', [AccountController::class, 'unsuspend'])->name('accounts.unsuspend');
+    Route::post('/accounts/{account}/reset-hwid', [AccountController::class, 'resetHwid'])->name('accounts.reset-hwid');
+    Route::post('/accounts/{account}/verify-email', [AccountController::class, 'verifyEmail'])->name('accounts.verify-email');
 
-        // Logs
-        Route::resource('logs', LogController::class)->only(['index', 'show']);
-        Route::post('/logs/clear', [LogController::class, 'clear'])->name('logs.clear');
-    });
+    // Logs - unified routes, controller handles permission-based content
+    Route::resource('logs', LogController::class)->only(['index', 'show']);
+    Route::post('/logs/clear', [LogController::class, 'clear'])->name('logs.clear');
 });
 
 require __DIR__.'/auth.php';

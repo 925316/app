@@ -71,7 +71,7 @@
                     <!-- Filters Section -->
                     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                         <h4 class="text-sm font-medium mb-3">Filters</h4>
-                        <form method="GET" action="{{ route('devices.admin') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <form method="GET" action="{{ route('devices.index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <!-- Search -->
                             <div>
                                 <label for="search" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
@@ -134,10 +134,10 @@
                                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
                                     Apply Filters
                                 </button>
-                                <a href="{{ route('devices.admin') }}" class="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition">
+                                <a href="{{ route('devices.index') }}" class="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition">
                                     Reset
                                 </a>
-                                <a href="{{ route('devices.admin.export', request()->query()) }}" class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition">
+                                <a href="{{ route('devices.export', request()->query()) }}" class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition">
                                     Export CSV
                                 </a>
                             </div>
@@ -227,7 +227,7 @@
                                         <td class="px-4 py-2 whitespace-nowrap text-sm">
                                             <div class="flex gap-2">
                                                 @if($device->isBound())
-                                                    <form method="POST" action="{{ route('devices.admin.unbind', $device) }}" class="inline" onsubmit="return confirm('Unbind device from {{ $device->account->username }}?');">
+                                                    <form method="POST" action="{{ route('devices.unbind-admin', $device) }}" class="inline" onsubmit="return confirm('Unbind device from {{ $device->account->username }}?');">
                                                         @csrf
                                                         <button type="submit" class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition">
                                                             Unbind
@@ -235,7 +235,7 @@
                                                     </form>
                                                 @endif
                                                 @if($device->account->canResetHwid())
-                                                    <form method="POST" action="{{ route('devices.admin.reset-hwid', $device->account) }}" class="inline" onsubmit="return confirm('Reset HWID for {{ $device->account->username }}? This will unbind all devices.');">
+                                                    <form method="POST" action="{{ route('devices.reset-hwid-admin', $device->account) }}" class="inline" onsubmit="return confirm('Reset HWID for {{ $device->account->username }}? This will unbind all devices.');">
                                                         @csrf
                                                         <button type="submit" class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition">
                                                             Reset HWID

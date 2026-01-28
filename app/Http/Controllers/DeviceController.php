@@ -342,7 +342,7 @@ class DeviceController extends Controller
             ],
         ]);
 
-        return redirect()->route('devices.admin')
+        return redirect()->route('devices.index')
             ->with('success', 'Device unbound successfully!');
     }
 
@@ -381,7 +381,7 @@ class DeviceController extends Controller
             ],
         ]);
 
-        return redirect()->route('devices.admin')
+        return redirect()->route('devices.index')
             ->with('success', 'HWID reset successfully for user: '.$account->username);
     }
 
@@ -428,7 +428,7 @@ class DeviceController extends Controller
             ]);
         }
 
-        return redirect()->route('devices.admin')
+        return redirect()->route('devices.index')
             ->with('success', 'Successfully unbound '.$unboundCount.' devices.');
     }
 
@@ -483,7 +483,7 @@ class DeviceController extends Controller
             return back()->withErrors(['bulk_action' => 'No accounts eligible for HWID reset (72-hour cooldown).']);
         }
 
-        return redirect()->route('devices.admin')
+        return redirect()->route('devices.index')
             ->with('success', 'Successfully reset HWID for '.$resetCount.' accounts.');
     }
 
