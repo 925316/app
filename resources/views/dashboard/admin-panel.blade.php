@@ -134,59 +134,182 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Database Status -->
     <div>
         <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            <svg class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
             </svg>
-            Quick Actions
+            Database System Status
         </h4>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ route('licenses.create') }}" class="group p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h5 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">Create License</h5>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">Generate new license keys</p>
-                    </div>
-                    <svg class="w-8 h-8 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        
+        @if(isset($databaseStatus['error']))
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
+                    <span class="text-red-700 dark:text-red-300">{{ $databaseStatus['error'] }}</span>
                 </div>
-            </a>
-            <a href="{{ route('packages.upload') }}" class="group p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg hover:border-green-300 dark:hover:border-green-600 transition-all duration-300">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h5 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">Add Package</h5>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">Add new software packages</p>
-                    </div>
-                    <svg class="w-8 h-8 text-green-600 dark:text-green-400 group-hover:text-green-700 dark:group-hover:text-green-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </div>
+        @endif
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Database Info -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
                     </svg>
-                </div>
-            </a>
-            <a href="{{ route('licenses.index') }}" class="group p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-300">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h5 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">Manage Licenses</h5>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">View and manage all licenses</p>
+                    Database Info
+                </h5>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Name:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['database']['name'] ?? 'Unknown' }}</span>
                     </div>
-                    <svg class="w-8 h-8 text-purple-600 dark:text-purple-400 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-            </a>
-            <a href="{{ route('logs.index') }}" class="group p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h5 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">View Logs</h5>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">System activity logs</p>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Version:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['database']['version'] ?? 'Unknown' }}</span>
                     </div>
-                    <svg class="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Size:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($databaseStatus['database']['size_mb'] ?? 0, 2) }} MB</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Connection:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['database']['connection'] ?? 'Unknown' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Driver:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['database']['driver'] ?? 'Unknown' }}</span>
+                    </div>
                 </div>
-            </a>
+            </div>
+
+            <!-- Connection Pool -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Connection Pool
+                </h5>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Max Connections:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['connections']['max_connections'] ?? 0 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Threads Connected:</span>
+                        <span class="font-semibold text-blue-700 dark:text-blue-300">{{ $databaseStatus['connections']['threads_connected'] ?? 0 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Threads Running:</span>
+                        <span class="font-semibold text-green-700 dark:text-green-300">{{ $databaseStatus['connections']['threads_running'] ?? 0 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Usage:</span>
+                        <span class="font-semibold text-yellow-700 dark:text-yellow-300">{{ $databaseStatus['connections']['usage_percent'] ?? 0 }}%</span>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full transition-all duration-300" style="width: {{ min($databaseStatus['connections']['usage_percent'] ?? 0, 100) }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Queue Jobs -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-orange-600 dark:text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Queue Jobs
+                </h5>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Pending Jobs:</span>
+                        <span class="font-semibold text-blue-700 dark:text-blue-300">{{ $databaseStatus['queues']['pending_jobs'] ?? 0 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Failed Jobs:</span>
+                        <span class="font-semibold text-red-700 dark:text-red-300">{{ $databaseStatus['queues']['failed_jobs'] ?? 0 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uptime & Cache -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    System Status
+                </h5>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Database Uptime:</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['uptime']['formatted'] ?? 'Unknown' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 {{ $databaseStatus['cache']['connected'] ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20' }} rounded-lg">
+                        <span class="text-gray-600 dark:text-gray-300">Cache ({{ $databaseStatus['cache']['type'] ?? 'Unknown' }}):</span>
+                        <span class="font-semibold {{ $databaseStatus['cache']['connected'] ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300' }}">
+                            {{ $databaseStatus['cache']['connected'] ? 'Connected' : 'Disconnected' }}
+                        </span>
+                    </div>
+                    @if(isset($databaseStatus['cache']['db_size']))
+                        <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                            <span class="text-gray-600 dark:text-gray-300">Cache Keys:</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['cache']['db_size'] ?? 0 }}</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
+
+        {{-- <!-- Table Sizes -->
+        <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-teal-600 dark:text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Table Sizes (Top 10)
+            </h5>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Table Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Rows</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Size (MB)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach(array_slice($databaseStatus['tables'] ?? [], 0, 10) as $table)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $table['name'] }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    {{ number_format($table['rows']) }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    {{ number_format($table['size_mb'], 2) }}
+                                </td>
+                            </tr>
+                        @endforeach
+                        @if(empty($databaseStatus['tables'] ?? []))
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    No tables found
+                                </td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+        </div> --}}
     </div>
 </div>

@@ -226,4 +226,209 @@ class StatisticsService
             'unverified_accounts' => Account::unverified()->count(),
         ];
     }
+
+    /**
+     * Get database system status information
+     */
+    public static function getDatabaseStatus(): array
+    {
+        try {
+            $connection = DB::connection();
+            $pdo = $connection->getPdo();
+            $driver = $connection->getDriverName();
+            $databaseName = $connection->getDatabaseName();
+            
+            // Get database version
+            $version = $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            
+            // Initialize variables
+            $sizeMb = 0;
+            $tables = [];
+            $maxConnections = 0;
+            $threadsConnected = 0;
+            $threadsRunning = 0;
+            $uptime = 0;
+            $uptimeFormatted = 'Unknown';
+            
+            // Get database-specific information
+            if ($driver === 'sqlite') {
+                // SQLite specific queries
+                $tableNames = DB::select("SELECT name as table_name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
+                
+                // Get row count and size for each table
+                $tables = [];
+                foreach ($tableNames as $tableObj) {
+                    $tableName = $tableObj->table_name;
+                    $rowCount = DB::table($tableName)->count();
+                    
+                    // Estimate table size (SQLite doesn't provide per-table size easily)
+                    // Use a rough estimate based on row count
+                    $sizeMb = $rowCount * 0.001; // Rough estimate
+                    
+                    $tables[] = (object) [
+                        'table_name' => $tableName,
+                        'table_rows' => $rowCount,
+                        'size_mb' => $sizeMb,
+                    ];
+                }
+                
+                // Get file size for SQLite
+                $databasePath = database_path($databaseName);
+                if (file_exists($databasePath)) {
+                    $sizeMb = round(filesize($databasePath) / 1024 / 1024, 2);
+                }
+                
+                // SQLite doesn't have connection pool info
+                $maxConnections = 1;
+                $threadsConnected = 1;
+                $threadsRunning = 1;
+                $uptimeFormatted = 'N/A';
+            } else {
+                // MySQL/MariaDB specific queries
+                $sizeResult = DB::select('SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb FROM information_schema.tables WHERE table_schema = ?', [$databaseName]);
+                $sizeMb = $sizeResult[0]->size_mb ?? 0;
+                
+                $tables = DB::select("SELECT 
+                    table_name,
+                    table_rows,
+                    ROUND((data_length + index_length) / 1024 / 1024, 2) AS size_mb
+                    FROM information_schema.tables 
+                    WHERE table_schema = ? 
+                    AND table_type = 'BASE TABLE'
+                    ORDER BY (data_length + index_length) DESC", [$databaseName]);
+                
+                // Get connection pool info
+                $maxConnectionsResult = $connection->select('SHOW VARIABLES LIKE "max_connections"');
+                $maxConnections = (int) ($maxConnectionsResult[0]->Value ?? 0);
+                
+                $threadsConnectedResult = $connection->select('SHOW STATUS LIKE "Threads_connected"');
+                $threadsConnected = (int) ($threadsConnectedResult[0]->Value ?? 0);
+                
+                $threadsRunningResult = $connection->select('SHOW STATUS LIKE "Threads_running"');
+                $threadsRunning = (int) ($threadsRunningResult[0]->Value ?? 0);
+                
+                // Get uptime
+                $uptimeResult = $connection->select('SHOW STATUS LIKE "Uptime"');
+                $uptime = (int) ($uptimeResult[0]->Value ?? 0);
+                $uptimeFormatted = self::formatUptime($uptime);
+            }
+            
+            // Get queue jobs count (works for both SQLite and MySQL)
+            $queueTable = config('queue.connections.database.table', 'queued_jobs');
+            $failedTable = config('queue.failed.table', 'queued_failed_jobs');
+            
+            $queuedJobs = DB::table($queueTable)->count();
+            $failedJobs = DB::table($failedTable)->count();
+            
+            // Get cache status (if using Redis)
+            $cacheStatus = [];
+            if (config('cache.default') === 'redis') {
+                try {
+                    $redis = app('redis');
+                    $cacheStatus = [
+                        'type' => 'Redis',
+                        'connected' => true,
+                        'db_size' => $redis->dbSize(),
+                        'info' => $redis->info(),
+                    ];
+                } catch (\Exception $e) {
+                    $cacheStatus = [
+                        'type' => 'Redis',
+                        'connected' => false,
+                        'error' => $e->getMessage(),
+                    ];
+                }
+            } else {
+                $cacheStatus = [
+                    'type' => ucfirst(config('cache.default')),
+                    'connected' => true,
+                ];
+            }
+            
+            return [
+                'database' => [
+                    'name' => $databaseName,
+                    'version' => $version,
+                    'size_mb' => $sizeMb,
+                    'connection' => $connection->getName(),
+                    'driver' => $driver,
+                ],
+                'tables' => array_map(function($table) {
+                    return [
+                        'name' => $table->table_name,
+                        'rows' => (int) ($table->table_rows ?? 0),
+                        'size_mb' => (float) ($table->size_mb ?? 0),
+                    ];
+                }, $tables),
+                'connections' => [
+                    'max_connections' => $maxConnections,
+                    'threads_connected' => $threadsConnected,
+                    'threads_running' => $threadsRunning,
+                    'usage_percent' => $maxConnections > 0 ? round($threadsConnected / $maxConnections * 100, 2) : 0,
+                ],
+                'queues' => [
+                    'pending_jobs' => $queuedJobs,
+                    'failed_jobs' => $failedJobs,
+                ],
+                'uptime' => [
+                    'seconds' => $uptime,
+                    'formatted' => $uptimeFormatted,
+                ],
+                'cache' => $cacheStatus,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage(),
+                'database' => [
+                    'name' => 'Unknown',
+                    'version' => 'Unknown',
+                    'size_mb' => 0,
+                    'connection' => 'Unknown',
+                    'driver' => 'Unknown',
+                ],
+                'tables' => [],
+                'connections' => [
+                    'max_connections' => 0,
+                    'threads_connected' => 0,
+                    'threads_running' => 0,
+                    'usage_percent' => 0,
+                ],
+                'queues' => [
+                    'pending_jobs' => 0,
+                    'failed_jobs' => 0,
+                ],
+                'uptime' => [
+                    'seconds' => 0,
+                    'formatted' => 'Unknown',
+                ],
+                'cache' => [
+                    'type' => 'Unknown',
+                    'connected' => false,
+                ],
+            ];
+        }
+    }
+    
+    /**
+     * Format uptime for display
+     */
+    protected static function formatUptime(int $seconds): string
+    {
+        $days = floor($seconds / 86400);
+        $hours = floor(($seconds % 86400) / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        
+        $parts = [];
+        if ($days > 0) {
+            $parts[] = $days.'d';
+        }
+        if ($hours > 0) {
+            $parts[] = $hours.'h';
+        }
+        if ($minutes > 0) {
+            $parts[] = $minutes.'m';
+        }
+        
+        return implode(' ', $parts) ?: '0m';
+    }
 }

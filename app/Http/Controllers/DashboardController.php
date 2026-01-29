@@ -19,10 +19,12 @@ class DashboardController extends Controller
         if ($user->hasPrivilege(7)) { // Admin
             $stats = StatisticsService::getSystemHealth();
             $recentActivity = StatisticsService::getRecentActivity();
+            $databaseStatus = StatisticsService::getDatabaseStatus();
 
             return view('dashboard.index', [
                 'stats' => $stats,
                 'recentActivity' => $recentActivity,
+                'databaseStatus' => $databaseStatus,
                 'isAdmin' => true,
             ]);
         } else { // Regular user
@@ -56,10 +58,12 @@ class DashboardController extends Controller
 
         $stats = StatisticsService::getSystemHealth();
         $recentActivity = StatisticsService::getRecentActivity();
+        $databaseStatus = StatisticsService::getDatabaseStatus();
 
         return view('dashboard.admin-panel', [
             'stats' => $stats,
             'recentActivity' => $recentActivity,
+            'databaseStatus' => $databaseStatus,
         ]);
     }
 
