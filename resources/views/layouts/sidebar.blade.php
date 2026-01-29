@@ -70,6 +70,14 @@
                 </x-sidebar-nav-link>
             @endif
 
+            <!-- Sessions -->
+            @if (Auth::user()->hasPrivilege(7))
+                <x-sidebar-nav-link :href="route('sessions.index')" :active="request()->routeIs('sessions.*')"
+                                    :icon="'desktop'">
+                    {{ __('Sessions') }}
+                </x-sidebar-nav-link>
+            @endif
+
             <!-- Logs -->
             @if (Auth::user()->hasPrivilege(7))
                 <x-sidebar-nav-link :href="route('logs.index')" :active="request()->routeIs('logs.*')"

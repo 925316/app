@@ -7,6 +7,7 @@ use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -62,6 +63,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/accounts/{account}/unsuspend', [AccountController::class, 'unsuspend'])->name('accounts.unsuspend');
     Route::post('/accounts/{account}/reset-hwid', [AccountController::class, 'resetHwid'])->name('accounts.reset-hwid');
     Route::post('/accounts/{account}/verify-email', [AccountController::class, 'verifyEmail'])->name('accounts.verify-email');
+
+    // Sessions - admin-only routes
+    Route::resource('sessions', SessionController::class)->only(['index', 'show', 'destroy']);
 
     // Logs - unified routes, controller handles permission-based content
     Route::resource('logs', LogController::class)->only(['index', 'show']);
