@@ -3,7 +3,80 @@
         {{ __('Licenses') }}
     </x-slot>
 
-    <div class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+    <div class="py-7">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            
+            @if (Auth::user()->hasPrivilege(7))
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-500/20 rounded-full">
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Licenses</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $licenses->total() }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-500/20 rounded-full">
+                            <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $licenses->filter(fn($l) => $l->isActive())->count() }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-red-500/20 rounded-full">
+                            <svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expired</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $licenses->filter(fn($l) => $l->isExpired())->count() }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-yellow-500/20 rounded-full">
+                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Unassigned</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $licenses->filter(fn($l) => !$l->account)->count() }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header with actions -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-medium">
@@ -17,7 +90,7 @@
                         @if ($isAdmin ?? false)
                             <div class="flex gap-2">
                                 <a href="{{ route('licenses.create') }}"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                   class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
                                     Create License
                                 </a>
                             </div>
@@ -31,9 +104,9 @@
                             <div class="flex items-start space-x-4">
                                 <div class="p-3 bg-blue-500/20 rounded-full">
                                     <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                         stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                                              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
                                         </path>
                                     </svg>
                                 </div>
@@ -46,34 +119,35 @@
                                     </p>
 
                                     <form method="POST" action="{{ route('licenses.activate-by-key') }}"
-                                        class="space-y-4">
+                                          class="space-y-4">
                                         @csrf
 
                                         <div>
                                             <label for="license_key"
-                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                   class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 License Key
                                             </label>
                                             <input type="text" id="license_key" name="license_key"
-                                                value="{{ old('license_key') }}"
-                                                placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
-                                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200 text-center font-mono text-lg tracking-wider uppercase @error('license_key') border-red-500 @enderror"
-                                                maxlength="29" required {{-- pattern="^[A-Z0-9]{5}-[0-9A-F]{5}-[A-Z2-7]{5}-[A-Z3-8]{5}-[A-Z0-9]{5}$" --}}
-                                                title="License key must be in the format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX">
+                                                   value="{{ old('license_key') }}"
+                                                   placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
+                                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200 text-center font-mono text-lg tracking-wider uppercase @error('license_key') border-red-500 @enderror"
+                                                   maxlength="29" required
+                                                   {{-- pattern="^[A-Z0-9]{5}-[0-9A-F]{5}-[A-Z2-7]{5}-[A-Z3-8]{5}-[A-Z0-9]{5}$" --}}
+                                                   title="License key must be in the format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX">
                                             @error('license_key')
-                                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}
-                                                </p>
+                                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}
+                                            </p>
                                             @enderror
                                         </div>
 
                                         <div class="flex justify-end">
                                             <button type="submit"
-                                                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md font-medium">
+                                                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md font-medium">
                                                 <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                                                          stroke-width="2"
+                                                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
                                                     </path>
                                                 </svg>
                                                 Activate License
@@ -92,9 +166,9 @@
                             <div class="flex items-center justify-between mb-4">
                                 <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                                     <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                         stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                                              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
                                         </path>
                                     </svg>
                                     Filter Licenses
@@ -107,14 +181,14 @@
                             </div>
 
                             <form method="GET" action="{{ route('licenses.index') }}"
-                                class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                  class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                                 <!-- Status filter -->
                                 <div class="space-y-2">
                                     <label for="status"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                           class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                                     <select name="status" id="status"
-                                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                                            class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
                                         <option value="">All Statuses</option>
                                         @foreach ($statusOptions as $value => $label)
                                             <option value="{{ $value }}"
@@ -128,9 +202,9 @@
                                 <!-- Privilege filter -->
                                 <div class="space-y-2">
                                     <label for="privilege"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Privilege</label>
+                                           class="block text-sm font-medium text-gray-700 dark:text-gray-300">Privilege</label>
                                     <select name="privilege" id="privilege"
-                                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                                            class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
                                         <option value="">All Privileges</option>
                                         @foreach ($privilegeOptions as $value => $label)
                                             <option value="{{ $value }}"
@@ -144,38 +218,38 @@
                                 <!-- Search -->
                                 <div class="space-y-2 md:col-span-2">
                                     <label for="search"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
+                                           class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
                                     <div class="flex gap-2">
                                         <div class="relative flex-1">
                                             <div
                                                 class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                 <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                                          stroke-width="2"
+                                                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                                 </svg>
                                             </div>
                                             <input type="text" name="search" id="search"
-                                                value="{{ request('search', '') }}"
-                                                class="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200"
-                                                placeholder="Search by key or username...">
+                                                   value="{{ request('search', '') }}"
+                                                   class="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200"
+                                                   placeholder="Search by key or username...">
                                         </div>
                                         <button type="submit"
-                                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 font-medium shadow-sm">
+                                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 font-medium shadow-sm">
                                             <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                             </svg>
                                             Filter
                                         </button>
                                         <a href="{{ route('licenses.index') }}"
-                                            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 font-medium shadow-sm">
+                                           class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 font-medium shadow-sm">
                                             <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                                                 </path>
                                             </svg>
                                             Reset
@@ -190,7 +264,8 @@
                                     request()->filled('privilege') ||
                                     request()->filled('search'))
                                 <div class="mt-4 flex items-center space-x-3">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Active filters:</span>
+                                    <span
+                                        class="text-sm font-medium text-gray-700 dark:text-gray-300">Active filters:</span>
                                     <div class="flex flex-wrap gap-2">
                                         @if (request()->filled('status'))
                                             @php
@@ -202,11 +277,11 @@
                                                     class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                                     Status: {{ ucfirst($statusLabel) }}
                                                     <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}"
-                                                        class="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                                                       class="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                  stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                         </svg>
                                                     </a>
                                                 </span>
@@ -222,11 +297,11 @@
                                                     class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                                     Privilege: {{ ucfirst($privilegeLabel) }}
                                                     <a href="{{ request()->fullUrlWithQuery(['privilege' => null]) }}"
-                                                        class="ml-2 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200">
+                                                       class="ml-2 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                  stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                         </svg>
                                                     </a>
                                                 </span>
@@ -237,11 +312,11 @@
                                                 class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                                                 Search: "{{ request('search') }}"
                                                 <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}"
-                                                    class="ml-2 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-200">
+                                                   class="ml-2 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-200">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                              stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                     </svg>
                                                 </a>
                                             </span>
@@ -256,90 +331,90 @@
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
+                            <tr>
+                                <th scope="col"
+                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    License Key
+                                </th>
+                                @if ($isAdmin ?? false)
                                     <th scope="col"
                                         class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        License Key
+                                        Account
                                     </th>
-                                    @if ($isAdmin ?? false)
-                                        <th scope="col"
-                                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Account
-                                        </th>
-                                    @endif
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Privilege
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Expires
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
+                                @endif
+                                <th scope="col"
+                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Privilege
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Expires
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
                             </thead>
                             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($licenses as $license)
-                                    <tr>
-                                        <td
-                                            class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            {{ $license->key }}
-                                        </td>
-                                        @if ($isAdmin ?? false)
-                                            <td
-                                                class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                {{ $license->account?->username ?? 'Unassigned' }}
-                                            </td>
-                                        @endif
+                            @forelse($licenses as $license)
+                                <tr>
+                                    <td
+                                        class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $license->key }}
+                                    </td>
+                                    @if ($isAdmin ?? false)
                                         <td
                                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $license->getPrivilegeTextAttribute() }}
+                                            {{ $license->account?->username ?? 'Unassigned' }}
                                         </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    @endif
+                                    <td
+                                        class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        {{ $license->getPrivilegeTextAttribute() }}
+                                    </td>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm">
                                             <span
                                                 class="px-2 py-0.5 rounded text-xs font-medium {{ $license->getStatusColorAttribute() }}">
                                                 {{ $license->getStatusTextAttribute() }}
                                             </span>
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $license->expires_at->format('Y-m-d') }}
-                                            @if ($license->isActive() && !$license->isExpired())
-                                                <br>
-                                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                    </td>
+                                    <td
+                                        class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        {{ $license->expires_at->format('Y-m-d') }}
+                                        @if ($license->isActive() && !$license->isExpired())
+                                            <br>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
                                                     ({{ $license->daysUntilExpiry() }} days)
                                                 </span>
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('licenses.show', $license) }}"
-                                                class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                                View
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="{{ route('licenses.show', $license) }}"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                            View
+                                        </a>
+                                        @if ($isAdmin ?? false)
+                                            <span class="mx-1 text-gray-400">|</span>
+                                            <a href="{{ route('licenses.edit', $license) }}"
+                                               class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                                                Edit
                                             </a>
-                                            @if ($isAdmin ?? false)
-                                                <span class="mx-1 text-gray-400">|</span>
-                                                <a href="{{ route('licenses.edit', $license) }}"
-                                                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                                                    Edit
-                                                </a>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="{{ $isAdmin ? 7 : 6 }}"
-                                            class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                            No licenses found.
-                                        </td>
-                                    </tr>
-                                @endforelse
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="{{ $isAdmin ? 7 : 6 }}"
+                                        class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
+                                        No licenses found.
+                                    </td>
+                                </tr>
+                            @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -349,67 +424,72 @@
                         {{ $licenses->links() }}
                     </div>
 
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const filterForm = document.querySelector('form[method="GET"]');
+                    @push('scripts')
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const filterForm = document.querySelector('form[method="GET"]');
 
-                if (filterForm) {
-                    cleanupUrl();
+                                if (filterForm) {
+                                    cleanupUrl();
 
-                    filterForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
+                                    filterForm.addEventListener('submit', function (e) {
+                                        e.preventDefault();
 
-                        const formData = new FormData(this);
-                        const params = new URLSearchParams();
+                                        const formData = new FormData(this);
+                                        const params = new URLSearchParams();
 
-                        for (const [key, value] of formData.entries()) {
-                            const trimmedValue = value.toString().trim();
-                            if (trimmedValue !== '') {
-                                params.append(key, trimmedValue);
-                            }
-                        }
+                                        for (const [key, value] of formData.entries()) {
+                                            const trimmedValue = value.toString().trim();
+                                            if (trimmedValue !== '') {
+                                                params.append(key, trimmedValue);
+                                            }
+                                        }
 
-                        const baseUrl = this.action.split('?')[0];
-                        const queryString = params.toString();
-                        const url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+                                        const baseUrl = this.action.split('?')[0];
+                                        const queryString = params.toString();
+                                        const url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
 
-                        window.location.href = url;
-                    });
+                                        window.location.href = url;
+                                    });
 
-                    const resetBtn = filterForm.querySelector('a[href*="licenses.index"]');
-                    if (resetBtn) {
-                        resetBtn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            window.location.href = this.href;
-                        });
-                    }
-                }
+                                    const resetBtn = filterForm.querySelector('a[href*="licenses.index"]');
+                                    if (resetBtn) {
+                                        resetBtn.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            window.location.href = this.href;
+                                        });
+                                    }
+                                }
 
-                function cleanupUrl() {
-                    const url = new URL(window.location);
-                    const params = new URLSearchParams(url.search);
-                    let hasChanges = false;
+                                function cleanupUrl() {
+                                    const url = new URL(window.location);
+                                    const params = new URLSearchParams(url.search);
+                                    let hasChanges = false;
 
-                    for (const [key, value] of params.entries()) {
-                        if (value === '' || value.trim() === '') {
-                            params.delete(key);
-                            hasChanges = true;
-                        }
-                    }
+                                    for (const [key, value] of params.entries()) {
+                                        if (value === '' || value.trim() === '') {
+                                            params.delete(key);
+                                            hasChanges = true;
+                                        }
+                                    }
 
-                    if (hasChanges) {
-                        const newUrl = params.toString() ?
-                            `${url.pathname}?${params.toString()}` :
-                            url.pathname;
-                        window.history.replaceState({}, '', newUrl);
-                    }
-                }
+                                    if (hasChanges) {
+                                        const newUrl = params.toString() ?
+                                            `${url.pathname}?${params.toString()}` :
+                                            url.pathname;
+                                        window.history.replaceState({}, '', newUrl);
+                                    }
+                                }
 
-                window.addEventListener('popstate', function() {
-                    cleanupUrl();
-                });
-            });
-        </script>
-    @endpush
+                                window.addEventListener('popstate', function () {
+                                    cleanupUrl();
+                                });
+                            });
+                        </script>
+                    @endpush
+                </div>
+            </div>
+        </div>
+    </div>
+
 </x-app-sidebar-layout>

@@ -38,6 +38,7 @@ class PackageController extends Controller
             'releases' => $releases,
             'stats' => $stats,
             'isAdmin' => $user->hasPrivilege(7),
+            'canDownload' => $user->hasPrivilege(1),
         ]);
     }
 
