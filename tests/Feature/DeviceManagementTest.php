@@ -23,7 +23,7 @@ test('admin can access device management page', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->get(route('devices.admin'));
+        ->get(route('devices.index'));
 
     $response->assertSuccessful();
     $response->assertViewIs('devices.admin-index');
@@ -38,7 +38,7 @@ test('non-admin cannot access device management page', function () {
 
     $response = $this
         ->actingAs($user)
-        ->get(route('devices.admin'));
+        ->get(route('devices.index'));
 
     $response->assertForbidden();
 });
@@ -58,7 +58,7 @@ test('admin can see device statistics', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->get(route('devices.admin'));
+        ->get(route('devices.index'));
 
     $response->assertSuccessful();
     $response->assertViewHasAll([
@@ -84,7 +84,7 @@ test('admin can filter devices by status', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->get(route('devices.admin', ['status' => 'bound']));
+        ->get(route('devices.index', ['status' => 'bound']));
 
     $response->assertSuccessful();
     $response->assertViewHas('devices');
@@ -105,7 +105,7 @@ test('admin can filter devices by date range', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->get(route('devices.admin', ['date_range' => '7d']));
+        ->get(route('devices.index', ['date_range' => '7d']));
 
     $response->assertSuccessful();
     $response->assertViewHas('devices');
@@ -131,7 +131,7 @@ test('admin can search devices', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->get(route('devices.admin', ['search' => 'testuser']));
+        ->get(route('devices.index', ['search' => 'testuser']));
 
     $response->assertSuccessful();
     $response->assertViewHas('devices');
@@ -171,9 +171,9 @@ test('admin can unbind a device', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->post(route('devices.admin.unbind', $device));
+        ->post(route('devices.unbind-admin', $device));
 
-    $response->assertRedirect(route('devices.admin'));
+    $response->assertRedirect(route('devices.index'));
     $response->assertSessionHas('success');
 
     $this->assertDatabaseHas('account_devices', [
@@ -202,9 +202,9 @@ test('admin can reset HWID for a user', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->post(route('devices.admin.reset-hwid', $user));
+        ->post(route('devices.reset-hwid-admin', $user));
 
-    $response->assertRedirect(route('devices.admin'));
+    $response->assertRedirect(route('devices.index'));
     $response->assertSessionHas('success');
 
     $this->assertDatabaseHas('accounts', [
@@ -245,11 +245,11 @@ test('admin can perform bulk unbind', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->post(route('devices.admin.bulk-unbind'), [
+        ->post(route('devices.bulk-unbind-admin'), [
             'device_ids' => [$device1->id, $device2->id],
         ]);
 
-    $response->assertRedirect(route('devices.admin'));
+    $response->assertRedirect(route('devices.index'));
     $response->assertSessionHas('success');
 
     $this->assertDatabaseHas('account_devices', [
@@ -289,11 +289,11 @@ test('admin can perform bulk HWID reset', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->post(route('devices.admin.bulk-reset-hwid'), [
+        ->post(route('devices.bulk-reset-hwid-admin'), [
             'device_ids' => [$device->id],
         ]);
 
-    $response->assertRedirect(route('devices.admin'));
+    $response->assertRedirect(route('devices.index'));
     $response->assertSessionHas('success');
 
     $this->assertDatabaseHas('accounts', [
@@ -330,15 +330,9 @@ test('admin can export device data', function () {
         'last_seen_at' => now(),
     ]);
 
-    // Give admin privileges
-    License::factory()->active()->privilege(7)->create([
-        'used_by' => $admin->id,
-        'expires_at' => now()->addYear(),
-    ]);
-
     $response = $this
         ->actingAs($admin)
-        ->get(route('devices.admin.export', ['status' => 'bound']));
+        ->get(route('devices.export', ['status' => 'bound']));
 
     $response->assertSuccessful();
     $response->assertHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -359,7 +353,7 @@ test('bulk actions require at least one device', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->post(route('devices.admin.bulk-unbind'), [
+        ->post(route('devices.bulk-unbind-admin'), [
             'device_ids' => [],
         ]);
 
@@ -381,7 +375,7 @@ test('bulk actions validate device IDs', function () {
 
     $response = $this
         ->actingAs($admin)
-        ->post(route('devices.admin.bulk-unbind'), [
+        ->post(route('devices.bulk-unbind-admin'), [
             'device_ids' => [999999],
         ]);
 
