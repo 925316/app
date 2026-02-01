@@ -205,7 +205,6 @@ class StatisticsService
 
         return [
             'new_accounts' => Account::where('created_at', '>=', $startDate)->count(),
-            'new_licenses' => License::where('created_at', '>=', $startDate)->count(),
             'active_sessions' => ClientSession::where('last_heartbeat_at', '>=', $startDate)->count(),
             'login_events' => EventLog::where('event_type', 'account.login')
                 ->where('created_at', '>=', $startDate)

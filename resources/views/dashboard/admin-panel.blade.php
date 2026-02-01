@@ -89,10 +89,6 @@
                     <span class="font-semibold text-gray-900 dark:text-white">{{ $recentActivity['new_accounts'] ?? 0 }}</span>
                 </div>
                 <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                    <span class="text-gray-600 dark:text-gray-300">New Licenses:</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{ $recentActivity['new_licenses'] ?? 0 }}</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <span class="text-gray-600 dark:text-gray-300">Active Sessions:</span>
                     <span class="font-semibold text-gray-900 dark:text-white">{{ $recentActivity['active_sessions'] ?? 0 }}</span>
                 </div>
