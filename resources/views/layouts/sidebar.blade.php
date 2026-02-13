@@ -57,7 +57,7 @@
             <!-- Devices -->
             @if (Auth::user()->hasPrivilege(1))
                 <x-sidebar-nav-link :href="route('devices.index')" :active="request()->routeIs('devices.*')"
-                                    :icon="'device-mobile'">
+                                    :icon="'desktop'">
                     {{ __('Devices') }}
                 </x-sidebar-nav-link>
             @endif
@@ -73,7 +73,7 @@
             <!-- Sessions -->
             @if (Auth::user()->hasPrivilege(7))
                 <x-sidebar-nav-link :href="route('sessions.index')" :active="request()->routeIs('sessions.*')"
-                                    :icon="'desktop'">
+                                    :icon="'server'">
                     {{ __('Sessions') }}
                 </x-sidebar-nav-link>
             @endif

@@ -20,43 +20,29 @@ class AccountController extends Controller
 
         $query = Account::query();
 
-        // Filter by status (multiple checkboxes)
-        if ($request->has('status') && ! empty($request->status)) {
-            $statuses = is_array($request->status) ? $request->status : [$request->status];
+        // Filter by account status (single selection)
+        if ($request->filled('status') && $request->status !== '') {
+            $status = $request->status;
 
-            $query->where(function ($q) use ($statuses) {
-                $first = true;
-                foreach ($statuses as $status) {
-                    if ($first) {
-                        if ($status === 'active') {
-                            $q->active();
-                        } elseif ($status === 'suspended') {
-                            $q->suspended();
-                        } elseif ($status === 'verified') {
-                            $q->verified();
-                        } elseif ($status === 'unverified') {
-                            $q->unverified();
-                        }
-                        $first = false;
-                    } else {
-                        if ($status === 'active') {
-                            $q->orWhereHas('licenses', function ($q) {
-                                $q->where('status', \App\Enums\LicenseStatus::ACTIVE->value)
-                                    ->where('expires_at', '>', now());
-                            });
-                        } elseif ($status === 'suspended') {
-                            $q->orWhere(function ($q) {
-                                $q->where('suspended_until', '>', now())
-                                    ->orWhere('suspended_until', null);
-                            });
-                        } elseif ($status === 'verified') {
-                            $q->orWhereNotNull('email_verified_at');
-                        } elseif ($status === 'unverified') {
-                            $q->orWhereNull('email_verified_at');
-                        }
-                    }
-                }
-            });
+            match ($status) {
+                'active' => $query->active(),
+                'suspended' => $query->suspended(),
+                'verified' => $query->verified(),
+                'unverified' => $query->unverified(),
+                '2fa-enabled' => $query->hasTwoFactorEnabled(),
+                default => null,
+            };
+        }
+
+        // Filter by license count
+        if ($request->filled('license_count') && $request->license_count !== '') {
+            $licenseCount = $request->license_count;
+
+            if ($licenseCount === 'none') {
+                $query->whereDoesntHave('licenses');
+            } elseif ($licenseCount === 'has') {
+                $query->whereHas('licenses');
+            }
         }
 
         // Filter by privilege level
@@ -82,8 +68,18 @@ class AccountController extends Controller
         }
 
         // Sort
-        $sort = $request->get('sort', 'created_at');
-        $direction = $request->get('direction', 'desc');
+        $sortValue = $request->get('sort', 'created_at_desc');
+
+        // Parse sort value (format: field_direction)
+        if (str_contains($sortValue, '_')) {
+            $parts = explode('_', $sortValue);
+            $direction = array_pop($parts);
+            $sort = implode('_', $parts);
+        } else {
+            $sort = $sortValue;
+            $direction = 'desc';
+        }
+
         $query->orderBy($sort, $direction);
 
         $accounts = $query->withCount('licenses', 'devices')
@@ -97,7 +93,7 @@ class AccountController extends Controller
             2 => 'Upgrade',
             3 => 'Ultimate',
             6 => 'Tester',
-            7 => 'Staff/Admin',
+            7 => 'Staff',
         ];
 
         return view('accounts.index', [
@@ -114,6 +110,7 @@ class AccountController extends Controller
             'currentFilters' => [
                 'status' => $request->status,
                 'privilege' => $request->privilege,
+                'license_count' => $request->license_count,
                 'search' => $request->search,
                 'sort' => $sort,
                 'direction' => $direction,
