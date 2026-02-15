@@ -20,141 +20,74 @@ class AccountDeviceSeeder extends Seeder
         }
 
         $this->createPrimaryDeviceBindings();
-        $this->createTestCases();
+        $this->createHistoricalDevices();
         $this->displayDeviceStats();
     }
 
     /**
      * Create primary device bindings for accounts.
+     * Each account gets exactly one currently bound device.
      */
     private function createPrimaryDeviceBindings(): void
     {
-        $accounts = Account::limit(30)->get();
+        $accounts = Account::all();
 
         foreach ($accounts as $account) {
-            AccountDevice::factory()
-                ->count(1)
-                ->for($account)
-                ->create();
+            // Check if account already has a bound device
+            $existingBound = AccountDevice::where('account_id', $account->id)
+                ->whereNotNull('bound_at')
+                ->whereNull('unbound_at')
+                ->exists();
+
+            if (! $existingBound) {
+                $firstSeen = now()->subDays(rand(30, 365));
+                $lastSeen = $firstSeen->copy()->addDays(rand(0, 30));
+                $boundAt = $firstSeen->copy()->addDays(rand(1, 7));
+
+                AccountDevice::factory()
+                    ->for($account)
+                    ->create([
+                        'first_seen_at' => $firstSeen,
+                        'last_seen_at' => $lastSeen,
+                        'bound_at' => $boundAt,
+                        'unbound_at' => null, // Currently bound
+                    ]);
+            }
         }
 
         $this->command->info("Created primary device bindings for {$accounts->count()} accounts");
     }
 
     /**
-     * Create specific test cases for development.
+     * Create historical unbound devices for accounts.
+     * Each account may have multiple historical devices, but only one currently bound.
      */
-    private function createTestCases(): void
-    {
-        // First, ensure all accounts have at most one currently bound device
-        $this->ensureSingleBoundDevicePerAccount();
-
-        // Test case 1: Account with one currently bound device and historical unbound devices
-        $multiDeviceAccount = Account::first();
-        if ($multiDeviceAccount) {
-            // Create historical unbound devices
-            AccountDevice::factory()
-                ->count(2)
-                ->for($multiDeviceAccount)
-                ->unbound()
-                ->create();
-        }
-
-        // Test case 2: Account with mixed device statuses (only one bound at a time)
-        $mixedStatusAccount = Account::skip(1)->first();
-        if ($mixedStatusAccount) {
-            // Create historical unbound devices
-            AccountDevice::factory()
-                ->for($mixedStatusAccount)
-                ->unbound()
-                ->create();
-
-            // Create never bound devices
-            AccountDevice::factory()
-                ->for($mixedStatusAccount)
-                ->neverBound()
-                ->create();
-        }
-
-        // Test case 3: Devices from specific countries (each with different accounts)
-        $countries = [
-            ['US', 5],
-            ['GB', 3],
-            ['JP', 4],
-            ['CN', 6],
-        ];
-
-        foreach ($countries as [$countryCode, $count]) {
-            // Create devices for different accounts to avoid multiple bound devices per account
-            $accounts = Account::inRandomOrder()->limit($count)->get();
-            foreach ($accounts as $account) {
-                AccountDevice::factory()
-                    ->for($account)
-                    ->country($countryCode)
-                    ->unbound() // Make these unbound to avoid conflicts
-                    ->create();
-            }
-        }
-
-        // Test case 4: Inactive devices (not seen for >60 days)
-        // Create for different accounts to avoid conflicts
-        $accounts = Account::inRandomOrder()->limit(10)->get();
-        foreach ($accounts as $account) {
-            AccountDevice::factory()
-                ->for($account)
-                ->inactive(60)
-                ->unbound() // Make these unbound to avoid conflicts
-                ->create();
-        }
-
-        // Test case 5: Recently unbound devices
-        $accounts = Account::inRandomOrder()->limit(5)->get();
-        foreach ($accounts as $account) {
-            AccountDevice::factory()
-                ->for($account)
-                ->state([
-                    'bound_at' => now()->subDays(30),
-                    'unbound_at' => now()->subDays(1),
-                ])
-                ->create();
-        }
-
-        // Test case 6: Devices from local network
-        $accounts = Account::inRandomOrder()->limit(5)->get();
-        foreach ($accounts as $account) {
-            AccountDevice::factory()
-                ->for($account)
-                ->localNetwork()
-                ->unbound() // Make these unbound to avoid conflicts
-                ->create();
-        }
-    }
-
-    /**
-     * Ensure each account has at most one currently bound device.
-     */
-    private function ensureSingleBoundDevicePerAccount(): void
+    private function createHistoricalDevices(): void
     {
         $accounts = Account::all();
 
         foreach ($accounts as $account) {
-            // Get all currently bound devices for this account
-            $boundDevices = AccountDevice::where('account_id', $account->id)
-                ->whereNotNull('bound_at')
-                ->whereNull('unbound_at')
-                ->orderBy('bound_at', 'desc')
-                ->get();
+            // Random number of historical devices (0-3 per account)
+            $historicalCount = rand(0, 3);
 
-            // If there are multiple bound devices, keep only the most recent one
-            if ($boundDevices->count() > 1) {
-                $mostRecentDevice = $boundDevices->first();
-                $devicesToUnbind = $boundDevices->slice(1);
+            for ($i = 0; $i < $historicalCount; $i++) {
+                $firstSeen = now()->subDays(rand(365, 730)); // 1-2 years ago
+                $bindDate = $firstSeen->copy()->addDays(rand(1, 7));
+                $unbindDate = $bindDate->copy()->addDays(rand(30, 180)); // Unbound after 1-6 months
+                $lastSeen = $unbindDate->copy()->subDays(rand(1, 7));
 
-                foreach ($devicesToUnbind as $device) {
-                    $device->update(['unbound_at' => now()]);
-                }
+                AccountDevice::factory()
+                    ->for($account)
+                    ->create([
+                        'first_seen_at' => $firstSeen,
+                        'last_seen_at' => $lastSeen,
+                        'bound_at' => $bindDate,
+                        'unbound_at' => $unbindDate,
+                    ]);
             }
         }
+
+        $this->command->info('Created historical devices for multiple accounts');
     }
 
     /**

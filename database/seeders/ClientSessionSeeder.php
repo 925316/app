@@ -18,20 +18,11 @@ class ClientSessionSeeder extends Seeder
         $accounts = Account::take(10)->get();
         $devices = AccountDevice::whereIn('account_id', $accounts->pluck('id'))->get();
 
-        // Create active sessions
+        // Create current active sessions (one per account+device combo)
         $this->createActiveSessions($accounts, $devices);
 
-        // Create expired sessions
-        $this->createExpiredSessions($accounts);
-
-        // Create sessions with no heartbeat
-        $this->createNoHeartbeatSessions($accounts);
-
-        // Create version-specific sessions
-        $this->createVersionSessions();
-
-        // Create IP-specific sessions
-        $this->createIpSessions();
+        // Create historical expired sessions
+        $this->createHistoricalSessions($accounts);
 
         // Display session statistics
         $this->displaySessionStats();
@@ -39,6 +30,7 @@ class ClientSessionSeeder extends Seeder
 
     /**
      * Create active client sessions.
+     * Each account+device combination has at most one active session.
      */
     private function createActiveSessions($accounts, $devices): void
     {
@@ -47,75 +39,51 @@ class ClientSessionSeeder extends Seeder
 
             if ($accountDevices->isNotEmpty()) {
                 $accountDevices->each(function ($device) {
-                    $sessionCount = rand(0, 2);
+                    // Only create one active session per device
+                    // Check if an active session already exists
+                    $existingActive = ClientSession::where('device_id', $device->id)
+                        ->where('last_heartbeat_at', '>=', now()->subMinutes(30))
+                        ->exists();
 
-                    ClientSession::factory()
-                        ->count($sessionCount)
-                        ->forDevice($device)
-                        ->active()
-                        ->create();
+                    if (! $existingActive) {
+                        ClientSession::factory()
+                            ->forDevice($device)
+                            ->active()
+                            ->create();
+                    }
                 });
             }
         });
+
+        $this->command->info('Created active sessions (one per device)');
     }
 
     /**
-     * Create expired client sessions.
+     * Create historical expired sessions.
      */
-    private function createExpiredSessions($accounts): void
+    private function createHistoricalSessions($accounts): void
     {
-        $expiredCount = max(5, $accounts->count() * 2);
-        ClientSession::factory()
-            ->count($expiredCount)
-            ->expired()
-            ->create();
-    }
+        $devices = AccountDevice::whereIn('account_id', $accounts->pluck('id'))->get();
 
-    /**
-     * Create sessions with no heartbeat.
-     */
-    private function createNoHeartbeatSessions($accounts): void
-    {
-        $noHeartbeatCount = max(5, $accounts->count());
-        ClientSession::factory()
-            ->count($noHeartbeatCount)
-            ->noHeartbeat()
-            ->create();
-    }
+        foreach ($devices as $device) {
+            // Random number of historical sessions (0-2 per device)
+            $historicalCount = rand(0, 2);
 
-    /**
-     * Create version-specific sessions.
-     */
-    private function createVersionSessions(): void
-    {
-        $testVersions = [
-            '1.0.0' => 3,
-            '2.0.0' => 4,
-            '2.2.5' => 2,
-        ];
+            for ($i = 0; $i < $historicalCount; $i++) {
+                $createdTime = now()->subDays(rand(30, 180));
+                $heartbeatTime = $createdTime->copy()->addHours(rand(1, 24));
 
-        foreach ($testVersions as $version => $count) {
-            ClientSession::factory()
-                ->count($count)
-                ->version($version)
-                ->create();
+                ClientSession::factory()
+                    ->forDevice($device)
+                    ->create([
+                        'created_at' => $createdTime,
+                        'updated_at' => $heartbeatTime,
+                        'last_heartbeat_at' => $heartbeatTime,
+                    ]);
+            }
         }
-    }
 
-    /**
-     * Create IP-specific sessions.
-     */
-    private function createIpSessions(): void
-    {
-        $testIps = ['16.59.46.1', '72.22.3.1', '1.56.19.46'];
-
-        foreach ($testIps as $ip) {
-            ClientSession::factory()
-                ->count(2)
-                ->ip($ip)
-                ->active()
-                ->create();
-        }
+        $this->command->info('Created historical expired sessions');
     }
 
     /**

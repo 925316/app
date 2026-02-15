@@ -42,24 +42,71 @@ class PackageReleaseSeeder extends Seeder
     {
         $this->command->info('Creating development package releases...');
 
-        // Create some additional development releases
+        // Create some additional development releases with random URLs
         $devReleases = [
-            ['3.0.0-alpha.1', 'dev', 'https://example.com/downloads/v3.0.0-alpha.1.zip', 'Early alpha testing for v3.0.0'],
-            ['3.0.0-beta.1', 'dev', 'https://example.com/downloads/v3.0.0-beta.1.zip', 'Beta testing with improved stability'],
-            ['3.0.0-rc.1', 'dev', 'https://example.com/downloads/v3.0.0-rc.1.zip', 'Release candidate for v3.0.0'],
+            [
+                'version' => '3.0.0-alpha.1',
+                'release_channel' => 'dev',
+                'changelog' => 'Early alpha version',
+            ],
+            [
+                'version' => '3.0.0-beta.1',
+                'release_channel' => 'dev',
+                'changelog' => 'Beta testing improvements',
+            ],
+            [
+                'version' => '3.0.0-rc.1',
+                'release_channel' => 'dev',
+                'changelog' => 'Release candidate',
+            ],
         ];
 
         foreach ($devReleases as $release) {
             PackageRelease::factory()->create([
-                'version' => $release[0],
-                'release_channel' => $release[1],
-                'download_url' => $release[2],
-                'virus_detection_url' => null, // No virus detection link for seeded data
-                'changelog' => $release[3],
+                'version' => $release['version'],
+                'release_channel' => $release['release_channel'],
+                'download_url' => $this->generateRandomDownloadUrl($release['version']),
+                'virus_detection_url' => $this->generateRandomVirusUrl(),
+                'changelog' => $release['changelog'],
             ]);
         }
 
         $this->command->info(' Development package releases created successfully!');
+    }
+
+    /**
+     * Generate a random download URL.
+     */
+    private function generateRandomDownloadUrl(string $version): string
+    {
+        $paths = [
+            'downloads/releases',
+            'files/packages',
+            'static/builds',
+            'cdn/distributions',
+        ];
+
+        $path = $paths[array_rand($paths)];
+        $randomHash = strtolower(substr(md5($version.time()), 0, 8));
+
+        return "https://cdn.example.com/{$path}/{$version}-{$randomHash}.zip";
+    }
+
+    /**
+     * Generate a random virus detection URL.
+     */
+    private function generateRandomVirusUrl(): string
+    {
+        $providers = [
+            'virustotal.com/file',
+            'scan.secure.com/check',
+            'verify.safe-api.com/scan',
+        ];
+
+        $provider = $providers[array_rand($providers)];
+        $randomId = strtolower(substr(uniqid(), 0, 16));
+
+        return "https://{$provider}/{$randomId}";
     }
 
     /**
@@ -160,23 +207,23 @@ class PackageReleaseSeeder extends Seeder
             [
                 'version' => '1.0.0',
                 'release_channel' => 'stable',
-                'download_url' => 'https://example.com/downloads/v1.0.0/package.zip',
-                'virus_detection_url' => null, // No virus detection link for seeded data
-                'changelog' => $this->generateMilestoneChangelog('1.0.0', true),
+                'download_url' => $this->generateRandomDownloadUrl('1.0.0'),
+                'virus_detection_url' => $this->generateRandomVirusUrl(),
+                'changelog' => $this->generateSimpleChangelog('1.0.0', 'Initial release'),
             ],
             [
                 'version' => '2.0.0',
                 'release_channel' => 'stable',
-                'download_url' => 'https://example.com/downloads/v2.0.0/package.zip',
-                'virus_detection_url' => null, // No virus detection link for seeded data
-                'changelog' => $this->generateMilestoneChangelog('2.0.0'),
+                'download_url' => $this->generateRandomDownloadUrl('2.0.0'),
+                'virus_detection_url' => $this->generateRandomVirusUrl(),
+                'changelog' => $this->generateSimpleChangelog('2.0.0', 'Major update'),
             ],
             [
                 'version' => '2.1.0-rc',
                 'release_channel' => 'dev',
-                'download_url' => 'https://example.com/downloads/v2.1.0-rc/package.zip',
-                'virus_detection_url' => null, // No virus detection link for seeded data
-                'changelog' => $this->generateMilestoneChangelog('2.1.0-rc', false, true),
+                'download_url' => $this->generateRandomDownloadUrl('2.1.0-rc'),
+                'virus_detection_url' => $this->generateRandomVirusUrl(),
+                'changelog' => $this->generateSimpleChangelog('2.1.0-rc', 'Release candidate'),
             ],
         ];
 
@@ -320,47 +367,25 @@ class PackageReleaseSeeder extends Seeder
     }
 
     /**
-     * Generate a detailed milestone changelog.
+     * Generate a simple changelog.
      */
-    private function generateMilestoneChangelog(
-        string $version,
-        bool $isInitial = false,
-        bool $isReleaseCandidate = false
-    ): string {
-        $title = $isInitial
-            ? "🎉 Initial Release {$version}"
-            : ($isReleaseCandidate
-                ? "🚀 Release Candidate {$version}"
-                : "✨ Major Release {$version}");
+    private function generateSimpleChangelog(string $version, string $description): string
+    {
+        $changes = [
+            'Bug fixes and improvements',
+            'Performance optimizations',
+            'Security updates',
+            'New features added',
+            'UI improvements',
+            'API updates',
+        ];
 
-        return <<<CHANGELOG
-        # {$title}
+        $selectedChanges = array_rand($changes, 3);
+        $changeList = '';
+        foreach ($selectedChanges as $index) {
+            $changeList .= "- {$changes[$index]}\n";
+        }
 
-        ## Overview
-        This release represents a significant milestone in our development journey.
-
-        ## Breaking Changes
-        - Updated API endpoints for better consistency
-        - Improved database schema for better performance
-
-        ## New Features
-        - Added comprehensive documentation
-        - Implemented new authentication system
-        - Enhanced error handling and logging
-
-        ## Improvements
-        - Optimized database queries
-        - Improved response times by 40%
-        - Enhanced security measures
-
-        ## Bug Fixes
-        - Fixed memory leak in background processing
-        - Resolved race condition in concurrent requests
-        - Patched security vulnerability in file uploads
-
-        ## Migration Notes
-        Please backup your data before upgrading.
-
-        CHANGELOG;
+        return "# {$version}\n\n{$description}\n\n{$changeList}";
     }
 }
