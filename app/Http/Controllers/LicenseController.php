@@ -73,12 +73,23 @@ class LicenseController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->paginate(25);
 
+            // Get overall statistics (not filtered by search/pagination)
+            $statistics = [
+                'total' => License::count(),
+                'active' => License::where('status', LicenseStatus::ACTIVE)->count(),
+                'expired' => License::query()
+                    ->where('expires_at', '<', now())
+                    ->count(),
+                'unassigned' => License::whereNull('used_by')->count(),
+            ];
+
             $statusOptions = LicenseStatus::options();
             $typeOptions = [];
             $privilegeOptions = LicensePrivilege::options();
 
             return view('licenses.index', [
                 'licenses' => $licenses,
+                'statistics' => $statistics,
                 'statusOptions' => $statusOptions,
                 'typeOptions' => $typeOptions,
                 'privilegeOptions' => $privilegeOptions,

@@ -57,6 +57,14 @@ class LogController extends Controller
 
         $logs = $query->paginate(25);
 
+        // Get overall statistics (not filtered by search/pagination)
+        $statistics = [
+            'total' => EventLog::count(),
+            'info' => EventLog::where('event_level', 0)->count(),
+            'warning' => EventLog::where('event_level', 1)->count(),
+            'error' => EventLog::where('event_level', 2)->count(),
+        ];
+
         // Get filter options
         $eventTypes = EventLog::select('event_type')->distinct()->pluck('event_type');
         $eventLevels = [
@@ -67,6 +75,7 @@ class LogController extends Controller
 
         return view('logs.index', [
             'logs' => $logs,
+            'statistics' => $statistics,
             'eventTypes' => $eventTypes,
             'eventLevels' => $eventLevels,
             'filters' => $request->all(),

@@ -18,7 +18,9 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Logs</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $logs->total() }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $statistics['total'] }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -34,7 +36,9 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Info</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $logs->filter(fn($l) => $l->event_level === 0)->count() }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $statistics['info'] }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -50,7 +54,9 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Warnings</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $logs->filter(fn($l) => $l->event_level === 1)->count() }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $statistics['warning'] }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -66,7 +72,9 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Errors</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $logs->filter(fn($l) => $l->event_level === 2)->count() }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $statistics['error'] }}
+                            </p>
                         </div>
                     </div>
                 </div>

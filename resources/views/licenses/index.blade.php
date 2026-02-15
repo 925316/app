@@ -20,7 +20,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Licenses</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $licenses->total() }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $statistics['total'] }}</p>
                         </div>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $licenses->filter(fn($l) => $l->isActive())->count() }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $statistics['active'] }}</p>
                         </div>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expired</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $licenses->filter(fn($l) => $l->isExpired())->count() }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $statistics['expired'] }}</p>
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Unassigned</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $licenses->filter(fn($l) => !$l->account)->count() }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $statistics['unassigned'] }}</p>
                         </div>
                     </div>
                 </div>

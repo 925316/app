@@ -19,7 +19,8 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Accounts</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $accounts->total() }}
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $statistics['total'] }}
                             </p>
                         </div>
                     </div>
@@ -37,7 +38,8 @@
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Accounts</p>
                             <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $accounts->filter(fn($a) => !$a->isCurrentlySuspended)->count() }}</p>
+                                {{ $statistics['active'] }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -55,7 +57,8 @@
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Suspended</p>
                             <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $accounts->filter(fn($a) => $a->isCurrentlySuspended)->count() }}</p>
+                                {{ $statistics['suspended'] }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -73,7 +76,8 @@
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Verified</p>
                             <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $accounts->filter(fn($a) => $a->email_verified_at)->count() }}</p>
+                                {{ $statistics['verified'] }}
+                            </p>
                         </div>
                     </div>
                 </div>

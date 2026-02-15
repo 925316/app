@@ -86,6 +86,21 @@ class AccountController extends Controller
             ->paginate(25)
             ->appends($request->except('page'));
 
+        // Get overall statistics (not filtered by search/pagination)
+        $statistics = [
+            'total' => Account::count(),
+            'active' => Account::query()
+                ->where(function ($q) {
+                    $q->whereNull('suspended_until')
+                        ->orWhere('suspended_until', '<', now());
+                })
+                ->count(),
+            'suspended' => Account::query()
+                ->where('suspended_until', '>', now())
+                ->count(),
+            'verified' => Account::whereNotNull('email_verified_at')->count(),
+        ];
+
         // Get privilege options for filter
         $privilegeOptions = [
             '' => 'All Privileges',
@@ -98,6 +113,7 @@ class AccountController extends Controller
 
         return view('accounts.index', [
             'accounts' => $accounts,
+            'statistics' => $statistics,
             'statusOptions' => [
                 '' => 'All Statuses',
                 'active' => 'Active',
