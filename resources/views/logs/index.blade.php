@@ -86,6 +86,7 @@
                     <!-- Filters -->
                     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <form method="GET" action="{{ route('logs.index') }}"
+                              data-clean-form="true"
                               class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div>
                                 <label for="event_type"

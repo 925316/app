@@ -181,6 +181,7 @@
                             </div>
 
                             <form method="GET" action="{{ route('licenses.index') }}"
+                                  data-clean-form="true"
                                   class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                                 <!-- Status filter -->
@@ -423,70 +424,6 @@
                     <div class="mt-4">
                         {{ $licenses->links() }}
                     </div>
-
-                    @push('scripts')
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const filterForm = document.querySelector('form[method="GET"]');
-
-                                if (filterForm) {
-                                    cleanupUrl();
-
-                                    filterForm.addEventListener('submit', function (e) {
-                                        e.preventDefault();
-
-                                        const formData = new FormData(this);
-                                        const params = new URLSearchParams();
-
-                                        for (const [key, value] of formData.entries()) {
-                                            const trimmedValue = value.toString().trim();
-                                            if (trimmedValue !== '') {
-                                                params.append(key, trimmedValue);
-                                            }
-                                        }
-
-                                        const baseUrl = this.action.split('?')[0];
-                                        const queryString = params.toString();
-                                        const url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
-
-                                        window.location.href = url;
-                                    });
-
-                                    const resetBtn = filterForm.querySelector('a[href*="licenses.index"]');
-                                    if (resetBtn) {
-                                        resetBtn.addEventListener('click', function (e) {
-                                            e.preventDefault();
-                                            window.location.href = this.href;
-                                        });
-                                    }
-                                }
-
-                                function cleanupUrl() {
-                                    const url = new URL(window.location);
-                                    const params = new URLSearchParams(url.search);
-                                    let hasChanges = false;
-
-                                    for (const [key, value] of params.entries()) {
-                                        if (value === '' || value.trim() === '') {
-                                            params.delete(key);
-                                            hasChanges = true;
-                                        }
-                                    }
-
-                                    if (hasChanges) {
-                                        const newUrl = params.toString() ?
-                                            `${url.pathname}?${params.toString()}` :
-                                            url.pathname;
-                                        window.history.replaceState({}, '', newUrl);
-                                    }
-                                }
-
-                                window.addEventListener('popstate', function () {
-                                    cleanupUrl();
-                                });
-                            });
-                        </script>
-                    @endpush
                 </div>
             </div>
         </div>

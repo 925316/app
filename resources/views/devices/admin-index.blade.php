@@ -80,7 +80,8 @@
                     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                         <h4 class="text-sm font-medium mb-3">Filters</h4>
                         <form method="GET" action="{{ route('devices.index') }}"
-                              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                          data-clean-form="true"
+                          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <!-- Search -->
                             <div>
                                 <label for="search"

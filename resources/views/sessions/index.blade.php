@@ -117,7 +117,9 @@
                             </div>
                         </div>
 
-                        <form method="GET" action="{{ route('sessions.index') }}">
+                        <form method="GET" action="{{ route('sessions.index') }}"
+                              data-clean-form="true"
+                              data-default-values="sort:last_heartbeat_at,direction:desc">
                             <!-- Status & Sort Row -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 <!-- Status filter -->
