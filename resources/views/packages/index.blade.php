@@ -11,14 +11,15 @@
                     <div class="flex items-center">
                         <div class="p-3 bg-blue-500/20 rounded-full">
                             <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor"
-                                 viewBox="0 0 24 24">
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                             </svg>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Releases</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['total_releases'] ?? 0 }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $stats['total_releases'] ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -27,14 +28,15 @@
                     <div class="flex items-center">
                         <div class="p-3 bg-green-500/20 rounded-full">
                             <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor"
-                                 viewBox="0 0 24 24">
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Stable</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['stable_releases'] ?? 0 }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $stats['stable_releases'] ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -42,15 +44,16 @@
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                     <div class="flex items-center">
                         <div class="p-3 bg-purple-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor"
-                                 viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-300" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Dev</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['dev_releases'] ?? 0 }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $stats['dev_releases'] ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -58,15 +61,17 @@
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                     <div class="flex items-center">
                         <div class="p-3 bg-yellow-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor"
-                                 viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                </path>
                             </svg>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Latest Stable</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['latest_stable']?->version ?? 'None' }}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $stats['latest_stable']?->version ?? 'None' }}</p>
                         </div>
                     </div>
                 </div>
@@ -77,17 +82,20 @@
                 <div class="p-6">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Latest Stable Release</h3>
 
-                    @if($stats['latest_stable'] ?? null)
+                    @if ($stats['latest_stable'] ?? null)
                         <div class="space-y-4">
                             <!-- Version Badge -->
                             <div class="flex items-center gap-3">
-                                <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm font-medium">
+                                <span
+                                    class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm font-medium">
                                     Version {{ $stats['latest_stable']->version }}
                                 </span>
-                                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium">
+                                <span
+                                    class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium">
                                     Stable
                                 </span>
-                                <span class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-sm font-medium">
+                                <span
+                                    class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-sm font-medium">
                                     Latest
                                 </span>
                             </div>
@@ -101,9 +109,10 @@
                                     </p>
                                 </div>
                                 <div>
-                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Security Verification</h4>
+                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Security
+                                        Verification</h4>
                                     <p class="text-gray-900 dark:text-gray-100">
-                                        @if($stats['latest_stable']->virus_detection_url)
+                                        @if ($stats['latest_stable']->virus_detection_url)
                                             <span class="text-green-600 dark:text-green-400">
                                                 ✓ Verified
                                             </span>
@@ -117,10 +126,11 @@
                             </div>
 
                             <!-- Changelog -->
-                            @if($stats['latest_stable']->changelog)
+                            @if ($stats['latest_stable']->changelog)
                                 <div class="mt-4">
                                     <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Changelog</h4>
-                                    <div class="prose dark:prose-invert max-w-none text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                    <div
+                                        class="prose dark:prose-invert max-w-none text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                                         {!! nl2br(e($stats['latest_stable']->changelog)) !!}
                                     </div>
                                 </div>
@@ -129,19 +139,20 @@
                             <!-- Action Buttons -->
                             <div class="flex gap-3 mt-6">
                                 <a href="{{ route('packages.show', $stats['latest_stable']) }}"
-                                   class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2">
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                     View Details
                                 </a>
-                                @if($canDownload ?? false)
+                                @if ($canDownload ?? false)
                                     <a href="{{ route('packages.download', ['release' => $stats['latest_stable']->id]) }}"
-                                       class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition flex items-center gap-2">
+                                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition flex items-center gap-2">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                            </path>
                                         </svg>
                                         Download
                                     </a>
@@ -159,171 +170,177 @@
             </div>
 
             @if (Auth::user()->hasPrivilege(7))
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <!-- Header with actions -->
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="text-lg font-medium">All Package Releases</h3>
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
+                        <!-- Header with actions -->
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                            <h3 class="text-lg font-medium">All Package Releases</h3>
 
-                        @if($isAdmin ?? false)
-                            <div class="flex gap-2">
-                                <a href="{{ route('packages.upload') }}"
-                                   class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                                    Add New Package
-                                </a>
-                                <a href="{{ route('packages.manage') }}"
-                                   class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
-                                    Manage Packages
-                                </a>
-                            </div>
-                        @endif
-                    </div>
+                            @if ($isAdmin ?? false)
+                                <div class="flex gap-2">
+                                    <a href="{{ route('packages.upload') }}"
+                                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                                        Add New Package
+                                    </a>
+                                    <a href="{{ route('packages.manage') }}"
+                                        class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                                        Manage Packages
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
 
-                    <!-- Statistics -->
-                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">Package Statistics</h4>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                            <div>
-                                <div class="text-gray-600 dark:text-gray-300">Total Releases:</div>
-                                <div class="font-medium">{{ $stats['total_releases'] ?? 0 }}</div>
-                            </div>
-                            <div>
-                                <div class="text-gray-600 dark:text-gray-300">Stable Releases:</div>
-                                <div class="font-medium">{{ $stats['stable_releases'] ?? 0 }}</div>
-                            </div>
-                            <div>
-                                <div class="text-gray-600 dark:text-gray-300">Dev Releases:</div>
-                                <div class="font-medium">{{ $stats['dev_releases'] ?? 0 }}</div>
-                            </div>
-                            <div>
-                                <div class="text-gray-600 dark:text-gray-300">Latest Stable:</div>
-                                <div class="font-medium">{{ $stats['latest_stable']?->version ?? 'None' }}</div>
+                        <!-- Statistics -->
+                        <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">Package Statistics</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <div class="text-gray-600 dark:text-gray-300">Total Releases:</div>
+                                    <div class="font-medium">{{ $stats['total_releases'] ?? 0 }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-600 dark:text-gray-300">Stable Releases:</div>
+                                    <div class="font-medium">{{ $stats['stable_releases'] ?? 0 }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-600 dark:text-gray-300">Dev Releases:</div>
+                                    <div class="font-medium">{{ $stats['dev_releases'] ?? 0 }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-600 dark:text-gray-300">Latest Stable:</div>
+                                    <div class="font-medium">{{ $stats['latest_stable']?->version ?? 'None' }}</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Channel Filter -->
-                    <div class="mb-6">
-                        <form method="GET" action="{{ route('packages.index') }}" class="flex items-center gap-4">
-                            <div>
-                                <label for="channel"
-                                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Release
-                                    Channel</label>
-                                <select name="channel" id="channel" onchange="this.form.submit()"
+                        <!-- Channel Filter -->
+                        <div class="mb-6">
+                            <form method="GET" action="{{ route('packages.index') }}"
+                                class="flex items-center gap-4">
+                                <div>
+                                    <label for="channel"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Release
+                                        Channel</label>
+                                    <select name="channel" id="channel" onchange="this.form.submit()"
                                         class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                                    <option value="">All Channels</option>
-                                    <option value="stable" {{ request('channel') === 'stable' ? 'selected' : '' }}>
-                                        Stable
-                                    </option>
-                                    <option value="dev" {{ request('channel') === 'dev' ? 'selected' : '' }}>
-                                        Development
-                                    </option>
-                                </select>
-                            </div>
-                            @if(request('channel'))
-                                <a href="{{ route('packages.index') }}"
-                                   class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition mt-auto">
-                                    Reset Filter
-                                </a>
-                            @endif
-                        </form>
-                    </div>
+                                        <option value="">All Channels</option>
+                                        <option value="stable"
+                                            {{ request('channel') === 'stable' ? 'selected' : '' }}>
+                                            Stable
+                                        </option>
+                                        <option value="dev" {{ request('channel') === 'dev' ? 'selected' : '' }}>
+                                            Development
+                                        </option>
+                                    </select>
+                                </div>
+                                @if (request('channel'))
+                                    <a href="{{ route('packages.index') }}"
+                                        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition mt-auto">
+                                        Reset Filter
+                                    </a>
+                                @endif
+                            </form>
+                        </div>
 
-                    <!-- Packages table -->
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th scope="col"
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Version
-                                </th>
-                                <th scope="col"
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Channel
-                                </th>
-                                <th scope="col"
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Released
-                                </th>
-                                <th scope="col"
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Hash Verification
-                                </th>
-                                <th scope="col"
-                                    class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Actions
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            @forelse($releases as $release)
-                                <tr>
-                                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        {{ $release->version }}
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <span class="px-2 py-0.5 rounded text-xs font-medium
+                        <!-- Packages table -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Version
+                                        </th>
+                                        <th scope="col"
+                                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Channel
+                                        </th>
+                                        <th scope="col"
+                                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Released
+                                        </th>
+                                        <th scope="col"
+                                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Hash Verification
+                                        </th>
+                                        <th scope="col"
+                                            class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @forelse($releases as $release)
+                                        <tr>
+                                            <td
+                                                class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                {{ $release->version }}
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                                <span
+                                                    class="px-2 py-0.5 rounded text-xs font-medium
                                                 {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' }}">
-                                                {{ ucfirst($release->release_channel) }}
-                                            </span>
-                                        @if($release->version === ($stats['latest_stable']?->version ?? null))
-                                            <span
-                                                class="ml-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
-                                                    Latest
+                                                    {{ ucfirst($release->release_channel) }}
                                                 </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        {{ $release->created_at ? $release->created_at->format('Y-m-d H:i') : 'Unknown' }}
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        @if($release->virus_detection_url)
-                                            <span
-                                                class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                    Available
-                                                </span>
-                                        @else
-                                            <span
-                                                class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                                                    None
-                                                </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{{ route('packages.show', $release) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                            Details
-                                        </a>
-                                        @if($canDownload ?? false && $release->id)
-                                            <span class="mx-1 text-gray-400">|</span>
-                                            <a href="{{ route('packages.download', ['release' => $release->id]) }}"
-                                               class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
-                                                Download
-                                            </a>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5"
-                                        class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                        No packages found.
-                                    </td>
-                                </tr>
-                            @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                                @if ($release->version === ($stats['latest_stable']?->version ?? null))
+                                                    <span
+                                                        class="ml-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
+                                                        Latest
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td
+                                                class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                {{ $release->created_at ? $release->created_at->format('Y-m-d H:i') : 'Unknown' }}
+                                            </td>
+                                            <td
+                                                class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                @if ($release->virus_detection_url)
+                                                    <span
+                                                        class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                        Available
+                                                    </span>
+                                                @else
+                                                    <span
+                                                        class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
+                                                        None
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                                <a href="{{ route('packages.show', $release) }}"
+                                                    class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                                    Details
+                                                </a>
+                                                @if ($canDownload ?? false && $release->id)
+                                                    <span class="mx-1 text-gray-400">|</span>
+                                                    <a href="{{ route('packages.download', ['release' => $release->id]) }}"
+                                                        class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
+                                                        Download
+                                                    </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5"
+                                                class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
+                                                No packages found.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
 
-                    <!-- Pagination -->
-                    <div class="mt-4">
-                        {{ $releases->links() }}
+                        <!-- Pagination -->
+                        <div class="mt-4">
+                            {{ $releases->links() }}
+                        </div>
                     </div>
                 </div>
-            </div>
             @endif
-            
+
 
         </div>
     </div>

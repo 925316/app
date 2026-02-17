@@ -9,16 +9,16 @@
             <div class="mb-6 flex justify-between items-center">
                 <div class="flex items-center space-x-2">
                     <a href="{{ route('sessions.index') }}"
-                       class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm">
-                        ← Back to Sessions
+                        class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm">
+                        Back to Sessions
                     </a>
                 </div>
                 <form action="{{ route('sessions.destroy', $session) }}" method="POST"
-                      onsubmit="return confirm('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.')">
+                    onsubmit="return confirm('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.')">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
-                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition text-sm font-medium">
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition text-sm font-medium">
                         Terminate Session
                     </button>
                 </form>
@@ -60,8 +60,8 @@
                             <dl class="space-y-3">
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Session Token</dt>
-                                    <dd
-                                        class="mt-1 text-sm text-gray-900 dark:text-white font-mono">{{ $session->session_token }}</dd>
+                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono">
+                                        {{ $session->session_token }}</dd>
                                 </div>
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">IP Address</dt>
@@ -128,7 +128,9 @@
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Time Since Last Heartbeat</dt>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Time Since Last
+                                        Heartbeat
+                                    </dt>
                                     <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                                         @if ($session->time_since_last_heartbeat !== null)
                                             {{ number_format($session->time_since_last_heartbeat, 2) }} minutes
@@ -163,7 +165,7 @@
                                     </div>
                                 </div>
                                 <a href="{{ route('accounts.show', $session->account) }}"
-                                   class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium">
                                     View Account
                                 </a>
                             </div>
@@ -186,9 +188,10 @@
                                         <div
                                             class="h-12 w-12 rounded-full bg-purple-500 flex items-center justify-center text-white">
                                             <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                 viewBox="0 0 24 24">
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                                </path>
                                             </svg>
                                         </div>
                                     </div>

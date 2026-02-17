@@ -14,33 +14,33 @@
 
             <div class="flex gap-2">
                 <a href="{{ route('packages.index') }}"
-                   class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
                     View Packages
                 </a>
-                @if($isAdmin ?? false)
+                @if ($isAdmin ?? false)
                     <a href="{{ route('packages.upload') }}"
-                       class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
                         Add New Package
                     </a>
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open"
-                                class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition flex items-center gap-2">
+                            class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition flex items-center gap-2">
                             <span>Bulk Actions</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M19 9l-7 7-7-7"></path>
+                                    d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
                         <div x-show="open" @click.away="open = false"
-                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
-                             x-cloak>
+                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+                            x-cloak>
                             <div class="py-1">
                                 <button onclick="bulkAction('delete')"
-                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     Delete Selected
                                 </button>
                                 <button onclick="bulkAction('export')"
-                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     Export List
                                 </button>
                             </div>
@@ -77,18 +77,19 @@
         <div class="mb-6">
             <form method="GET" action="{{ route('packages.manage') }}" class="flex items-center gap-4">
                 <div>
-                    <label for="channel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Release
+                    <label for="channel"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Release
                         Channel</label>
                     <select name="channel" id="channel" onchange="this.form.submit()"
-                            class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
                         <option value="">All Channels</option>
                         <option value="stable" {{ request('channel') === 'stable' ? 'selected' : '' }}>Stable</option>
                         <option value="dev" {{ request('channel') === 'dev' ? 'selected' : '' }}>Development</option>
                     </select>
                 </div>
-                @if(request('channel'))
+                @if (request('channel'))
                     <a href="{{ route('packages.manage') }}"
-                       class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition mt-auto">
+                        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition mt-auto">
                         Reset Filter
                     </a>
                 @endif
@@ -99,107 +100,109 @@
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                    @if($isAdmin ?? false)
-                        <th scope="col"
-                            class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            <input type="checkbox" id="select-all"
-                                   class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500">
-                        </th>
-                    @endif
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Version
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Channel
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Released
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Hash Verification
-                    </th>
-                    @if($isAdmin ?? false)
+                    <tr>
+                        @if ($isAdmin ?? false)
+                            <th scope="col"
+                                class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <input type="checkbox" id="select-all"
+                                    class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500">
+                            </th>
+                        @endif
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Actions
+                            Version
                         </th>
-                    @endif
-                </tr>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Channel
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Released
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Hash Verification
+                        </th>
+                        @if ($isAdmin ?? false)
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        @endif
+                    </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                @forelse($releases as $release)
-                    <tr>
-                        @if($isAdmin ?? false)
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">
-                                <input type="checkbox" name="selected_releases[]" value="{{ $release->id }}"
-                                       class="release-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500">
+                    @forelse($releases as $release)
+                        <tr>
+                            @if ($isAdmin ?? false)
+                                <td class="px-3 py-4 whitespace-nowrap text-sm">
+                                    <input type="checkbox" name="selected_releases[]" value="{{ $release->id }}"
+                                        class="release-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500">
+                                </td>
+                            @endif
+                            <td
+                                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                {{ $release->version }}
                             </td>
-                        @endif
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {{ $release->version }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                            <span class="px-2 py-1 rounded-full text-xs font-medium
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span
+                                    class="px-2 py-1 rounded-full text-xs font-medium
                                                 {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' }}">
-                                                {{ ucfirst($release->release_channel) }}
-                                            </span>
-                            @if($release->version === ($stats['latest_stable']?->version ?? null))
-                                <span
-                                    class="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
-                                                    Latest Stable
-                                                </span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                            {{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                            @if($release->virus_detection_url)
-                                <span
-                                    class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                    Available
-                                                </span>
-                            @else
-                                <span
-                                    class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                                                    None
-                                                </span>
-                            @endif
-                        </td>
-                        @if($isAdmin ?? false)
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex items-center space-x-2">
-                                    <a href="{{ route('packages.show', $release) }}"
-                                       class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        Details
-                                    </a>
-                                    <span class="text-gray-400">|</span>
-                                    <form class="inline delete-form" data-version="{{ $release->version }}"
-                                          onsubmit="return confirmDelete('{{ $release->version }}')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </div>
+                                    {{ ucfirst($release->release_channel) }}
+                                </span>
+                                @if ($release->version === ($stats['latest_stable']?->version ?? null))
+                                    <span
+                                        class="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
+                                        Latest Stable
+                                    </span>
+                                @endif
                             </td>
-                        @endif
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="{{ $isAdmin ? 6 : 4 }}"
-                            class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-300">
-                            No packages found.
-                        </td>
-                    </tr>
-                @endforelse
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                {{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                @if ($release->virus_detection_url)
+                                    <span
+                                        class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                        Available
+                                    </span>
+                                @else
+                                    <span
+                                        class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
+                                        None
+                                    </span>
+                                @endif
+                            </td>
+                            @if ($isAdmin ?? false)
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex items-center space-x-2">
+                                        <a href="{{ route('packages.show', $release) }}"
+                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                            Details
+                                        </a>
+                                        <span class="text-gray-400">|</span>
+                                        <form class="inline delete-form" data-version="{{ $release->version }}"
+                                            onsubmit="return confirmDelete('{{ $release->version }}')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            @endif
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="{{ $isAdmin ? 6 : 4 }}"
+                                class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-300">
+                                No packages found.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -209,26 +212,26 @@
             {{ $releases->links() }}
         </div>
 
-        @if($isAdmin ?? false)
+        @if ($isAdmin ?? false)
             <script>
                 function confirmDelete(version) {
                     return confirm(`Are you sure you want to delete package version ${version}? This action cannot be undone.`);
                 }
 
                 // Select all functionality
-                document.addEventListener('DOMContentLoaded', function () {
+                document.addEventListener('DOMContentLoaded', function() {
                     const selectAll = document.getElementById('select-all');
                     const checkboxes = document.querySelectorAll('.release-checkbox');
 
                     if (selectAll && checkboxes.length > 0) {
-                        selectAll.addEventListener('change', function () {
+                        selectAll.addEventListener('change', function() {
                             checkboxes.forEach(checkbox => {
                                 checkbox.checked = this.checked;
                             });
                         });
 
                         checkboxes.forEach(checkbox => {
-                            checkbox.addEventListener('change', function () {
+                            checkbox.addEventListener('change', function() {
                                 const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                                 const someChecked = Array.from(checkboxes).some(cb => cb.checked);
                                 selectAll.checked = allChecked;
@@ -249,7 +252,9 @@
                     }
 
                     if (action === 'delete') {
-                        if (confirm(`Are you sure you want to delete ${selectedIds.length} selected package(s)? This action cannot be undone.`)) {
+                        if (confirm(
+                                `Are you sure you want to delete ${selectedIds.length} selected package(s)? This action cannot be undone.`
+                                )) {
                             // Create a form to submit the bulk delete
                             const form = document.createElement('form');
                             form.method = 'POST';
@@ -294,7 +299,9 @@
                             };
                         });
 
-                        const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+                        const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                            type: 'application/json'
+                        });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;

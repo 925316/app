@@ -1,0 +1,46 @@
+/* Sidebar Styles */ /* Extracted from sidebar.blade.php and app-sidebar.blade.php */ /* Sidebar container */
+.sidebar {
+    @apply bg-white/90 dark:bg-cool-900/80 backdrop-blur-sm border-r border-cool-200/50 dark:border-cool-700/50 shadow-sm h-screen fixed left-0 top-0 z-40 transition-all duration-300;
+} /* Sidebar expanded state */
+.sidebar-expanded {
+    @apply w-64;
+} /* Sidebar collapsed state */
+.sidebar-collapsed {
+    @apply w-16;
+} /* Sidebar header */
+.sidebar-header {
+    @apply relative flex items-center justify-between h-16 px-4 border-b border-cool-200/50 dark:border-cool-700/50;
+} /* Sidebar logo container */
+.sidebar-logo {
+    @apply flex items-center space-x-3;
+} /* Sidebar toggle button */
+.sidebar-toggle {
+    @apply absolute top-1/2 transform -translate-y-1/2 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10 transition-colors duration-150;
+} /* Sidebar navigation */
+.sidebar-nav {
+    @apply flex-1 overflow-y-auto py-4;
+} /* Sidebar user section */
+.sidebar-user {
+    @apply border-t border-cool-200/50 dark:border-cool-700/50 p-4;
+} /* User avatar */
+.user-avatar {
+    @apply h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm;
+} /* User avatar small (collapsed state) */
+.user-avatar-sm {
+    @apply h-6 w-6 text-xs;
+} /* Sidebar link base */
+.sidebar-link {
+    @apply flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150;
+} /* Sidebar link active */
+.sidebar-link-active {
+    @apply bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300;
+} /* Sidebar link inactive */
+.sidebar-link-inactive {
+    @apply text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700;
+} /* Sidebar animation for content visibility */
+.sidebar-content-visible {
+    @apply opacity-100 w-auto;
+}
+.sidebar-content-hidden {
+    @apply opacity-0 w-0;
+}

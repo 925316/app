@@ -15,8 +15,9 @@
                             <div>
                                 <h3 class="text-lg font-medium">Log Entry: {{ $log->event_type }}</h3>
                                 <div class="mt-2 flex items-center gap-4">
-                                    <span class="px-3 py-1 rounded-full text-sm font-medium
-                                        @if($log->event_level == 0) bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
+                                    <span
+                                        class="px-3 py-1 rounded-full text-sm font-medium
+                                        @if ($log->event_level == 0) bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
                                         @elseif($log->event_level == 1) bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
                                         @else bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 @endif">
                                         {{ $log->event_level == 0 ? 'Info' : ($log->event_level == 1 ? 'Warning' : 'Error') }}
@@ -29,7 +30,7 @@
 
                             <div class="flex gap-2">
                                 <a href="{{ route('logs.index') }}"
-                                   class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                                    class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
                                     Back to Logs
                                 </a>
                             </div>
@@ -48,7 +49,7 @@
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Event Level:</span>
                                     <span class="font-medium">
-                                        @if($log->event_level == 0)
+                                        @if ($log->event_level == 0)
                                             Info
                                         @elseif($log->event_level == 1)
                                             Warning
@@ -74,7 +75,7 @@
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Account:</span>
                                     <span class="font-medium">
-                                        @if($log->account)
+                                        @if ($log->account)
                                             <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {{ $log->account->username }}
                                             </a>
@@ -86,7 +87,7 @@
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Actor:</span>
                                     <span class="font-medium">
-                                        @if($log->actor)
+                                        @if ($log->actor)
                                             <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {{ $log->actor->username }}
                                             </a>
@@ -98,9 +99,9 @@
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">License:</span>
                                     <span class="font-medium">
-                                        @if($log->license)
+                                        @if ($log->license)
                                             <a href="{{ route('licenses.show', $log->license) }}"
-                                               class="text-blue-600 dark:text-blue-400 hover:underline">
+                                                class="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {{ $log->license->key }}
                                             </a>
                                         @else
@@ -113,13 +114,12 @@
                     </div>
 
                     <!-- Event Details -->
-                    @if($log->details)
+                    @if ($log->details)
                         <div class="mb-6">
                             <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200">Event Details</h4>
                             <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                                 <div class="text-sm">
-                                    <pre
-                                        class="bg-white dark:bg-gray-800 p-4 rounded overflow-x-auto">{{ json_encode($log->details, JSON_PRETTY_PRINT) }}</pre>
+                                    <pre class="bg-white dark:bg-gray-800 p-4 rounded overflow-x-auto">{{ json_encode($log->details, JSON_PRETTY_PRINT) }}</pre>
                                 </div>
                             </div>
                         </div>
@@ -130,8 +130,7 @@
                         <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200">Raw Data</h4>
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                             <div class="text-sm">
-                                <pre
-                                    class="bg-white dark:bg-gray-800 p-4 rounded overflow-x-auto">{{ json_encode($log->toArray(), JSON_PRETTY_PRINT) }}</pre>
+                                <pre class="bg-white dark:bg-gray-800 p-4 rounded overflow-x-auto">{{ json_encode($log->toArray(), JSON_PRETTY_PRINT) }}</pre>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,31 @@
+/* Table Styles */ /* Extracted from data-table.blade.php */ /* Base table */
+.data-table {
+    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+} /* Table header */
+.table-header {
+    @apply bg-gray-50 dark:bg-gray-700;
+} /* Table header cell */
+.table-header-cell {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+} /* Table body */
+.table-body {
+    @apply bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700;
+} /* Table row */
+.table-row {
+    @apply hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150;
+} /* Table cell */
+.table-cell {
+    @apply px-6 py-4 whitespace-nowrap text-sm;
+} /* Table cell - primary content */
+.table-cell-primary {
+    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white;
+} /* Table cell - secondary content */
+.table-cell-secondary {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400;
+} /* Table responsive wrapper */
+.table-responsive {
+    @apply overflow-x-auto;
+} /* Table empty state */
+.table-empty {
+    @apply px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400;
+}

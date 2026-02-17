@@ -1,3 +1,11 @@
+@import './modules/badges.css';
+@import './modules/buttons.css';
+@import './modules/cards.css';
+@import './modules/sidebar.css';
+@import './modules/modals.css';
+@import './modules/tables.css';
+@import './modules/forms.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,12 +18,10 @@
         border-color: rgb(75 85 99) !important; /* border-gray-600 */
         color: rgb(209 213 219) !important; /* text-gray-300 */
     }
-    
     .dark nav[aria-label="Pagination Navigation"] a:hover {
         background-color: rgb(55 65 81) !important; /* bg-gray-700 */
         color: rgb(229 231 235) !important; /* text-gray-200 */
     }
-    
     /* Current page */
     .dark nav[aria-label="Pagination Navigation"] span[aria-current="page"] span {
         background-color: rgb(37 99 235) !important; /* bg-blue-600 */
