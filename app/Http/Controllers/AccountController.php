@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LicensePrivilege;
 use App\Http\Requests\AccountRequest;
 use App\Models\Account;
 use App\Models\EventLog;
@@ -16,12 +17,10 @@ class AccountController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorizeAdmin();
-
         $query = Account::query();
 
         // Filter by account status (single selection)
-        if ($request->filled('status') && $request->status !== '') {
+        if ($request->filled('status')) {
             $status = $request->status;
 
             match ($status) {
@@ -35,7 +34,7 @@ class AccountController extends Controller
         }
 
         // Filter by license count
-        if ($request->filled('license_count') && $request->license_count !== '') {
+        if ($request->filled('license_count')) {
             $licenseCount = $request->license_count;
 
             if ($licenseCount === 'none') {
@@ -46,7 +45,7 @@ class AccountController extends Controller
         }
 
         // Filter by privilege level
-        if ($request->has('privilege') && $request->privilege !== '') {
+        if ($request->filled('privilege')) {
             $privilege = (int) $request->privilege;
             $query->whereHas('licenses', function ($q) use ($privilege) {
                 $q->where('status', \App\Enums\LicenseStatus::ACTIVE->value)
@@ -56,7 +55,7 @@ class AccountController extends Controller
         }
 
         // Search by username, email, or license key
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('username', 'like', "%{$search}%")
@@ -101,15 +100,11 @@ class AccountController extends Controller
             'verified' => Account::whereNotNull('email_verified_at')->count(),
         ];
 
-        // Get privilege options for filter
-        $privilegeOptions = [
-            '' => 'All Privileges',
-            1 => 'Standard',
-            2 => 'Upgrade',
-            3 => 'Ultimate',
-            6 => 'Tester',
-            7 => 'Staff',
-        ];
+        // Build privilege options from the enum to keep in sync
+        $privilegeOptions = ['' => 'All Privileges'] + collect(LicensePrivilege::cases())
+            ->reject(fn ($case) => $case === LicensePrivilege::DEFAULT)
+            ->mapWithKeys(fn ($case) => [$case->value => ucfirst($case->getLabel())])
+            ->toArray();
 
         return view('accounts.index', [
             'accounts' => $accounts,
@@ -139,8 +134,6 @@ class AccountController extends Controller
      */
     public function create()
     {
-        $this->authorizeAdmin();
-
         return view('accounts.create');
     }
 
@@ -149,8 +142,6 @@ class AccountController extends Controller
      */
     public function store(AccountRequest $request)
     {
-        $this->authorizeAdmin();
-
         $validated = $request->validated();
 
         // Create account
@@ -183,8 +174,6 @@ class AccountController extends Controller
      */
     public function show(Account $account)
     {
-        $this->authorizeAdmin();
-
         $account->load([
             'licenses' => function ($query) {
                 $query->orderBy('created_at', 'desc');
@@ -215,8 +204,6 @@ class AccountController extends Controller
      */
     public function edit(Account $account)
     {
-        $this->authorizeAdmin();
-
         return view('accounts.edit', [
             'account' => $account,
         ]);
@@ -227,8 +214,6 @@ class AccountController extends Controller
      */
     public function update(AccountRequest $request, Account $account)
     {
-        $this->authorizeAdmin();
-
         $validated = $request->validated();
 
         // Update account
@@ -266,8 +251,6 @@ class AccountController extends Controller
      */
     public function destroy(Account $account)
     {
-        $this->authorizeAdmin();
-
         // Log the event before deletion
         EventLog::create([
             'event_type' => 'account.deleted',
@@ -291,8 +274,6 @@ class AccountController extends Controller
      */
     public function suspend(Request $request, Account $account)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'reason' => 'nullable|string|max:255',
             'duration' => 'nullable|integer|min:1|max:365',
@@ -331,8 +312,6 @@ class AccountController extends Controller
      */
     public function unsuspend(Account $account)
     {
-        $this->authorizeAdmin();
-
         $account->unsuspend();
 
         // Log the event
@@ -355,8 +334,6 @@ class AccountController extends Controller
      */
     public function resetHwid(Account $account)
     {
-        $this->authorizeAdmin();
-
         if (! $account->canResetHwid()) {
             return back()->withErrors(['hwid_reset' => 'HWID can only be reset once every 72 hours.']);
         }
@@ -391,8 +368,6 @@ class AccountController extends Controller
      */
     public function verifyEmail(Account $account)
     {
-        $this->authorizeAdmin();
-
         if ($account->email_verified_at) {
             return back()->withErrors(['email_verification' => 'Account email is already verified.']);
         }
@@ -414,16 +389,5 @@ class AccountController extends Controller
 
         return redirect()->route('accounts.show', $account)
             ->with('success', 'Email verified successfully!');
-    }
-
-    /**
-     * Authorize admin access.
-     */
-    protected function authorizeAdmin()
-    {
-        $user = Auth::user();
-        if ($user->getPrivilegeLevel() < 7) {
-            abort(403, 'Unauthorized action. Admin privileges required.');
-        }
     }
 }

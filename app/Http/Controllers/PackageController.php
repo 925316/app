@@ -7,7 +7,6 @@ use App\Models\PackageRelease;
 use App\Services\PackageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class PackageController extends Controller
 {
@@ -26,7 +25,7 @@ class PackageController extends Controller
         $query = PackageRelease::orderBy('version', 'desc');
 
         // Filter by channel
-        if ($request->has('channel')) {
+        if ($request->filled('channel')) {
             $query->where('release_channel', $request->channel);
         }
 
@@ -47,8 +46,6 @@ class PackageController extends Controller
      */
     public function upload()
     {
-        $this->authorizeAdmin();
-
         return view('packages.upload');
     }
 
@@ -57,8 +54,6 @@ class PackageController extends Controller
      */
     public function store(PackageUploadRequest $request)
     {
-        $this->authorizeAdmin();
-
         $validated = $request->validated();
 
         $release = PackageService::uploadPackage(
@@ -131,7 +126,7 @@ class PackageController extends Controller
         $query = PackageRelease::orderBy('version', 'desc');
 
         // Filter by channel
-        if (request()->has('channel')) {
+        if (request()->filled('channel')) {
             $query->where('release_channel', request()->channel);
         }
 
@@ -151,11 +146,6 @@ class PackageController extends Controller
      */
     public function destroy(PackageRelease $release)
     {
-        $this->authorizeAdmin();
-
-        // Optionally delete the actual file
-        // Storage::delete($release->download_url);
-
         $release->delete();
 
         return redirect()->route('packages.manage')
@@ -167,8 +157,6 @@ class PackageController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:package_releases,id',
@@ -185,8 +173,6 @@ class PackageController extends Controller
      */
     public function updateChangelog(Request $request, PackageRelease $release)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'changelog' => 'required|string|max:65535',
         ]);
@@ -194,16 +180,5 @@ class PackageController extends Controller
         PackageService::updateChangelog($release, $request->changelog);
 
         return back()->with('success', 'Changelog updated successfully!');
-    }
-
-    /**
-     * Authorize admin access.
-     */
-    protected function authorizeAdmin()
-    {
-        $user = Auth::user();
-        if (! $user->hasPrivilege(7)) {
-            abort(403, 'Unauthorized action. Admin privileges required.');
-        }
     }
 }

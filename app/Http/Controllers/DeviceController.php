@@ -6,6 +6,7 @@ use App\Http\Requests\DeviceRequest;
 use App\Models\Account;
 use App\Models\AccountDevice;
 use App\Models\EventLog;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +15,7 @@ class DeviceController extends Controller
     /**
      * Display a listing of devices for the authenticated user.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -26,7 +27,7 @@ class DeviceController extends Controller
         $isAdmin = $user->hasPrivilege(7); // Admin privilege level
 
         if ($isAdmin) {
-            return $this->adminIndex();
+            return $this->adminIndex($request);
         }
 
         $devices = $user->devices()
@@ -47,97 +48,13 @@ class DeviceController extends Controller
     /**
      * Display a listing of all devices for admin users.
      */
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
         $query = AccountDevice::query()
             ->with('account')
             ->orderBy('created_at', 'desc');
 
-        // Apply filters
-        if (request()->filled('status')) {
-            $status = request('status');
-            switch ($status) {
-                case 'bound':
-                    $query->whereNotNull('bound_at')->whereNull('unbound_at');
-                    break;
-                case 'unbound':
-                    $query->whereNotNull('unbound_at');
-                    break;
-                case 'active':
-                    $query->where('last_seen_at', '>=', now()->subDays(30));
-                    break;
-            }
-        }
-
-        // Apply date range filter
-        if (request()->filled('date_range')) {
-            $dateRange = request('date_range');
-            switch ($dateRange) {
-                case '24h':
-                    $query->where('created_at', '>=', now()->subHours(24));
-                    break;
-                case '7d':
-                    $query->where('created_at', '>=', now()->subDays(7));
-                    break;
-                case '30d':
-                    $query->where('created_at', '>=', now()->subDays(30));
-                    break;
-                case '90d':
-                    $query->where('created_at', '>=', now()->subDays(90));
-                    break;
-            }
-        }
-
-        // Apply country code filter
-        if (request()->filled('country_code')) {
-            $query->where('country_code', strtoupper(request('country_code')));
-        }
-
-        // Apply minimum HWID reset count filter
-        if (request()->filled('min_reset_count')) {
-            $minResetCount = (int) request('min_reset_count');
-            $query->whereHas('account', function ($accountQuery) use ($minResetCount) {
-                $accountQuery->where('hwid_reset_count', '>=', $minResetCount);
-            });
-        }
-
-        // Apply account status filter
-        if (request()->filled('account_status')) {
-            $accountStatus = request('account_status');
-            switch ($accountStatus) {
-                case 'active':
-                    $query->whereHas('account', function ($accountQuery) {
-                        $accountQuery->where('is_suspended', false)
-                            ->orWhere(function ($q) {
-                                $q->where('is_suspended', true)
-                                    ->where('suspended_until', '<', now());
-                            });
-                    });
-                    break;
-                case 'suspended':
-                    $query->whereHas('account', function ($accountQuery) {
-                        $accountQuery->where('is_suspended', true)
-                            ->where(function ($q) {
-                                $q->whereNull('suspended_until')
-                                    ->orWhere('suspended_until', '>', now());
-                            });
-                    });
-                    break;
-            }
-        }
-
-        // Apply search
-        if (request()->filled('search')) {
-            $search = request('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('hwid_hash', 'like', "%{$search}%")
-                    ->orWhere('ip_address', 'like', "%{$search}%")
-                    ->orWhereHas('account', function ($accountQuery) use ($search) {
-                        $accountQuery->where('username', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
-                    });
-            });
-        }
+        $this->applyDeviceFilters($query, $request);
 
         $devices = $query->paginate(10);
 
@@ -320,8 +237,6 @@ class DeviceController extends Controller
      */
     public function adminUnbind(AccountDevice $device)
     {
-        $this->authorizeAdmin();
-
         if (! $device->isBound()) {
             return back()->withErrors(['device' => 'This device is not currently bound.']);
         }
@@ -351,8 +266,6 @@ class DeviceController extends Controller
      */
     public function adminResetHwid(Account $account)
     {
-        $this->authorizeAdmin();
-
         if (! $account->canResetHwid()) {
             return back()->withErrors([
                 'hwid_reset' => 'HWID can only be reset once every 72 hours. Last reset: '.
@@ -390,8 +303,6 @@ class DeviceController extends Controller
      */
     public function bulkUnbind(Request $request)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'device_ids' => 'required|array|min:1',
             'device_ids.*' => 'exists:account_devices,id',
@@ -437,8 +348,6 @@ class DeviceController extends Controller
      */
     public function bulkResetHwid(Request $request)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'device_ids' => 'required|array|min:1',
             'device_ids.*' => 'exists:account_devices,id',
@@ -492,13 +401,75 @@ class DeviceController extends Controller
      */
     public function export(Request $request)
     {
-        $this->authorizeAdmin();
-
         $query = AccountDevice::query()
             ->with('account')
             ->orderBy('created_at', 'desc');
 
-        // Apply the same filters as the admin index
+        $this->applyDeviceFilters($query, $request);
+
+        $devices = $query->get();
+
+        // Generate CSV
+        $filename = 'devices_export_'.now()->format('Y-m-d_His').'.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ];
+
+        $callback = function () use ($devices) {
+            $file = fopen('php://output', 'w');
+
+            // Add CSV header
+            fputcsv($file, [
+                'ID',
+                'Account ID',
+                'Username',
+                'Email',
+                'HWID Hash',
+                'IP Address',
+                'Country Code',
+                'Status',
+                'Bound At',
+                'Unbound At',
+                'First Seen',
+                'Last Seen',
+                'Account Status',
+                'HWID Reset Count',
+                'Last HWID Reset',
+            ]);
+
+            // Add data rows
+            foreach ($devices as $device) {
+                fputcsv($file, [
+                    $device->id,
+                    $device->account_id,
+                    $device->account->username,
+                    $device->account->email,
+                    $device->hwid_hash,
+                    $device->ip_address,
+                    $device->country_code ?? 'Unknown',
+                    $device->isBound() ? 'Bound' : 'Unbound',
+                    $device->bound_at?->format('Y-m-d H:i:s') ?? 'Never',
+                    $device->unbound_at?->format('Y-m-d H:i:s') ?? 'Never',
+                    $device->first_seen_at->format('Y-m-d H:i:s'),
+                    $device->last_seen_at->format('Y-m-d H:i:s'),
+                    $device->account->isSuspended() ? 'Suspended' : 'Active',
+                    $device->account->hwid_reset_count,
+                    $device->account->hwid_last_reset_at?->format('Y-m-d H:i:s') ?? 'Never',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Apply common device filters to a query builder instance.
+     */
+    private function applyDeviceFilters(Builder $query, Request $request): Builder
+    {
         if ($request->filled('status')) {
             $status = $request->input('status');
             switch ($status) {
@@ -579,72 +550,6 @@ class DeviceController extends Controller
             });
         }
 
-        $devices = $query->get();
-
-        // Generate CSV
-        $filename = 'devices_export_'.now()->format('Y-m-d_His').'.csv';
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-        ];
-
-        $callback = function () use ($devices) {
-            $file = fopen('php://output', 'w');
-
-            // Add CSV header
-            fputcsv($file, [
-                'ID',
-                'Account ID',
-                'Username',
-                'Email',
-                'HWID Hash',
-                'IP Address',
-                'Country Code',
-                'Status',
-                'Bound At',
-                'Unbound At',
-                'First Seen',
-                'Last Seen',
-                'Account Status',
-                'HWID Reset Count',
-                'Last HWID Reset',
-            ]);
-
-            // Add data rows
-            foreach ($devices as $device) {
-                fputcsv($file, [
-                    $device->id,
-                    $device->account_id,
-                    $device->account->username,
-                    $device->account->email,
-                    $device->hwid_hash,
-                    $device->ip_address,
-                    $device->country_code ?? 'Unknown',
-                    $device->isBound() ? 'Bound' : 'Unbound',
-                    $device->bound_at?->format('Y-m-d H:i:s') ?? 'Never',
-                    $device->unbound_at?->format('Y-m-d H:i:s') ?? 'Never',
-                    $device->first_seen_at->format('Y-m-d H:i:s'),
-                    $device->last_seen_at->format('Y-m-d H:i:s'),
-                    $device->account->isSuspended() ? 'Suspended' : 'Active',
-                    $device->account->hwid_reset_count,
-                    $device->account->hwid_last_reset_at?->format('Y-m-d H:i:s') ?? 'Never',
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
-    }
-
-    /**
-     * Authorize admin access.
-     */
-    protected function authorizeAdmin()
-    {
-        $user = Auth::user();
-        if ($user->getPrivilegeLevel() < 7) {
-            abort(403, 'Unauthorized action. Admin privileges required.');
-        }
+        return $query;
     }
 }

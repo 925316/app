@@ -112,8 +112,6 @@ class LicenseController extends Controller
      */
     public function create()
     {
-        $this->authorizeAdmin();
-
         $accounts = Account::orderBy('username')->get();
         $statusOptions = LicenseStatus::options();
         $privilegeOptions = LicensePrivilege::options();
@@ -130,8 +128,6 @@ class LicenseController extends Controller
      */
     public function store(LicenseRequest $request)
     {
-        $this->authorizeAdmin();
-
         $validated = $request->validated();
 
         $license = LicenseService::createLicense(
@@ -177,8 +173,6 @@ class LicenseController extends Controller
      */
     public function edit(License $license)
     {
-        $this->authorizeAdmin();
-
         $accounts = Account::orderBy('username')->get();
         $statusOptions = LicenseStatus::options();
         $privilegeOptions = LicensePrivilege::options();
@@ -196,8 +190,6 @@ class LicenseController extends Controller
      */
     public function update(LicenseRequest $request, License $license)
     {
-        $this->authorizeAdmin();
-
         $validated = $request->validated();
 
         // Only allow certain fields to be updated
@@ -224,8 +216,6 @@ class LicenseController extends Controller
      */
     public function destroy(License $license)
     {
-        $this->authorizeAdmin();
-
         $license->delete();
 
         return redirect()->route('licenses.index')
@@ -342,8 +332,6 @@ class LicenseController extends Controller
      */
     public function suspend(Request $request, License $license)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'suspension_reason' => 'nullable|string|max:255',
         ]);
@@ -366,8 +354,6 @@ class LicenseController extends Controller
      */
     public function reactivate(License $license)
     {
-        $this->authorizeAdmin();
-
         try {
             LicenseService::reactivateLicense($license);
 
@@ -386,8 +372,6 @@ class LicenseController extends Controller
      */
     public function revoke(Request $request, License $license)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'revocation_reason' => 'nullable|string|max:255',
         ]);
@@ -410,8 +394,6 @@ class LicenseController extends Controller
      */
     public function upgrade(Request $request, License $license)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'new_privilege' => 'required|integer|min:1|max:7',
             'upgrade_notes' => 'nullable|string|max:255',
@@ -435,8 +417,6 @@ class LicenseController extends Controller
      */
     public function extend(Request $request, License $license)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'days' => 'required|integer|min:1|max:365',
         ]);
@@ -448,17 +428,6 @@ class LicenseController extends Controller
                 ->with('success', 'License expiration extended successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
-        }
-    }
-
-    /**
-     * Authorize admin access.
-     */
-    protected function authorizeAdmin()
-    {
-        $user = Auth::user();
-        if ($user->getPrivilegeLevel() < 7) {
-            abort(403, 'Unauthorized action. Admin privileges required.');
         }
     }
 }

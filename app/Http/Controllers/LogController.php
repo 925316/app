@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\EventLog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class LogController extends Controller
 {
@@ -13,37 +12,35 @@ class LogController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorizeAdmin();
-
         $query = EventLog::with(['account', 'license'])
             ->orderBy('created_at', 'desc');
 
         // Filter by event type
-        if ($request->has('event_type')) {
+        if ($request->filled('event_type')) {
             $query->where('event_type', $request->event_type);
         }
 
         // Filter by event level
-        if ($request->has('event_level')) {
+        if ($request->filled('event_level')) {
             $query->where('event_level', $request->event_level);
         }
 
         // Filter by account
-        if ($request->has('account_id')) {
+        if ($request->filled('account_id')) {
             $query->where('account_id', $request->account_id);
         }
 
         // Filter by date range
-        if ($request->has('start_date') && $request->start_date) {
+        if ($request->filled('start_date')) {
             $query->where('created_at', '>=', $request->start_date);
         }
 
-        if ($request->has('end_date') && $request->end_date) {
+        if ($request->filled('end_date')) {
             $query->where('created_at', '<=', $request->end_date.' 23:59:59');
         }
 
         // Search functionality
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('event_type', 'like', "%{$search}%")
@@ -87,8 +84,6 @@ class LogController extends Controller
      */
     public function show(EventLog $log)
     {
-        $this->authorizeAdmin();
-
         return view('logs.show', [
             'log' => $log,
         ]);
@@ -99,8 +94,6 @@ class LogController extends Controller
      */
     public function clear(Request $request)
     {
-        $this->authorizeAdmin();
-
         $request->validate([
             'days' => 'required|integer|min:1|max:365',
         ]);
@@ -109,16 +102,5 @@ class LogController extends Controller
         $deleted = EventLog::where('created_at', '<=', now()->subDays($days))->delete();
 
         return back()->with('success', "Deleted {$deleted} log entries older than {$days} days.");
-    }
-
-    /**
-     * Authorize admin access.
-     */
-    protected function authorizeAdmin()
-    {
-        $user = Auth::user();
-        if (! $user->hasPrivilege(7)) {
-            abort(403, 'Unauthorized action. Admin privileges required.');
-        }
     }
 }

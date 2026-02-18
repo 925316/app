@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\ClientSession;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SessionController extends Controller
 {
@@ -13,12 +12,10 @@ class SessionController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorizeAdmin();
-
         $query = ClientSession::query()->with(['account', 'device']);
 
         // Filter by status
-        if ($request->has('status') && $request->status !== '') {
+        if ($request->filled('status')) {
             if ($request->status === 'active') {
                 $query->active();
             } elseif ($request->status === 'expired') {
@@ -27,7 +24,7 @@ class SessionController extends Controller
         }
 
         // Search by account username, device name, or session token
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('session_token', 'like', "%{$search}%")
@@ -84,8 +81,6 @@ class SessionController extends Controller
      */
     public function show(ClientSession $session)
     {
-        $this->authorizeAdmin();
-
         $session->load(['account', 'device']);
 
         return view('sessions.show', [
@@ -98,12 +93,6 @@ class SessionController extends Controller
      */
     public function destroy(ClientSession $session)
     {
-        $this->authorizeAdmin();
-
-        // Store info for logging
-        $sessionToken = $session->session_token;
-        $accountId = $session->account_id;
-        $deviceId = $session->device_id;
         $accountUsername = $session->account ? $session->account->username : 'Unknown';
 
         // Delete the session - this will force the client to disconnect
@@ -112,16 +101,5 @@ class SessionController extends Controller
 
         return redirect()->route('sessions.index')
             ->with('success', "Session for account '{$accountUsername}' has been terminated. The client will be disconnected on next heartbeat check.");
-    }
-
-    /**
-     * Authorize admin access.
-     */
-    protected function authorizeAdmin()
-    {
-        $user = Auth::user();
-        if ($user->getPrivilegeLevel() < 7) {
-            abort(403, 'Unauthorized action. Admin privileges required.');
-        }
     }
 }
