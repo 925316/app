@@ -58,7 +58,7 @@ class UsageStatisticSeeder extends Seeder
     /**
      * Create global level statistics.
      */
-    protected function createGlobalStatistics(): void
+    private function createGlobalStatistics(): void
     {
         UsageStatistic::create([
             'stat_type' => UsageStatistic::TYPE_GLOBAL,
@@ -88,7 +88,7 @@ class UsageStatisticSeeder extends Seeder
     /**
      * Create license level statistics.
      */
-    protected function createLicenseStatistics(): void
+    private function createLicenseStatistics(): void
     {
         UsageStatistic::create([
             'stat_type' => UsageStatistic::TYPE_LICENSE,

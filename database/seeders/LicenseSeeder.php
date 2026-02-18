@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\LicensePrivilege;
 use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\License;
@@ -28,74 +29,74 @@ class LicenseSeeder extends Seeder
      */
     private function createSpecificTestLicenses(): void
     {
-        // Test Case 1: Standard license (privilege 1) - UNUSED
+        // Test Case 1: Standard license - UNUSED
         License::create([
             'key' => 'STAND-12345-ABCDE-FGHIJ-KLMNO',
-            'privilege' => 1, // standard
-            'status' => 0, // unused
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::UNUSED->value,
             'expires_at' => now()->addYear(),
             'notes' => 'Test: Standard license for activation',
         ]);
 
-        // Test Case 2: Upgrade license (privilege 2) - UNUSED
+        // Test Case 2: Upgrade license - UNUSED
         License::create([
             'key' => 'STD2U-67890-BCDEF-GHIJK-LMNOP',
-            'privilege' => 2, // upgrade
-            'status' => 0, // unused
+            'privilege' => LicensePrivilege::UPGRADE->value,
+            'status' => LicenseStatus::UNUSED->value,
             'expires_at' => now()->addYear(),
             'notes' => 'Test: Upgrade license for activation',
         ]);
 
-        // Test Case 3: Ultimate license (privilege 3) - UNUSED
+        // Test Case 3: Ultimate license - UNUSED
         License::create([
             'key' => 'ULTIM-13579-CDEFG-HIJKL-MNOPQ',
-            'privilege' => 3, // ultimate
-            'status' => 0, // unused
+            'privilege' => LicensePrivilege::ULTIMATE->value,
+            'status' => LicenseStatus::UNUSED->value,
             'expires_at' => now()->addYear(),
             'notes' => 'Test: Ultimate license for activation',
         ]);
 
-        // Test Case 4: Admin/Staff license (privilege 7) - UNUSED
+        // Test Case 4: Staff license - UNUSED
         License::create([
             'key' => 'STAFF-24680-DEFGH-IJKLM-NOPQR',
-            'privilege' => 7, // staff
-            'status' => 0, // unused
+            'privilege' => LicensePrivilege::STAFF->value,
+            'status' => LicenseStatus::UNUSED->value,
             'expires_at' => now()->addYear(),
             'notes' => 'Test: Staff license for activation',
         ]);
 
-        // Test Case 5: Upgrade license (privilege 3) - UNUSED
+        // Test Case 5: Ultimate license - UNUSED
         License::create([
-            'key' => 'UPGRA-11223-34567-89ABC-DEFGH',
-            'privilege' => 3, // ultimate
-            'status' => 0, // unused
+            'key' => 'UPGRA-11223-34567-38ABC-DEFGH',
+            'privilege' => LicensePrivilege::ULTIMATE->value,
+            'status' => LicenseStatus::UNUSED->value,
             'expires_at' => now()->addYear(),
             'notes' => 'Test: Upgrade license for activation',
         ]);
 
         // Test Case 6: Expired license - UNUSED
         License::create([
-            'key' => 'EXPIR-44556-67890-ABCDE-FGHIJ',
-            'privilege' => 1, // basic
-            'status' => 0, // unused
-            'expires_at' => now()->subDay(), // expired
+            'key' => 'EXPIR-44556-67234-ABCDE-FGHIJ',
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::UNUSED->value,
+            'expires_at' => now()->subDay(),
             'notes' => 'Test: Expired license (cannot activate)',
         ]);
 
         // Test Case 7: Revoked license
         License::create([
-            'key' => 'REVOK-77889-90123-45678-9ABCD',
-            'privilege' => 1, // basic
-            'status' => 5, // revoked
+            'key' => 'REVOK-77889-90123-ABCDE-RABCD',
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::REVOKED->value,
             'expires_at' => now()->addYear(),
             'notes' => 'Test: Revoked license (cannot activate)',
         ]);
 
         // Test Case 8: Suspended license
         License::create([
-            'key' => 'SUSPE-12345-67890-ABCDE-FGHIJ',
-            'privilege' => 1, // basic
-            'status' => 2, // suspended
+            'key' => 'SUSPE-12345-23456-ABCDE-FGHIJ',
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::SUSPENDED->value,
             'expires_at' => now()->addYear(),
             'notes' => 'Test: Suspended license (cannot activate)',
         ]);
@@ -104,9 +105,9 @@ class LicenseSeeder extends Seeder
         $testAccount = Account::first();
         if ($testAccount) {
             License::create([
-                'key' => 'ACTIVE-11111-22222-33333-44444',
-                'privilege' => 2, // upgrade
-                'status' => 1, // active
+                'key' => 'ACTIV-11111-22222-33333-44444',
+                'privilege' => LicensePrivilege::UPGRADE->value,
+                'status' => LicenseStatus::ACTIVE->value,
                 'used_by' => $testAccount->id,
                 'activated_at' => now(),
                 'expires_at' => now()->addYear(),
@@ -247,10 +248,10 @@ class LicenseSeeder extends Seeder
             ['STD2U-67890-BCDEF-GHIJK-LMNOP', 'Upgrade (2)', 'Can activate'],
             ['ULTIM-13579-CDEFG-HIJKL-MNOPQ', 'Ultimate (3)', 'Can activate'],
             ['STAFF-24680-DEFGH-IJKLM-NOPQR', 'Staff (7)', 'Can activate (gives admin)'],
-            ['UPGRA-11223-34567-89ABC-DEFGH', 'Ultimate (3)', 'Can activate'],
-            ['EXPIR-44556-67890-ABCDE-FGHIJ', 'Standard (1)', 'EXPIRED - Cannot activate'],
-            ['REVOK-77889-90123-45678-9ABCD', 'Standard (1)', 'REVOKED - Cannot activate'],
-            ['SUSPE-12345-67890-ABCDE-FGHIJ', 'Standard (1)', 'SUSPENDED - Cannot activate'],
+            ['UPGRA-11223-34567-38ABC-DEFGH', 'Ultimate (3)', 'Can activate'],
+            ['EXPIR-44556-67234-ABCDE-FGHIJ', 'Standard (1)', 'EXPIRED - Cannot activate'],
+            ['REVOK-77889-90123-ABCDE-RABCD', 'Standard (1)', 'REVOKED - Cannot activate'],
+            ['SUSPE-12345-23456-ABCDE-FGHIJ', 'Standard (1)', 'SUSPENDED - Cannot activate'],
             ['ACTIV-11111-22222-33333-44444', 'Upgrade (2)', 'ALREADY ACTIVE - Cannot activate'],
         ];
 
@@ -277,47 +278,23 @@ class LicenseSeeder extends Seeder
         $this->command->info('LICENSE STATISTICS');
         $this->command->info(str_repeat('-', 50));
 
-        $statuses = [
-            0 => 'unused',
-            1 => 'active',
-            2 => 'suspended',
-            3 => 'expired',
-            4 => 'upgraded',
-            5 => 'revoked',
-        ];
-
-        $privileges = [
-            0 => 'default',
-            1 => 'standard',
-            2 => 'upgrade',
-            3 => 'ultimate',
-            6 => 'tester',
-            7 => 'staff',
-        ];
-
-        $headers = ['Status', 'Privilege', 'Count'];
         $rows = [];
-
         $total = 0;
 
-        foreach ($statuses as $statusId => $statusName) {
-            foreach ($privileges as $privilegeId => $privilegeName) {
-                $count = License::where('status', $statusId)
-                    ->where('privilege', $privilegeId)
+        foreach (LicenseStatus::cases() as $status) {
+            foreach (LicensePrivilege::cases() as $privilege) {
+                $count = License::where('status', $status->value)
+                    ->where('privilege', $privilege->value)
                     ->count();
 
                 if ($count > 0) {
-                    $rows[] = [
-                        $statusName,
-                        $privilegeName,
-                        $count,
-                    ];
+                    $rows[] = [$status->getLabel(), $privilege->getLabel(), $count];
                     $total += $count;
                 }
             }
         }
 
-        $this->command->table($headers, $rows);
+        $this->command->table(['Status', 'Privilege', 'Count'], $rows);
         $this->command->info("Total licenses: {$total}");
         $this->command->info(str_repeat('-', 50));
     }

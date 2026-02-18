@@ -2,10 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Enums\LicensePrivilege;
+use App\Enums\LicenseStatus;
+use App\Models\License;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\License>
  */
 class LicenseFactory extends Factory
 {
@@ -18,8 +21,8 @@ class LicenseFactory extends Factory
     {
         return [
             'key' => $this->generateLicenseKey(),
-            'privilege' => fake()->randomElement([0, 1, 2, 3, 6, 7]),
-            'status' => fake()->randomElement([0, 1, 2, 3, 4, 5]),
+            'privilege' => fake()->randomElement(LicensePrivilege::cases())->value,
+            'status' => fake()->randomElement(LicenseStatus::cases())->value,
             'used_by' => null,
             'expires_at' => fake()->dateTimeBetween('now', '+2 years'),
             'activated_at' => fake()->optional(0.7)->dateTimeBetween('-1 year', 'now'),
@@ -73,30 +76,12 @@ class LicenseFactory extends Factory
     }
 
     /**
-     * Generate base32-like string with custom character range.
-     */
-    private function generateBase32(int $length, int $min = 2, int $max = 7): string
-    {
-        $characters = '';
-        for ($i = $min; $i <= $max; $i++) {
-            $characters .= strtoupper(base_convert($i, 10, 32));
-        }
-
-        $result = '';
-        for ($i = 0; $i < $length; $i++) {
-            $result .= $characters[random_int(0, strlen($characters) - 1)];
-        }
-
-        return $result;
-    }
-
-    /**
      * State for unused licenses.
      */
     public function unused(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 0,
+            'status' => LicenseStatus::UNUSED->value,
             'used_by' => null,
             'activated_at' => null,
             'suspended_at' => null,
@@ -121,7 +106,7 @@ class LicenseFactory extends Factory
             $expiresAt = fake()->dateTimeBetween($minExpiry, $maxExpiry);
 
             return [
-                'status' => 1,
+                'status' => LicenseStatus::ACTIVE->value,
                 'activated_at' => $activatedAt,
                 'expires_at' => $expiresAt,
                 'suspended_at' => null,
@@ -135,7 +120,7 @@ class LicenseFactory extends Factory
     public function suspended(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 2,
+            'status' => LicenseStatus::SUSPENDED->value,
             'suspended_at' => fake()->dateTimeBetween('-3 months', '-1 day'),
         ]);
     }
@@ -153,7 +138,7 @@ class LicenseFactory extends Factory
             );
 
             return [
-                'status' => 3,
+                'status' => LicenseStatus::EXPIRED->value,
                 'activated_at' => $activatedAt,
                 'expires_at' => $expiresAt,
             ];
@@ -166,7 +151,7 @@ class LicenseFactory extends Factory
     public function upgraded(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 4,
+            'status' => LicenseStatus::UPGRADED->value,
         ]);
     }
 
@@ -176,14 +161,9 @@ class LicenseFactory extends Factory
     public function revoked(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 5,
+            'status' => LicenseStatus::REVOKED->value,
         ]);
     }
-
-    /**
-     * State for base licenses (type 1).
-     */
-    // Type states removed as type field is deprecated
 
     /**
      * State for specific privilege tiers.
@@ -201,7 +181,7 @@ class LicenseFactory extends Factory
     public function standard(): static
     {
         return $this->state(fn (array $attributes) => [
-            'privilege' => 1,
+            'privilege' => LicensePrivilege::STANDARD->value,
         ]);
     }
 
@@ -211,7 +191,7 @@ class LicenseFactory extends Factory
     public function upgrade(): static
     {
         return $this->state(fn (array $attributes) => [
-            'privilege' => 2,
+            'privilege' => LicensePrivilege::UPGRADE->value,
         ]);
     }
 
@@ -221,7 +201,7 @@ class LicenseFactory extends Factory
     public function ultimate(): static
     {
         return $this->state(fn (array $attributes) => [
-            'privilege' => 3,
+            'privilege' => LicensePrivilege::ULTIMATE->value,
         ]);
     }
 
@@ -231,7 +211,7 @@ class LicenseFactory extends Factory
     public function tester(): static
     {
         return $this->state(fn (array $attributes) => [
-            'privilege' => 6,
+            'privilege' => LicensePrivilege::TESTER->value,
         ]);
     }
 
@@ -241,7 +221,7 @@ class LicenseFactory extends Factory
     public function staff(): static
     {
         return $this->state(fn (array $attributes) => [
-            'privilege' => 7,
+            'privilege' => LicensePrivilege::STAFF->value,
         ]);
     }
 

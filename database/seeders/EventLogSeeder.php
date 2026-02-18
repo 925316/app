@@ -128,11 +128,11 @@ class EventLogSeeder extends Seeder
             ])
             ->create();
 
-        // Suspicious activity warnings
+        // Suspicious activity warnings - logged as account login anomalies
         EventLog::factory()
             ->count(5)
             ->warning()
-            ->state(['event_type' => 'security.suspicious_activity'])
+            ->state(['event_type' => \App\Enums\EventType::ACCOUNT_LOGIN->value])
             ->sequence(fn ($sequence) => [
                 'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
                 'details' => [
@@ -168,16 +168,15 @@ class EventLogSeeder extends Seeder
             ])
             ->create();
 
-        // License validation errors
+        // License expired during device binding attempts
         EventLog::factory()
             ->count(3)
             ->error()
-            ->state(['event_type' => 'license.validation_failed'])
+            ->state(['event_type' => \App\Enums\EventType::LICENSE_EXPIRED->value])
             ->sequence(fn ($sequence) => [
                 'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
                 'license_id' => $licenses->isNotEmpty() ? $licenses->random()->id : null,
                 'details' => [
-                    'error_code' => 'LICENSE_EXPIRED',
                     'attempted_action' => 'device_binding',
                     'suggested_action' => 'renew_license',
                 ],
@@ -185,18 +184,18 @@ class EventLogSeeder extends Seeder
             ])
             ->create();
 
-        // API rate limit errors
+        // Repeated failed login attempts
         EventLog::factory()
             ->count(4)
             ->error()
-            ->state(['event_type' => 'api.rate_limit_exceeded'])
+            ->state(['event_type' => \App\Enums\EventType::ACCOUNT_LOGIN->value])
             ->sequence(fn ($sequence) => [
                 'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
                 'ip_address' => $this->generateRandomIp(),
                 'details' => [
-                    'endpoint' => '/api/v1/devices/bind',
-                    'limit' => '100 requests per hour',
-                    'retry_after' => '3600 seconds',
+                    'reason' => 'invalid_credentials',
+                    'failed_attempts' => rand(5, 20),
+                    'lockout_triggered' => true,
                 ],
                 'created_at' => now()->subHours(rand(1, 48)),
             ])

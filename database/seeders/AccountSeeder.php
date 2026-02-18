@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\LicensePrivilege;
+use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\License;
 use Illuminate\Database\Seeder;
@@ -40,9 +42,9 @@ class AccountSeeder extends Seeder
 
         // Create administrator license
         License::create([
-            'key' => 'ADMIN-00000-00000-00000-00000',
-            'privilege' => 7, // staff
-            'status' => 1, // active
+            'key' => 'ADMIN-ABCDE-ABCDE-ABCDE-ADMIN',
+            'privilege' => LicensePrivilege::STAFF->value,
+            'status' => LicenseStatus::ACTIVE->value,
             'used_by' => $admin->id,
             'expires_at' => now()->addYears(10),
             'activated_at' => now(),
@@ -70,9 +72,9 @@ class AccountSeeder extends Seeder
         ]);
 
         License::create([
-            'key' => 'TESTD-00000-00000-00000-00000',
-            'privilege' => 6, // tester
-            'status' => 1, // active
+            'key' => 'TESTD-ABCDE-ABCDE-ABCDE-TESTD',
+            'privilege' => LicensePrivilege::TESTER->value,
+            'status' => LicenseStatus::ACTIVE->value,
             'used_by' => $accountWith2FA->id,
             'expires_at' => now()->addYears(10),
             'activated_at' => now(),
@@ -80,23 +82,27 @@ class AccountSeeder extends Seeder
             'notes' => 'Tester license with full privileges',
         ]);
 
-        // Temporarily suspended account
-        $tempSuspended = Account::create([
-            'username' => 'suspended_temp',
-            'email' => 'suspended_temp@example.com',
-            'password' => Hash::make('temp123'),
+        // Temporarily suspended account (multiple failed login attempts)
+        Account::create([
+            'username' => 'carlos_m',
+            'email' => 'carlos.m@example.com',
+            'password' => Hash::make('password'),
             'email_verified_at' => now()->subMonths(2),
+            'last_login_at' => now()->subDays(3),
+            'last_ip_address' => '203.0.113.45',
             'is_suspended' => true,
             'suspension_reason' => 'Multiple Failed Login Attempts',
             'suspended_until' => now()->addDays(7),
         ]);
 
-        // Permanently banned account
-        $bannedAccount = Account::create([
-            'username' => 'banned_user',
-            'email' => 'banned@example.com',
-            'password' => Hash::make('banned123'),
+        // Permanently banned account (ToS violation)
+        Account::create([
+            'username' => 'tommy_g',
+            'email' => 'tommy.g@example.com',
+            'password' => Hash::make('password'),
             'email_verified_at' => now()->subMonths(4),
+            'last_login_at' => now()->subMonths(1),
+            'last_ip_address' => '198.51.100.22',
             'is_suspended' => true,
             'suspension_reason' => 'Violation of Terms of Service',
             'suspended_until' => null,

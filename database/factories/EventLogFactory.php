@@ -8,7 +8,7 @@ use App\Models\License;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\EventLog>
  */
 class EventLogFactory extends Factory
 {
@@ -166,7 +166,7 @@ class EventLogFactory extends Factory
     /**
      * State for info level events.
      */
-    public function info(): Factory
+    public function info(): static
     {
         return $this->state(fn (array $attributes) => [
             'event_level' => 0,
@@ -176,7 +176,7 @@ class EventLogFactory extends Factory
     /**
      * State for warning level events.
      */
-    public function warning(): Factory
+    public function warning(): static
     {
         return $this->state(fn (array $attributes) => [
             'event_level' => 1,
@@ -186,7 +186,7 @@ class EventLogFactory extends Factory
     /**
      * State for error level events.
      */
-    public function error(): Factory
+    public function error(): static
     {
         return $this->state(fn (array $attributes) => [
             'event_level' => 2,
@@ -196,7 +196,7 @@ class EventLogFactory extends Factory
     /**
      * State for account activated events.
      */
-    public function accountActivated(): Factory
+    public function accountActivated(): static
     {
         return $this->state(fn (array $attributes) => [
             'event_type' => \App\Enums\EventType::LICENSE_ACTIVATED->value,
@@ -207,7 +207,7 @@ class EventLogFactory extends Factory
     /**
      * State for login anomaly events.
      */
-    public function loginAnomaly(): Factory
+    public function loginAnomaly(): static
     {
         return $this->state(fn (array $attributes) => [
             'event_type' => \App\Enums\EventType::ACCOUNT_LOGIN->value,
@@ -218,7 +218,7 @@ class EventLogFactory extends Factory
     /**
      * State for recent events (last 7 days).
      */
-    public function recent(): Factory
+    public function recent(): static
     {
         return $this->state(fn (array $attributes) => [
             'created_at' => $this->faker->dateTimeBetween('-7 days', 'now'),
@@ -228,7 +228,7 @@ class EventLogFactory extends Factory
     /**
      * State for events with account.
      */
-    public function withAccount(): Factory
+    public function withAccount(): static
     {
         return $this->state(fn (array $attributes) => [
             'account_id' => Account::factory(),
@@ -238,7 +238,7 @@ class EventLogFactory extends Factory
     /**
      * State for events with license.
      */
-    public function withLicense(): Factory
+    public function withLicense(): static
     {
         return $this->state(fn (array $attributes) => [
             'license_id' => License::factory(),
@@ -248,7 +248,7 @@ class EventLogFactory extends Factory
     /**
      * State for events with actor.
      */
-    public function withActor(): Factory
+    public function withActor(): static
     {
         return $this->state(fn (array $attributes) => [
             'actor_id' => Account::factory(),

@@ -47,17 +47,17 @@ class PackageReleaseSeeder extends Seeder
             [
                 'version' => '3.0.0-alpha.1',
                 'release_channel' => 'dev',
-                'changelog' => 'Early alpha version',
+                'changelog' => $this->generateSimpleChangelog('3.0.0-alpha.1', 'Early alpha - complete rewrite of the core engine. Not recommended for production use.'),
             ],
             [
                 'version' => '3.0.0-beta.1',
                 'release_channel' => 'dev',
-                'changelog' => 'Beta testing improvements',
+                'changelog' => $this->generateSimpleChangelog('3.0.0-beta.1', 'Public beta. Most features are stable; known issues with session handling under load.'),
             ],
             [
                 'version' => '3.0.0-rc.1',
                 'release_channel' => 'dev',
-                'changelog' => 'Release candidate',
+                'changelog' => $this->generateSimpleChangelog('3.0.0-rc.1', 'Release candidate. All planned features implemented; final round of testing before stable release.'),
             ],
         ];
 
@@ -142,60 +142,6 @@ class PackageReleaseSeeder extends Seeder
         }
 
         $this->command->info(str_repeat('-', 50));
-    }
-
-    /**
-     * Generate a unique stable version number.
-     */
-    private function generateUniqueStableVersion(): string
-    {
-        do {
-            $version = $this->generateStableVersion();
-        } while (in_array($version, $this->usedVersions));
-
-        $this->usedVersions[] = $version;
-
-        return $version;
-    }
-
-    /**
-     * Generate a unique development version number.
-     */
-    private function generateUniqueDevVersion(): string
-    {
-        do {
-            $version = $this->generateDevVersion();
-        } while (in_array($version, $this->usedVersions));
-
-        $this->usedVersions[] = $version;
-
-        return $version;
-    }
-
-    /**
-     * Generate a stable version number.
-     */
-    private function generateStableVersion(): string
-    {
-        $major = rand(1, 3);
-        $minor = rand(0, 5);
-        $patch = rand(0, 20);
-
-        return "{$major}.{$minor}.{$patch}";
-    }
-
-    /**
-     * Generate a development version number.
-     */
-    private function generateDevVersion(): string
-    {
-        $major = rand(4, 5);
-        $minor = rand(0, 2);
-        $patch = rand(0, 10);
-
-        $preRelease = rand(0, 1) ? '-alpha' : '-beta';
-
-        return "{$major}.{$minor}.{$patch}{$preRelease}";
     }
 
     /**
@@ -367,25 +313,54 @@ class PackageReleaseSeeder extends Seeder
     }
 
     /**
-     * Generate a simple changelog.
+     * Generate a realistic changelog for a release.
      */
     private function generateSimpleChangelog(string $version, string $description): string
     {
-        $changes = [
-            'Bug fixes and improvements',
-            'Performance optimizations',
-            'Security updates',
-            'New features added',
-            'UI improvements',
-            'API updates',
+        $features = [
+            'Added support for hardware ID binding with automatic device detection',
+            'Introduced license upgrade path from Standard to Ultimate tier',
+            'New two-factor authentication support for enhanced account security',
+            'Added session heartbeat monitoring for active client connections',
+            'Implemented automatic license expiry notifications',
+            'Added admin dashboard with real-time usage statistics',
         ];
 
-        $selectedChanges = array_rand($changes, 3);
-        $changeList = '';
-        foreach ($selectedChanges as $index) {
-            $changeList .= "- {$changes[$index]}\n";
+        $fixes = [
+            'Fixed license activation failing when device count exceeded limit',
+            'Resolved incorrect privilege level after license upgrade',
+            'Fixed session token not invalidating on logout',
+            'Corrected HWID hash collision causing false device duplicates',
+            'Fixed timezone handling for license expiry dates',
+            'Resolved race condition in concurrent device binding requests',
+        ];
+
+        $improvements = [
+            'Improved license key validation performance by 40%',
+            'Reduced database queries during session validation',
+            'Optimized device binding flow to reduce latency',
+            'Enhanced error messages for invalid license states',
+            'Improved stability under high concurrent session load',
+        ];
+
+        $featuresSelected = array_map(fn ($i) => $features[$i], (array) array_rand($features, rand(1, 2)));
+        $fixesSelected = array_map(fn ($i) => $fixes[$i], (array) array_rand($fixes, rand(1, 2)));
+        $improvementsSelected = array_map(fn ($i) => $improvements[$i], (array) array_rand($improvements, 1));
+
+        $changelog = "# {$version}\n\n{$description}\n\n";
+        $changelog .= "### New Features\n";
+        foreach ($featuresSelected as $item) {
+            $changelog .= "- {$item}\n";
+        }
+        $changelog .= "\n### Bug Fixes\n";
+        foreach ($fixesSelected as $item) {
+            $changelog .= "- {$item}\n";
+        }
+        $changelog .= "\n### Improvements\n";
+        foreach ($improvementsSelected as $item) {
+            $changelog .= "- {$item}\n";
         }
 
-        return "# {$version}\n\n{$description}\n\n{$changeList}";
+        return $changelog;
     }
 }
