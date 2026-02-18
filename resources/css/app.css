@@ -1,31 +1,43 @@
-@import './modules/badges.css';
-@import './modules/buttons.css';
-@import './modules/cards.css';
-@import './modules/sidebar.css';
-@import './modules/modals.css';
-@import './modules/tables.css';
-@import './modules/forms.css';
+@import "modules/button.css";
+@import "modules/input.css";
+@import "modules/table.css";
+@import "modules/tabs.css";
+@import "modules/datepicker.css";
+@import "modules/progress.css";
+@import "modules/popup.min.css";
+@import "modules/slider.css";
+@import "modules/side-nav.css";
+@import "modules/sidebar.css";
+@import "modules/cards.css";
+@import "modules/modals.css";
+@import "modules/forms.css";
+@import "modules/badges.css";
+@import "modules/flags.css";
+@import "modules/filepond.css";
+@import "modules/filepond.min.css";
+@import "modules/filepond-plugin-image-preview.css";
+@import "modules/filepond-plugin-image-edit.css";
+@import "modules/cropper.min.css";
+@import "modules/animate.min.css";
+@import "modules/ui.min.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Pagination Dark Mode */
-@media (prefers-color-scheme: dark) {
-    .dark nav[aria-label="Pagination Navigation"] span,
-    .dark nav[aria-label="Pagination Navigation"] a {
-        background-color: rgb(31 41 55) !important; /* bg-gray-800 */
-        border-color: rgb(75 85 99) !important; /* border-gray-600 */
-        color: rgb(209 213 219) !important; /* text-gray-300 */
+@layer base {
+    :root {
+        --slide-distance: 2rem;
+        --fade-distance: 1rem;
+        --zoom-duration: 0.5s;
+        --shimmer-duration: 1.5s;
+        --shimmer-angle: 90deg;
+        --shimmer-mode: alternate;
+        --shimmer-direction: 1;
+        --shimmer-color: rgba(255, 255, 255, 0.6);
     }
-    .dark nav[aria-label="Pagination Navigation"] a:hover {
-        background-color: rgb(55 65 81) !important; /* bg-gray-700 */
-        color: rgb(229 231 235) !important; /* text-gray-200 */
-    }
-    /* Current page */
-    .dark nav[aria-label="Pagination Navigation"] span[aria-current="page"] span {
-        background-color: rgb(37 99 235) !important; /* bg-blue-600 */
-        border-color: rgb(37 99 235) !important;
-        color: white !important;
+
+    .dark {
+        --shimmer-color: rgba(255, 255, 255, 0.1);
     }
 }

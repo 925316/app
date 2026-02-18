@@ -1,0 +1,105 @@
+.button,
+.btn {
+    @apply py-3 px-5 tracking-wider text-xs font-medium inline-block items-center transition duration-300;
+}
+.button-circle {
+    @apply focus:outline-none focus:!ring-opacity-25 focus:ring-offset-0 rounded-full inline-flex place-items-center justify-center;
+}
+.button.tiny,
+.btn.tiny {
+    @apply py-[6px] px-[15px] text-[10px];
+}
+.button.small,
+.btn.small {
+    @apply py-[9.5px] px-4 !text-[11px];
+}
+.button.medium,
+.btn.medium {
+    @apply py-4 px-6;
+}
+.button.medium.has-icon,
+.btn.medium.has-icon {
+    @apply py-[15px] px-6;
+}
+.button.big,
+.btn.big {
+    @apply py-6 px-9 !text-[14px];
+}
+.button.big.has-icon,
+.btn.big.has-icon {
+    @apply pt-[19px] pb-[20px] px-8 !text-[16px];
+}
+.button.primary:not(.outlined),
+.button-circle.primary:not(.outlined),
+.button.secondary:not(.outlined),
+.button-circle.secondary:not(.outlined),
+.btn-primary:not(.outlined),
+.btn-secondary:not(.outlined) {
+    @apply active:translate-y-0.5 text-white text-opacity-90 hover:text-opacity-100 hover:!no-underline active:opacity-100 focus:outline-none focus:!ring-opacity-25 focus:!ring-offset-0;
+}
+.button.primary.outlined,
+.button-circle.primary.outlined,
+.button.secondary.outlined,
+.button-circle.secondary.outlined,
+.btn-primary.outlined,
+.btn-secondary.outlined {
+    @apply bg-transparent focus:outline-none focus:!ring-opacity-25 focus:!ring-offset-0;
+}
+.button.disabled,
+.button-circle.disabled,
+.btn.disabled {
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+.button.outlined,
+.btn.outlined {
+    @apply py-2.5;
+}
+.button.tiny.outlined,
+.btn.tiny.outlined {
+    @apply py-[5px];
+}
+.button.small.outlined,
+.btn.small.outlined {
+    @apply py-[8.5px];
+}
+.button.medium.outlined,
+.btn.medium.outlined {
+    @apply py-[14px];
+}
+.button.big.outlined,
+.btn.big.outlined {
+    @apply py-[22px];
+}
+.button-circle.tiny {
+    @apply size-[31px];
+}
+.button-circle.small {
+    @apply p-0.5 size-10;
+}
+.button-circle.regular {
+    @apply p-1 size-[42px];
+}
+.button-circle.medium {
+    @apply p-1 size-[50px];
+}
+.button-circle.big {
+    @apply p-3 size-[65px];
+}
+.button-circle.tiny.outlined {
+    @apply size-[32px];
+}
+.button-circle.small.outlined {
+    @apply p-0.5;
+}
+.button-circle.medium.outlined {
+    @apply p-1 size-[50px];
+}
+.button-circle.big.outlined {
+    @apply p-3 size-[66px];
+} /* Button color variants */
+.btn-primary {
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800;
+}
+.btn-secondary {
+    @apply bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800;
+}

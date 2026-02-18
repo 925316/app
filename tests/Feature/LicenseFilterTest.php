@@ -64,7 +64,7 @@ class LicenseFilterTest extends TestCase
         ]);
     }
 
-    public function test_admin_can_filter_licenses_by_status()
+    public function test_admin_can_filter_licenses_by_status(): void
     {
         $response = $this->actingAs($this->admin)
             ->get('/licenses?status=1');
@@ -75,7 +75,7 @@ class LicenseFilterTest extends TestCase
         $response->assertDontSee('TEST2-67890-VWXYZ-12345-67890');
     }
 
-    public function test_admin_can_filter_licenses_by_privilege()
+    public function test_admin_can_filter_licenses_by_privilege(): void
     {
         $response = $this->actingAs($this->admin)
             ->get('/licenses?privilege=1');
@@ -86,7 +86,7 @@ class LicenseFilterTest extends TestCase
         $response->assertDontSee('TEST2-67890-VWXYZ-12345-67890');
     }
 
-    public function test_admin_can_search_licenses_by_key()
+    public function test_admin_can_search_licenses_by_key(): void
     {
         $response = $this->actingAs($this->admin)
             ->get('/licenses?search=TEST1');
@@ -97,7 +97,7 @@ class LicenseFilterTest extends TestCase
         $response->assertDontSee('TEST3-ABCDE-12345-VWXYZ-ABCDE');
     }
 
-    public function test_admin_can_search_licenses_by_username()
+    public function test_admin_can_search_licenses_by_username(): void
     {
         $response = $this->actingAs($this->admin)
             ->get('/licenses?search=testuser');
@@ -108,7 +108,7 @@ class LicenseFilterTest extends TestCase
         $response->assertDontSee('TEST3-ABCDE-12345-VWXYZ-ABCDE');
     }
 
-    public function test_admin_can_combine_filters()
+    public function test_admin_can_combine_filters(): void
     {
         $response = $this->actingAs($this->admin)
             ->get('/licenses?status=1&privilege=1');
@@ -119,7 +119,7 @@ class LicenseFilterTest extends TestCase
         $response->assertDontSee('TEST2-67890-VWXYZ-12345-67890');
     }
 
-    public function test_regular_user_cannot_see_filter_section()
+    public function test_regular_user_cannot_see_filter_section(): void
     {
         $response = $this->actingAs($this->user)
             ->get('/licenses');
@@ -130,7 +130,7 @@ class LicenseFilterTest extends TestCase
         $response->assertDontSee('All Privileges');
     }
 
-    public function test_regular_user_only_sees_their_own_licenses()
+    public function test_regular_user_only_sees_their_own_licenses(): void
     {
         $response = $this->actingAs($this->user)
             ->get('/licenses');
@@ -141,7 +141,7 @@ class LicenseFilterTest extends TestCase
         $response->assertDontSee('TEST3-ABCDE-12345-VWXYZ-ABCDE');
     }
 
-    public function test_empty_filter_values_maintain_all_statuses_selection()
+    public function test_empty_filter_values_maintain_all_statuses_selection(): void
     {
         $response = $this->actingAs($this->admin)
             ->get('/licenses?status=&privilege=&search=');
@@ -158,10 +158,11 @@ class LicenseFilterTest extends TestCase
         $response->assertSee('All Privileges');
 
         // Verify that no active filters badge is shown when filters are empty
+        // Use assertDontSee with the full phrase to avoid false positives from other "Active" text
         $response->assertDontSee('Active filters:');
     }
 
-    public function test_single_filter_only_includes_non_empty_parameters()
+    public function test_single_filter_only_includes_non_empty_parameters(): void
     {
         $response = $this->actingAs($this->admin)
             ->get('/licenses?privilege=1');
@@ -174,6 +175,7 @@ class LicenseFilterTest extends TestCase
         $response->assertDontSee('TEST2-67890-VWXYZ-12345-67890');
 
         // Verify that the active filters badge shows only the privilege filter
+        // Using assertSee with the full phrase to match the badge text
         $response->assertSee('Active filters:');
         $response->assertSee('Privilege:');
         $response->assertDontSee('Status:');

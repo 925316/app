@@ -1,0 +1,123 @@
+.slider {
+    @apply appearance-none w-full h-2 bg-gray-200 dark:bg-dark-600 outline-0 opacity-90 rounded-full transition-opacity absolute;
+}
+
+.slider::-webkit-slider-thumb {
+    @apply rounded-full cursor-pointer appearance-none size-6;
+}
+
+.slider::-moz-range-thumb {
+    @apply rounded-full cursor-pointer appearance-none size-6;
+}
+
+.slider.primary::-webkit-slider-thumb {
+    @apply bg-primary-500;
+}
+
+.slider.primary::-moz-range-thumb {
+    @apply bg-primary-500;
+}
+
+.slider.pink::-webkit-slider-thumb {
+    @apply bg-pink-500;
+}
+
+.slider.pink::-moz-range-thumb {
+    @apply bg-pink-500;
+}
+
+.slider.blue::-webkit-slider-thumb {
+    @apply bg-blue-500;
+}
+
+.slider.blue::-moz-range-thumb {
+    @apply bg-blue-500;
+}
+
+.slider.red::-webkit-slider-thumb {
+    @apply bg-red-500;
+}
+
+.slider.red::-moz-range-thumb {
+    @apply bg-red-500;
+}
+
+.slider.yellow::-webkit-slider-thumb {
+    @apply bg-amber-500;
+}
+
+.slider.yellow::-moz-range-thumb {
+    @apply bg-amber-500;
+}
+
+.slider.black::-webkit-slider-thumb {
+    @apply bg-slate-500;
+}
+
+.slider.black::-moz-range-thumb {
+    @apply bg-slate-500;
+}
+
+.slider.gray::-webkit-slider-thumb {
+    @apply bg-slate-500;
+}
+
+.slider.gray::-moz-range-thumb {
+    @apply bg-slate-500;
+}
+
+.slider.purple::-webkit-slider-thumb {
+    @apply bg-purple-500;
+}
+
+.slider.purple::-moz-range-thumb {
+    @apply bg-purple-500;
+}
+
+.slider.cyan::-webkit-slider-thumb {
+    @apply bg-cyan-500;
+}
+
+.slider.cyan::-moz-range-thumb {
+    @apply bg-cyan-500;
+}
+
+.slider.orange::-webkit-slider-thumb {
+    @apply bg-orange-500;
+}
+
+.slider.orange::-moz-range-thumb {
+    @apply bg-orange-500;
+}
+
+.slider.violet::-webkit-slider-thumb {
+    @apply bg-violet-500;
+}
+
+.slider.violet::-moz-range-thumb {
+    @apply bg-violet-500;
+}
+
+.slider.indigo::-webkit-slider-thumb {
+    @apply bg-indigo-500;
+}
+
+.slider.indigo::-moz-range-thumb {
+    @apply bg-indigo-500;
+}
+
+.slider.fuchsia::-webkit-slider-thumb {
+    @apply bg-fuchsia-500;
+}
+
+.slider.fuchsia::-moz-range-thumb {
+    @apply bg-fuchsia-500;
+}
+
+.slider.green::-webkit-slider-thumb {
+    @apply bg-green-500;
+}
+
+.slider.green::-moz-range-thumb {
+    @apply bg-green-500;
+}
