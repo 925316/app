@@ -17,10 +17,11 @@ class StatisticsService
     public static function updateGlobalStatistics(): void
     {
         // Global login count
-        self::updateStatistic('global', 'login_count', Account::count());
+        $loginCount = EventLog::where('event_type', 'account.login')->count();
+        self::updateStatistic('global', 'login_count', $loginCount);
 
         // Global total usage time (in hours)
-        $totalUsageHours = ClientSession::sum(DB::raw('TIMESTAMPDIFF(HOUR, created_at, COALESCE(last_heartbeat_at, NOW()))'));
+        $totalUsageHours = ClientSession::selectRaw(self::usageHoursExpression().' as usage_hours')->value('usage_hours') ?? 0;
         self::updateStatistic('global', 'total_usage_hours', $totalUsageHours);
 
         // Active licenses count
@@ -53,7 +54,8 @@ class StatisticsService
 
         // User usage time (in hours)
         $usageHours = ClientSession::where('account_id', $accountId)
-            ->sum(DB::raw('TIMESTAMPDIFF(HOUR, created_at, COALESCE(last_heartbeat_at, NOW()))'));
+            ->selectRaw(self::usageHoursExpression().' as usage_hours')
+            ->value('usage_hours') ?? 0;
 
         self::updateStatistic('user', "user_{$accountId}_usage_hours", $usageHours);
 
@@ -408,6 +410,20 @@ class StatisticsService
                 ],
             ];
         }
+    }
+
+    /**
+     * Return a cross-database SQL expression for summing session hours.
+     */
+    protected static function usageHoursExpression(): string
+    {
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver === 'sqlite') {
+            return "SUM((strftime('%s', COALESCE(last_heartbeat_at, datetime('now'))) - strftime('%s', created_at)) / 3600.0)";
+        }
+
+        return 'SUM(TIMESTAMPDIFF(HOUR, created_at, COALESCE(last_heartbeat_at, NOW())))';
     }
 
     /**

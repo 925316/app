@@ -88,15 +88,8 @@ class AccountController extends Controller
         // Get overall statistics (not filtered by search/pagination)
         $statistics = [
             'total' => Account::count(),
-            'active' => Account::query()
-                ->where(function ($q) {
-                    $q->whereNull('suspended_until')
-                        ->orWhere('suspended_until', '<', now());
-                })
-                ->count(),
-            'suspended' => Account::query()
-                ->where('suspended_until', '>', now())
-                ->count(),
+            'active' => Account::active()->count(),
+            'suspended' => Account::suspended()->count(),
             'verified' => Account::whereNotNull('email_verified_at')->count(),
         ];
 

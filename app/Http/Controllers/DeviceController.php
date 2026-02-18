@@ -119,8 +119,8 @@ class DeviceController extends Controller
             return back()->withErrors(['hwid_hash' => 'You can only bind one device at a time. Please unbind your current device first.']);
         }
 
-        // Create or update device record
-        $device = AccountDevice::updateOrCreate(
+        // Create or update device record — only set first_seen_at on initial creation
+        $device = AccountDevice::firstOrCreate(
             [
                 'account_id' => $user->id,
                 'hwid_hash' => $request->hwid_hash,
@@ -134,6 +134,16 @@ class DeviceController extends Controller
                 'unbound_at' => null,
             ]
         );
+
+        if (! $device->wasRecentlyCreated) {
+            $device->update([
+                'ip_address' => $request->ip_address,
+                'country_code' => $request->country_code,
+                'last_seen_at' => now(),
+                'bound_at' => now(),
+                'unbound_at' => null,
+            ]);
+        }
 
         // Log the event
         EventLog::create([

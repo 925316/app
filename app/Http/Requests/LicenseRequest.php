@@ -49,6 +49,11 @@ class LicenseRequest extends FormRequest
                 'date',
                 'after:now',
             ],
+            'used_by' => [
+                'nullable',
+                'integer',
+                'exists:accounts,id',
+            ],
             'notes' => [
                 'nullable',
                 'string',
@@ -69,9 +74,10 @@ class LicenseRequest extends FormRequest
             }
         }
 
-        // For updates, key is required and must exist
+        // For updates, key is required and must exist; expires_at may already be in the past
         if ($this->isMethod('put') || $this->isMethod('patch')) {
             $rules['key'][] = 'exists:licenses,key';
+            $rules['expires_at'] = ['required', 'date'];
         }
 
         return $rules;

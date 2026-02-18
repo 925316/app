@@ -23,15 +23,12 @@ class LicenseController extends Controller
         if ($user->getPrivilegeLevel() >= 7) { // Admin - can see all licenses
             $query = License::query();
 
-            // Filter by status (supports both enum labels and values)
+            // Filter by status (supports both enum labels and integer values)
             if ($request->filled('status')) {
-                $statusValue = array_search(
-                    ucfirst(strtolower($request->status)),
-                    array_map('strtolower', LicenseStatus::options())
-                );
+                $statusValue = array_search(strtolower($request->status), LicenseStatus::options());
 
                 if ($statusValue === false) {
-                    $statusValue = $request->status;
+                    $statusValue = (int) $request->status;
                 }
 
                 $status = LicenseStatus::tryFrom($statusValue);
@@ -40,15 +37,12 @@ class LicenseController extends Controller
                 }
             }
 
-            // Filter by privilege (supports both labels and values)
+            // Filter by privilege (supports both labels and integer values)
             if ($request->filled('privilege')) {
-                $privilegeValue = array_search(
-                    ucfirst(strtolower($request->privilege)),
-                    array_map('strtolower', LicensePrivilege::options())
-                );
+                $privilegeValue = array_search(strtolower($request->privilege), LicensePrivilege::options());
 
                 if ($privilegeValue === false) {
-                    $privilegeValue = $request->privilege;
+                    $privilegeValue = (int) $request->privilege;
                 }
 
                 $privilege = LicensePrivilege::tryFrom($privilegeValue);
@@ -76,10 +70,8 @@ class LicenseController extends Controller
             // Get overall statistics (not filtered by search/pagination)
             $statistics = [
                 'total' => License::count(),
-                'active' => License::where('status', LicenseStatus::ACTIVE)->count(),
-                'expired' => License::query()
-                    ->where('expires_at', '<', now())
-                    ->count(),
+                'active' => License::active()->count(),
+                'expired' => License::expired()->count(),
                 'unassigned' => License::whereNull('used_by')->count(),
             ];
 
@@ -315,6 +307,28 @@ class LicenseController extends Controller
         $user = Auth::user();
 
         try {
+            // Apply the same privilege-level rules as activateByKey
+            $currentPrivilege = $user->getPrivilegeLevel();
+
+            if ($currentPrivilege > 0 && $license->privilege->value <= $currentPrivilege) {
+                $currentLevelName = LicensePrivilege::tryFrom($currentPrivilege)?->getLabel() ?? 'unknown';
+                $newLevelName = $license->privilege?->getLabel() ?? 'unknown';
+
+                $errorMessage = $license->privilege->value == $currentPrivilege
+                    ? "You already have an active {$currentLevelName} license. You cannot activate another license of the same level."
+                    : "You already have an active {$currentLevelName} license. You cannot downgrade to {$newLevelName}.";
+
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'license' => $errorMessage,
+                ]);
+            }
+
+            if (! $license->canActivateByPrivilege()) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'license' => 'License upgrade cannot be activated alone. It must be used to upgrade a standard license.',
+                ]);
+            }
+
             LicenseService::activateLicense($license, $user, $request->ip());
 
             // Log the event

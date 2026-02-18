@@ -203,11 +203,13 @@ class Account extends Authenticatable // implements MustVerifyEmail
      */
     public function scopeActive($query)
     {
-        return $query->where('is_suspended', false)
-            ->orWhere(function ($query) {
-                $query->where('is_suspended', true)
-                    ->where('suspended_until', '<', now());
-            });
+        return $query->where(function ($q) {
+            $q->where('is_suspended', false)
+                ->orWhere(function ($q) {
+                    $q->where('is_suspended', true)
+                        ->where('suspended_until', '<', now());
+                });
+        });
     }
 
     /**
