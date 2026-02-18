@@ -40,7 +40,7 @@ class LicenseRequest extends FormRequest
                 Rule::in([0, 1, 2, 3, 6, 7]), // 0=none, 1=standard, 2=upgrade, 3=ultimate, 6=tester, 7=staff
             ],
             'status' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::in([0, 1, 2, 3, 4, 5]), // 0=unused, 1=active, 2=suspended, 3=expired, 4=upgraded, 5=revoked
             ],
@@ -93,8 +93,7 @@ class LicenseRequest extends FormRequest
             'key.unique' => 'This license key is already in use.',
             'key.exists' => 'The specified license key does not exist.',
             'privilege.required' => 'The license privilege is required.',
-            'privilege.in' => 'The license privilege must be a valid value (0-5).',
-            'status.required' => 'The license status is required.',
+            'privilege.in' => 'The license privilege must be a valid value (0, 1, 2, 3, 6, or 7).',
             'status.in' => 'The license status must be a valid value (0-5).',
             'expires_at.required' => 'The expiration date is required.',
             'expires_at.after' => 'The expiration date must be in the future.',

@@ -6,6 +6,7 @@ use App\Enums\LicensePrivilege;
 use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\License;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -75,7 +76,24 @@ class LicenseService
         // Note: We no longer check for existing active licenses here
         // The controller should handle privilege level upgrade/downgrade logic
 
-        return $license->activate($account->id, $ipAddress);
+        return DB::transaction(function () use ($license, $account, $ipAddress) {
+            // Re-fetch with a pessimistic lock to prevent concurrent activations
+            $locked = License::lockForUpdate()->find($license->id);
+
+            if (! $locked || ! $locked->canActivate()) {
+                throw ValidationException::withMessages([
+                    'license' => 'License cannot be activated. It may have already been activated by another request.',
+                ]);
+            }
+
+            $result = $locked->activate($account->id, $ipAddress);
+
+            // Sync the caller's instance so it reflects the saved state
+            $license->setRawAttributes($locked->getAttributes());
+            $license->syncOriginal();
+
+            return $result;
+        });
     }
 
     /**

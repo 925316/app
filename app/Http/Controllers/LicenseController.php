@@ -184,10 +184,11 @@ class LicenseController extends Controller
     {
         $validated = $request->validated();
 
-        // Only allow certain fields to be updated
+        // Only allow certain fields to be updated.
+        // Status is intentionally excluded — use the dedicated endpoints
+        // (suspend, reactivate, revoke, upgrade) to change license status.
         $updateData = [
             'privilege' => $validated['privilege'],
-            'status' => $validated['status'],
             'expires_at' => $validated['expires_at'],
             'notes' => $validated['notes'],
         ];

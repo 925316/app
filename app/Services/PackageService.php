@@ -61,9 +61,13 @@ class PackageService
      */
     public static function getLatestRelease(string $channel = 'stable'): ?PackageRelease
     {
-        return PackageRelease::where('release_channel', $channel)
-            ->orderBy('version', 'desc')
-            ->first();
+        $releases = PackageRelease::where('release_channel', $channel)->get();
+
+        if ($releases->isEmpty()) {
+            return null;
+        }
+
+        return $releases->sort(fn ($a, $b) => version_compare($b->version, $a->version))->first();
     }
 
     /**

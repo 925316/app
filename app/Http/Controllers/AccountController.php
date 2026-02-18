@@ -331,12 +331,11 @@ class AccountController extends Controller
             return back()->withErrors(['hwid_reset' => 'HWID can only be reset once every 72 hours.']);
         }
 
-        // Reset HWID for all devices
-        $account->devices()->update([
-            'hwid_hash' => null,
-            'bound_at' => null,
-            'unbound_at' => now(),
-        ]);
+        // Unbind currently bound devices only; preserve hwid_hash for audit history
+        $account->devices()
+            ->whereNotNull('bound_at')
+            ->whereNull('unbound_at')
+            ->update(['unbound_at' => now()]);
 
         $account->incrementHwidResetCount();
 

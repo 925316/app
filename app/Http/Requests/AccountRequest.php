@@ -45,7 +45,7 @@ class AccountRequest extends FormRequest
                 'confirmed',
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', // At least one lowercase, one uppercase, and one number
             ],
-            'email_verified' => 'boolean',
+            'email_verified' => 'nullable|boolean',
         ];
     }
 

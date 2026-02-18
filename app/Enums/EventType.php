@@ -9,18 +9,30 @@ enum EventType: string
     case ACCOUNT_LOGIN = 'account.login';
     case ACCOUNT_LOGOUT = 'account.logout';
     case ACCOUNT_PROFILE_UPDATED = 'account.profile_updated';
+    case ACCOUNT_CREATED = 'account.created';
+    case ACCOUNT_UPDATED = 'account.updated';
+    case ACCOUNT_DELETED = 'account.deleted';
+    case ACCOUNT_SUSPENDED = 'account.suspended';
+    case ACCOUNT_UNSUSPENDED = 'account.unsuspended';
+    case ACCOUNT_HWID_RESET = 'account.hwid_reset';
+    case ACCOUNT_EMAIL_VERIFIED = 'account.email_verified';
 
     // License events
     case LICENSE_CREATED = 'license.created';
     case LICENSE_ACTIVATED = 'license.activated';
     case LICENSE_SUSPENDED = 'license.suspended';
+    case LICENSE_REACTIVATED = 'license.reactivated';
     case LICENSE_REVOKED = 'license.revoked';
+    case LICENSE_UPGRADED = 'license.upgraded';
+    case LICENSE_EXTENDED = 'license.extended';
     case LICENSE_EXPIRED = 'license.expired';
 
     // Device events
     case DEVICE_BOUND = 'device.bound';
     case DEVICE_UNBOUND = 'device.unbound';
     case DEVICE_HWID_CHANGED = 'device.hwid_changed';
+    case DEVICE_ADMIN_UNBOUND = 'device.admin_unbound';
+    case DEVICE_ADMIN_HWID_RESET = 'device.admin_hwid_reset';
 
     // System events
     case SYSTEM_PACKAGE_UPLOADED = 'system.package_uploaded';
@@ -63,16 +75,28 @@ enum EventType: string
             self::ACCOUNT_LOGIN => 'Login',
             self::ACCOUNT_LOGOUT => 'Logout',
             self::ACCOUNT_PROFILE_UPDATED => 'Profile Updated',
+            self::ACCOUNT_CREATED => 'Account Created',
+            self::ACCOUNT_UPDATED => 'Account Updated',
+            self::ACCOUNT_DELETED => 'Account Deleted',
+            self::ACCOUNT_SUSPENDED => 'Account Suspended',
+            self::ACCOUNT_UNSUSPENDED => 'Account Unsuspended',
+            self::ACCOUNT_HWID_RESET => 'HWID Reset',
+            self::ACCOUNT_EMAIL_VERIFIED => 'Email Verified',
 
             self::LICENSE_CREATED => 'License Created',
             self::LICENSE_ACTIVATED => 'License Activated',
             self::LICENSE_SUSPENDED => 'License Suspended',
+            self::LICENSE_REACTIVATED => 'License Reactivated',
             self::LICENSE_REVOKED => 'License Revoked',
+            self::LICENSE_UPGRADED => 'License Upgraded',
+            self::LICENSE_EXTENDED => 'License Extended',
             self::LICENSE_EXPIRED => 'License Expired',
 
             self::DEVICE_BOUND => 'Device Bound',
             self::DEVICE_UNBOUND => 'Device Unbound',
             self::DEVICE_HWID_CHANGED => 'HWID Changed',
+            self::DEVICE_ADMIN_UNBOUND => 'Device Unbound (Admin)',
+            self::DEVICE_ADMIN_HWID_RESET => 'HWID Reset (Admin)',
 
             self::SYSTEM_PACKAGE_UPLOADED => 'Package Uploaded',
             self::SYSTEM_STATISTICS_UPDATED => 'Statistics Updated',

@@ -114,36 +114,50 @@ class DeviceController extends Controller
             abort(403, 'You need a valid license to bind devices.');
         }
 
-        // Check if user already has a bound device
-        if ($user->getBoundDeviceCount() >= 1) {
-            return back()->withErrors(['hwid_hash' => 'You can only bind one device at a time. Please unbind your current device first.']);
-        }
+        // DeviceRequest already validates that the user has no bound device.
+        // Wrap the operation in a transaction to prevent race conditions.
+        $device = \Illuminate\Support\Facades\DB::transaction(function () use ($user, $request) {
+            // Re-check inside transaction with a lock to prevent concurrent binds
+            $alreadyBound = AccountDevice::where('account_id', $user->id)
+                ->whereNotNull('bound_at')
+                ->whereNull('unbound_at')
+                ->lockForUpdate()
+                ->exists();
 
-        // Create or update device record — only set first_seen_at on initial creation
-        $device = AccountDevice::firstOrCreate(
-            [
-                'account_id' => $user->id,
-                'hwid_hash' => $request->hwid_hash,
-            ],
-            [
-                'ip_address' => $request->ip_address,
-                'country_code' => $request->country_code,
-                'first_seen_at' => now(),
-                'last_seen_at' => now(),
-                'bound_at' => now(),
-                'unbound_at' => null,
-            ]
-        );
+            if ($alreadyBound) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'hwid_hash' => 'You can only bind one device at a time. Please unbind your current device first.',
+                ]);
+            }
 
-        if (! $device->wasRecentlyCreated) {
-            $device->update([
-                'ip_address' => $request->ip_address,
-                'country_code' => $request->country_code,
-                'last_seen_at' => now(),
-                'bound_at' => now(),
-                'unbound_at' => null,
-            ]);
-        }
+            // Create or update device record — only set first_seen_at on initial creation
+            $device = AccountDevice::firstOrCreate(
+                [
+                    'account_id' => $user->id,
+                    'hwid_hash' => $request->hwid_hash,
+                ],
+                [
+                    'ip_address' => $request->ip_address,
+                    'country_code' => $request->country_code,
+                    'first_seen_at' => now(),
+                    'last_seen_at' => now(),
+                    'bound_at' => now(),
+                    'unbound_at' => null,
+                ]
+            );
+
+            if (! $device->wasRecentlyCreated) {
+                $device->update([
+                    'ip_address' => $request->ip_address,
+                    'country_code' => $request->country_code,
+                    'last_seen_at' => now(),
+                    'bound_at' => now(),
+                    'unbound_at' => null,
+                ]);
+            }
+
+            return $device;
+        });
 
         // Log the event
         EventLog::create([
@@ -222,7 +236,12 @@ class DeviceController extends Controller
             ]);
         }
 
-        // Increment reset count
+        // Unbind currently bound devices; preserve hwid_hash for audit history
+        $user->devices()
+            ->whereNotNull('bound_at')
+            ->whereNull('unbound_at')
+            ->update(['unbound_at' => now()]);
+
         $user->incrementHwidResetCount();
 
         // Log the event
@@ -239,7 +258,7 @@ class DeviceController extends Controller
         ]);
 
         return redirect()->route('devices.manage')
-            ->with('success', 'HWID reset count incremented. You can now bind a new device.');
+            ->with('success', 'HWID reset successfully. You can now bind a new device.');
     }
 
     /**
@@ -283,12 +302,11 @@ class DeviceController extends Controller
             ]);
         }
 
-        // Reset HWID for all devices
-        $account->devices()->update([
-            'hwid_hash' => null,
-            'bound_at' => null,
-            'unbound_at' => now(),
-        ]);
+        // Unbind currently bound devices; preserve hwid_hash for audit history
+        $account->devices()
+            ->whereNotNull('bound_at')
+            ->whereNull('unbound_at')
+            ->update(['unbound_at' => now()]);
 
         $account->incrementHwidResetCount();
 
@@ -373,12 +391,11 @@ class DeviceController extends Controller
         $resetCount = 0;
         foreach ($accounts as $account) {
             if ($account->canResetHwid()) {
-                // Reset HWID for all devices
-                $account->devices()->update([
-                    'hwid_hash' => null,
-                    'bound_at' => null,
-                    'unbound_at' => now(),
-                ]);
+                // Unbind currently bound devices; preserve hwid_hash for audit history
+                $account->devices()
+                    ->whereNotNull('bound_at')
+                    ->whereNull('unbound_at')
+                    ->update(['unbound_at' => now()]);
 
                 $account->incrementHwidResetCount();
                 $resetCount++;

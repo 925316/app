@@ -62,16 +62,6 @@ class EventLog extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @deprecated Use the casts() method instead.
-     */
-    protected $casts = [
-        'details' => 'array',
-        'event_level' => 'integer',
-    ];
-
-    /**
      * Relationship with the account that this event is about.
      */
     public function account()
