@@ -10,22 +10,20 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Pagination Dark Mode */
-@media (prefers-color-scheme: dark) {
-    .dark nav[aria-label="Pagination Navigation"] span,
-    .dark nav[aria-label="Pagination Navigation"] a {
-        background-color: rgb(31 41 55) !important; /* bg-gray-800 */
-        border-color: rgb(75 85 99) !important; /* border-gray-600 */
-        color: rgb(209 213 219) !important; /* text-gray-300 */
-    }
-    .dark nav[aria-label="Pagination Navigation"] a:hover {
-        background-color: rgb(55 65 81) !important; /* bg-gray-700 */
-        color: rgb(229 231 235) !important; /* text-gray-200 */
-    }
-    /* Current page */
-    .dark nav[aria-label="Pagination Navigation"] span[aria-current="page"] span {
-        background-color: rgb(37 99 235) !important; /* bg-blue-600 */
-        border-color: rgb(37 99 235) !important;
-        color: white !important;
-    }
+/* Pagination Dark Mode - uses class strategy to match tailwind.config.js darkMode: 'class' */
+.dark nav[aria-label="Pagination Navigation"] span,
+.dark nav[aria-label="Pagination Navigation"] a {
+    background-color: rgb(31 41 55); /* bg-gray-800 */
+    border-color: rgb(75 85 99); /* border-gray-600 */
+    color: rgb(209 213 219); /* text-gray-300 */
+}
+.dark nav[aria-label="Pagination Navigation"] a:hover {
+    background-color: rgb(55 65 81); /* bg-gray-700 */
+    color: rgb(229 231 235); /* text-gray-200 */
+}
+/* Current page */
+.dark nav[aria-label="Pagination Navigation"] span[aria-current="page"] span {
+    background-color: rgb(37 99 235); /* bg-blue-600 */
+    border-color: rgb(37 99 235);
+    color: white;
 }
