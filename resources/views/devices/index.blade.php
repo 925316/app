@@ -108,18 +108,13 @@
                                             </div>
                                         </td>
                                         <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <div class="text-gray-900 dark:text-gray-100">{{ $device->ip_address }}
-                                            </div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ $device->country_code ?? 'Unknown' }}</div>
+                                            <span class="text-gray-900 dark:text-gray-100">{{ $device->ip_address }}</span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">({{ $device->country_code ?? 'N/A' }})</span>
                                         </td>
                                         <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <div class="text-gray-900 dark:text-gray-100">
-                                                F: {{ $device->first_seen_at->format('Y-m-d H:i') }}
-                                            </div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                L: {{ $device->last_seen_at->format('Y-m-d H:i') }}
-                                            </div>
+                                            <span class="text-gray-900 dark:text-gray-100" title="First: {{ $device->first_seen_at->format('Y-m-d H:i:s') }} | Last: {{ $device->last_seen_at->format('Y-m-d H:i:s') }}">
+                                                {{ $device->first_seen_at->format('m-d') }} / {{ $device->last_seen_at->format('m-d') }}
+                                            </span>
                                         </td>
                                         <td class="px-4 py-2 whitespace-nowrap text-sm">
                                             @if ($device->bound_at && !$device->unbound_at)

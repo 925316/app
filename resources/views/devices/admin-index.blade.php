@@ -200,9 +200,9 @@
                                         </td>
                                         <td class="px-4 py-2 whitespace-nowrap text-sm">
                                             <div class="text-gray-900 dark:text-gray-100">
-                                                F: {{ $device->first_seen_at->format('Y-m-d H:i') }}</div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
                                                 L: {{ $device->last_seen_at->format('Y-m-d H:i') }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                F: {{ $device->first_seen_at->format('Y-m-d H:i') }}</div>
                                         </td>
                                         <td class="px-4 py-2 whitespace-nowrap text-sm">
                                             @if ($device->isBound())

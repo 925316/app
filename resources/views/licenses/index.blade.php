@@ -271,11 +271,12 @@
                                         </td>
                                         <td
                                             class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $license->expires_at->format('Y-m-d') }}
+                                            <span title="{{ $license->expires_at->format('Y-m-d H:i:s') }}">
+                                                {{ $license->expires_at->format('Y-m-d') }}
+                                            </span>
                                             @if ($license->isActive() && !$license->isExpired())
-                                                <br>
                                                 <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                    ({{ $license->daysUntilExpiry() }} days)
+                                                    ({{ $license->daysUntilExpiry() }}d)
                                                 </span>
                                             @endif
                                         </td>

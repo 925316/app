@@ -222,11 +222,9 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ $account->email }} @if ($account->email_verified_at)
-                                        <x-status-badge status="verified" />
-                                    @else
-                                        <x-status-badge status="unverified" />
-                                    @endif
+                                    <div class="max-w-[200px] truncate" title="{{ $account->email }}">
+                                        <span class="px-1 rounded {{ $account->email_verified_at ? 'bg-green-100 dark:bg-green-800' : 'bg-red-100 dark:bg-red-800' }}">{{ $account->email }}</span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap">
                                     @if ($account->isCurrentlySuspended)
@@ -264,10 +262,7 @@
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium"><a
                                         href="{{ route('accounts.show', $account) }}"
                                         class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        View </a> <span class="mx-1 text-gray-400">|</span> <a
-                                        href="{{ route('accounts.edit', $account) }}"
-                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                                        Edit </a>
+                                        View </a>
                                     @if ($account->isCurrentlySuspended)
                                         <span class="mx-1 text-gray-400">|</span>
                                         <form action="{{ route('accounts.unsuspend', $account) }}" method="POST"
