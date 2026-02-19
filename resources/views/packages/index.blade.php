@@ -7,74 +7,10 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-blue-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Releases</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $stats['total_releases'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-green-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Stable</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $stats['stable_releases'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-purple-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Dev</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $stats['dev_releases'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-yellow-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Latest Stable</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $stats['latest_stable']?->version ?? 'None' }}</p>
-                        </div>
-                    </div>
-                </div>
+                <x-stat-card title="Total Releases" :value="$stats['total_releases'] ?? 0" icon="cube" iconColor="icon-blue" />
+                <x-stat-card title="Stable" :value="$stats['stable_releases'] ?? 0" icon="success" iconColor="icon-green" />
+                <x-stat-card title="Dev" :value="$stats['dev_releases'] ?? 0" icon="lightning" iconColor="icon-purple" />
+                <x-stat-card title="Latest Stable" :value="$stats['latest_stable']?->version ?? 'None'" icon="cloud" iconColor="icon-yellow" />
             </div>
 
             <!-- Latest Stable Release - For All Users -->

@@ -9,74 +9,10 @@
             @if (Auth::user()->hasPrivilege(7))
                 <!-- Statistics Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                        <div class="flex items-center">
-                            <div class="p-3 bg-blue-500/20 rounded-full">
-                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Licenses</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                    {{ $statistics['total'] }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                        <div class="flex items-center">
-                            <div class="p-3 bg-green-500/20 rounded-full">
-                                <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                    {{ $statistics['active'] }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                        <div class="flex items-center">
-                            <div class="p-3 bg-red-500/20 rounded-full">
-                                <svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expired</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                    {{ $statistics['expired'] }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                        <div class="flex items-center">
-                            <div class="p-3 bg-yellow-500/20 rounded-full">
-                                <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Unassigned</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                    {{ $statistics['unassigned'] }}</p>
-                            </div>
-                        </div>
-                    </div>
+                    <x-stat-card title="Total Licenses" :value="$statistics['total']" icon="document" iconColor="icon-blue" />
+                    <x-stat-card title="Active" :value="$statistics['active']" icon="success" iconColor="icon-green" />
+                    <x-stat-card title="Expired" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
+                    <x-stat-card title="Unassigned" :value="$statistics['unassigned']" icon="warning" iconColor="icon-yellow" />
                 </div>
             @endif
 
@@ -94,8 +30,7 @@
 
                         @if ($isAdmin ?? false)
                             <div class="flex gap-2">
-                                <a href="{{ route('licenses.create') }}"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                <a href="{{ route('licenses.create') }}" class="btn btn-blue btn-sm">
                                     Create License
                                 </a>
                             </div>
@@ -145,8 +80,7 @@
                                         </div>
 
                                         <div class="flex justify-end">
-                                            <button type="submit"
-                                                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md font-medium">
+                                            <button type="submit" class="btn btn-blue">
                                                 <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -165,28 +99,8 @@
 
                     @if ($isAdmin ?? false)
                         <!-- Admin filters -->
-                        <div
-                            class="mb-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                            <div class="flex items-center justify-between mb-4">
-                                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                                    <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                                        </path>
-                                    </svg>
-                                    Filter Licenses
-                                </h4>
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">
-                                        {{ $licenses->total() }} total licenses
-                                    </span>
-                                </div>
-                            </div>
-
-                            <form method="GET" action="{{ route('licenses.index') }}" data-clean-form="true"
-                                class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
+                        <x-filter-box :action="route('licenses.index')" :showTotal="true" :totalCount="$licenses->total()">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <!-- Status filter -->
                                 <div class="space-y-2">
                                     <label for="status"
@@ -240,8 +154,7 @@
                                                 class="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200"
                                                 placeholder="Search by key or username...">
                                         </div>
-                                        <button type="submit"
-                                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 font-medium shadow-sm">
+                                        <button type="submit" class="btn btn-blue btn-sm">
                                             <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -249,8 +162,7 @@
                                             </svg>
                                             Filter
                                         </button>
-                                        <a href="{{ route('licenses.index') }}"
-                                            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 font-medium shadow-sm">
+                                        <a href="{{ route('licenses.index') }}" class="btn btn-secondary btn-sm">
                                             <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -261,7 +173,7 @@
                                         </a>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
 
                             <!-- Active filters badge -->
                             @if (request()->filled(['status', 'privilege', 'search']) ||
@@ -277,18 +189,8 @@
                                                 $statusLabel = $statusOptions[$statusValue] ?? null;
                                             @endphp
                                             @if ($statusLabel)
-                                                <span
-                                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                                    Status: {{ ucfirst($statusLabel) }}
-                                                    <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}"
-                                                        class="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                        </svg>
-                                                    </a>
-                                                </span>
+                                                <x-filter-badge label="Status: {{ ucfirst($statusLabel) }}" color="blue"
+                                                    :removeUrl="request()->fullUrlWithQuery(['status' => null])" />
                                             @endif
                                         @endif
                                         @if (request()->filled('privilege'))
@@ -297,38 +199,18 @@
                                                 $privilegeLabel = $privilegeOptions[$privilegeValue] ?? null;
                                             @endphp
                                             @if ($privilegeLabel)
-                                                <span
-                                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                                    Privilege: {{ ucfirst($privilegeLabel) }}
-                                                    <a href="{{ request()->fullUrlWithQuery(['privilege' => null]) }}"
-                                                        class="ml-2 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                        </svg>
-                                                    </a>
-                                                </span>
+                                                <x-filter-badge label="Privilege: {{ ucfirst($privilegeLabel) }}" color="green"
+                                                    :removeUrl="request()->fullUrlWithQuery(['privilege' => null])" />
                                             @endif
                                         @endif
                                         @if (request()->filled('search'))
-                                            <span
-                                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                                Search: "{{ request('search') }}"
-                                                <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}"
-                                                    class="ml-2 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-200">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                    </svg>
-                                                </a>
-                                            </span>
+                                            <x-filter-badge label="Search: &quot;{{ request('search') }}&quot;" color="purple"
+                                                :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
                                         @endif
                                     </div>
                                 </div>
                             @endif
-                        </div>
+                        </x-filter-box>
                     @endif
 
                     <!-- Licenses table -->

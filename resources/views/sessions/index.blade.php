@@ -7,93 +7,11 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-blue-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Sessions</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $statistics['total'] }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-green-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Sessions</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $statistics['active'] }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-red-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expired Sessions</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $statistics['expired'] }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-purple-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Unique Accounts</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $statistics['unique_accounts'] }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-orange-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-orange-600 dark:text-orange-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Unique Devices</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $statistics['unique_devices'] }}</p>
-                        </div>
-                    </div>
-                </div>
+                <x-stat-card title="Total Sessions" :value="$statistics['total']" icon="server" iconColor="icon-blue" />
+                <x-stat-card title="Active Sessions" :value="$statistics['active']" icon="success" iconColor="icon-green" />
+                <x-stat-card title="Expired Sessions" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
+                <x-stat-card title="Unique Accounts" :value="$statistics['unique_accounts']" icon="users" iconColor="icon-purple" />
+                <x-stat-card title="Unique Devices" :value="$statistics['unique_devices']" icon="desktop" iconColor="icon-orange" />
             </div>
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">

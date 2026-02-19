@@ -3,11 +3,12 @@
     'value' => null,
     'icon' => null,
     'iconColor' => 'icon-blue',
-]) <div class="card-stat">
+])
+<div class="card-stat">
     <div class="flex items-center">
         <div class="card-icon-container {{ $iconColor }}">
             @if ($icon)
-                <x-icon :name="$icon" class="w-6 h-6" />
+                <x-icon :name="$icon" class="w-7 h-7" />
             @else
                 {{ $slot }}
             @endif

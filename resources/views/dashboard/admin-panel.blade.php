@@ -7,15 +7,6 @@
     <div>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                    <svg class="w-6 h-6 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                        </path>
-                    </svg>
-                    System Overview
-                </h3>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
                     Last updated: {{ now()->format('M d, Y H:i') }}
                 </div>
@@ -23,79 +14,10 @@
 
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <!-- Total Accounts -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-blue-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Accounts</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $stats['total_accounts'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Active Licenses -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-green-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Licenses</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $stats['active_licenses'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Suspended Accounts -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-red-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Suspended Accounts</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $stats['suspended_accounts'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Expired Licenses -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-yellow-500/20 rounded-full">
-                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expired Licenses</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $stats['expired_licenses'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
+                <x-stat-card title="Total Accounts" :value="$stats['total_accounts'] ?? 0" icon="users" iconColor="icon-blue" />
+                <x-stat-card title="Active Licenses" :value="$stats['active_licenses'] ?? 0" icon="success" iconColor="icon-green" />
+                <x-stat-card title="Suspended Accounts" :value="$stats['suspended_accounts'] ?? 0" icon="warning" iconColor="icon-red" />
+                <x-stat-card title="Expired Licenses" :value="$stats['expired_licenses'] ?? 0" icon="error" iconColor="icon-yellow" />
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -346,49 +268,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- <!-- Table Sizes -->
-                <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                    <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-teal-600 dark:text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                        Table Sizes (Top 10)
-                    </h5>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Table Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Rows</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Size (MB)</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @foreach (array_slice($databaseStatus['tables'] ?? [], 0, 10) as $table)
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $table['name'] }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {{ number_format($table['rows']) }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {{ number_format($table['size_mb'], 2) }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                @if (empty($databaseStatus['tables'] ?? []))
-                                    <tr>
-                                        <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                            No tables found
-                                        </td>
-                                    </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div> --}}
             </div>
         </div>
     </div>

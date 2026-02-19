@@ -1,46 +1,58 @@
-/* Card Styles */ /* Extracted from stat-card, auth-card, info-card, form-card components */ /* Base card style */
+/* Card Styles */
 .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow;
-} /* Glass card (translucent with blur) */
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700;
+    @apply transition-all duration-200 hover:shadow-md;
+}
+
 .card-glass {
     @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50;
-} /* Stat card */
+}
+
 .card-stat {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow p-4;
-} /* Form card */
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5;
+    @apply transition-all duration-200 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600;
+}
+
 .card-form {
-    @apply bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg;
-} /* Info card */
+    @apply bg-white dark:bg-gray-800 overflow-hidden rounded-xl shadow-sm border border-gray-100 dark:border-gray-700;
+}
+
 .card-info {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow p-6;
-} /* Card header */
-.card-header {
-    @apply text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center;
-} /* Card body */
-.card-body {
-    @apply p-6;
-} /* Icon container for stat cards */
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6;
+}
+
 .card-icon-container {
-    @apply p-3 rounded-full;
-} /* Icon color variants */
+    @apply flex items-center justify-center w-12 h-12 rounded-lg;
+}
+
 .icon-blue {
     @apply bg-blue-500/20 text-blue-600 dark:text-blue-300;
 }
+
 .icon-green {
     @apply bg-green-500/20 text-green-600 dark:text-green-300;
 }
+
 .icon-red {
     @apply bg-red-500/20 text-red-600 dark:text-red-300;
 }
+
 .icon-yellow {
     @apply bg-yellow-500/20 text-yellow-600 dark:text-yellow-300;
 }
+
 .icon-purple {
     @apply bg-purple-500/20 text-purple-600 dark:text-purple-300;
 }
+
 .icon-orange {
     @apply bg-orange-500/20 text-orange-600 dark:text-orange-300;
 }
+
 .icon-indigo {
     @apply bg-indigo-500/20 text-indigo-600 dark:text-indigo-300;
+}
+
+.icon-gray {
+    @apply bg-gray-500/20 text-gray-600 dark:text-gray-300;
 }

@@ -27,13 +27,11 @@
 
                 <div class="flex gap-2">
                     @if ($isAdmin ?? false)
-                        <a href="{{ route('licenses.edit', $license) }}"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                        <a href="{{ route('licenses.edit', $license) }}" class="btn btn-indigo btn-sm">
                             Edit
                         </a>
                     @endif
-                    <a href="{{ route('licenses.index') }}"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                    <a href="{{ route('licenses.index') }}" class="btn btn-secondary btn-sm">
                         Back to List
                     </a>
                 </div>
@@ -48,10 +46,6 @@
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">License Key:</span>
                         <span class="font-medium">{{ $license->key }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">Type:</span>
-                        <span class="font-medium">N/A (deprecated)</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Privilege:</span>
@@ -157,60 +151,50 @@
                 <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">Admin Actions</h4>
                 <div class="flex flex-wrap gap-2">
                     @if ($license->canActivate())
-                        <form action="{{ route('licenses.activate', $license) }}" method="POST"
-                            onsubmit="return confirm('Are you sure you want to activate this license?')">
+                        <form action="{{ route('licenses.activate', $license) }}" method="POST">
                             @csrf
-                            <button type="submit"
-                                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                            <button type="submit" class="btn btn-green btn-sm">
                                 Activate
                             </button>
                         </form>
                     @endif
 
                     @if ($license->status->canSuspend())
-                        <form action="{{ route('licenses.suspend', $license) }}" method="POST"
-                            onsubmit="return confirm('Are you sure you want to suspend this license?')">
+                        <form action="{{ route('licenses.suspend', $license) }}" method="POST">
                             @csrf
                             <input type="hidden" name="suspension_reason" value="Administrative action">
-                            <button type="submit"
-                                class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition">
+                            <button type="submit" class="btn btn-yellow btn-sm">
                                 Suspend
                             </button>
                         </form>
                     @endif
 
                     @if ($license->status->canReactivate())
-                        <form action="{{ route('licenses.reactivate', $license) }}" method="POST"
-                            onsubmit="return confirm('Are you sure you want to reactivate this license?')">
+                        <form action="{{ route('licenses.reactivate', $license) }}" method="POST">
                             @csrf
-                            <button type="submit"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                            <button type="submit" class="btn btn-blue btn-sm">
                                 Reactivate
                             </button>
                         </form>
                     @endif
 
                     @if ($license->status->canUpgrade())
-                        <button onclick="showUpgradeModal()"
-                            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                        <button onclick="showUpgradeModal()" class="btn btn-purple btn-sm">
                             Upgrade
                         </button>
                     @endif
 
                     @if ($license->status->canRevoke())
-                        <form action="{{ route('licenses.revoke', $license) }}" method="POST"
-                            onsubmit="return confirm('Are you sure you want to revoke this license? This action cannot be undone.')">
+                        <form action="{{ route('licenses.revoke', $license) }}" method="POST">
                             @csrf
                             <input type="hidden" name="revocation_reason" value="Administrative action">
-                            <button type="submit"
-                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                            <button type="submit" class="btn btn-danger btn-sm">
                                 Revoke
                             </button>
                         </form>
                     @endif
 
-                    <button onclick="showExtendModal()"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                    <button onclick="showExtendModal()" class="btn btn-indigo btn-sm">
                         Extend Expiration
                     </button>
                 </div>
@@ -221,11 +205,9 @@
         @if (!($isAdmin ?? false) && $license->canActivate() && !$license->used_by)
             <div class="mb-6">
                 <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">Available Actions</h4>
-                <form action="{{ route('licenses.activate', $license) }}" method="POST"
-                    onsubmit="return confirm('Are you sure you want to activate this license for your account?')">
+                <form action="{{ route('licenses.activate', $license) }}" method="POST">
                     @csrf
-                    <button type="submit"
-                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                    <button type="submit" class="btn btn-green btn-sm">
                         Activate This License
                     </button>
                 </form>
@@ -234,9 +216,8 @@
 
         <!-- Upgrade Modal -->
         @if ($isAdmin ?? false)
-            <div id="upgradeModal"
-                class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
+            <x-modal name="upgrade-modal">
+                <div class="p-6">
                     <h3 class="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Upgrade License</h3>
                     <form action="{{ route('licenses.upgrade', $license) }}" method="POST">
                         @csrf
@@ -261,23 +242,21 @@
                                 class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"></textarea>
                         </div>
                         <div class="flex justify-end gap-2">
-                            <button type="button" onclick="hideUpgradeModal()"
-                                class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                            <button type="button" @click="show = false"
+                                class="btn btn-secondary">
                                 Cancel
                             </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                            <button type="submit" class="btn btn-purple">
                                 Upgrade License
                             </button>
                         </div>
                     </form>
                 </div>
-            </div>
+            </x-modal>
 
             <!-- Extend Modal -->
-            <div id="extendModal"
-                class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
+            <x-modal name="extend-modal">
+                <div class="p-6">
                     <h3 class="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Extend Expiration</h3>
                     <form action="{{ route('licenses.extend', $license) }}" method="POST">
                         @csrf
@@ -290,52 +269,26 @@
                                 class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
                         </div>
                         <div class="flex justify-end gap-2">
-                            <button type="button" onclick="hideExtendModal()"
-                                class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                            <button type="button" @click="show = false"
+                                class="btn btn-secondary">
                                 Cancel
                             </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                            <button type="submit" class="btn btn-indigo">
                                 Extend Expiration
                             </button>
                         </div>
                     </form>
                 </div>
-            </div>
+            </x-modal>
 
             <script>
                 function showUpgradeModal() {
-                    document.getElementById('upgradeModal').classList.remove('hidden');
-                    document.getElementById('upgradeModal').classList.add('flex');
-                }
-
-                function hideUpgradeModal() {
-                    document.getElementById('upgradeModal').classList.add('hidden');
-                    document.getElementById('upgradeModal').classList.remove('flex');
+                    window.dispatchEvent(new CustomEvent('open-modal', { detail: 'upgrade-modal' }));
                 }
 
                 function showExtendModal() {
-                    document.getElementById('extendModal').classList.remove('hidden');
-                    document.getElementById('extendModal').classList.add('flex');
+                    window.dispatchEvent(new CustomEvent('open-modal', { detail: 'extend-modal' }));
                 }
-
-                function hideExtendModal() {
-                    document.getElementById('extendModal').classList.add('hidden');
-                    document.getElementById('extendModal').classList.remove('flex');
-                }
-
-                // Close modals when clicking outside
-                document.getElementById('upgradeModal').addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        hideUpgradeModal();
-                    }
-                });
-
-                document.getElementById('extendModal').addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        hideExtendModal();
-                    }
-                });
             </script>
         @endif
     </div>

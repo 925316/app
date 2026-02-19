@@ -57,7 +57,7 @@
 </head>
 
 <body
-    class="font-sans antialiased bg-gradient-to-br from-cool-50 to-cool-100 dark:from-cool-900 dark:to-cool-800 min-h-screen transition-colors duration-300">
+    class="font-sans antialiased bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
     <div class="min-h-screen">
         @include('layouts.navigation')
 

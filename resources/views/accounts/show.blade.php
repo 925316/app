@@ -12,12 +12,10 @@
                 <p class="text-gray-500 dark:text-gray-400">Account ID: {{ $account->id }}</p>
             </div>
             <div class="flex space-x-3">
-                <a href="{{ route('accounts.edit', $account) }}"
-                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <a href="{{ route('accounts.edit', $account) }}" class="btn btn-indigo btn-sm">
                     Edit Account
                 </a>
-                <a href="{{ route('accounts.index') }}"
-                    class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <a href="{{ route('accounts.index') }}" class="btn btn-secondary btn-sm">
                     Back to Accounts
                 </a>
             </div>
@@ -36,29 +34,17 @@
                         <span class="text-sm text-gray-500 dark:text-gray-400">Email</span>
                         <p class="font-medium">{{ $account->email }}</p>
                         @if ($account->email_verified_at)
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 mt-1">
-                                Verified
-                            </span>
+                            <x-status-badge status="verified" text="Verified" />
                         @else
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 mt-1">
-                                Unverified
-                            </span>
+                            <x-status-badge status="unverified" text="Unverified" />
                         @endif
                     </div>
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Status</span>
                         @if ($account->isCurrentlySuspended)
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                                Suspended
-                            </span>
+                            <x-status-badge status="suspended" />
                         @else
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                Active
-                            </span>
+                            <x-status-badge status="active" />
                         @endif
                     </div>
                     <div>
@@ -127,14 +113,12 @@
                 @if ($account->isCurrentlySuspended)
                     <form action="{{ route('accounts.unsuspend', $account) }}" method="POST" class="inline">
                         @csrf
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="submit" class="btn btn-green btn-sm">
                             Unsuspend Account
                         </button>
                     </form>
                 @else
-                    <button onclick="openSuspendModal({{ $account->id }})"
-                        class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <button onclick="openSuspendModal({{ $account->id }})" class="btn btn-danger btn-sm">
                         Suspend Account
                     </button>
                 @endif
@@ -142,24 +126,20 @@
                 @if (!$account->email_verified_at)
                     <form action="{{ route('accounts.verify-email', $account) }}" method="POST" class="inline">
                         @csrf
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="submit" class="btn btn-blue btn-sm">
                             Verify Email
                         </button>
                     </form>
                 @endif
 
-                <button onclick="openResetHwidModal({{ $account->id }})"
-                    class="inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <button onclick="openResetHwidModal({{ $account->id }})" class="btn btn-yellow btn-sm">
                     Reset HWID
                 </button>
 
-                <form action="{{ route('accounts.destroy', $account) }}" method="POST" class="inline"
-                    onsubmit="return confirm('Are you sure you want to delete this account? This action cannot be undone.')">
+                <form action="{{ route('accounts.destroy', $account) }}" method="POST" class="inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit"
-                        class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <button type="submit" class="btn btn-danger btn-sm">
                         Delete Account
                     </button>
                 </form>
@@ -207,32 +187,10 @@
                                             {{ $license->key }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                                {{ $license->privilege?->getLabel() ?? 'Unknown' }}
-                                            </span>
+                                            <x-status-badge :status="strtolower($license->privilege?->getLabel() ?? 'default')" :text="$license->privilege?->getLabel() ?? 'Unknown'" />
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            @php
-                                                $statusColor = match ($license->status->value) {
-                                                    0
-                                                        => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-                                                    1
-                                                        => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-                                                    2 => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-                                                    3
-                                                        => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-                                                    4
-                                                        => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-                                                    5 => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-                                                    default
-                                                        => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-                                                };
-                                            @endphp
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColor }}">
-                                                {{ $license->status?->getLabel() ?? 'Unknown' }}
-                                            </span>
+                                            <x-status-badge :status="strtolower($license->status?->getLabel() ?? 'default')" :text="$license->status?->getLabel() ?? 'Unknown'" />
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                             {{ $license->expires_at->format('Y-m-d H:i:s') }}
@@ -301,20 +259,11 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if ($device->bound_at && !$device->unbound_at)
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                                    Bound
-                                                </span>
+                                                <x-status-badge status="active" text="Bound" />
                                             @elseif($device->unbound_at)
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                                                    Unbound
-                                                </span>
+                                                <x-status-badge status="suspended" text="Unbound" />
                                             @else
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                                    Not Bound
-                                                </span>
+                                                <x-status-badge status="default" text="Not Bound" />
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
@@ -358,7 +307,7 @@
                                         {{ $log->id }}</span>
                                 </div>
                                 <div class="text-sm text-gray-900 dark:text-white">
-                                    {{ json_encode($log->details, JSON_PRETTY_PRINT) }}
+                                    <pre class="bg-gray-100 dark:bg-gray-900 p-3 rounded text-xs overflow-x-auto">{{ json_encode($log->details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
                                 </div>
                             </div>
                         @endforeach
@@ -368,12 +317,10 @@
         </div>
 
         <!-- Suspend Modal -->
-        <div id="suspendModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden"
-            style="z-index: 9999;">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
-                <div class="mt-3">
-                    <div
-                        class="flex items-center justify-center mx-auto h-12 w-12 rounded-full bg-red-100 dark:bg-red-900">
+        <x-modal name="suspend-modal">
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
                         <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -381,49 +328,44 @@
                             </path>
                         </svg>
                     </div>
-                    <div class="mt-2 text-center">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Suspend Account</h3>
-                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Enter suspension details for this
-                            account.</p>
-                    </div>
-                    <form id="suspendForm" method="POST" class="mt-5">
-                        @csrf
-                        <div class="mb-4">
-                            <label for="suspend_reason"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reason</label>
-                            <input type="text" name="reason" id="suspend_reason"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                        </div>
-                        <div class="mb-4">
-                            <label for="suspend_duration"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Duration (days) -
-                                Optional</label>
-                            <input type="number" name="duration" id="suspend_duration" min="1"
-                                max="365"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                        </div>
-                        <div class="flex justify-end space-x-2">
-                            <button type="button" onclick="closeSuspendModal()"
-                                class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
-                                Suspend
-                            </button>
-                        </div>
-                    </form>
                 </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">Suspend Account</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">Enter suspension details for this
+                    account.</p>
+                <form id="suspendForm" method="POST" class="mt-5">
+                    @csrf
+                    <div class="mb-4">
+                        <label for="suspend_reason"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reason</label>
+                        <input type="text" name="reason" id="suspend_reason"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                    </div>
+                    <div class="mb-4">
+                        <label for="suspend_duration"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Duration (days) -
+                            Optional</label>
+                        <input type="number" name="duration" id="suspend_duration" min="1"
+                            max="365"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" @click="show = false"
+                            class="btn btn-secondary">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            Suspend
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
+        </x-modal>
 
         <!-- Reset HWID Modal -->
-        <div id="resetHwidModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden"
-            style="z-index: 9999;">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
-                <div class="mt-3">
-                    <div
-                        class="flex items-center justify-center mx-auto h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900">
+        <x-modal name="reset-hwid-modal">
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
                         <svg class="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -431,29 +373,26 @@
                             </path>
                         </svg>
                     </div>
-                    <div class="mt-2 text-center">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Reset HWID</h3>
-                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">This will unbind all devices and reset
-                            the HWID for this account.</p>
-                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">Warning: This action cannot be
-                            undone.</p>
-                    </div>
-                    <form id="resetHwidForm" method="POST" class="mt-5">
-                        @csrf
-                        <div class="flex justify-end space-x-2">
-                            <button type="button" onclick="closeResetHwidModal()"
-                                class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-yellow-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-                                Reset HWID
-                            </button>
-                        </div>
-                    </form>
                 </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">Reset HWID</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">This will unbind all devices and reset
+                    the HWID for this account.</p>
+                <p class="text-sm text-red-600 dark:text-red-400 text-center mb-4">Warning: This action cannot be
+                    undone.</p>
+                <form id="resetHwidForm" method="POST" class="mt-5">
+                    @csrf
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" @click="show = false"
+                            class="btn btn-secondary">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-yellow">
+                            Reset HWID
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
+        </x-modal>
 
         <script>
             let suspendAccountId = null;
@@ -461,46 +400,15 @@
 
             function openSuspendModal(accountId) {
                 suspendAccountId = accountId;
-                document.getElementById('suspendModal').classList.remove('hidden');
+                window.dispatchEvent(new CustomEvent('open-modal', { detail: 'suspend-modal' }));
                 document.getElementById('suspendForm').action = `/accounts/${accountId}/suspend`;
-            }
-
-            function closeSuspendModal() {
-                document.getElementById('suspendModal').classList.add('hidden');
-                suspendAccountId = null;
             }
 
             function openResetHwidModal(accountId) {
                 resetHwidAccountId = accountId;
-                document.getElementById('resetHwidModal').classList.remove('hidden');
+                window.dispatchEvent(new CustomEvent('open-modal', { detail: 'reset-hwid-modal' }));
                 document.getElementById('resetHwidForm').action = `/accounts/${accountId}/reset-hwid`;
             }
-
-            function closeResetHwidModal() {
-                document.getElementById('resetHwidModal').classList.add('hidden');
-                resetHwidAccountId = null;
-            }
-
-            // Close modals when clicking outside
-            document.getElementById('suspendModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeSuspendModal();
-                }
-            });
-
-            document.getElementById('resetHwidModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeResetHwidModal();
-                }
-            });
-
-            // Close modals on escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeSuspendModal();
-                    closeResetHwidModal();
-                }
-            });
         </script>
     </div>
 

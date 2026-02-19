@@ -13,7 +13,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-medium"> Account Management </h3>
                         <div class="flex gap-2"><a href="{{ route('accounts.create') }}"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                class="btn btn-blue btn-sm">
                                 Create
                                 Account </a></div>
                     </div> <!-- filters -->
@@ -122,12 +122,12 @@
                                     class="block text-sm font-medium text-transparent">Actions</label>
                                 <div class="flex gap-2">
                                     <button type="submit"
-                                        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-sm flex items-center justify-center gap-2">
+                                        class="flex-1 btn btn-blue btn-sm flex items-center justify-center gap-2">
                                         <x-icon name="search" class="w-4 h-4" />
                                         Filter
                                     </button>
                                     <a href="{{ route('accounts.index') }}"
-                                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-sm flex items-center justify-center gap-2">
+                                        class="btn btn-secondary btn-sm flex items-center justify-center gap-2">
                                         <x-icon name="reset" class="w-4 h-4" />
                                         Reset </a>
                                 </div>
