@@ -5,21 +5,27 @@
 
     <div class="py-7">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                <x-stat-card title="Total Sessions" :value="$statistics['total']" icon="server" iconColor="icon-blue" />
-                <x-stat-card title="Active Sessions" :value="$statistics['active']" icon="success" iconColor="icon-green" />
-                <x-stat-card title="Expired Sessions" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
-                <x-stat-card title="Unique Accounts" :value="$statistics['unique_accounts']" icon="users" iconColor="icon-purple" />
-                <x-stat-card title="Unique Devices" :value="$statistics['unique_devices']" icon="desktop" iconColor="icon-orange" />
-            </div>
+            @if ($isAdmin && $statistics)
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                    <x-stat-card title="Total Sessions" :value="$statistics['total']" icon="server" iconColor="icon-blue" />
+                    <x-stat-card title="Active Sessions" :value="$statistics['active']" icon="success" iconColor="icon-green" />
+                    <x-stat-card title="Expired Sessions" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
+                    <x-stat-card title="Unique Accounts" :value="$statistics['unique_accounts']" icon="users" iconColor="icon-purple" />
+                    <x-stat-card title="Unique Devices" :value="$statistics['unique_devices']" icon="desktop" iconColor="icon-orange" />
+                </div>
+            @endif
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-medium">
-                            Session Management
+                            @if ($isAdmin)
+                                Session Management
+                            @else
+                                My Sessions
+                            @endif
                         </h3>
                     </div>
 
@@ -38,7 +44,7 @@
                             </h4>
                             <div class="flex items-center space-x-2">
                                 <span class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $sessions->total() }} total sessions
+                                    {{ $sessions->total() }} {{ $isAdmin ? 'total' : 'my' }} sessions
                                 </span>
                             </div>
                         </div>
@@ -112,7 +118,7 @@
                                         <input type="text" name="search" id="search"
                                             value="{{ $currentFilters['search'] }}"
                                             class="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200"
-                                            placeholder="Search by account username, device name, or session token...">
+                                            placeholder="{{ $isAdmin ? 'Search by account username, device name, or session token...' : 'Search by device name or session token...' }}">
                                     </div>
                                 </div>
 
@@ -232,10 +238,12 @@
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Account
-                                    </th>
+                                    @if ($isAdmin)
+                                        <th scope="col"
+                                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Account
+                                        </th>
+                                    @endif
                                     <th scope="col"
                                         class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Device
@@ -269,28 +277,30 @@
                             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 @forelse($sessions as $session)
                                     <tr>
-                                        <td class="px-4 py-2 whitespace-nowrap">
-                                            @if ($session->account)
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-8 w-8">
-                                                        <div
-                                                            class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                                                            {{ $session->account->initials() }}
+                                        @if ($isAdmin)
+                                            <td class="px-4 py-2 whitespace-nowrap">
+                                                @if ($session->account)
+                                                    <div class="flex items-center">
+                                                        <div class="flex-shrink-0 h-8 w-8">
+                                                            <div
+                                                                class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                                                                {{ $session->account->initials() }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="ml-3">
+                                                            <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                                {{ $session->account->username }}
+                                                            </div>
+                                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                                {{ $session->account->email }}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="ml-3">
-                                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                            {{ $session->account->username }}
-                                                        </div>
-                                                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                            {{ $session->account->email }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <span class="text-sm text-gray-500 dark:text-gray-400">Unknown</span>
-                                            @endif
-                                        </td>
+                                                @else
+                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Unknown</span>
+                                                @endif
+                                            </td>
+                                        @endif
                                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                             @if ($session->device)
                                                 <div>
@@ -367,7 +377,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8"
+                                        <td colspan="{{ $isAdmin ? 8 : 7 }}"
                                             class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
                                             No sessions found.
                                         </td>

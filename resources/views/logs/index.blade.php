@@ -5,23 +5,27 @@
 
     <div class="py-7">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <x-stat-card title="Total Logs" :value="$statistics['total']" icon="document" iconColor="icon-blue" />
-                <x-stat-card title="Info" :value="$statistics['info']" icon="info" iconColor="icon-blue" />
-                <x-stat-card title="Warnings" :value="$statistics['warning']" icon="warning" iconColor="icon-yellow" />
-                <x-stat-card title="Errors" :value="$statistics['error']" icon="error" iconColor="icon-red" />
-            </div>
+            @if (Auth::user()->hasPrivilege(7))
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <x-stat-card title="Total Logs" :value="$statistics['total']" icon="document" iconColor="icon-blue" />
+                    <x-stat-card title="Info" :value="$statistics['info']" icon="info" iconColor="icon-blue" />
+                    <x-stat-card title="Warnings" :value="$statistics['warning']" icon="warning" iconColor="icon-yellow" />
+                    <x-stat-card title="Errors" :value="$statistics['error']" icon="error" iconColor="icon-red" />
+                </div>
+            @endif
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header with actions -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-medium">System Event Logs</h3>
-                        <button onclick="showClearModal()"
-                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
-                            Clear Old Logs
-                        </button>
+                        @if (Auth::user()->hasPrivilege(7))
+                            <button onclick="showClearModal()"
+                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                                Clear Old Logs
+                            </button>
+                        @endif
                     </div>
 
                     <!-- Filters -->

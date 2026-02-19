@@ -6,10 +6,16 @@
     <div class="py-7">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            @php
+                $showDevStats = Auth::user()->hasPrivilege(6) || Auth::user()->hasPrivilege(7);
+                $gridCols = $showDevStats ? 'lg:grid-cols-4' : 'lg:grid-cols-3';
+            @endphp
+            <div class="grid grid-cols-1 md:grid-cols-2 {{ $gridCols }} gap-4 mb-6">
                 <x-stat-card title="Total Releases" :value="$stats['total_releases'] ?? 0" icon="cube" iconColor="icon-blue" />
                 <x-stat-card title="Stable" :value="$stats['stable_releases'] ?? 0" icon="success" iconColor="icon-green" />
-                <x-stat-card title="Dev" :value="$stats['dev_releases'] ?? 0" icon="lightning" iconColor="icon-purple" />
+                @if ($showDevStats)
+                    <x-stat-card title="Dev" :value="$stats['dev_releases'] ?? 0" icon="lightning" iconColor="icon-purple" />
+                @endif
                 <x-stat-card title="Latest Stable" :value="$stats['latest_stable']?->version ?? 'None'" icon="cloud" iconColor="icon-yellow" />
             </div>
 
