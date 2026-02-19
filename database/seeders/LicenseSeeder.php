@@ -121,8 +121,12 @@ class LicenseSeeder extends Seeder
      */
     private function createBulkDemoData(): void
     {
-        // Get available accounts for assignment
-        $accounts = Account::pluck('id')->toArray();
+        // Get available accounts for assignment (skip test accounts)
+        $accounts = Account::where('email', 'not like', '%@test.com')->pluck('id')->toArray();
+
+        if (empty($accounts)) {
+            return;
+        }
 
         // Create unused licenses with different privileges
         License::factory()
@@ -193,10 +197,14 @@ class LicenseSeeder extends Seeder
 
     /**
      * Create licenses assigned to specific accounts.
+     * Only assigns to accounts created by factories (not test accounts with @test.com emails).
      */
     private function createLicensesForAccounts(): void
     {
-        $accounts = Account::take(10)->get();
+        // Skip accounts created by AccountSeeder (they have @test.com emails)
+        $accounts = Account::where('email', 'not like', '%@test.com')
+            ->take(10)
+            ->get();
 
         foreach ($accounts as $account) {
             // Create one active license per account

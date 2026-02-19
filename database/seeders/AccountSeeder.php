@@ -5,154 +5,284 @@ namespace Database\Seeders;
 use App\Enums\LicensePrivilege;
 use App\Enums\LicenseStatus;
 use App\Models\Account;
+use App\Models\AccountDevice;
 use App\Models\License;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AccountSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    private const PASSWORD = 'password';
+
     public function run(): void
     {
-        $this->createAdminAccount();
-        $this->createTestAccounts();
-        $this->createSampleAccounts();
-        $this->displayAccountStats();
+        $this->command->info('Creating test accounts...');
+
+        $this->createDefaultUser();
+        $this->createTierUsers();
+        $this->createStaffAndTester();
+        $this->createUpgradeUsers();
+        $this->createEdgeCaseUsers();
+
+        $this->displayStats();
     }
 
-    /**
-     * Create the main administrator account.
-     */
-    private function createAdminAccount(): void
+    private function createDefaultUser(): void
     {
-        // Create admin account
-        $admin = Account::create([
-            'username' => 'admin',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('admin123'),
-            'email_verified_at' => now()->subMonths(6),
+        $account = Account::create([
+            'username' => 'default',
+            'email' => 'default@test.com',
+            'password' => Hash::make(self::PASSWORD),
+            'email_verified_at' => now()->subDay(),
             'last_login_at' => now()->subHours(2),
-            'last_ip_address' => '10.0.0.1',
-            'two_factor_secret' => encrypt('secret'),
-            'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1', 'recovery-code-2'])),
-            'two_factor_confirmed_at' => now()->subMonths(3),
+            'last_ip_address' => '127.0.0.1',
         ]);
 
-        // Create administrator license
-        License::create([
-            'key' => 'ADMIN-ABCDE-ABCDE-ABCDE-ADMIN',
-            'privilege' => LicensePrivilege::STAFF->value,
-            'status' => LicenseStatus::ACTIVE->value,
-            'used_by' => $admin->id,
-            'expires_at' => now()->addYears(10),
-            'activated_at' => now(),
-            'created_from_ip' => '127.0.0.1',
-            'notes' => 'Administrator license with full privileges',
-        ]);
+        $this->createDevice($account, now()->subDays(30));
     }
 
-    /**
-     * Create specific test accounts for development.
-     */
-    private function createTestAccounts(): void
+    private function createTierUsers(): void
     {
-        // Test account with 2FA
-        $accountWith2FA = Account::create([
-            'username' => 'tester',
-            'email' => 'tester@example.com',
-            'password' => Hash::make('tester123'),
-            'email_verified_at' => now()->subMonths(6),
-            'last_login_at' => now()->subDays(1),
-            'last_ip_address' => '172.16.0.100',
-            'two_factor_secret' => encrypt('test-secret'),
-            'two_factor_recovery_codes' => encrypt(json_encode(['test-code-1', 'test-code-2'])),
-            'two_factor_confirmed_at' => now()->subMonths(3),
-        ]);
+        $tiers = [
+            ['privilege' => LicensePrivilege::STANDARD, 'username' => 'standard'],
+            ['privilege' => LicensePrivilege::UPGRADE, 'username' => 'upgrade'],
+            ['privilege' => LicensePrivilege::ULTIMATE, 'username' => 'ultimate'],
+        ];
 
-        License::create([
-            'key' => 'TESTD-ABCDE-ABCDE-ABCDE-TESTD',
-            'privilege' => LicensePrivilege::TESTER->value,
-            'status' => LicenseStatus::ACTIVE->value,
-            'used_by' => $accountWith2FA->id,
-            'expires_at' => now()->addYears(10),
-            'activated_at' => now(),
-            'created_from_ip' => '127.0.0.1',
-            'notes' => 'Tester license with full privileges',
-        ]);
+        foreach ($tiers as $tier) {
+            $account = $this->createAccountWithLicense(
+                username: $tier['username'],
+                email: "{$tier['username']}@test.com",
+                privilege: $tier['privilege']
+            );
+            $this->createDevice($account, now()->subDays(rand(10, 60)));
+        }
+    }
 
-        // Temporarily suspended account (multiple failed login attempts)
-        Account::create([
-            'username' => 'carlos_m',
-            'email' => 'carlos.m@example.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now()->subMonths(2),
-            'last_login_at' => now()->subDays(3),
-            'last_ip_address' => '203.0.113.45',
+    private function createStaffAndTester(): void
+    {
+        $staff = $this->createAccountWithLicense(
+            username: 'staff',
+            email: 'staff@test.com',
+            privilege: LicensePrivilege::STAFF
+        );
+        $this->createDevice($staff, now()->subDays(5));
+
+        $tester = $this->createAccountWithLicense(
+            username: 'tester',
+            email: 'tester@test.com',
+            privilege: LicensePrivilege::TESTER
+        );
+        $this->createDevice($tester, now()->subDays(3));
+    }
+
+    private function createUpgradeUsers(): void
+    {
+        $this->createUpgradeAccount(
+            'default_standard',
+            'default.standard@test.com',
+            LicensePrivilege::DEFAULT,
+            LicensePrivilege::STANDARD
+        );
+
+        $this->createUpgradeAccount(
+            'default_staff',
+            'default.staff@test.com',
+            LicensePrivilege::DEFAULT,
+            LicensePrivilege::STAFF
+        );
+
+        $this->createUpgradeAccount(
+            'standard_ultimate',
+            'standard.ultimate@test.com',
+            LicensePrivilege::STANDARD,
+            LicensePrivilege::ULTIMATE
+        );
+
+        $this->createUpgradeAccount(
+            'tester_staff',
+            'tester.staff@test.com',
+            LicensePrivilege::TESTER,
+            LicensePrivilege::STAFF
+        );
+    }
+
+    private function createEdgeCaseUsers(): void
+    {
+        $expired = $this->createAccountWithLicense(
+            username: 'expired',
+            email: 'expired@test.com',
+            privilege: LicensePrivilege::ULTIMATE,
+            status: LicenseStatus::EXPIRED,
+            activatedAt: now()->subMonths(6),
+            expiresAt: now()->subDays(7)
+        );
+        $this->createDevice($expired, now()->subMonths(5));
+
+        $suspended = Account::create([
+            'username' => 'suspended',
+            'email' => 'suspended@test.com',
+            'password' => Hash::make(self::PASSWORD),
+            'email_verified_at' => now()->subMonth(),
             'is_suspended' => true,
-            'suspension_reason' => 'Multiple Failed Login Attempts',
+            'suspension_reason' => 'Test suspension',
             'suspended_until' => now()->addDays(7),
         ]);
+        $this->createAccountWithLicense(
+            username: 'suspended',
+            email: 'suspended@test.com',
+            privilege: LicensePrivilege::STANDARD,
+            account: $suspended
+        );
 
-        // Permanently banned account (ToS violation)
-        Account::create([
-            'username' => 'tommy_g',
-            'email' => 'tommy.g@example.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now()->subMonths(4),
-            'last_login_at' => now()->subMonths(1),
-            'last_ip_address' => '198.51.100.22',
-            'is_suspended' => true,
-            'suspension_reason' => 'Violation of Terms of Service',
-            'suspended_until' => null,
+        $unverified = Account::create([
+            'username' => 'unverified',
+            'email' => 'unverified@test.com',
+            'password' => Hash::make(self::PASSWORD),
+            'email_verified_at' => null,
+        ]);
+        $this->createAccountWithLicense(
+            username: 'unverified',
+            email: 'unverified@test.com',
+            privilege: LicensePrivilege::DEFAULT,
+            account: $unverified
+        );
+    }
+
+    private function generateLicenseKey(string $prefix): string
+    {
+        $part1 = substr(strtoupper(Str::random(10)), 0, 5);
+        $part2 = substr(strtoupper(dechex(rand(0, 1048575))), 0, 5);
+        $part2 = str_pad($part2, 5, '0', STR_PAD_LEFT);
+        $chars3 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        $part3 = '';
+        for ($i = 0; $i < 5; $i++) {
+            $part3 .= $chars3[rand(0, strlen($chars3) - 1)];
+        }
+        $chars4 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ345678';
+        $part4 = '';
+        for ($i = 0; $i < 5; $i++) {
+            $part4 .= $chars4[rand(0, strlen($chars4) - 1)];
+        }
+        $part5 = substr(strtoupper(Str::random(10)), 0, 5);
+
+        return "{$part1}-{$part2}-{$part3}-{$part4}-{$part5}";
+    }
+
+    private function createAccountWithLicense(
+        string $username,
+        string $email,
+        LicensePrivilege $privilege,
+        ?Account $account = null,
+        LicenseStatus $status = LicenseStatus::ACTIVE,
+        ?\DateTime $activatedAt = null,
+        ?\DateTime $expiresAt = null
+    ): Account {
+        $account ??= Account::create([
+            'username' => $username,
+            'email' => $email,
+            'password' => Hash::make(self::PASSWORD),
+            'email_verified_at' => now()->subDays(rand(1, 30)),
+            'last_login_at' => now()->subHours(rand(1, 72)),
+            'last_ip_address' => '192.168.1.'.rand(1, 254),
+        ]);
+
+        License::create([
+            'key' => $this->generateLicenseKey($privilege->getLabel()),
+            'privilege' => $privilege->value,
+            'status' => $status->value,
+            'used_by' => $account->id,
+            'expires_at' => $expiresAt ?? now()->addYear(),
+            'activated_at' => $activatedAt ?? now()->subMonth(),
+            'notes' => "{$privilege->getLabel()} license",
+        ]);
+
+        return $account;
+    }
+
+    private function createUpgradeAccount(
+        string $username,
+        string $email,
+        LicensePrivilege $fromPrivilege,
+        LicensePrivilege $toPrivilege
+    ): Account {
+        $account = Account::create([
+            'username' => $username,
+            'email' => $email,
+            'password' => Hash::make(self::PASSWORD),
+            'email_verified_at' => now()->subMonth(),
+            'last_login_at' => now()->subDays(rand(1, 7)),
+            'last_ip_address' => '192.168.1.'.rand(1, 254),
+        ]);
+
+        License::create([
+            'key' => $this->generateLicenseKey($toPrivilege->getLabel()),
+            'privilege' => $toPrivilege->value,
+            'status' => LicenseStatus::ACTIVE->value,
+            'used_by' => $account->id,
+            'expires_at' => now()->addYear(),
+            'activated_at' => now()->subWeek(),
+            'notes' => "Current: {$toPrivilege->getLabel()}",
+        ]);
+
+        License::create([
+            'key' => $this->generateLicenseKey('OLD'),
+            'privilege' => $fromPrivilege->value,
+            'status' => LicenseStatus::UPGRADED->value,
+            'used_by' => $account->id,
+            'expires_at' => now()->subWeek(),
+            'activated_at' => now()->subMonth(),
+            'notes' => "Previous: {$fromPrivilege->getLabel()}",
+        ]);
+
+        $this->createDevice($account, now()->subDays(rand(10, 30)));
+
+        return $account;
+    }
+
+    private function createDevice(Account $account, \DateTime $firstSeen): void
+    {
+        $boundAt = (clone $firstSeen)->modify('+'.rand(1, 7).' days');
+
+        AccountDevice::create([
+            'account_id' => $account->id,
+            'hwid_hash' => hash('sha256', $account->username.Str::random(20)),
+            'ip_address' => '192.168.1.'.rand(1, 254),
+            'first_seen_at' => $firstSeen,
+            'last_seen_at' => now()->subHours(rand(1, 48)),
+            'bound_at' => $boundAt,
+            'unbound_at' => null,
         ]);
     }
 
-    /**
-     * Create sample accounts for testing.
-     */
-    private function createSampleAccounts(): void
+    private function displayStats(): void
     {
-        // Create verified accounts
-        Account::factory()->count(5)->verified()->create();
+        $this->command->newLine();
+        $this->command->info('======================================');
+        $this->command->info('  Test Accounts Created');
+        $this->command->info('  Default password: '.self::PASSWORD);
+        $this->command->info('======================================');
+        $this->command->newLine();
 
-        // Create accounts with 2FA enabled
-        Account::factory()->count(3)->withTwoFactor()->verified()->create();
-
-        // Create recently active accounts
-        Account::factory()->count(4)->recentlyActive()->verified()->create();
-
-        // Create accounts with HWID resets
-        Account::factory()->count(3)->withHwidResets()->create();
-
-        // Create unverified accounts
-        Account::factory()->count(3)->unverified()->create();
-
-        // Create additional sample accounts
-        Account::factory()->count(20)->create();
-    }
-
-    /**
-     * Display account statistics.
-     */
-    private function displayAccountStats(): void
-    {
-        $this->command->info(str_repeat('-', 50));
-        $this->command->info('ACCOUNT STATISTICS');
-        $this->command->info(str_repeat('-', 50));
-
-        $total = Account::count();
-        $verified = Account::whereNotNull('email_verified_at')->count();
-        $suspended = Account::where('is_suspended', true)->count();
-        $with2fa = Account::whereNotNull('two_factor_secret')->count();
-        $withHwidResets = Account::where('hwid_reset_count', '>', 0)->count();
-
-        $this->command->info("Total accounts: {$total}");
-        $this->command->info("Verified accounts: {$verified}");
-        $this->command->info("Suspended accounts: {$suspended}");
-        $this->command->info("Accounts with 2FA: {$with2fa}");
-        $this->command->info("Accounts with HWID resets: {$withHwidResets}");
-        $this->command->info(str_repeat('-', 50));
+        $this->command->info('Accounts:');
+        $this->command->info('  default@test.com          - DEFAULT (no license)');
+        $this->command->info('  standard@test.com         - STANDARD');
+        $this->command->info('  upgrade@test.com          - UPGRADE');
+        $this->command->info('  ultimate@test.com         - ULTIMATE');
+        $this->command->info('  staff@test.com            - STAFF');
+        $this->command->info('  tester@test.com           - TESTER');
+        $this->command->newLine();
+        $this->command->info('Upgrade scenarios:');
+        $this->command->info('  default.standard@test.com - DEFAULT -> STANDARD');
+        $this->command->info('  default.staff@test.com    - DEFAULT -> STAFF');
+        $this->command->info('  standard.ultimate@test.com - STANDARD -> ULTIMATE');
+        $this->command->info('  tester.staff@test.com     - TESTER -> STAFF');
+        $this->command->newLine();
+        $this->command->info('Edge cases:');
+        $this->command->info('  expired@test.com      - Expired license');
+        $this->command->info('  suspended@test.com    - Suspended account');
+        $this->command->info('  unverified@test.com   - Unverified email');
+        $this->command->newLine();
     }
 }
