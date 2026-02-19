@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EventLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LogController extends Controller
 {
@@ -12,6 +13,10 @@ class LogController extends Controller
      */
     public function index(Request $request)
     {
+        if (! Auth::user()->hasPrivilege(7)) {
+            abort(403, 'Unauthorized access to system logs.');
+        }
+
         $query = EventLog::with(['account', 'license'])
             ->orderBy('created_at', 'desc');
 
@@ -84,6 +89,10 @@ class LogController extends Controller
      */
     public function show(EventLog $log)
     {
+        if (! Auth::user()->hasPrivilege(7)) {
+            abort(403, 'Unauthorized access to system logs.');
+        }
+
         return view('logs.show', [
             'log' => $log,
         ]);
@@ -94,6 +103,10 @@ class LogController extends Controller
      */
     public function clear(Request $request)
     {
+        if (! Auth::user()->hasPrivilege(7)) {
+            abort(403, 'Unauthorized access to system logs.');
+        }
+
         $request->validate([
             'days' => 'required|integer|min:1|max:365',
         ]);
