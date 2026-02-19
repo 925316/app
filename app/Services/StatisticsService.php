@@ -221,6 +221,7 @@ class StatisticsService
     {
         return [
             'total_accounts' => Account::count(),
+            'total_licenses' => License::count(),
             'active_licenses' => License::active()->count(),
             'suspended_accounts' => Account::suspended()->count(),
             'expired_licenses' => License::expired()->count(),

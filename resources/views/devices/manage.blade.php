@@ -20,7 +20,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm mb-3">
                     <div>
                         <div class="text-gray-600 dark:text-gray-300 text-xs">HWID Hash:</div>
-                        <div class="font-medium text-green-700 dark:text-green-300 break-all text-xs">
+                        <div class="font-medium text-green-600 dark:text-green-300 break-all text-xs">
                             {{ $currentDevice->hwid_hash }}
                         </div>
                     </div>
@@ -51,7 +51,7 @@
         @else
             <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/50 rounded-lg">
                 <h4 class="font-medium mb-1 text-yellow-800 dark:text-yellow-200 text-sm">No Device Bound</h4>
-                <p class="text-yellow-700 dark:text-yellow-300 text-xs">You haven't bound any device to your account
+                <p class="text-yellow-600 dark:text-yellow-300 text-xs">You haven't bound any device to your account
                     yet.</p>
             </div>
         @endif

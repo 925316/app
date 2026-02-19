@@ -79,7 +79,7 @@
                                 <span class="text-gray-600 dark:text-gray-300">Active License Ratio:</span>
                                 <span class="font-semibold text-gray-900 dark:text-white">
                                     @php
-                                        $totalLicenses = License::count();
+                                        $totalLicenses = $stats['total_licenses'] ?? 0;
                                         $activeRatio =
                                             $totalLicenses > 0
                                                 ? round((($stats['active_licenses'] ?? 0) / $totalLicenses) * 100)
@@ -114,7 +114,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span class="text-red-700 dark:text-red-300">{{ $databaseStatus['error'] }}</span>
+                            <span class="text-red-600 dark:text-red-300">{{ $databaseStatus['error'] }}</span>
                         </div>
                     </div>
                 @endif
@@ -183,17 +183,17 @@
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">Threads Connected:</span>
                                     <span
-                                        class="font-semibold text-blue-700 dark:text-blue-300">{{ $databaseStatus['connections']['threads_connected'] ?? 0 }}</span>
+                                        class="font-semibold text-blue-600 dark:text-blue-300">{{ $databaseStatus['connections']['threads_connected'] ?? 0 }}</span>
                                 </div>
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">Threads Running:</span>
                                     <span
-                                        class="font-semibold text-green-700 dark:text-green-300">{{ $databaseStatus['connections']['threads_running'] ?? 0 }}</span>
+                                        class="font-semibold text-green-600 dark:text-green-300">{{ $databaseStatus['connections']['threads_running'] ?? 0 }}</span>
                                 </div>
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">Usage:</span>
                                     <span
-                                        class="font-semibold text-yellow-700 dark:text-yellow-300">{{ $databaseStatus['connections']['usage_percent'] ?? 0 }}%</span>
+                                        class="font-semibold text-yellow-600 dark:text-yellow-300">{{ $databaseStatus['connections']['usage_percent'] ?? 0 }}%</span>
                                 </div>
                                 <div class="mt-4">
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -221,12 +221,12 @@
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">Pending Jobs:</span>
                                     <span
-                                        class="font-semibold text-blue-700 dark:text-blue-300">{{ $databaseStatus['queues']['pending_jobs'] ?? 0 }}</span>
+                                        class="font-semibold text-blue-600 dark:text-blue-300">{{ $databaseStatus['queues']['pending_jobs'] ?? 0 }}</span>
                                 </div>
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">Failed Jobs:</span>
                                     <span
-                                        class="font-semibold text-red-700 dark:text-red-300">{{ $databaseStatus['queues']['failed_jobs'] ?? 0 }}</span>
+                                        class="font-semibold text-red-600 dark:text-red-300">{{ $databaseStatus['queues']['failed_jobs'] ?? 0 }}</span>
                                 </div>
                             </div>
                         </div>
@@ -253,7 +253,7 @@
                                     <span class="text-gray-600 dark:text-gray-300">Cache
                                         ({{ $databaseStatus['cache']['type'] ?? 'Unknown' }}):</span>
                                     <span
-                                        class="font-semibold {{ $databaseStatus['cache']['connected'] ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300' }}">
+                                        class="font-semibold {{ $databaseStatus['cache']['connected'] ? 'text-green-600 dark:text-green-300' : 'text-red-600 dark:text-red-300' }}">
                                         {{ $databaseStatus['cache']['connected'] ? 'Connected' : 'Disconnected' }}
                                     </span>
                                 </div>
