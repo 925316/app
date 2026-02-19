@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\LicensePrivilege;
 use App\Models\Account;
 
 test('profile page is displayed', function () {
@@ -12,8 +13,37 @@ test('profile page is displayed', function () {
     $response->assertOk();
 });
 
-test('profile information can be updated', function () {
+test('non-admin cannot update username and email', function () {
     $user = Account::factory()->create();
+    $originalUsername = $user->username;
+    $originalEmail = $user->email;
+
+    $response = $this
+        ->actingAs($user)
+        ->patch('/profile', [
+            'username' => 'Test Account',
+            'email' => 'test@example.com',
+        ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/profile');
+
+    $user->refresh();
+
+    // Non-admin should not be able to update username and email
+    $this->assertSame($originalUsername, $user->username);
+    $this->assertSame($originalEmail, $user->email);
+});
+
+test('admin can update username and email', function () {
+    $user = Account::factory()->create();
+    $license = $user->licenses()->create([
+        'key' => 'TEST-ADMIN-KEY-12345',
+        'privilege' => LicensePrivilege::STAFF,
+        'status' => \App\Enums\LicenseStatus::ACTIVE,
+        'expires_at' => now()->addYear(),
+    ]);
 
     $response = $this
         ->actingAs($user)
@@ -33,7 +63,7 @@ test('profile information can be updated', function () {
     $this->assertNull($user->email_verified_at);
 });
 
-test('email verification status is unchanged when the email address is unchanged', function () {
+test('email verification status is unchanged when the email address is unchanged for non-admin', function () {
     $user = Account::factory()->verified()->create();
 
     $response = $this
@@ -47,6 +77,7 @@ test('email verification status is unchanged when the email address is unchanged
         ->assertSessionHasNoErrors()
         ->assertRedirect('/profile');
 
+    // Email unchanged, so verification status should remain
     $this->assertNotNull($user->refresh()->email_verified_at);
 });
 

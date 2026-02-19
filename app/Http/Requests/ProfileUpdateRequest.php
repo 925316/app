@@ -9,12 +9,27 @@ use Illuminate\Validation\Rule;
 class ProfileUpdateRequest extends FormRequest
 {
     /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
+        $isAdmin = $this->user()->hasPrivilege(7);
+
+        // Only admin can update username and email
+        if (! $isAdmin) {
+            return [];
+        }
+
         return [
             'username' => ['required', 'string', 'max:255'],
             'email' => [

@@ -16,8 +16,12 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        $isAdmin = $user->hasPrivilege(7); // Admin privilege level
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'isAdmin' => $isAdmin,
         ]);
     }
 
@@ -26,13 +30,22 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $isAdmin = $user->hasPrivilege(7);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Only admin can update username and email
+        $validated = $request->validated();
+        if (! $isAdmin) {
+            unset($validated['username'], $validated['email']);
         }
 
-        $request->user()->save();
+        $user->fill($validated);
+
+        if (isset($validated['email']) && $user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
