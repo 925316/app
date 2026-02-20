@@ -46,3 +46,33 @@
     @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700;
     @apply overflow-hidden;
 }
+
+/* Striped table variant */
+.data-table.striped tbody tr:nth-child(even) {
+    @apply bg-gray-50/50 dark:bg-gray-700/30;
+}
+
+/* Compact variant */
+.data-table.compact .table-header-cell {
+    @apply px-3 py-2;
+}
+
+.data-table.compact .table-cell,
+.data-table.compact .table-cell-primary,
+.data-table.compact .table-cell-secondary {
+    @apply px-3 py-2 text-xs;
+}
+
+/* Hover effect */
+.data-table.with-hover tbody tr {
+    @apply hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150;
+}
+
+/* Sortable header styling */
+.data-table th[data-column] .sort-icon {
+    @apply opacity-50 transition-opacity;
+}
+
+.data-table th[data-column]:hover .sort-icon {
+    @apply opacity-100;
+}

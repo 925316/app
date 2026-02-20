@@ -11,7 +11,6 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100"> <!-- Header with actions -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="text-lg font-medium"> Account Management </h3>
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white"> Account Management </h3>
                         <div class="flex gap-2"><a href="{{ route('accounts.create') }}"
                                 class="btn btn-blue btn-sm">
@@ -305,7 +304,9 @@
                                 </tr>
                             @endif
                     </x-data-table> <!-- Pagination -->
-                    <div class="mt-4"> {{ $accounts->links() }} </div>
+                    <div class="mt-4">
+                        <x-pagination :paginator="$accounts" />
+                    </div>
                 </div>
             </div>
         </div>

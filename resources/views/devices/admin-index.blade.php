@@ -135,149 +135,117 @@
                     </div>
 
                     <!-- Device Table -->
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Account
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        HWID Hash
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        IP / Country
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        First / Last Seen
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Account Status
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        HWID Resets
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($devices as $device)
-                                    <tr>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <div class="font-medium text-gray-900 dark:text-gray-100">
-                                                {{ $device->account->username }}</div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ $device->account->email }}</div>
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            @if ($device->hwid_hash)
-                                                <span title="{{ $device->hwid_hash }}" class="cursor-help">
-                                                    {{ substr($device->hwid_hash, 0, 8) }}...
-                                                </span>
-                                            @else
-                                                N/A
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <div class="text-gray-900 dark:text-gray-100">{{ $device->ip_address }}
-                                            </div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ $device->country_code ?? 'Unknown' }}</div>
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <div class="text-gray-900 dark:text-gray-100">
-                                                L: {{ $device->last_seen_at->format('Y-m-d H:i') }}</div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                F: {{ $device->first_seen_at->format('Y-m-d H:i') }}</div>
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            @if ($device->isBound())
-                                                <span
-                                                    class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
-                                                    Currently Bound
-                                                </span>
-                                            @else
-                                                <span
-                                                    class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium">
-                                                    Historical
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            @if ($device->account->isSuspended())
-                                                <span
-                                                    class="px-2 py-0.5 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded text-xs font-medium">
-                                                    Suspended
-                                                </span>
-                                            @else
-                                                <span
-                                                    class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
-                                                    Active
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {{ $device->account->hwid_reset_count }}
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <div class="flex gap-2">
-                                                @if ($device->isBound())
-                                                    <form method="POST"
-                                                        action="{{ route('devices.unbind-admin', $device) }}"
-                                                        class="inline"
-                                                        onsubmit="return confirm('Unbind device from {{ $device->account->username }}?');">
-                                                        @csrf
-                                                        <button type="submit"
-                                                            class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition">
-                                                            Unbind
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                                @if ($device->account->canResetHwid())
-                                                    <form method="POST"
-                                                        action="{{ route('devices.reset-hwid-admin', $device->account) }}"
-                                                        class="inline"
-                                                        onsubmit="return confirm('Reset HWID for {{ $device->account->username }}? This will unbind all devices.');">
-                                                        @csrf
-                                                        <button type="submit"
-                                                            class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition">
-                                                            Reset HWID
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8"
-                                            class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                            No devices found matching your filters.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+
+                    <x-table :headers="[
+                        'Account',
+                        'HWID Hash',
+                        'IP / Country',
+                        'First / Last Seen',
+                        'Status',
+                        'Account Status',
+                        'HWID Resets',
+                        'Actions',
+                    ]" :emptyColspan="5">
+                        @forelse($devices as $device)
+                            <tr>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <div class="font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $device->account->username }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $device->account->email }}</div>
+                                </td>
+                                <td
+                                    class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    @if ($device->hwid_hash)
+                                        <span title="{{ $device->hwid_hash }}" class="cursor-help">
+                                            {{ substr($device->hwid_hash, 0, 8) }}...
+                                        </span>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <div class="text-gray-900 dark:text-gray-100">{{ $device->ip_address }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $device->country_code ?? 'Unknown' }}</div>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <div class="text-gray-900 dark:text-gray-100">
+                                        L: {{ $device->last_seen_at->format('Y-m-d H:i') }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        F: {{ $device->first_seen_at->format('Y-m-d H:i') }}</div>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    @if ($device->isBound())
+                                        <span
+                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
+                                            Currently Bound
+                                        </span>
+                                    @else
+                                        <span
+                                            class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium">
+                                            Historical
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    @if ($device->account->isSuspended())
+                                        <span
+                                            class="px-2 py-0.5 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded text-xs font-medium">
+                                            Suspended
+                                        </span>
+                                    @else
+                                        <span
+                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
+                                            Active
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    {{ $device->account->hwid_reset_count }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <div class="flex gap-2">
+                                        @if ($device->isBound())
+                                            <form method="POST"
+                                                action="{{ route('devices.unbind-admin', $device) }}" class="inline"
+                                                onsubmit="return confirm('Unbind device from {{ $device->account->username }}?');">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition">
+                                                    Unbind
+                                                </button>
+                                            </form>
+                                        @endif
+                                        @if ($device->account->canResetHwid())
+                                            <form method="POST"
+                                                action="{{ route('devices.reset-hwid-admin', $device->account) }}"
+                                                class="inline"
+                                                onsubmit="return confirm('Reset HWID for {{ $device->account->username }}? This will unbind all devices.');">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition">
+                                                    Reset HWID
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8"
+                                    class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
+                                    No devices found matching your filters.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </x-table>
 
                     <!-- Pagination -->
                     <div class="mt-4">
-                        {{ $devices->links() }}
+                        <x-pagination :paginator="$devices" />
                     </div>
                 </div>
             </div>

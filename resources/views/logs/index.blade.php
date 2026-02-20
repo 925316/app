@@ -107,86 +107,49 @@
                     </div>
 
                     <!-- Logs table -->
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Timestamp
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Type
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Level
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Account
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        IP Address
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($logs as $log)
-                                    <tr>
-                                        <td
-                                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $log->created_at->format('Y-m-d H:i') }}
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <span
-                                                class="px-2 py-0.5 rounded text-xs font-medium
-                                                @if ($log->event_level == 0) bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
-                                                @elseif($log->event_level == 1) bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
-                                                @else bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 @endif">
-                                                {{ $log->event_type }}
-                                            </span>
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $eventLevels[$log->event_level] ?? 'Unknown' }}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $log->account?->username ?? 'System' }}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $log->ip_address }}
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('logs.show', $log) }}"
-                                                class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                                View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6"
-                                            class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                            No logs found.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    <x-table :headers="['Time', 'Type', 'Level', 'Account', 'IP', 'Actions']" :emptyColspan="6">
+                        @forelse($logs as $log)
+                            <tr>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    {{ $log->created_at->format('Y-m-d H:i') }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-0.5 rounded text-xs font-medium
+                                        @if ($log->event_level == 0) bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
+                                        @elseif($log->event_level == 1) bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
+                                        @else bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 @endif">
+                                        {{ $log->event_type }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    {{ $eventLevels[$log->event_level] ?? 'Unknown' }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    {{ $log->account?->username ?? 'System' }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    {{ $log->ip_address }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="{{ route('logs.show', $log) }}"
+                                        class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
+                                    No logs found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </x-table>
                     </div>
 
                     <!-- Pagination -->
                     <div class="mt-4">
-                        {{ $logs->links() }}
+                        <x-pagination :paginator="$logs" />
                     </div>
 
                     <!-- Clear Logs Modal -->

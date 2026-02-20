@@ -67,95 +67,63 @@
                     @endif
 
                     <!-- Device Table -->
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        HWID Hash
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        IP / Country
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        First / Last Seen
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th scope="col"
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($devices as $device)
-                                    <tr>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <div class="font-medium text-gray-900 dark:text-gray-100">
-                                                @if ($device->hwid_hash)
-                                                    <span title="{{ $device->hwid_hash }}" class="cursor-help">
-                                                        {{ substr($device->hwid_hash, 0, 8) }}...
-                                                    </span>
-                                                @else
-                                                    N/A
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <span class="text-gray-900 dark:text-gray-100">{{ $device->ip_address }}</span>
-                                            <span class="text-xs text-gray-500 dark:text-gray-400">({{ $device->country_code ?? 'N/A' }})</span>
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <span class="text-gray-900 dark:text-gray-100" title="First: {{ $device->first_seen_at->format('Y-m-d H:i:s') }} | Last: {{ $device->last_seen_at->format('Y-m-d H:i:s') }}">
-                                                {{ $device->first_seen_at->format('m-d') }} / {{ $device->last_seen_at->format('m-d') }}
+                    <x-table :headers="['HWID', 'IP / Country', 'First / Last', 'Status', 'Actions']" :emptyColspan="5">
+                        @forelse($devices as $device)
+                            <tr>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <div class="font-medium text-gray-900 dark:text-gray-100">
+                                        @if ($device->hwid_hash)
+                                            <span title="{{ $device->hwid_hash }}" class="cursor-help">
+                                                {{ substr($device->hwid_hash, 0, 8) }}...
                                             </span>
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            @if ($device->bound_at && !$device->unbound_at)
-                                                <span
-                                                    class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
-                                                    Currently Bound
-                                                </span>
-                                            @else
-                                                <span
-                                                    class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium">
-                                                    Historical
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                            <div class="flex gap-2">
-                                                @if ($device->isBound())
-                                                    <form method="POST"
-                                                        action="{{ route('devices.unbind', $device) }}" class="inline"
-                                                        onsubmit="return confirm('Unbind this device?');">
-                                                        @csrf
-                                                        <button type="submit"
-                                                            class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition">
-                                                            Unbind
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5"
-                                            class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                            No device history found.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                        @else
+                                            N/A
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <span class="text-gray-900 dark:text-gray-100">{{ $device->ip_address }}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">({{ $device->country_code ?? 'N/A' }})</span>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <span class="text-gray-900 dark:text-gray-100" title="First: {{ $device->first_seen_at->format('Y-m-d H:i:s') }} | Last: {{ $device->last_seen_at->format('Y-m-d H:i:s') }}">
+                                        {{ $device->first_seen_at->format('m-d') }} / {{ $device->last_seen_at->format('m-d') }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    @if ($device->bound_at && !$device->unbound_at)
+                                        <span class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
+                                            Currently Bound
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium">
+                                            Historical
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <div class="flex gap-2">
+                                        @if ($device->isBound())
+                                            <form method="POST" action="{{ route('devices.unbind', $device) }}" class="inline"
+                                                onsubmit="return confirm('Unbind this device?');">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition">
+                                                    Unbind
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
+                                    No device history found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </x-table>
 
                     <!-- Pagination -->
                     <div class="mt-4">
