@@ -15,7 +15,7 @@
                         <x-input-label for="username" :value="__('Username')"
                             class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" />
                         <x-input-with-icon id="username" name="username" type="text" :value="old('username')" required
-                            autofocus autocomplete="username" placeholder="your_username" icon="user" />
+                            autofocus autocomplete="username" placeholder="Username" icon="user" />
                         <x-input-error :messages="$errors->get('username')" class="mt-2" />
                     </div>
 
@@ -24,7 +24,7 @@
                         <x-input-label for="email" :value="__('Email Address')"
                             class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" />
                         <x-input-with-icon id="email" name="email" type="email" :value="old('email')" required
-                            autocomplete="username" placeholder="your@email.com" icon="mail" />
+                            autocomplete="username" placeholder="Email" icon="mail" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
@@ -33,7 +33,7 @@
                         <x-input-label for="password" :value="__('Password')"
                             class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" />
                         <x-input-with-icon id="password" name="password" type="password" required
-                            autocomplete="new-password" placeholder="••••••••" icon="lock" />
+                            autocomplete="new-password" placeholder="Password" icon="lock" />
                         <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
 
@@ -42,7 +42,7 @@
                         <x-input-label for="password_confirmation" :value="__('Confirm Password')"
                             class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" />
                         <x-input-with-icon id="password_confirmation" name="password_confirmation" type="password"
-                            required autocomplete="new-password" placeholder="••••••••" icon="lock" />
+                            required autocomplete="new-password" placeholder="Confirm password" icon="lock" />
                         <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                     </div>
 

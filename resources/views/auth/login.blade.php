@@ -14,7 +14,7 @@
                         <x-input-label for="email" :value="__('Email Address')"
                             class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" />
                         <x-input-with-icon id="email" name="email" type="email" :value="old('email')" required
-                            autofocus autocomplete="username" placeholder="your@email.com" icon="user" />
+                            autofocus autocomplete="username" placeholder="Email" icon="user" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
@@ -23,7 +23,7 @@
                         <x-input-label for="password" :value="__('Password')"
                             class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" />
                         <x-input-with-icon id="password" name="password" type="password" required
-                            autocomplete="current-password" placeholder="•••••••••" icon="lock" />
+                            autocomplete="current-password" placeholder="Password" icon="lock" />
                         <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
 
