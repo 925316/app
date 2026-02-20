@@ -7,7 +7,7 @@
         class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
         <!-- Header -->
         <div class="mb-6">
-            <h3 class="text-lg font-medium mb-2">Device Binding Management</h3>
+            <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">Device Binding Management</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm">
                 Manage the devices bound to your account. You can only bind one device at a time.
             </p>
@@ -26,15 +26,15 @@
                     </div>
                     <div>
                         <div class="text-gray-600 dark:text-gray-300 text-xs">IP Address:</div>
-                        <div class="font-medium text-xs">{{ $currentDevice->ip_address }}</div>
+                        <div class="font-medium text-xs text-gray-900 dark:text-white">{{ $currentDevice->ip_address }}</div>
                     </div>
                     <div>
                         <div class="text-gray-600 dark:text-gray-300 text-xs">Country:</div>
-                        <div class="font-medium text-xs">{{ $currentDevice->country_code ?? 'Unknown' }}</div>
+                        <div class="font-medium text-xs text-gray-900 dark:text-white">{{ $currentDevice->country_code ?? 'Unknown' }}</div>
                     </div>
                     <div>
                         <div class="text-gray-600 dark:text-gray-300 text-xs">Bound At:</div>
-                        <div class="font-medium text-xs">{{ $currentDevice->bound_at->format('Y-m-d H:i') }}</div>
+                        <div class="font-medium text-xs text-gray-900 dark:text-white">{{ $currentDevice->bound_at->format('Y-m-d H:i') }}</div>
                     </div>
                 </div>
 
@@ -118,17 +118,17 @@
                 <div class="space-y-2 text-xs">
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">HWID Reset Count:</span>
-                        <span class="font-medium">{{ $hwidResetCount }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $hwidResetCount }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Last HWID Reset:</span>
-                        <span class="font-medium">
+                        <span class="font-medium text-gray-900 dark:text-white">
                             {{ $hwidLastReset ? $hwidLastReset->format('Y-m-d H:i') : 'Never' }}
                         </span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Can Reset HWID:</span>
-                        <span class="font-medium">
+                        <span class="font-medium text-gray-900 dark:text-white">
                             @if ($canResetHwid)
                                 <span class="text-green-600 dark:text-green-400">Yes</span>
                             @else

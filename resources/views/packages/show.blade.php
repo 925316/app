@@ -13,7 +13,7 @@
                     <div class="mb-6">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
-                                <h3 class="text-lg font-medium">Package: {{ $release->version }}</h3>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Package: {{ $release->version }}</h3>
                                 <div class="mt-2 flex items-center gap-4">
                                     <span
                                         class="px-3 py-1 rounded-full text-sm font-medium
@@ -45,16 +45,16 @@
                             <div class="space-y-2 text-sm">
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Version:</span>
-                                    <span class="font-medium">{{ $release->version }}</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ $release->version }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Release Channel:</span>
-                                    <span class="font-medium">{{ ucfirst($release->release_channel) }}</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ ucfirst($release->release_channel) }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Released At:</span>
                                     <span
-                                        class="font-medium">{{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}</span>
+                                        class="font-medium text-gray-900 dark:text-white">{{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : 'Unknown' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -64,15 +64,15 @@
                             <div class="space-y-2 text-sm">
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Download URL:</span>
-                                    <span class="font-medium break-all">{{ $release->download_url }}</span>
+                                    <span class="font-medium break-all text-gray-900 dark:text-white">{{ $release->download_url }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">File Size:</span>
-                                    <span class="font-medium">Remote file (size not available)</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">Remote file (size not available)</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Checksum Verified:</span>
-                                    <span class="font-medium">
+                                    <span class="font-medium text-gray-900 dark:text-white">
                                         <span class="text-gray-600 dark:text-gray-400">Not applicable for remote
                                             files</span>
                                     </span>
@@ -80,7 +80,7 @@
                                 @if ($release->virus_detection_url)
                                     <div class="flex justify-between">
                                         <span class="text-gray-600 dark:text-gray-300">Virus Detection:</span>
-                                        <span class="font-medium">
+                                        <span class="font-medium text-gray-900 dark:text-white">
                                             <span class="text-gray-600 dark:text-gray-400">Available</span>
                                         </span>
                                     </div>

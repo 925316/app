@@ -33,7 +33,7 @@
                             d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                 </div>
-                <h1 class="text-4xl lg:text-6xl font-bold tracking-tight mb-4">
+                <h1 class="text-4xl lg:text-6xl font-bold tracking-tight mb-4 text-gray-900 dark:text-white">
                     Welcome to
                     <span class="bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
                         {{ config('app.name') }}
@@ -97,7 +97,7 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2">License Management</h3>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">License Management</h3>
                     <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
                         Easily create, manage, and track software licenses with detailed analytics and expiration
                         monitoring.
@@ -113,7 +113,7 @@
                                 d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2">Device Tracking</h3>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Device Tracking</h3>
                     <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
                         Monitor and manage device registrations with real-time status updates and usage statistics.
                     </p>
@@ -129,7 +129,7 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2">Package Distribution</h3>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Package Distribution</h3>
                     <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
                         Distribute software packages securely with version control and download analytics.
                     </p>

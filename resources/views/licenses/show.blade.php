@@ -10,7 +10,7 @@
         <div class="mb-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h3 class="text-lg font-medium">License: {{ $license->key }}</h3>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">License: {{ $license->key }}</h3>
                     <div class="mt-2 flex items-center gap-4">
                         <span
                             class="px-3 py-1 rounded-full text-sm font-medium {{ $license->getStatusColorAttribute() }}">
@@ -45,23 +45,23 @@
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">License Key:</span>
-                        <span class="font-medium">{{ $license->key }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $license->key }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Privilege:</span>
-                        <span class="font-medium">{{ $license->getPrivilegeTextAttribute() }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $license->getPrivilegeTextAttribute() }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Status:</span>
-                        <span class="font-medium">{{ $license->getStatusTextAttribute() }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $license->getStatusTextAttribute() }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Created At:</span>
-                        <span class="font-medium">{{ $license->created_at->format('Y-m-d H:i:s') }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $license->created_at->format('Y-m-d H:i:s') }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Created From IP:</span>
-                        <span class="font-medium">{{ $license->created_from_ip ?? 'N/A' }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $license->created_from_ip ?? 'N/A' }}</span>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Assigned To:</span>
-                        <span class="font-medium">
+                        <span class="font-medium text-gray-900 dark:text-white">
                             @if ($license->account)
                                 <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline">
                                     {{ $license->account->username }}
@@ -84,20 +84,20 @@
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Activated At:</span>
                         <span
-                            class="font-medium">{{ $license->activated_at?->format('Y-m-d H:i:s') ?? 'Not activated' }}</span>
+                            class="font-medium text-gray-900 dark:text-white">{{ $license->activated_at?->format('Y-m-d H:i:s') ?? 'Not activated' }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Expires At:</span>
-                        <span class="font-medium">{{ $license->expires_at->format('Y-m-d H:i:s') }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $license->expires_at->format('Y-m-d H:i:s') }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Suspended At:</span>
                         <span
-                            class="font-medium">{{ $license->suspended_at?->format('Y-m-d H:i:s') ?? 'Never' }}</span>
+                            class="font-medium text-gray-900 dark:text-white">{{ $license->suspended_at?->format('Y-m-d H:i:s') ?? 'Never' }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Days Until Expiry:</span>
-                        <span class="font-medium">{{ $license->daysUntilExpiry() }} days</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $license->daysUntilExpiry() }} days</span>
                     </div>
                 </div>
             </div>
@@ -121,25 +121,25 @@
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Current Status:</span>
-                        <span class="font-medium">{{ $statusHistory['current_status'] }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $statusHistory['current_status'] }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Activated At:</span>
                         <span
-                            class="font-medium">{{ $statusHistory['activated_at']?->format('Y-m-d H:i:s') ?? 'Not activated' }}</span>
+                            class="font-medium text-gray-900 dark:text-white">{{ $statusHistory['activated_at']?->format('Y-m-d H:i:s') ?? 'Not activated' }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Suspended At:</span>
                         <span
-                            class="font-medium">{{ $statusHistory['suspended_at']?->format('Y-m-d H:i:s') ?? 'Never' }}</span>
+                            class="font-medium text-gray-900 dark:text-white">{{ $statusHistory['suspended_at']?->format('Y-m-d H:i:s') ?? 'Never' }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Expires At:</span>
-                        <span class="font-medium">{{ $statusHistory['expires_at']?->format('Y-m-d H:i:s') }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $statusHistory['expires_at']?->format('Y-m-d H:i:s') }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Days Until Expiry:</span>
-                        <span class="font-medium">{{ $statusHistory['days_until_expiry'] }} days</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ $statusHistory['days_until_expiry'] }} days</span>
                     </div>
                 </div>
             </div>

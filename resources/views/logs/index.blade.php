@@ -19,7 +19,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header with actions -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="text-lg font-medium">System Event Logs</h3>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">System Event Logs</h3>
                         @if (Auth::user()->hasPrivilege(7))
                             <button onclick="showClearModal()"
                                 class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">

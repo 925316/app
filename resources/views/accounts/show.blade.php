@@ -8,7 +8,7 @@
         class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-2xl font-bold">{{ $account->username }}</h1>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $account->username }}</h1>
                 <p class="text-gray-500 dark:text-gray-400">Account ID: {{ $account->id }}</p>
             </div>
             <div class="flex space-x-3">
@@ -24,15 +24,15 @@
         <!-- Account Overview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4">Account Information</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Account Information</h3>
                 <div class="space-y-3">
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Username</span>
-                        <p class="font-medium">{{ $account->username }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->username }}</p>
                     </div>
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Email</span>
-                        <p class="font-medium">{{ $account->email }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->email }}</p>
                         @if ($account->email_verified_at)
                             <x-status-badge status="verified" text="Verified" />
                         @else
@@ -49,7 +49,7 @@
                     </div>
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Privilege Level</span>
-                        <p class="font-medium">
+                        <p class="font-medium text-gray-900 dark:text-white">
                             {{ $account->getPrivilegeLevel() ? ucfirst(strtolower(LicensePrivilege::tryFrom($account->getPrivilegeLevel())?->getLabel() ?? 'Unknown')) : 'None' }}
                         </p>
                     </div>
@@ -57,11 +57,11 @@
             </div>
 
             <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4">Login Information</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Login Information</h3>
                 <div class="space-y-3">
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Last Login</span>
-                        <p class="font-medium">
+                        <p class="font-medium text-gray-900 dark:text-white">
                             @if ($account->last_login_at)
                                 {{ $account->last_login_at->diffForHumans() }}
                                 <br>
@@ -74,29 +74,29 @@
                     </div>
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Last IP Address</span>
-                        <p class="font-medium">{{ $account->last_ip_address ?? 'N/A' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->last_ip_address ?? 'N/A' }}</p>
                     </div>
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Registration Date</span>
-                        <p class="font-medium">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
                     </div>
                 </div>
             </div>
 
             <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4">Device Information</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Device Information</h3>
                 <div class="space-y-3">
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Total Devices</span>
-                        <p class="font-medium">{{ $account->devices_count }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->devices_count }}</p>
                     </div>
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">Bound Devices</span>
-                        <p class="font-medium">{{ $boundDevices->count() }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $boundDevices->count() }}</p>
                     </div>
                     <div>
                         <span class="text-sm text-gray-500 dark:text-gray-400">HWID Resets</span>
-                        <p class="font-medium">{{ $account->hwid_reset_count }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->hwid_reset_count }}</p>
                         @if ($account->hwid_last_reset_at)
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Last
                                 reset: {{ $account->hwid_last_reset_at->diffForHumans() }}</p>
@@ -108,7 +108,7 @@
 
         <!-- Action Buttons -->
         <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg mb-8">
-            <h3 class="text-lg font-semibold mb-4">Account Actions</h3>
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Account Actions</h3>
             <div class="flex flex-wrap gap-3">
                 @if ($account->isCurrentlySuspended)
                     <form action="{{ route('accounts.unsuspend', $account) }}" method="POST" class="inline">
@@ -149,7 +149,7 @@
         <!-- Licenses -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
             <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4">Licenses</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Licenses</h3>
                 @if ($account->licenses->isEmpty())
                     <p class="text-gray-500 dark:text-gray-400">No licenses found for this account.</p>
                 @else
@@ -213,7 +213,7 @@
         <!-- Devices -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
             <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4">Devices</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Devices</h3>
                 @if ($account->devices->isEmpty())
                     <p class="text-gray-500 dark:text-gray-400">No devices found for this account.</p>
                 @else
@@ -287,7 +287,7 @@
         <!-- Recent Activity -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Activity</h3>
                 @if ($account->eventLogs->isEmpty())
                     <p class="text-gray-500 dark:text-gray-400">No activity found for this account.</p>
                 @else

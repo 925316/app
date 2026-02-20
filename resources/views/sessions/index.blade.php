@@ -20,7 +20,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="text-lg font-medium">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
                             @if ($isAdmin)
                                 Session Management
                             @else
@@ -389,7 +389,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-4 pagination-container">
-                        {{ $sessions->links() }}
+                        <x-pagination :paginator="$sessions" />
                     </div>
                 </div>
             </div>

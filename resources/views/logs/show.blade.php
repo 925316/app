@@ -13,7 +13,7 @@
                     <div class="mb-6">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
-                                <h3 class="text-lg font-medium">Log Entry: {{ $log->event_type }}</h3>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Log Entry: {{ $log->event_type }}</h3>
                                 <div class="mt-2 flex items-center gap-4">
                                     <span
                                         class="px-3 py-1 rounded-full text-sm font-medium
@@ -44,11 +44,11 @@
                             <div class="space-y-2 text-sm">
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Event Type:</span>
-                                    <span class="font-medium">{{ $log->event_type }}</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ $log->event_type }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Event Level:</span>
-                                    <span class="font-medium">
+                                    <span class="font-medium text-gray-900 dark:text-white">
                                         @if ($log->event_level == 0)
                                             Info
                                         @elseif($log->event_level == 1)
@@ -60,11 +60,11 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Timestamp:</span>
-                                    <span class="font-medium">{{ $log->created_at->format('Y-m-d H:i:s') }}</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ $log->created_at->format('Y-m-d H:i:s') }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">IP Address:</span>
-                                    <span class="font-medium">{{ $log->ip_address }}</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ $log->ip_address }}</span>
                                 </div>
                             </div>
                         </div>
@@ -74,7 +74,7 @@
                             <div class="space-y-2 text-sm">
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Account:</span>
-                                    <span class="font-medium">
+                                    <span class="font-medium text-gray-900 dark:text-white">
                                         @if ($log->account)
                                             <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {{ $log->account->username }}
@@ -86,7 +86,7 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">Actor:</span>
-                                    <span class="font-medium">
+                                    <span class="font-medium text-gray-900 dark:text-white">
                                         @if ($log->actor)
                                             <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {{ $log->actor->username }}
@@ -98,7 +98,7 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-300">License:</span>
-                                    <span class="font-medium">
+                                    <span class="font-medium text-gray-900 dark:text-white">
                                         @if ($log->license)
                                             <a href="{{ route('licenses.show', $log->license) }}"
                                                 class="text-blue-600 dark:text-blue-400 hover:underline">

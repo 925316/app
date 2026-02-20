@@ -159,7 +159,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-4">
-                        {{ $devices->links() }}
+                        <x-pagination :paginator="$devices" />
                     </div>
                 </div>
             </div>

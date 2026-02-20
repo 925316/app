@@ -116,7 +116,7 @@
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <!-- Header with actions -->
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                            <h3 class="text-lg font-medium">All Package Releases</h3>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">All Package Releases</h3>
 
                             @if ($isAdmin ?? false)
                                 <div class="flex gap-2">
@@ -138,19 +138,19 @@
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                 <div>
                                     <div class="text-gray-600 dark:text-gray-300">Total Releases:</div>
-                                    <div class="font-medium">{{ $stats['total_releases'] ?? 0 }}</div>
+                                    <div class="font-medium text-gray-900 dark:text-white">{{ $stats['total_releases'] ?? 0 }}</div>
                                 </div>
                                 <div>
                                     <div class="text-gray-600 dark:text-gray-300">Stable Releases:</div>
-                                    <div class="font-medium">{{ $stats['stable_releases'] ?? 0 }}</div>
+                                    <div class="font-medium text-gray-900 dark:text-white">{{ $stats['stable_releases'] ?? 0 }}</div>
                                 </div>
                                 <div>
                                     <div class="text-gray-600 dark:text-gray-300">Dev Releases:</div>
-                                    <div class="font-medium">{{ $stats['dev_releases'] ?? 0 }}</div>
+                                    <div class="font-medium text-gray-900 dark:text-white">{{ $stats['dev_releases'] ?? 0 }}</div>
                                 </div>
                                 <div>
                                     <div class="text-gray-600 dark:text-gray-300">Latest Stable:</div>
-                                    <div class="font-medium">{{ $stats['latest_stable']?->version ?? 'None' }}</div>
+                                    <div class="font-medium text-gray-900 dark:text-white">{{ $stats['latest_stable']?->version ?? 'None' }}</div>
                                 </div>
                             </div>
                         </div>
