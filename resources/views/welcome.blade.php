@@ -11,6 +11,32 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
+    <!-- Early theme detection to prevent FOUC -->
+    <script>
+        (function() {
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            
+            // Determine initial theme - default to dark for guests
+            let isDark = false;
+            if (savedTheme === 'dark') {
+                isDark = true;
+            } else if (savedTheme === 'light') {
+                isDark = false;
+            } else {
+                // No saved preference - default to dark for guests (unauthenticated users)
+                isDark = true;
+            }
+
+            // Apply theme immediately
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -21,6 +47,31 @@
 </head>
 
 <body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+    <!-- Theme Toggle - Only for authenticated users -->
+    @auth
+        <div class="fixed top-4 right-4 z-50">
+            <button x-data="{
+                dark: document.documentElement.classList.contains('dark'),
+                toggle() {
+                    this.dark = !this.dark;
+                    document.documentElement.classList.toggle('dark');
+                    if (this.dark) {
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                    }
+                }
+            }" x-cloak @click="toggle"
+                class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+                aria-label="Toggle dark mode">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+        </div>
+    @endauth
+
     <div class="container mx-auto px-6 py-12 flex-1 flex items-center justify-center">
         <div class="max-w-4xl w-full mx-auto">
             <!-- Logo and Title Section -->
