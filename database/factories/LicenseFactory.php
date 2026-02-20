@@ -97,11 +97,9 @@ class LicenseFactory extends Factory
             // Activated between 1-365 days ago
             $activatedAt = fake()->dateTimeBetween('-365 days', '-1 day');
 
-            // Expires between 1 day from activation and 2 years from activation
-            $minExpiry = clone $activatedAt;
-            $minExpiry->modify('+1 day');
-            $maxExpiry = clone $activatedAt;
-            $maxExpiry->modify('+2 years');
+            // Expires between tomorrow and 2 years from now (always in the future)
+            $minExpiry = now()->addDay();
+            $maxExpiry = now()->addYears(2);
 
             $expiresAt = fake()->dateTimeBetween($minExpiry, $maxExpiry);
 
@@ -132,10 +130,8 @@ class LicenseFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             $expiresAt = fake()->dateTimeBetween('-1 year', '-1 day');
-            $activatedAt = fake()->dateTimeBetween(
-                $expiresAt->modify('-2 years')->format('Y-m-d H:i:s'),
-                $expiresAt->modify('+1 year')->format('Y-m-d H:i:s')
-            );
+            // activated_at should be before expires_at
+            $activatedAt = fake()->dateTimeBetween($expiresAt->format('Y-m-d H:i:s'), '+1 year');
 
             return [
                 'status' => LicenseStatus::EXPIRED->value,

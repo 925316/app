@@ -44,10 +44,7 @@ class SessionController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('session_token', 'like', "%{$search}%")
-                    ->orWhereHas('device', function ($q) use ($search) {
-                        $q->where('device_name', 'like', "%{$search}%");
-                    });
+                $q->where('session_token', 'like', "%{$search}%");
             });
         }
 
@@ -101,9 +98,6 @@ class SessionController extends Controller
                     ->orWhereHas('account', function ($q) use ($search) {
                         $q->where('username', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('device', function ($q) use ($search) {
-                        $q->where('device_name', 'like', "%{$search}%");
                     });
             });
         }

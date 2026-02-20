@@ -17,7 +17,7 @@ class AccountDeviceFactory extends Factory
      */
     public function definition(): array
     {
-        $firstSeen = $this->faker->dateTimeBetween('-1 year', '-1 month');
+        $firstSeen = $this->faker->dateTimeBetween('-1 year', '-2 months');
         $lastSeen = Carbon::parse($firstSeen)->addDays($this->faker->numberBetween(0, 30));
 
         $isBound = $this->faker->boolean(80);

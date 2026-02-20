@@ -278,7 +278,7 @@
                                     @if ($session->device)
                                         <div>
                                             <div class="text-sm font-medium">
-                                                {{ $session->device->device_name }}
+                                                {{ $session->device->hwid_hash ?? 'Unknown Device' }}
                                             </div>
                                             <div class="text-xs text-gray-500 dark:text-gray-400">
                                                 ID: {{ $session->device->id }}
