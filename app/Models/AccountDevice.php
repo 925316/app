@@ -56,18 +56,6 @@ class AccountDevice extends Model
     }
 
     /**
-     * The attributes that should be appended to the model's array form.
-     *
-     * @var array<int, string>
-     */
-    protected $appends = [
-        'is_bound',
-        'is_active',
-        'device_summary',
-        'bound_duration',
-    ];
-
-    /**
      * Get the account that owns the device.
      */
     public function account(): BelongsTo

@@ -59,15 +59,19 @@ class LogController extends Controller
 
         $logs = $query->paginate(25);
 
-        // Get overall statistics (not filtered by search/pagination)
+        // Get overall statistics (not filtered by search/pagination) - optimized single query
+        $stats = EventLog::selectRaw('COUNT(*) as total, SUM(CASE WHEN event_level = 0 THEN 1 ELSE 0 END) as info, SUM(CASE WHEN event_level = 1 THEN 1 ELSE 0 END) as warning, SUM(CASE WHEN event_level = 2 THEN 1 ELSE 0 END) as error')
+            ->first();
+
         $statistics = [
-            'total' => EventLog::count(),
-            'info' => EventLog::where('event_level', 0)->count(),
-            'warning' => EventLog::where('event_level', 1)->count(),
-            'error' => EventLog::where('event_level', 2)->count(),
+            'total' => $stats->total ?? 0,
+            'info' => $stats->info ?? 0,
+            'warning' => $stats->warning ?? 0,
+            'error' => $stats->error ?? 0,
         ];
 
         // Get filter options
+        $eventTypes = EventLog::distinct()->pluck('event_type');
         $eventTypes = EventLog::select('event_type')->distinct()->pluck('event_type');
         $eventLevels = [
             0 => 'Info',

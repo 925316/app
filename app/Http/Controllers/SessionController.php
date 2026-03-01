@@ -114,7 +114,8 @@ class SessionController extends Controller
         $totalSessions = ClientSession::count();
         $activeSessions = ClientSession::active()->count();
         $expiredSessions = ClientSession::expired()->count();
-        $uniqueAccounts = ClientSession::distinct('account_id')->count();
+        $uniqueAccounts = ClientSession::distinct('account_id')->count('account_id');
+        $uniqueDevices = ClientSession::distinct('device_id')->count('device_id');
         $uniqueDevices = ClientSession::distinct('device_id')->count();
 
         return view('sessions.index', [
