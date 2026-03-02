@@ -221,7 +221,15 @@ class LicenseController extends Controller
     public function activateByKey(Request $request)
     {
         $request->validate([
-            'license_key' => 'required|string|regex:/^[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$/',
+            'license_key' => [
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! is_string($value) || ! LicenseService::validateLicenseKeyFormat($value)) {
+                        $fail('The license key format is invalid.');
+                    }
+                },
+            ],
         ]);
 
         $user = Auth::user();

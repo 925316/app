@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\LicensePrivilege;
 use App\Enums\LicenseStatus;
 use App\Models\License;
+use App\Services\LicenseService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -38,41 +39,7 @@ class LicenseFactory extends Factory
      */
     private function generateLicenseKey(): string
     {
-        // Segment 1: A-Z0-9 (5 chars)
-        $segment1 = '';
-        $chars1 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        for ($i = 0; $i < 5; $i++) {
-            $segment1 .= $chars1[random_int(0, strlen($chars1) - 1)];
-        }
-
-        // Segment 2: 0-9A-F (5 chars)
-        $segment2 = '';
-        $chars2 = '0123456789ABCDEF';
-        for ($i = 0; $i < 5; $i++) {
-            $segment2 .= $chars2[random_int(0, strlen($chars2) - 1)];
-        }
-
-        // Segment 3: A-Z2-7 (5 chars)
-        $segment3 = '';
-        $chars3 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        for ($i = 0; $i < 5; $i++) {
-            $segment3 .= $chars3[random_int(0, strlen($chars3) - 1)];
-        }
-
-        // Segment 4: A-Z3-8 (5 chars)
-        $segment4 = '';
-        $chars4 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ345678';
-        for ($i = 0; $i < 5; $i++) {
-            $segment4 .= $chars4[random_int(0, strlen($chars4) - 1)];
-        }
-
-        // Segment 5: A-Z0-9 (5 chars)
-        $segment5 = '';
-        for ($i = 0; $i < 5; $i++) {
-            $segment5 .= $chars1[random_int(0, strlen($chars1) - 1)];
-        }
-
-        return "{$segment1}-{$segment2}-{$segment3}-{$segment4}-{$segment5}";
+        return LicenseService::generateLicenseKey();
     }
 
     /**

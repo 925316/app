@@ -14,11 +14,11 @@ beforeEach(function () {
 it('can generate license key', function () {
     $key = LicenseService::generateLicenseKey();
 
-    expect($key)->toMatch('/^[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$/');
+    expect($key)->toMatch('/'.LicenseService::LICENSE_KEY_PATTERN.'/');
 });
 
 it('can validate license key format', function () {
-    $validKey = 'ABCDE-12345-FGHIJ-67890-KLMNO';
+    $validKey = 'ABCDE-1A2B3-AB2C3-A3B4C-K9LMN';
     expect(LicenseService::validateLicenseKeyFormat($validKey))->toBeTrue();
 
     $invalidKey = 'INVALID-KEY';
@@ -34,7 +34,7 @@ it('can create license', function () {
 });
 
 it('can create license with custom key', function () {
-    $customKey = 'ABCDE-12345-FGHIJ-67890-KLMNO';
+    $customKey = 'ABCDE-1A2B3-AB2C3-A3B4C-K9LMN';
     $license = LicenseService::createLicense(
         LicensePrivilege::STANDARD->value,
         null,

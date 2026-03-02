@@ -7,6 +7,7 @@ use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\AccountDevice;
 use App\Models\License;
+use App\Services\LicenseService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -152,22 +153,7 @@ class AccountSeeder extends Seeder
 
     private function generateLicenseKey(string $prefix): string
     {
-        $part1 = substr(strtoupper(Str::random(10)), 0, 5);
-        $part2 = substr(strtoupper(dechex(rand(0, 1048575))), 0, 5);
-        $part2 = str_pad($part2, 5, '0', STR_PAD_LEFT);
-        $chars3 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        $part3 = '';
-        for ($i = 0; $i < 5; $i++) {
-            $part3 .= $chars3[rand(0, strlen($chars3) - 1)];
-        }
-        $chars4 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ345678';
-        $part4 = '';
-        for ($i = 0; $i < 5; $i++) {
-            $part4 .= $chars4[rand(0, strlen($chars4) - 1)];
-        }
-        $part5 = substr(strtoupper(Str::random(10)), 0, 5);
-
-        return "{$part1}-{$part2}-{$part3}-{$part4}-{$part5}";
+        return LicenseService::generateLicenseKey();
     }
 
     private function createAccountWithLicense(
@@ -176,8 +162,8 @@ class AccountSeeder extends Seeder
         LicensePrivilege $privilege,
         ?Account $account = null,
         LicenseStatus $status = LicenseStatus::ACTIVE,
-        ?\DateTime $activatedAt = null,
-        ?\DateTime $expiresAt = null
+        ?\DateTimeInterface $activatedAt = null,
+        ?\DateTimeInterface $expiresAt = null
     ): Account {
         $account ??= Account::create([
             'username' => $username,
@@ -241,9 +227,9 @@ class AccountSeeder extends Seeder
         return $account;
     }
 
-    private function createDevice(Account $account, \DateTime $firstSeen): void
+    private function createDevice(Account $account, \DateTimeInterface $firstSeen): void
     {
-        $boundAt = (clone $firstSeen)->modify('+'.rand(1, 7).' days');
+        $boundAt = now()->setTimestamp($firstSeen->getTimestamp())->addDays(rand(1, 7));
 
         AccountDevice::create([
             'account_id' => $account->id,

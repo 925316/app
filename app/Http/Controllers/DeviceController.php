@@ -188,30 +188,38 @@ class DeviceController extends Controller
             abort(403, 'You need a valid license to unbind devices.');
         }
 
-        $device = $user->devices()
-            ->whereNotNull('bound_at')
-            ->whereNull('unbound_at')
-            ->first();
+        $device = \Illuminate\Support\Facades\DB::transaction(function () use ($user, $request) {
+            $lockedDevice = AccountDevice::where('account_id', $user->id)
+                ->whereNotNull('bound_at')
+                ->whereNull('unbound_at')
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedDevice) {
+                return null;
+            }
+
+            $lockedDevice->unbound_at = now();
+            $lockedDevice->save();
+
+            EventLog::create([
+                'event_type' => 'device.unbound',
+                'event_level' => 0,
+                'account_id' => $user->id,
+                'ip_address' => $request->ip(),
+                'actor_id' => $user->id,
+                'details' => [
+                    'hwid_hash' => $lockedDevice->hwid_hash,
+                    'device_id' => $lockedDevice->id,
+                ],
+            ]);
+
+            return $lockedDevice;
+        });
 
         if (! $device) {
             return back()->withErrors(['device' => 'No device is currently bound to your account.']);
         }
-
-        $device->unbound_at = now();
-        $device->save();
-
-        // Log the event
-        EventLog::create([
-            'event_type' => 'device.unbound',
-            'event_level' => 0,
-            'account_id' => $user->id,
-            'ip_address' => $request->ip(),
-            'actor_id' => $user->id,
-            'details' => [
-                'hwid_hash' => $device->hwid_hash,
-                'device_id' => $device->id,
-            ],
-        ]);
 
         return redirect()->route('devices.manage')
             ->with('success', 'Device unbound successfully!');

@@ -7,11 +7,20 @@ use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\License;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class LicenseService
 {
+    public const LICENSE_KEY_PATTERN = '^[A-Z0-9]{5}-[0-9A-F]{5}-[A-Z2-7]{5}-[A-Z3-8]{5}-[A-Z0-9]{5}$';
+
+    private const SEGMENT_ALPHABETS = [
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        '0123456789ABCDEF',
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ345678',
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    ];
+
     /**
      * Generate a new license key
      * Format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX (25 uppercase alphanumeric chars, 5 groups)
@@ -19,8 +28,9 @@ class LicenseService
     public static function generateLicenseKey(): string
     {
         $groups = [];
-        for ($i = 0; $i < 5; $i++) {
-            $groups[] = strtoupper(Str::random(5));
+
+        foreach (self::SEGMENT_ALPHABETS as $alphabet) {
+            $groups[] = self::generateSegment($alphabet, 5);
         }
 
         return implode('-', $groups);
@@ -31,7 +41,19 @@ class LicenseService
      */
     public static function validateLicenseKeyFormat(string $key): bool
     {
-        return preg_match('/^[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$/', $key) === 1;
+        return preg_match('/'.self::LICENSE_KEY_PATTERN.'/', strtoupper($key)) === 1;
+    }
+
+    private static function generateSegment(string $alphabet, int $length): string
+    {
+        $segment = '';
+        $maxIndex = strlen($alphabet) - 1;
+
+        for ($i = 0; $i < $length; $i++) {
+            $segment .= $alphabet[random_int(0, $maxIndex)];
+        }
+
+        return $segment;
     }
 
     /**
@@ -159,20 +181,29 @@ class LicenseService
      */
     public static function upgradeLicense(License $license, int $newPrivilege, ?string $notes = null): bool
     {
-        if (! $license->status->canUpgrade()) {
-            throw ValidationException::withMessages([
-                'license' => 'License cannot be upgraded. Current status: '.$license->status->getLabel(),
-            ]);
-        }
+        return DB::transaction(function () use ($license, $newPrivilege, $notes) {
+            $locked = License::lockForUpdate()->find($license->id);
 
-        $license->status = LicenseStatus::UPGRADED;
-        $license->privilege = $newPrivilege;
+            if (! $locked || ! $locked->status->canUpgrade()) {
+                throw ValidationException::withMessages([
+                    'license' => 'License cannot be upgraded. Current status: '.($locked?->status->getLabel() ?? 'unknown'),
+                ]);
+            }
 
-        if ($notes) {
-            $license->notes = $notes;
-        }
+            $locked->status = LicenseStatus::UPGRADED;
+            $locked->privilege = $newPrivilege;
 
-        return $license->save();
+            if ($notes) {
+                $locked->notes = $notes;
+            }
+
+            $saved = $locked->save();
+
+            $license->setRawAttributes($locked->getAttributes());
+            $license->syncOriginal();
+
+            return $saved;
+        });
     }
 
     /**
