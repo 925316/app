@@ -1,8 +1,6 @@
 # License Management System - Development Requirements Manual
 
-# Critical Design Constraints for AI Implementation
-
-## CRITICAL DESIGN CONSTRAINTS
+## Critical Design Constraints
 
 **Please ensure the AI understands and strictly adheres to these fundamental constraints:**
 
@@ -10,6 +8,16 @@
 
 - **Web Phase (current)**: prioritize web routes/controllers/services/models consistency first.
 - **API Phase (later)**: `routes/api.php`, `ClientLicenseController`, `ClientPackageController`, request anti-replay (`nonce` + `timestamp`), and response signing (`CryptoService`) can be implemented after Web Phase is stable.
+- **API implementation baseline (after Web Phase is stable)**:
+  1. `routes/api.php` + `ClientLicenseController@check` as the first heartbeat endpoint.
+  2. `ClientHeartbeatRequest` validation for `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
+  3. Replay protection with Redis nonce guard (5 minutes) and timestamp window (`<= 300s`).
+  4. `CryptoService` signs `data` payload and must include RSA signing support.
+  5. Add 6-10 API Feature tests (at minimum: success, replay, expired timestamp, HWID mismatch).
+  6. Register `api` routing in `bootstrap/app.php` so `routes/api.php` is actually loaded.
+  7. Define a stable error-code dictionary for `/api/license/check` (do not rely on free-form message text for client decisions).
+  8. Signature metadata is returned in `meta.signature` with fixed fields `algorithm` and `key_id`; signature input is canonical JSON of `data` only.
+  9. Heartbeat/session update uses `session_token` as lookup key: successful `check` updates `client_sessions.last_heartbeat_at`; failed checks do not update it.
 - Even in phased delivery, shared domain rules (license status machine, privilege source, key regex, bind/unbind consistency) must stay unified.
 
 ### 1. Permission System (MOST IMPORTANT!)
@@ -57,7 +65,7 @@
 - Response Signing (Anti-Tamper):
   - Critical responses (`/license/check`, `/license/activate`) MUST include `signature`.
   - Signature is produced from the `data` payload using server private key.
-  - Preferred algorithm: **Ed25519** (or RSA-2048 if Ed25519 unavailable).
+  - Signing algorithm for this project is fixed to **RSA-2048 (SHA-256)**.
   - Canonical JSON serialization rule MUST be fixed and shared with C++ client (same key order/encoding).
 
 ---
@@ -73,6 +81,7 @@ The C++ client should send requests in this format:
 
 ```json
 {
+    "session_token": "client_session_token",
     "license_key": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXX",
     "hwid": "client_generated_hwid_string",
     "nonce": "random_uuid_or_string",
@@ -81,6 +90,7 @@ The C++ client should send requests in this format:
 }
 ```
 - Field naming is fixed: use `license_key` consistently (do not use `key` alias).
+- `session_token` is required for heartbeat session lookup and update.
 
 ### 2. Common Response Structure (With Signature)
 
@@ -88,7 +98,8 @@ The server must respond in this format. The client will verify the `signature` a
 
 ```json
 {
-    "code": 200, // 200=Success, 4xx=Client Error, 5xx=Server Error
+    "code": 200,
+    "error_code": null,
     "message": "OK",
     "data": {
         "status": "active", // active, suspended, expired, unbound
@@ -97,11 +108,35 @@ The server must respond in this format. The client will verify the `signature` a
         "plan_level": 5,
         "username": "user_name_here" // Added per user requirement
     },
-    "signature": "base64_encoded_rsa_signature_of_data_block"
+    "signature": "base64_encoded_rsa_signature_of_data_block",
+    "meta": {
+        "signature": {
+            "algorithm": "RSA-2048-SHA256",
+            "key_id": "main-2026-01"
+        }
+    }
 }
 ```
 
-### 3. Signature Payload Canonicalization
+Rules:
+- HTTP status code is authoritative; body `code` mirrors HTTP status.
+- `error_code` is a stable machine-readable business code (nullable on success).
+- Signature metadata for signed responses must be provided in `meta.signature`.
+
+### 3. Error Code Dictionary (`/api/license/check`)
+
+| HTTP | `error_code` | Meaning |
+| --- | --- | --- |
+| 200 | `null` | Success |
+| 401 | `AUTH_REQUIRED` | Session token is missing or invalid |
+| 409 | `NONCE_REPLAY` | Nonce reused within protection window |
+| 422 | `TIMESTAMP_OUT_OF_WINDOW` | Timestamp drift exceeds allowed window |
+| 422 | `DEVICE_MISMATCH` | HWID does not match active bound device |
+| 422 | `LICENSE_INVALID` | License key not found or invalid |
+| 403 | `LICENSE_INEFFECTIVE` | License not active / suspended / revoked / expired |
+| 500 | `SERVER_ERROR` | Internal server error |
+
+### 4. Signature Payload Canonicalization
 
 To avoid cross-language verification mismatch, the signing payload must be deterministic:
 
@@ -338,9 +373,9 @@ Therefore, the backend needs to calculate statistics by category; this table onl
 
 ---
 
-# Project Structure
+## Project Structure
 
-## Database Migrations & Seeders:
+### Database Migrations & Seeders
 
 ```
 database/
@@ -371,7 +406,7 @@ database/
     └── LicenseFactory.php
 ```
 
-## Application Structure:
+### Application Structure
 
 ```
 C:\code\HTML\app\
@@ -671,7 +706,11 @@ C:\code\HTML\app\
        # E.g., periodic cleanup of old logs, update statistics, etc.
 
 
-### **Phase One: Database Migration**
+```
+
+## Implementation Checklist
+
+### Phase One: Database Migration
 1. **Create migration files** (in order):
    - `accounts` table
    - `account_devices` table
@@ -689,7 +728,7 @@ C:\code\HTML\app\
 - Pay attention to foreign key relationship settings
 - The `key` field in the `licenses` table must comply with the regex format
 
-### **Phase Two: Core Models and Enums**
+### Phase Two: Core Models and Enums
 1. **Create model files**:
    - Account.php (detailed method descriptions already provided)
    - AccountDevice.php
@@ -703,7 +742,7 @@ C:\code\HTML\app\
    - LicenseStatus.php (statuses 0–5)
    - EventType.php (classified system events)
 
-### **Phase Three: Business Logic Layer**
+### Phase Three: Business Logic Layer
 1. **Create service classes**:
    - LicenseService.php (core: key generation/validation/status management)
    - PackageService.php (package management logic)
@@ -714,21 +753,51 @@ C:\code\HTML\app\
    - DeviceRequest.php (HWID validation)
    - PackageUploadRequest.php (file validation)
 
-3. **Create API Routes**: Define endpoints in `api.php`.
-   - This step can be moved to a dedicated **API Phase** after Web Phase is complete.
-   **Implement `ClientLicenseController`**
-   * **Endpoint `check` (Heartbeat)**:
-   * Input: `license_key`, `hwid`, `nonce`, `timestamp`.
-   * Logic:
-   - Validate request schema and timestamp window.
-   - Check nonce replay cache (must be unused in last 5 minutes).
-   - Find License by `license_key`.
-   - Check effective status (active, not expired, not suspended/revoked).
-   - Resolve account and verify `hwid` hash matches the account's current active device.
-   - If HWID mismatch: return error `"Device Mismatch"`.
-   - If valid: construct `data` JSON -> sign via `CryptoService` -> return JSON + `signature`.
+3. **API implementation baseline (after Web Phase is complete)**
+   - Register `api` routing entry in `bootstrap/app.php` and map to `routes/api.php`.
 
-### **Phase Four: Controllers and Routing**
+   **Error contract for `/api/license/check`**
+   - Keep response shape stable as `{ code, error_code, message, data, signature, meta }`.
+   - HTTP status is authoritative; `code` mirrors HTTP status.
+   - Client behavior must key off `error_code`, not message text.
+   - Fixed business codes: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INVALID`, `LICENSE_INEFFECTIVE`, `SERVER_ERROR`.
+
+   **Signature contract**
+   - Response keeps `{ code, error_code, message, data, signature, meta }`.
+   - Signature metadata lives under `meta.signature` with `algorithm` and `key_id`.
+   - Signature input is fixed: canonical JSON of `data` only.
+   1) **`routes/api.php` + `ClientLicenseController@check`**
+   - Implement one endpoint first: `POST /api/license/check`.
+   - Keep JSON-only response contract.
+
+   2) **`ClientHeartbeatRequest`**
+   - Validate required fields: `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
+   - Keep field naming fixed as `license_key` (no `key` alias).
+
+   3) **Replay protection (`nonce` + `timestamp`)**
+   - Timestamp drift check must be within `<= 300` seconds.
+   - Reject nonce reuse within 5 minutes (Redis `SET key value NX EX 300`).
+
+   4) **`CryptoService` response signing**
+   - Sign canonicalized `data` payload and return `signature`.
+   - RSA-2048 (SHA-256) signing is required.
+   - Return signature metadata under `meta.signature` with `algorithm` and `key_id`.
+
+   5) **API Feature tests (6-10 cases)**
+   - Must cover at least: success, nonce replay rejection, expired/out-of-window timestamp, HWID mismatch.
+   - Add remaining cases up to 6-10 total based on endpoint contract and error branches.
+
+   **`ClientLicenseController@check` required logic**
+   - Validate request schema.
+   - Enforce timestamp window and nonce anti-replay.
+   - Resolve session by `session_token`; if missing/invalid, return `AUTH_REQUIRED`.
+   - Find license by `license_key` and verify effective status.
+   - Resolve account active device and compare `hwid` hash.
+   - On mismatch, return `Device Mismatch` error.
+   - On success, construct `data` -> sign with `CryptoService` -> return `{ code, error_code, message, data, signature, meta }`.
+   - On success, update `client_sessions.last_heartbeat_at`; on failure, do not update heartbeat timestamp.
+
+### Phase Four: Controllers and Routing
 1. **Create controllers**:
    - DashboardController.php (dashboard)
    - LicenseController.php (core controller)
@@ -745,7 +814,7 @@ C:\code\HTML\app\
      - Authenticated user route group
      - Admin route group (using AdminMiddleware)
 
-### **Phase Five: View Construction**
+### Phase Five: View Construction
 1. **Create view files**:
    - Layout files: `app.blade.php`, `guest.blade.php`, `navigation.blade.php`
    - Dashboard views: `dashboard/index.blade.php` + two panels
@@ -754,16 +823,15 @@ C:\code\HTML\app\
    - Package management views: `index`, `upload`, `version`
    - Log views: `index` (admin only)
 
-### **Phase Six: Data Seeding**
+### Phase Six: Data Seeding
 1. **Create factories and seeders**:
     - Create a Factory for each model
     - Create seeders and populate test data in order
     - Run database seeding
 
-### **Phase Seven: Testing and Verification**
+### Phase Seven: Testing and Verification
 1. **Validate core functionalities**:
     - License generation and activation flow
     - Device binding restriction logic
     - Permission controls (user vs. admin)
     - Verify correct status transitions
-```
