@@ -4,11 +4,10 @@
 
 **Please ensure the AI understands and strictly adheres to these fundamental constraints:**
 
-### Development Phase Boundary (Important)
+### Development Boundary (Important)
 
-- **Web Phase (current)**: prioritize web routes/controllers/services/models consistency first.
-- **API Phase (later)**: `routes/api.php`, `ClientLicenseController`, `ClientPackageController`, request anti-replay (`nonce` + `timestamp`), and response signing (`CryptoService`) can be implemented after Web Phase is stable.
-- **API implementation baseline (after Web Phase is stable)**:
+- Web routes/controllers/services/models and API routes/controllers/services/models must stay consistent with unified domain rules.
+- **API implementation baseline**:
   1. `routes/api.php` + `ClientLicenseController@check` as the first heartbeat endpoint.
   2. `ClientHeartbeatRequest` validation for `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
   3. Replay protection with Redis nonce guard (5 minutes) and timestamp window (`<= 300s`).
@@ -36,7 +35,6 @@
 - **API Context**:
   - Dedicated `routes/api.php` for Client/Software communication.
   - API responses MUST be JSON.
-  - This block belongs to **API Phase** and can be deferred during Web Phase.
 
 ### 3. License State Machine
 
@@ -147,6 +145,103 @@ To avoid cross-language verification mismatch, the signing payload must be deter
 5. Encode signature as Base64.
 
 Client verification must follow the exact same canonicalization process.
+
+### 5. API Endpoint Set (Normative)
+
+The client-server protocol includes the following endpoints:
+
+1. `POST /api/account/login`
+2. `POST /api/license/check`
+3. `POST /api/license/activate`
+4. `POST /api/license/unbind`
+5. `GET /api/update/check`
+
+Session liveness is heartbeat-driven. Explicit logout endpoint is not required by protocol correctness.
+
+### 6. Endpoint Contract Details
+
+#### `POST /api/license/check`
+
+- Required contract fields: `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
+- Server processing order:
+  1. schema validation,
+  2. timestamp window validation,
+  3. nonce acquire (replay guard),
+  4. resolve session by `session_token`,
+  5. resolve license by `license_key`,
+  6. verify license effective state,
+  7. verify bound device `hwid_hash` match,
+  8. build `data` and sign,
+  9. update `client_sessions.last_heartbeat_at` on success only.
+- Failure responses must not update heartbeat timestamp.
+
+#### `POST /api/account/login`
+
+- Required contract fields: account credentials + device identity (`hwid`, `nonce`, `timestamp`, `version`).
+- Success must return: `session_token`, account summary, effective license summary.
+- Server must persist/update:
+  - `client_sessions` record bound to account + device,
+  - device binding identity using irreversible `hwid_hash`.
+
+#### `POST /api/license/unbind`
+
+- Required contract fields: `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
+- Must enforce one-active-device rule with transaction + lock semantics.
+- Success must produce event log and unbind state transition consistency.
+
+#### `GET /api/update/check`
+
+- Must return latest package metadata: `version`, `release_channel`, `download_url`, `changelog`, optional `virus_detection_url`.
+- Response format remains JSON and follows stable error-code contract.
+- Client call timing contract:
+  1. Client MUST call this endpoint once after successful login/session bootstrap.
+  2. Client MUST NOT run continuous polling during the same runtime session.
+  3. Client SHOULD re-check only on next login or explicit user-triggered update check.
+
+#### `POST /api/license/activate`
+
+- Required contract fields: `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
+- Core checks:
+  - auth/session validity,
+  - timestamp + nonce replay rules,
+  - bound device HWID match,
+  - target license exists and can be activated by status/privilege rules.
+- Success response must follow the same signed shape as `/api/license/check`.
+
+### 7. Security and Determinism Requirements
+
+1. Nonce namespace must include business scope (`endpoint + session/account + nonce-hash`) to avoid cross-context collisions.
+2. Nonce TTL is fixed to `300s` unless protocol version explicitly changes it.
+3. Timestamp validation must reject both stale and future out-of-window requests.
+4. Canonical JSON rules are fixed for cross-language verification; both server and C++ client must follow the same deterministic process.
+5. RSA signing key must be at least 2048-bit; algorithm identifier remains `RSA-2048-SHA256`.
+
+### 8. API Test Matrix (Minimum 6-10 Cases)
+
+1. `check` success (signed payload + heartbeat updated).
+2. `check` nonce replay (`NONCE_REPLAY`).
+3. `check` timestamp out of window (`TIMESTAMP_OUT_OF_WINDOW`).
+4. `check` HWID mismatch (`DEVICE_MISMATCH`, heartbeat not updated).
+5. `check` missing/invalid session token (`AUTH_REQUIRED`).
+6. `check` ineffective license (`LICENSE_INEFFECTIVE`).
+7. `activate` success (status transition + signed payload).
+8. `activate` license invalid (`LICENSE_INVALID`).
+9. `activate` ineffective license (`LICENSE_INEFFECTIVE`).
+10. `activate` nonce replay/timestamp/HWID mismatch branches.
+
+### 9. Session Liveness and Statistics Contract
+
+1. Realtime online status is determined by heartbeat freshness only.
+2. Session is active when `last_heartbeat_at >= now() - 5 minutes`.
+3. Client crash/abrupt close requires no explicit API call; session becomes expired after timeout window.
+4. Session deletion/revocation (admin or system) should make next heartbeat return `AUTH_REQUIRED`.
+
+Statistics contract:
+1. Keep **realtime active sessions** and **recent activity sessions** as separate metrics.
+2. Realtime active session count: same threshold as heartbeat timeout policy (e.g., 5 minutes).
+3. Recent activity session count: windowed metric (e.g., last 7 days), for trend dashboards only.
+4. Login count should come from login event logs; heartbeat count should not be used as login count.
+
 
 
 ---
@@ -413,16 +508,15 @@ C:\code\HTML\app\
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   |   ├── Api/                     # Dedicated API Controllers for C++ Client
 │   │   │   ├── ClientLicenseController.php
 │   │   │   │   # Handles: /api/license/activate
 │   │   │   │   # Handles: /api/license/check (Heartbeat)
-│   │   │   │   # Logic: Validates Key + HWID -> Returns Signed JSON.
+│   │   │   │   # Logic: validates key + HWID and returns signed JSON.
 │   │   │   │
 │   │   │   ├── ClientPackageController.php
-│   │   │   |   # Handles: /api/update/check
-│   │   │   |   # Returns latest version info + download URL.
-|   |   │   │
+│   │   │   │   # Handles: /api/update/check
+│   │   │   │   # Returns latest version info + download URL.
+│   │   │   │
 │   │   │   ├── Auth/                    # Breeze Authentication Controllers (auto-generated)
 │   │   │   │   # Handles basic authentication functions: login, registration, password reset, etc.
 │   │   │   │   # No modification needed unless extending authentication logic.
@@ -453,17 +547,15 @@ C:\code\HTML\app\
 │   │   │       # Pay special attention to log pagination and query performance.
 │   │   │
 │   │   ├── Middleware/
-│   │   │   ├── EnsureJsonResponse.php   # Ensures API requests accept application/json
 │   │   │   └── AdminMiddleware.php      # Administrator Permission Verification Middleware
 │   │   │       # Simple but practical middleware.
 │   │   │       # Checks if the user has administrator privileges.
 │   │   │       # Can be added to route groups requiring admin permissions.
 │   │   │
 │   │   └── Requests/                    # Form Request Validation Directory
-│   │       ├── Api/
-│   │       │   ├── ClientHeartbeatRequest.php  # Validate timestamp, hwid format
-│   │       │   └── ClientActivateRequest.php   # Validate license key format
-|   |       |
+│   │       ├── ClientHeartbeatRequest.php  # Validate timestamp, hwid format
+│   │       ├── ClientActivateRequest.php   # Validate license key format
+│   │       │
 │   │       ├── Auth/                    # Authentication-related request validation (Breeze-generated)
 │   │       ├── LicenseRequest.php       # License-related request validation
 │   │       │   # Validates data during license creation/updates.
@@ -515,9 +607,9 @@ C:\code\HTML\app\
 │   │       # Requires scheduled background tasks to update statistics.
 │   │
 │   ├── Services/                        # Business Logic Service Layer Directory
-|   │   ├── CryptoService.php            # Handles RSA Signing
-│   │   │   # Method: signResponse(array $data): string
-│   │   │   # Loads 'private.key' from storage.
+│   │   ├── CryptoService.php            # Handles RSA signing
+│   │   │   # Method: signData(array $data): string
+│   │   │   # Loads private key path from config/services.php.
 │   │   │   # Uses openssl_sign to generate signature.
 │   │   ├── LicenseService.php           # License-related business logic
 │   │   │   # Core service! Includes license generation, validation, activation, status management.
@@ -557,16 +649,7 @@ C:\code\HTML\app\
 │       # Laravel service container configuration.
 │       # Generally no need to modify unless registering custom services.
 │       ├── AppServiceProvider.php       # Application Service Provider
-│       ├── AuthServiceProvider.php      # Authentication Service Provider
-│       ├── BroadcastServiceProvider.php # Broadcast Service Provider (can be deleted, not used)
-│       ├── EventServiceProvider.php     # Event Service Provider
-│       │   # Registers events and listeners.
-│       │   # Can define: license activation events, device binding events, etc.
-│       │   # Corresponding listeners handle logging, sending notifications, etc.
-│       │
-│       └── RouteServiceProvider.php     # Route Service Provider
-│           # Route model binding configuration.
-│           # Can define route model bindings, e.g., licenses/{license}
+│       # Additional providers may be added as project architecture evolves.
 │
 ├── resources/views/
 │   ├── auth/                           # Breeze Authentication Views (auto-generated)
@@ -684,7 +767,7 @@ C:\code\HTML\app\
 └── routes/
    ├── api.php                         # API Route Definitions
    │   # Group: middleware: 'throttle:api'
-   |   # POST /account/login     -> AccountController@login
+   │   # POST /account/login     -> AccountController@login
    │   # POST /license/activate  -> ClientLicenseController@activate
    │   # POST /license/check     -> ClientLicenseController@check
    │   # POST /license/unbind    -> ClientLicenseController@unbind
@@ -753,8 +836,8 @@ C:\code\HTML\app\
    - DeviceRequest.php (HWID validation)
    - PackageUploadRequest.php (file validation)
 
-3. **API implementation baseline (after Web Phase is complete)**
-   - Register `api` routing entry in `bootstrap/app.php` and map to `routes/api.php`.
+3. **API implementation baseline**
+   - Keep `api` routing entry in `bootstrap/app.php` mapped to `routes/api.php`.
 
    **Error contract for `/api/license/check`**
    - Keep response shape stable as `{ code, error_code, message, data, signature, meta }`.
