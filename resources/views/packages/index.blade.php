@@ -27,7 +27,7 @@
                     @if ($stats['latest_stable'] ?? null)
                         <div class="space-y-4">
                             <!-- Version Badge -->
-                            <div class="flex items-center gap-3">
+                            <div class="flex flex-wrap items-center gap-3">
                                 <span
                                     class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm font-medium">
                                     Version {{ $stats['latest_stable']->version }}
@@ -79,7 +79,7 @@
                             @endif
 
                             <!-- Action Buttons -->
-                            <div class="flex gap-3 mt-6">
+                            <div class="flex flex-wrap gap-3 mt-6">
                                 <a href="{{ route('packages.show', $stats['latest_stable']) }}"
                                     class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +119,7 @@
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">All Package Releases</h3>
 
                             @if ($isAdmin ?? false)
-                                <div class="flex gap-2">
+                                <div class="flex flex-wrap gap-2">
                                     <a href="{{ route('packages.upload') }}"
                                         class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
                                         Add New Package
@@ -246,8 +246,6 @@
                     </div>
                 </div>
             @endif
-
-
         </div>
     </div>
 </x-app-sidebar-layout>

@@ -4,7 +4,6 @@
     </x-slot>
 
     <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @if ($isAdmin && $statistics)
                 <!-- Statistics Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
@@ -32,7 +31,7 @@
                     <!-- Filters -->
                     <div
                         class="mb-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-4 lg:max-xl:flex-wrap gap-2">
                             <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +72,7 @@
                                     <label for="sort"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort
                                         By</label>
-                                    <div class="flex gap-2">
+                                    <div class="flex flex-wrap gap-2">
                                         <select name="sort" id="sort"
                                             class="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
                                             <option value="last_heartbeat_at"
@@ -357,7 +356,6 @@
                         <x-pagination :paginator="$sessions" />
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 

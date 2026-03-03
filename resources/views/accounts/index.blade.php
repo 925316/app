@@ -1,7 +1,6 @@
 <x-app-sidebar-layout>
     <x-slot name="header"> {{ __('Account Management') }} </x-slot>
-    <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> <!-- Statistics Cards -->
+    <div class="py-7"> <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <x-stat-card title="Total Accounts" :value="$statistics['total']" icon="users" iconColor="icon-blue" />
                 <x-stat-card title="Active Accounts" :value="$statistics['active']" icon="success" iconColor="icon-green" />
@@ -10,9 +9,9 @@
             </div>
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100"> <!-- Header with actions -->
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 lg:max-xl:flex-wrap">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white"> Account Management </h3>
-                        <div class="flex gap-2"><a href="{{ route('accounts.create') }}"
+                        <div class="flex flex-wrap gap-2"><a href="{{ route('accounts.create') }}"
                                 class="btn btn-blue btn-sm">
                                 Create
                                 Account </a></div>
@@ -308,7 +307,6 @@
                         <x-pagination :paginator="$accounts" />
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 </x-app-sidebar-layout>

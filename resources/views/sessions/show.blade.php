@@ -4,9 +4,8 @@
     </x-slot>
 
     <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Breadcrumb and Actions -->
-            <div class="mb-6 flex justify-between items-center">
+            <div class="mb-6 flex justify-between items-center gap-3 lg:max-xl:flex-wrap">
                 <div class="flex items-center space-x-2">
                     <a href="{{ route('sessions.index') }}"
                         class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm">
@@ -221,7 +220,6 @@
 
                 </div>
             </div>
-        </div>
     </div>
 
 </x-app-sidebar-layout>

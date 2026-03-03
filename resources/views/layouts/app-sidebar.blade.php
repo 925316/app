@@ -77,14 +77,14 @@
 </head>
 
 <body
-    class="font-sans antialiased bg-gradient-to-br from-cool-50 to-cool-100 dark:from-cool-900 dark:to-cool-800 min-h-screen transition-colors duration-300">
-    <div class="flex min-h-screen" x-data>
+    class="font-sans antialiased bg-gradient-to-br from-cool-50 to-cool-100 dark:from-cool-900 dark:to-cool-800 min-h-screen overflow-x-hidden transition-colors duration-300">
+    <div class="flex min-h-screen w-full overflow-x-hidden" x-data>
         <!-- Sidebar Navigation -->
         @include('layouts.sidebar')
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col transition-all duration-300 ml-0"
-            :class="{ 'lg:ml-64': $store.sidebar.open, 'lg:ml-16': !$store.sidebar.open }" x-cloak>
+        <div class="relative z-0 flex flex-col w-full min-w-0 transition-all duration-300 ml-0"
+            :class="{ 'lg:ml-64 lg:w-[calc(100%-16rem)]': $store.sidebar.open, 'lg:ml-16 lg:w-[calc(100%-4rem)]': !$store.sidebar.open }" x-cloak>
             <!-- Top Header -->
             <header
                 class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm border-b border-cool-200/50 dark:border-cool-700/50 shadow-sm">
@@ -113,7 +113,7 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto">
+            <main class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
                 <div class="py-8">
                     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                         {{ $slot }}

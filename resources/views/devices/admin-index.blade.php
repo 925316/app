@@ -6,7 +6,6 @@
     </x-slot>
 
     <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <x-stat-card title="Total Devices" :value="$totalDevices" icon="desktop" iconColor="icon-blue" />
@@ -21,7 +20,7 @@
                     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                         <h4 class="text-sm font-medium mb-3">Filters</h4>
                         <form method="GET" action="{{ route('devices.index') }}" data-clean-form="true"
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                             <!-- Search -->
                             <div>
                                 <label for="search"
@@ -248,7 +247,6 @@
                         <x-pagination :paginator="$devices" />
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 

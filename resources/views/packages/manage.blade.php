@@ -4,15 +4,14 @@
     </x-slot>
 
     <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Header with actions -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 lg:max-xl:flex-wrap">
                 <div>
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">Package Management</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">Manage software packages and releases</p>
                 </div>
 
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-2">
                     <a href="{{ route('packages.index') }}"
                         class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
                         View Packages
@@ -77,7 +76,7 @@
 
             <!-- Channel Filter -->
             <div class="mb-6">
-                <form method="GET" action="{{ route('packages.manage') }}" class="flex items-center gap-4">
+                <form method="GET" action="{{ route('packages.manage') }}" class="flex items-end gap-4 lg:max-xl:flex-wrap">
                     <div>
                         <label for="channel"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Release
@@ -223,7 +222,7 @@
                                 // Create a form to submit the bulk delete
                                 const form = document.createElement('form');
                                 form.method = 'POST';
-                                form.action = '{{ route('packages.bulk-delete') }}';
+                                form.action = "{{ route('packages.bulk-delete') }}";
 
                                 // Add CSRF token
                                 const csrfInput = document.createElement('input');
@@ -279,7 +278,6 @@
                     }
                 </script>
             @endif
-        </div>
     </div>
 
 </x-app-sidebar-layout>

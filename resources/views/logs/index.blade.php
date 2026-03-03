@@ -4,7 +4,6 @@
     </x-slot>
 
     <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @if (Auth::user()->hasPrivilege(7))
                 <!-- Statistics Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -18,7 +17,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header with actions -->
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 lg:max-xl:flex-wrap">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">System Event Logs</h3>
                         @if (Auth::user()->hasPrivilege(7))
                             <button onclick="showClearModal()"
@@ -31,7 +30,7 @@
                     <!-- Filters -->
                     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <form method="GET" action="{{ route('logs.index') }}" data-clean-form="true"
-                            class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
                             <div>
                                 <label for="event_type"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event
@@ -208,7 +207,6 @@
                     });
                 </script>
             </div>
-        </div>
     </div>
 
 </x-app-sidebar-layout>
