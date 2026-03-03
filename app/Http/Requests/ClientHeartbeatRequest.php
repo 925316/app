@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class ClientHeartbeatRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'session_token' => ['nullable', 'string', 'max:128'],
+            'license_key' => ['required', 'string', 'max:50'],
+            'hwid' => ['required', 'string', 'min:8', 'max:255'],
+            'nonce' => ['required', 'string', 'min:8', 'max:128'],
+            'timestamp' => ['required', 'integer', 'min:0'],
+            'version' => ['nullable', 'string', 'max:50'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'license_key.required' => 'License key is required.',
+            'hwid.required' => 'HWID is required.',
+            'nonce.required' => 'Nonce is required.',
+            'timestamp.required' => 'Timestamp is required.',
+            'timestamp.integer' => 'Timestamp must be an integer Unix timestamp.',
+        ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('license_key') && is_string($this->license_key)) {
+            $this->merge([
+                'license_key' => strtoupper($this->license_key),
+            ]);
+        }
+    }
+}

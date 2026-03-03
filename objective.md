@@ -63,7 +63,7 @@
   - Server validates timestamp drift (<= 300 seconds).
   - Server MUST reject reused nonce within 5 minutes (Redis `SET key value NX EX 300` recommended).
 - Response Signing (Anti-Tamper):
-  - Critical responses (`/license/check`, `/license/activate`) MUST include `signature`.
+- Critical responses (`/api/license/check`, `/api/license/activate`) MUST include `signature`.
   - Signature is produced from the `data` payload using server private key.
   - Signing algorithm for this project is fixed to **RSA-2048 (SHA-256)**.
   - Canonical JSON serialization rule MUST be fixed and shared with C++ client (same key order/encoding).
