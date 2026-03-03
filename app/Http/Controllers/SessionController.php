@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use App\Models\ClientSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,10 @@ class SessionController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege
         if (! $user->hasPrivilege(1)) {
@@ -40,17 +45,30 @@ class SessionController extends Controller
             }
         }
 
-        // Search by device name or session token
+        // Search by device HWID hash or session token
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('session_token', 'like', "%{$search}%");
+                $q->where('session_token', 'like', "%{$search}%")
+                    ->orWhereHas('device', function ($q) use ($search) {
+                        $q->where('hwid_hash', 'like', "%{$search}%");
+                    });
             });
         }
 
-        // Sort
+        // Sort (allowlist)
         $sort = $request->get('sort', 'last_heartbeat_at');
-        $direction = $request->get('direction', 'desc');
+        $direction = strtolower((string) $request->get('direction', 'desc'));
+        $allowedSorts = ['last_heartbeat_at', 'created_at'];
+
+        if (! in_array($sort, $allowedSorts, true)) {
+            $sort = 'last_heartbeat_at';
+        }
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
         $query->orderBy($sort, $direction);
 
         $sessions = $query->paginate(25)
@@ -90,11 +108,14 @@ class SessionController extends Controller
             }
         }
 
-        // Search by account username, device name, or session token
+        // Search by account username/email, device HWID hash, or session token
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('session_token', 'like', "%{$search}%")
+                    ->orWhereHas('device', function ($q) use ($search) {
+                        $q->where('hwid_hash', 'like', "%{$search}%");
+                    })
                     ->orWhereHas('account', function ($q) use ($search) {
                         $q->where('username', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
@@ -102,9 +123,19 @@ class SessionController extends Controller
             });
         }
 
-        // Sort
+        // Sort (allowlist)
         $sort = $request->get('sort', 'last_heartbeat_at');
-        $direction = $request->get('direction', 'desc');
+        $direction = strtolower((string) $request->get('direction', 'desc'));
+        $allowedSorts = ['last_heartbeat_at', 'created_at'];
+
+        if (! in_array($sort, $allowedSorts, true)) {
+            $sort = 'last_heartbeat_at';
+        }
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
         $query->orderBy($sort, $direction);
 
         $sessions = $query->paginate(25)
@@ -115,8 +146,7 @@ class SessionController extends Controller
         $activeSessions = ClientSession::active()->count();
         $expiredSessions = ClientSession::expired()->count();
         $uniqueAccounts = ClientSession::distinct('account_id')->count('account_id');
-        $uniqueDevices = ClientSession::distinct('device_id')->count('device_id');
-        $uniqueDevices = ClientSession::distinct('device_id')->count();
+        $uniqueDevices = ClientSession::whereNotNull('device_id')->distinct('device_id')->count('device_id');
 
         return view('sessions.index', [
             'sessions' => $sessions,
@@ -149,6 +179,10 @@ class SessionController extends Controller
     {
         $user = Auth::user();
 
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
+
         // Check if user has at least standard privilege
         if (! $user->hasPrivilege(1)) {
             abort(403, 'You need a valid license to access sessions.');
@@ -175,6 +209,10 @@ class SessionController extends Controller
     public function destroy(ClientSession $session)
     {
         $user = Auth::user();
+
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege
         if (! $user->hasPrivilege(1)) {

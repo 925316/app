@@ -104,7 +104,7 @@
                                 <td class="px-4 py-2 whitespace-nowrap text-sm">
                                     <div class="flex gap-2">
                                         @if ($device->isBound())
-                                            <form method="POST" action="{{ route('devices.unbind', $device) }}" class="inline"
+                                            <form method="POST" action="{{ route('devices.unbind') }}" class="inline"
                                                 onsubmit="return confirm('Unbind this device?');">
                                                 @csrf
                                                 <button type="submit"

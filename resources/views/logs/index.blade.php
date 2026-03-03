@@ -81,28 +81,27 @@
                                     Reset
                                 </a>
                             </div>
+                            <!-- Date Range Filter -->
+                            <div
+                                class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2 xl:col-span-4">
+                                <div>
+                                    <label for="start_date"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start
+                                        Date</label>
+                                    <input type="datetime-local" name="start_date" id="start_date"
+                                        value="{{ request('start_date') }}"
+                                        class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                </div>
+                                <div>
+                                    <label for="end_date"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End
+                                        Date</label>
+                                    <input type="datetime-local" name="end_date" id="end_date"
+                                        value="{{ request('end_date') }}"
+                                        class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                </div>
+                            </div>
                         </form>
-
-                        <!-- Date Range Filter -->
-                        <div
-                            class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="start_date"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start
-                                    Date</label>
-                                <input type="datetime-local" name="start_date" id="start_date"
-                                    value="{{ request('start_date') }}"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                            </div>
-                            <div>
-                                <label for="end_date"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End
-                                    Date</label>
-                                <input type="datetime-local" name="end_date" id="end_date"
-                                    value="{{ request('end_date') }}"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Logs table -->

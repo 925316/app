@@ -103,13 +103,18 @@
             @php
                 $tableHeaders =
                     $isAdmin ?? false
-                        ? ['Version', 'Channel', 'Released', 'Hash', 'Actions']
+                        ? ['', 'Version', 'Channel', 'Released', 'Hash', 'Actions']
                         : ['Version', 'Channel', 'Released', 'Hash'];
-                $tableColspan = $isAdmin ?? false ? 5 : 4;
+                $tableColspan = $isAdmin ?? false ? 6 : 4;
             @endphp
             <x-table :headers="$tableHeaders" :emptyColspan="$tableColspan">
                 @forelse($releases as $release)
                     <tr>
+                        @if ($isAdmin ?? false)
+                            <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                <input type="checkbox" class="release-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ $release->id }}">
+                            </td>
+                        @endif
                         <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                             {{ $release->version }}
                         </td>
@@ -149,7 +154,7 @@
                                     Details
                                 </a>
                                 <span class="mx-1 text-gray-400">|</span>
-                                <form class="inline delete-form" data-version="{{ $release->version }}"
+                                <form class="inline delete-form" method="POST" action="{{ route('packages.destroy', $release) }}" data-version="{{ $release->version }}"
                                     onsubmit="return confirmDelete('{{ $release->version }}')">
                                     @csrf
                                     @method('DELETE')
@@ -184,6 +189,14 @@
 
                     // Select all functionality
                     document.addEventListener('DOMContentLoaded', function() {
+                        const headerRow = document.querySelector('table thead tr');
+                        if (headerRow && !document.getElementById('select-all')) {
+                            const firstHeader = headerRow.querySelector('th');
+                            if (firstHeader) {
+                                firstHeader.innerHTML = '<input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">';
+                            }
+                        }
+
                         const selectAll = document.getElementById('select-all');
                         const checkboxes = document.querySelectorAll('.release-checkbox');
 
@@ -254,12 +267,15 @@
                             // Export selected packages to JSON
                             const exportData = Array.from(selectedCheckboxes).map(checkbox => {
                                 const row = checkbox.closest('tr');
+                                const cells = row.querySelectorAll('td');
+                                const offset = 1;
+
                                 return {
                                     id: checkbox.value,
-                                    version: row.querySelector('td:nth-child(2)').textContent.trim(),
-                                    channel: row.querySelector('td:nth-child(3) span').textContent.trim(),
-                                    released: row.querySelector('td:nth-child(4)').textContent.trim(),
-                                    hashVerification: row.querySelector('td:nth-child(5) span').textContent.trim()
+                                    version: cells[offset]?.textContent.trim() ?? '',
+                                    channel: cells[offset + 1]?.querySelector('span')?.textContent.trim() ?? '',
+                                    released: cells[offset + 2]?.textContent.trim() ?? '',
+                                    hashVerification: cells[offset + 3]?.querySelector('span')?.textContent.trim() ?? ''
                                 };
                             });
 

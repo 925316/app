@@ -176,7 +176,7 @@
                                                         'license_count' => null,
                                                     ])" />
                                                 @endif @if ($currentFilters['search'])
-                                                    <x-filter-badge label="Search: "{{ $currentFilters['search'] }}""
+                                                    <x-filter-badge :label="'Search: \"' . $currentFilters['search'] . '\"'"
                                                         color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
                                                     @endif @if ($currentFilters['sort'] !== 'created_at_desc')
                                                         @php

@@ -66,18 +66,20 @@ class AccountController extends Controller
             });
         }
 
-        // Sort
+        // Sort (allowlist)
         $sortValue = $request->get('sort', 'created_at_desc');
+        $allowedSorts = [
+            'created_at_desc' => ['created_at', 'desc'],
+            'created_at_asc' => ['created_at', 'asc'],
+            'username_asc' => ['username', 'asc'],
+            'username_desc' => ['username', 'desc'],
+            'email_asc' => ['email', 'asc'],
+            'email_desc' => ['email', 'desc'],
+            'last_login_at_desc' => ['last_login_at', 'desc'],
+            'last_login_at_asc' => ['last_login_at', 'asc'],
+        ];
 
-        // Parse sort value (format: field_direction)
-        if (str_contains($sortValue, '_')) {
-            $parts = explode('_', $sortValue);
-            $direction = array_pop($parts);
-            $sort = implode('_', $parts);
-        } else {
-            $sort = $sortValue;
-            $direction = 'desc';
-        }
+        [$sort, $direction] = $allowedSorts[$sortValue] ?? $allowedSorts['created_at_desc'];
 
         $query->orderBy($sort, $direction);
 
@@ -116,7 +118,7 @@ class AccountController extends Controller
                 'privilege' => $request->privilege,
                 'license_count' => $request->license_count,
                 'search' => $request->search,
-                'sort' => $sort,
+                'sort' => $sortValue,
                 'direction' => $direction,
             ],
         ]);
@@ -142,7 +144,7 @@ class AccountController extends Controller
             'username' => $validated['username'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'email_verified_at' => $validated['email_verified'] ? now() : null,
+            'email_verified_at' => ! empty($validated['email_verified']) ? now() : null,
         ]);
 
         // Log the event
@@ -154,7 +156,7 @@ class AccountController extends Controller
             'details' => [
                 'username' => $account->username,
                 'email' => $account->email,
-                'email_verified' => $validated['email_verified'],
+                'email_verified' => ! empty($validated['email_verified']),
             ],
         ]);
 
@@ -215,7 +217,7 @@ class AccountController extends Controller
             'email' => $validated['email'],
         ];
 
-        if ($validated['password']) {
+        if (! empty($validated['password'])) {
             $updateData['password'] = Hash::make($validated['password']);
         }
 
@@ -231,7 +233,7 @@ class AccountController extends Controller
             'details' => [
                 'username' => $account->username,
                 'email_changed' => $oldEmail !== $account->email,
-                'password_changed' => $validated['password'] !== null,
+                'password_changed' => ! empty($validated['password']),
             ],
         ]);
 
