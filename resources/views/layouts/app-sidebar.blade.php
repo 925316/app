@@ -83,12 +83,12 @@
         @include('layouts.sidebar')
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col transition-all duration-300"
-            :style="{ marginLeft: $store.sidebar.open ? '16rem' : '4rem' }" x-cloak>
+        <div class="flex-1 flex flex-col transition-all duration-300 ml-0"
+            :class="{ 'lg:ml-64': $store.sidebar.open, 'lg:ml-16': !$store.sidebar.open }" x-cloak>
             <!-- Top Header -->
             <header
                 class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm border-b border-cool-200/50 dark:border-cool-700/50 shadow-sm">
-                <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
                     <!-- Page Title -->
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -114,14 +114,16 @@
 
             <!-- Page Content -->
             <main class="flex-1 overflow-y-auto">
-                <div class="px-6 py-8">
-                    {{ $slot }}
+                <div class="py-8">
+                    <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                        {{ $slot }}
+                    </div>
                 </div>
             </main>
 
             <!-- Footer -->
             <footer
-                class="bg-white/50 dark:bg-cool-800/50 border-t border-cool-200/50 dark:border-cool-700/50 py-4 px-6">
+                class="bg-white/50 dark:bg-cool-800/50 border-t border-cool-200/50 dark:border-cool-700/50 py-4 px-4 sm:px-6 lg:px-8">
                 <div class="text-center text-sm text-gray-600 dark:text-gray-400">
                     &copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. {{ __('All rights reserved.') }}
                 </div>

@@ -3,8 +3,9 @@
         {{ __('Device Management') }}
     </x-slot>
 
-    <div
-        class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+    <div class="max-w-4xl mx-auto">
+        <div
+            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
         <!-- Header -->
         <div class="mb-6">
             <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">Device Binding Management</h3>
@@ -170,6 +171,7 @@
                 class="px-3 py-1.5 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition text-sm">
                 Back to Device History
             </a>
+        </div>
         </div>
     </div>
 

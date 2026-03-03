@@ -3,9 +3,10 @@
         {{ __('Create License') }}
     </x-slot>
 
-    <div
-        class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
-        <form method="POST" action="{{ route('licenses.store') }}">
+    <div class="max-w-4xl mx-auto">
+        <div
+            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+            <form method="POST" action="{{ route('licenses.store') }}">
             @csrf
 
             <!-- License Key -->
@@ -106,7 +107,8 @@
                     Create License
                 </button>
             </div>
-        </form>
+            </form>
+        </div>
     </div>
 
 </x-app-sidebar-layout>

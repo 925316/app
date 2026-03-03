@@ -34,7 +34,7 @@
     };
 @endphp
 <div id="{{ $id }}" class="modal-backdrop hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 modal-content">
+    <div class="relative top-20 mx-auto w-full max-w-md p-5 border shadow-lg rounded-md bg-white dark:bg-gray-800 modal-content">
         <div class="mt-3">
             @if ($icon || $iconName)
                 <div class="flex items-center justify-center mx-auto h-12 w-12 rounded-full {{ $iconBgColor }}">

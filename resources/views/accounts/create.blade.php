@@ -3,8 +3,9 @@
         {{ __('Create Account') }}
     </x-slot>
 
-    <div
-        class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+    <div class="max-w-4xl mx-auto">
+        <div
+            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Create New Account</h1>
             <a href="{{ route('accounts.index') }}" class="btn btn-secondary btn-sm">
@@ -74,6 +75,7 @@
                 </button>
             </div>
         </form>
+        </div>
     </div>
 
 </x-app-sidebar-layout>

@@ -4,8 +4,9 @@
         {{ __('Account Details') }}
     </x-slot>
 
-    <div
-        class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+    <div class="max-w-6xl mx-auto">
+        <div
+            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $account->username }}</h1>
@@ -118,7 +119,7 @@
                         </button>
                     </form>
                 @else
-                    <button onclick="openSuspendModal({{ $account->id }})" class="btn btn-danger btn-sm">
+                    <button onclick="openSuspendModal('{{ $account->id }}')" class="btn btn-danger btn-sm">
                         Suspend Account
                     </button>
                 @endif
@@ -132,7 +133,7 @@
                     </form>
                 @endif
 
-                <button onclick="openResetHwidModal({{ $account->id }})" class="btn btn-yellow btn-sm">
+                <button onclick="openResetHwidModal('{{ $account->id }}')" class="btn btn-yellow btn-sm">
                     Reset HWID
                 </button>
 
@@ -410,6 +411,7 @@
                 document.getElementById('resetHwidForm').action = `/accounts/${accountId}/reset-hwid`;
             }
         </script>
+        </div>
     </div>
 
 </x-app-sidebar-layout>

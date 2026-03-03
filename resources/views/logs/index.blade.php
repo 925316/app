@@ -145,7 +145,6 @@
                             </tr>
                         @endforelse
                     </x-table>
-                    </div>
 
                     <!-- Pagination -->
                     <div class="mt-4">
