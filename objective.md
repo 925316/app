@@ -2,12 +2,18 @@
 
 ## Critical Design Constraints
 
-**Please ensure the AI understands and strictly adheres to these fundamental constraints:**
+### Document Scope and Status (Important)
 
-### Development Boundary (Important)
+- This document is a living spec for a phased delivery project.
+- Rules are split into:
+  1. **Implemented (current behavior)**
+  2. **Planned (next modules to complete)**
+- Client integration must follow **Implemented** rules first; **Planned** rules are not assumed available until shipped.
+
+### Development Boundary
 
 - Web routes/controllers/services/models and API routes/controllers/services/models must stay consistent with unified domain rules.
-- **API implementation baseline**:
+- **API implementation**:
   1. `routes/api.php` + `ClientLicenseController@check` as the first heartbeat endpoint.
   2. `ClientHeartbeatRequest` validation for `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
   3. Replay protection with Redis nonce guard (5 minutes) and timestamp window (`<= 300s`).
@@ -19,7 +25,11 @@
   9. Heartbeat/session update uses `session_token` as lookup key: successful `check` updates `client_sessions.last_heartbeat_at`; failed checks do not update it.
 - Even in phased delivery, shared domain rules (license status machine, privilege source, key regex, bind/unbind consistency) must stay unified.
 
-### 1. Permission System (MOST IMPORTANT!)
+**Current API phase status**:
+- Implemented now: `POST /api/license/check`, `POST /api/license/activate`.
+- Planned next: `POST /api/account/login`, `POST /api/license/unbind`, `GET /api/update/check`.
+
+### 1. Permission System
 
 - **DO NOT** add `is_admin`, `role`, or any permission fields to the `accounts` table.
 - Administrator permissions are determined **SOLELY** by the `privilege` field in the `licenses` table.
@@ -46,10 +56,12 @@
 ### 4. Device Binding Restrictions
 
 - An account can have **ONLY ONE ACTIVE DEVICE** at a time.
+- An account can have **ONLY ONE ONLINE SESSION** at a time (online status judged by heartbeat freshness).
+- The same physical computer (same HWID) **may be used by multiple different accounts**. Restriction scope is per-account, not global-HWID.
 - Current active device condition: `bound_at IS NOT NULL AND unbound_at IS NULL`.
 - Enforce with:
   1. Transaction + row-level lock during bind/unbind.
-  2. Database-level uniqueness guard (generated-column unique strategy recommended).
+  2. Database-level uniqueness guard for **account-scoped active device uniqueness** (generated-column unique strategy recommended).
 - **HWID Logic**: store only irreversible hash (SHA-256), never raw HWID.
 - Device `characteristics` (if collected) is optional and **must not** replace `hwid_hash` as the binding identity source.
 
@@ -148,13 +160,16 @@ Client verification must follow the exact same canonicalization process.
 
 ### 5. API Endpoint Set (Normative)
 
-The client-server protocol includes the following endpoints:
+The client-server protocol endpoint set is phased:
 
+**Implemented now**:
+1. `POST /api/license/check`
+2. `POST /api/license/activate`
+
+**Planned next phase**:
 1. `POST /api/account/login`
-2. `POST /api/license/check`
-3. `POST /api/license/activate`
-4. `POST /api/license/unbind`
-5. `GET /api/update/check`
+2. `POST /api/license/unbind`
+3. `GET /api/update/check`
 
 Session liveness is heartbeat-driven. Explicit logout endpoint is not required by protocol correctness.
 
@@ -177,6 +192,8 @@ Session liveness is heartbeat-driven. Explicit logout endpoint is not required b
 
 #### `POST /api/account/login`
 
+Status: **Planned** (not part of current shipped API surface).
+
 - Required contract fields: account credentials + device identity (`hwid`, `nonce`, `timestamp`, `version`).
 - Success must return: `session_token`, account summary, effective license summary.
 - Server must persist/update:
@@ -185,11 +202,15 @@ Session liveness is heartbeat-driven. Explicit logout endpoint is not required b
 
 #### `POST /api/license/unbind`
 
+Status: **Planned** (not part of current shipped API surface).
+
 - Required contract fields: `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
 - Must enforce one-active-device rule with transaction + lock semantics.
 - Success must produce event log and unbind state transition consistency.
 
 #### `GET /api/update/check`
+
+Status: **Planned** (not part of current shipped API surface).
 
 - Must return latest package metadata: `version`, `release_channel`, `download_url`, `changelog`, optional `virus_detection_url`.
 - Response format remains JSON and follows stable error-code contract.
@@ -210,11 +231,15 @@ Session liveness is heartbeat-driven. Explicit logout endpoint is not required b
 
 ### 7. Security and Determinism Requirements
 
-1. Nonce namespace must include business scope (`endpoint + session/account + nonce-hash`) to avoid cross-context collisions.
+1. Nonce namespace target design should include business scope (`endpoint + session/account + nonce-hash`) to avoid cross-context collisions.
 2. Nonce TTL is fixed to `300s` unless protocol version explicitly changes it.
 3. Timestamp validation must reject both stale and future out-of-window requests.
 4. Canonical JSON rules are fixed for cross-language verification; both server and C++ client must follow the same deterministic process.
 5. RSA signing key must be at least 2048-bit; algorithm identifier remains `RSA-2048-SHA256`.
+
+Current implementation note:
+- Current replay guard may use a simpler nonce key strategy during phased delivery.
+- Before enabling all planned endpoints, upgrade nonce keying to the scoped namespace rule above.
 
 ### 8. API Test Matrix (Minimum 6-10 Cases)
 
@@ -513,9 +538,9 @@ C:\code\HTML\app\
 │   │   │   │   # Handles: /api/license/check (Heartbeat)
 │   │   │   │   # Logic: validates key + HWID and returns signed JSON.
 │   │   │   │
-│   │   │   ├── ClientPackageController.php
-│   │   │   │   # Handles: /api/update/check
-│   │   │   │   # Returns latest version info + download URL.
+│   │   │   ├── ClientPackageController.php (planned)
+│   │   │   │   # Planned for: /api/update/check
+│   │   │   │   # Returns latest version info + download URL when implemented.
 │   │   │   │
 │   │   │   ├── Auth/                    # Breeze Authentication Controllers (auto-generated)
 │   │   │   │   # Handles basic authentication functions: login, registration, password reset, etc.
@@ -767,11 +792,11 @@ C:\code\HTML\app\
 └── routes/
    ├── api.php                         # API Route Definitions
    │   # Group: middleware: 'throttle:api'
-   │   # POST /account/login     -> AccountController@login
+   │   # POST /account/login     -> AccountController@login (planned)
    │   # POST /license/activate  -> ClientLicenseController@activate
    │   # POST /license/check     -> ClientLicenseController@check
-   │   # POST /license/unbind    -> ClientLicenseController@unbind
-   │   # GET  /update/check      -> ClientPackageController@check
+   │   # POST /license/unbind    -> ClientLicenseController@unbind (planned)
+   │   # GET  /update/check      -> ClientPackageController@check (planned)
    │
    │
    ├── web.php                         # Web Route Definitions
