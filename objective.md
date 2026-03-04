@@ -48,7 +48,8 @@
 
 ### 3. License State Machine
 
-- State transitions MUST follow documented rules exactly (`revoked` is terminal).
+- State transitions must follow the backend enum/service guards as the runtime source of truth (`LicenseStatus` + `LicenseService`).
+- `revoked` is terminal in current implementation (cannot be re-revoked or activated).
 - Critical operations (Activate, Bind, Unbind, Upgrade) MUST use Database Transactions.
 - **No direct device pointer in `licenses`** (no `current_device_id`).
 - Device association is resolved through account ownership (`licenses.used_by -> accounts -> account_devices`).
@@ -366,16 +367,16 @@ UI may apply a looser pre-check for usability, but backend regex is the final au
 | `notes`                   | TEXT             | NULLABLE                  | Administrator Notes                                                 |
 | `created_at`,`updated_at` | TIMESTAMP        |                           | Laravel Timestamps                                                  |
 
-**Status Transition Rules**:
+**Status Transition Rules (aligned with current implementation)**:
 
 - `status`: 0='unused', 1='active', 2='suspended', 3='expired', 4='upgraded', 5='revoked'
 
-- `unused` → `active`: User first activation
-- `active` → `suspended`: Risk control trigger or administrator action
-- `active` → `expired`: Reached expiration time
-- `active` → `upgraded`: User upgraded license
-- `suspended` → `active`: Administrator unsuspension
-- Any status → `revoked`: License revoked
+- `unused` → `active`: User first activation (allowed).
+- `active` → `suspended`: Risk control trigger or administrator action (allowed).
+- `active` → `upgraded`: User upgraded license (allowed).
+- `suspended` → `active`: Administrator unsuspension (allowed).
+- Any non-`revoked` status → `revoked`: License revoked (allowed).
+- `active` → `expired`: represented by effective-state evaluation (`expires_at`) and expiry handling flows.
 
 **Optimization**
 
