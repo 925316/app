@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -31,6 +32,22 @@ return new class extends Migration
             $table->unique(['account_id', 'hwid_hash']);
             $table->index(['account_id', 'last_seen_at']);
         });
+
+        $driver = DB::getDriverName();
+
+        if ($driver === 'mysql') {
+            Schema::table('account_devices', function (Blueprint $table) {
+                $table->unsignedBigInteger('active_binding_account_id')
+                    ->nullable()
+                    ->storedAs('CASE WHEN bound_at IS NOT NULL AND unbound_at IS NULL THEN account_id ELSE NULL END');
+            });
+
+            DB::statement('CREATE UNIQUE INDEX account_devices_active_binding_unique ON account_devices (active_binding_account_id)');
+
+            return;
+        }
+
+        DB::statement('CREATE UNIQUE INDEX account_devices_active_binding_unique ON account_devices (account_id) WHERE bound_at IS NOT NULL AND unbound_at IS NULL');
     }
 
     /**

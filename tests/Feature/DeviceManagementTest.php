@@ -101,14 +101,17 @@ it('admin can reset HWID for a user', function () {
 });
 
 it('admin can perform bulk unbind', function () {
+    $userA = Account::factory()->create();
+    $userB = Account::factory()->create();
+
     $device1 = AccountDevice::factory()->create([
-        'account_id' => $this->regularUser->id,
+        'account_id' => $userA->id,
         'hwid_hash' => str_repeat('a', 64),
         'bound_at' => now(),
     ]);
 
     $device2 = AccountDevice::factory()->create([
-        'account_id' => $this->regularUser->id,
+        'account_id' => $userB->id,
         'hwid_hash' => str_repeat('b', 64),
         'bound_at' => now(),
     ]);

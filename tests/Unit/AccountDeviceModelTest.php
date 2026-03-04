@@ -97,6 +97,7 @@ it('has unbound scope', function () {
 it('has active scope', function () {
     // Use a fresh account to avoid interference from beforeEach
     $account = Account::factory()->create();
+    $otherAccount = Account::factory()->create();
 
     AccountDevice::factory()->create([
         'account_id' => $account->id,
@@ -105,7 +106,7 @@ it('has active scope', function () {
     ]);
 
     AccountDevice::factory()->create([
-        'account_id' => $account->id,
+        'account_id' => $otherAccount->id,
         'last_seen_at' => now()->subDays(60),
         'bound_at' => now(),
     ]);
