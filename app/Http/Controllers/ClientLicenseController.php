@@ -17,6 +17,8 @@ use Throwable;
 
 class ClientLicenseController extends Controller
 {
+    private const SIGNING_ALGORITHM = 'RSA-2048-SHA256';
+
     public function __construct(
         private readonly NonceGuardService $nonceGuardService,
         private readonly CryptoService $cryptoService,
@@ -104,7 +106,7 @@ class ClientLicenseController extends Controller
                 'signature' => $signature,
                 'meta' => [
                     'signature' => [
-                        'algorithm' => (string) config('services.api_signing.algorithm', 'RSA-2048-SHA256'),
+                        'algorithm' => self::SIGNING_ALGORITHM,
                         'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
                     ],
                 ],
@@ -213,7 +215,7 @@ class ClientLicenseController extends Controller
                 'signature' => $signature,
                 'meta' => [
                     'signature' => [
-                        'algorithm' => (string) config('services.api_signing.algorithm', 'RSA-2048-SHA256'),
+                        'algorithm' => self::SIGNING_ALGORITHM,
                         'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
                     ],
                 ],
