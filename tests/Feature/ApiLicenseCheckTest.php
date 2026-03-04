@@ -97,6 +97,19 @@ it('returns nonce replay error for reused nonce', function () {
         ->assertJsonPath('error_code', 'NONCE_REPLAY');
 });
 
+it('allows same nonce value across different endpoint scopes', function () {
+    seedValidApiContext();
+
+    $payload = apiPayload(['nonce' => 'nonce-same-cross-endpoint']);
+
+    postJson('/api/license/check', $payload)
+        ->assertSuccessful();
+
+    postJson('/api/license/activate', $payload)
+        ->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+});
+
 it('returns timestamp out of window for stale timestamp', function () {
     seedValidApiContext();
 

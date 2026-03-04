@@ -42,7 +42,8 @@ class ClientLicenseController extends Controller
                 return $this->errorResponse(422, 'TIMESTAMP_OUT_OF_WINDOW', 'Timestamp is out of allowed window.');
             }
 
-            $nonceAcquired = $this->nonceGuardService->acquire((string) $validated['nonce']);
+            $nonceScope = 'license.check|'.$sessionToken;
+            $nonceAcquired = $this->nonceGuardService->acquire($nonceScope, (string) $validated['nonce']);
             if (! $nonceAcquired) {
                 return $this->errorResponse(409, 'NONCE_REPLAY', 'Nonce has already been used.');
             }
@@ -130,7 +131,8 @@ class ClientLicenseController extends Controller
                 return $this->errorResponse(422, 'TIMESTAMP_OUT_OF_WINDOW', 'Timestamp is out of allowed window.');
             }
 
-            $nonceAcquired = $this->nonceGuardService->acquire((string) $validated['nonce']);
+            $nonceScope = 'license.activate|'.$sessionToken;
+            $nonceAcquired = $this->nonceGuardService->acquire($nonceScope, (string) $validated['nonce']);
             if (! $nonceAcquired) {
                 return $this->errorResponse(409, 'NONCE_REPLAY', 'Nonce has already been used.');
             }

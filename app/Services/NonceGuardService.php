@@ -8,9 +8,9 @@ use Throwable;
 
 class NonceGuardService
 {
-    public function acquire(string $nonce, int $ttlSeconds = 300): bool
+    public function acquire(string $scope, string $nonce, int $ttlSeconds = 300): bool
     {
-        $cacheKey = 'api:nonce:'.hash('sha256', $nonce);
+        $cacheKey = 'api:nonce:'.hash('sha256', $scope.'|'.$nonce);
 
         try {
             $result = Redis::set($cacheKey, '1', 'EX', $ttlSeconds, 'NX');
