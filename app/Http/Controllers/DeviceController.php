@@ -126,7 +126,7 @@ class DeviceController extends Controller
 
             if ($alreadyBound) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    'hwid_hash' => 'You can only bind one device at a time. Please unbind your current device first.',
+                    'hwid' => 'You can only bind one device at a time. Please unbind your current device first.',
                 ]);
             }
 
@@ -134,7 +134,7 @@ class DeviceController extends Controller
             $device = AccountDevice::firstOrCreate(
                 [
                     'account_id' => $user->id,
-                    'hwid_hash' => $request->hwid_hash,
+                    'hwid_hash' => hash('sha256', (string) $request->hwid),
                 ],
                 [
                     'ip_address' => $request->ip_address,

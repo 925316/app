@@ -22,15 +22,11 @@ class DeviceRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'hwid_hash' => [
+            'hwid' => [
                 'required',
                 'string',
-                'size:64', // SHA-256 hash
-                function ($attribute, $value, $fail) {
-                    if (! ctype_xdigit($value)) {
-                        $fail('The HWID hash must be a valid hexadecimal string.');
-                    }
-                },
+                'min:8',
+                'max:255',
             ],
             'ip_address' => [
                 'required',
@@ -46,11 +42,12 @@ class DeviceRequest extends FormRequest
 
         // For binding operations
         if ($this->routeIs('devices.bind')) {
-            $rules['hwid_hash'][] = function ($attribute, $value, $fail) {
+            $rules['hwid'][] = function ($attribute, $value, $fail) {
                 $account = $this->user();
+                $incomingHwidHash = hash('sha256', (string) $value);
 
                 // Check if device is already bound to this account
-                if ($account->devices()->where('hwid_hash', $value)
+                if ($account->devices()->where('hwid_hash', $incomingHwidHash)
                     ->whereNotNull('bound_at')
                     ->whereNull('unbound_at')
                     ->exists()) {
@@ -73,9 +70,9 @@ class DeviceRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'hwid_hash.required' => 'The HWID hash is required.',
-            'hwid_hash.size' => 'The HWID hash must be 64 characters long.',
-            'hwid_hash.regex' => 'The HWID hash must be a valid hexadecimal string.',
+            'hwid.required' => 'The HWID is required.',
+            'hwid.min' => 'The HWID must be at least 8 characters.',
+            'hwid.max' => 'The HWID must be at most 255 characters.',
             'ip_address.required' => 'The IP address is required.',
             'ip_address.ip' => 'The IP address must be a valid IP address.',
             'country_code.size' => 'The country code must be 2 characters.',
@@ -88,9 +85,9 @@ class DeviceRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        if ($this->filled('hwid_hash') && is_string($this->hwid_hash)) {
+        if ($this->filled('hwid') && is_string($this->hwid)) {
             $this->merge([
-                'hwid_hash' => strtolower($this->hwid_hash),
+                'hwid' => trim($this->hwid),
             ]);
         }
 

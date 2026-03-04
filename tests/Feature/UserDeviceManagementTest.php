@@ -68,7 +68,7 @@ it('user without license cannot access device manage page', function () {
 it('user with license can bind a device', function () {
     $this->actingAs($this->userWithLicense)
         ->post(route('devices.bind'), [
-            'hwid_hash' => str_repeat('a', 64),
+            'hwid' => 'USER-HWID-A-12345',
             'ip_address' => '192.168.1.1',
             'country_code' => 'US',
         ])
@@ -81,7 +81,7 @@ it('user with license can bind a device', function () {
 it('user without license cannot bind a device', function () {
     $this->actingAs($this->userWithoutLicense)
         ->post(route('devices.bind'), [
-            'hwid_hash' => str_repeat('a', 64),
+            'hwid' => 'USER-HWID-A-12345',
             'ip_address' => '192.168.1.1',
         ])
         ->assertForbidden();
@@ -97,10 +97,10 @@ it('user cannot bind a second device when one is already bound', function () {
 
     $this->actingAs($this->userWithLicense)
         ->post(route('devices.bind'), [
-            'hwid_hash' => str_repeat('b', 64),
+            'hwid' => 'USER-HWID-B-67890',
             'ip_address' => '192.168.1.2',
         ])
-        ->assertSessionHasErrors('hwid_hash');
+        ->assertSessionHasErrors('hwid');
 });
 
 // --- Unbind ---
