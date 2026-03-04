@@ -17,24 +17,26 @@ class AccountDeviceFactory extends Factory
      */
     public function definition(): array
     {
-        $firstSeen = $this->faker->dateTimeBetween('-1 year', '-2 months');
-        $lastSeen = Carbon::parse($firstSeen)->addDays($this->faker->numberBetween(0, 30));
+        $faker = fake();
 
-        $isBound = $this->faker->boolean(80);
+        $firstSeen = $faker->dateTimeBetween('-1 year', '-2 months');
+        $lastSeen = Carbon::parse($firstSeen)->addDays($faker->numberBetween(0, 30));
+
+        $isBound = $faker->boolean(80);
         $boundAt = $isBound
-            ? Carbon::parse($firstSeen)->addDays($this->faker->numberBetween(0, 7))
+            ? Carbon::parse($firstSeen)->addDays($faker->numberBetween(0, 7))
             : null;
 
-        $isUnbound = $isBound && $this->faker->boolean(30);
+        $isUnbound = $isBound && $faker->boolean(30);
         $unboundAt = $isUnbound
-            ? Carbon::parse($boundAt)->addDays($this->faker->numberBetween(1, 60))
+            ? Carbon::parse($boundAt)->addDays($faker->numberBetween(1, 60))
             : null;
 
         return [
             'account_id' => \App\Models\Account::factory(),
-            'hwid_hash' => hash('sha256', $this->faker->uuid().microtime()),
+            'hwid_hash' => hash('sha256', $faker->uuid().microtime()),
             'ip_address' => $this->generateValidIpv4(),
-            'country_code' => $this->faker->countryCode(),
+            'country_code' => $faker->countryCode(),
             'first_seen_at' => $firstSeen,
             'last_seen_at' => $lastSeen,
             'bound_at' => $boundAt,
@@ -49,11 +51,13 @@ class AccountDeviceFactory extends Factory
      */
     private function generateValidIpv4(): string
     {
+        $faker = fake();
+
         return sprintf('%d.%d.%d.%d',
-            $this->faker->numberBetween(1, 255),
-            $this->faker->numberBetween(0, 255),
-            $this->faker->numberBetween(0, 255),
-            $this->faker->numberBetween(0, 255)
+            $faker->numberBetween(1, 255),
+            $faker->numberBetween(0, 255),
+            $faker->numberBetween(0, 255),
+            $faker->numberBetween(0, 255)
         );
     }
 
@@ -65,7 +69,7 @@ class AccountDeviceFactory extends Factory
     public function bound(): static
     {
         return $this->state(fn (array $attributes) => [
-            'bound_at' => Carbon::parse($attributes['first_seen_at'])->addDays($this->faker->numberBetween(0, 7)),
+            'bound_at' => Carbon::parse($attributes['first_seen_at'])->addDays(fake()->numberBetween(0, 7)),
             'unbound_at' => null,
         ]);
     }
@@ -78,8 +82,8 @@ class AccountDeviceFactory extends Factory
     public function unbound(): static
     {
         return $this->state(fn (array $attributes) => [
-            'bound_at' => Carbon::parse($attributes['first_seen_at'])->addDays($this->faker->numberBetween(0, 7)),
-            'unbound_at' => Carbon::now()->subDays($this->faker->numberBetween(1, 30)),
+            'bound_at' => Carbon::parse($attributes['first_seen_at'])->addDays(fake()->numberBetween(0, 7)),
+            'unbound_at' => Carbon::now()->subDays(fake()->numberBetween(1, 30)),
         ]);
     }
 
@@ -104,7 +108,7 @@ class AccountDeviceFactory extends Factory
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'last_seen_at' => Carbon::now()->subHours($this->faker->numberBetween(1, 24)),
+            'last_seen_at' => Carbon::now()->subHours(fake()->numberBetween(1, 24)),
         ]);
     }
 
@@ -116,7 +120,7 @@ class AccountDeviceFactory extends Factory
     public function inactive(int $days = 60): static
     {
         return $this->state(fn (array $attributes) => [
-            'last_seen_at' => Carbon::now()->subDays($this->faker->numberBetween($days, $days + 30)),
+            'last_seen_at' => Carbon::now()->subDays(fake()->numberBetween($days, $days + 30)),
         ]);
     }
 
@@ -140,7 +144,7 @@ class AccountDeviceFactory extends Factory
     public function localNetwork(): static
     {
         return $this->state(fn (array $attributes) => [
-            'ip_address' => sprintf('192.168.%d.%d', $this->faker->numberBetween(0, 255), $this->faker->numberBetween(1, 254)),
+            'ip_address' => sprintf('192.168.%d.%d', fake()->numberBetween(0, 255), fake()->numberBetween(1, 254)),
         ]);
     }
 }

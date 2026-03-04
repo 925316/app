@@ -18,14 +18,14 @@ class PackageReleaseFactory extends Factory
     public function definition(): array
     {
         // Generate release date between 2 years ago and now
-        $releaseDate = $this->faker->dateTimeBetween('-2 years', 'now');
+        $releaseDate = fake()->dateTimeBetween('-2 years', 'now');
 
         return [
             'version' => $this->generateVersion(),
-            'release_channel' => $this->faker->randomElement(['stable', 'dev']),
-            'download_url' => $this->faker->url(),
+            'release_channel' => fake()->randomElement(['stable', 'dev']),
+            'download_url' => fake()->url(),
             'virus_detection_url' => null, // No virus detection link for seeded data
-            'changelog' => $this->faker->boolean(80)
+            'changelog' => fake()->boolean(80)
                 ? $this->generateChangelog()
                 : null,
             'created_at' => $releaseDate,
@@ -38,22 +38,22 @@ class PackageReleaseFactory extends Factory
      */
     private function generateVersion(): string
     {
-        $major = $this->faker->numberBetween(1, 5);
-        $minor = $this->faker->numberBetween(0, 20);
-        $patch = $this->faker->numberBetween(0, 50);
+        $major = fake()->numberBetween(1, 5);
+        $minor = fake()->numberBetween(0, 20);
+        $patch = fake()->numberBetween(0, 50);
 
         $version = "{$major}.{$minor}.{$patch}";
 
         // Less frequently add pre-release tag
-        if ($this->faker->boolean(15)) {
-            $version .= '-'.$this->faker->randomElement(['alpha', 'beta', 'rc']);
-            if ($this->faker->boolean(50)) {
-                $version .= '.'.$this->faker->numberBetween(1, 10);
+        if (fake()->boolean(15)) {
+            $version .= '-'.fake()->randomElement(['alpha', 'beta', 'rc']);
+            if (fake()->boolean(50)) {
+                $version .= '.'.fake()->numberBetween(1, 10);
             }
         }
 
         // Rarely add build metadata
-        if ($this->faker->boolean(5)) {
+        if (fake()->boolean(5)) {
             $version .= '+'.Str::random(8);
         }
 
@@ -96,8 +96,8 @@ class PackageReleaseFactory extends Factory
     public function majorVersion(int $major)
     {
         return $this->state(function (array $attributes) use ($major) {
-            $minor = $this->faker->numberBetween(0, 20);
-            $patch = $this->faker->numberBetween(0, 100);
+            $minor = fake()->numberBetween(0, 20);
+            $patch = fake()->numberBetween(0, 100);
 
             return [
                 'version' => "{$major}.{$minor}.{$patch}",
@@ -110,9 +110,9 @@ class PackageReleaseFactory extends Factory
      */
     private function generateChangelog(): string
     {
-        $features = $this->faker->sentences($this->faker->numberBetween(2, 5));
-        $fixes = $this->faker->sentences($this->faker->numberBetween(1, 4));
-        $improvements = $this->faker->sentences($this->faker->numberBetween(1, 3));
+        $features = fake()->sentences(fake()->numberBetween(2, 5));
+        $fixes = fake()->sentences(fake()->numberBetween(1, 4));
+        $improvements = fake()->sentences(fake()->numberBetween(1, 3));
 
         $changelog = "## Changelog\n\n";
 

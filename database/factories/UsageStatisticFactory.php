@@ -37,22 +37,22 @@ class UsageStatisticFactory extends Factory
             'network_traffic',
         ];
 
-        $statType = $this->faker->randomElement($statTypes);
-        $statKey = $this->faker->randomElement($statKeys);
+        $statType = fake()->randomElement($statTypes);
+        $statKey = fake()->randomElement($statKeys);
 
         // Generate appropriate values based on the stat key
         $statValue = match ($statKey) {
-            UsageStatistic::KEY_LOGIN_COUNT => $this->faker->numberBetween(100, 1000000),
-            UsageStatistic::KEY_USAGE_TIME => $this->faker->numberBetween(60, 5256000), // 1 minute to 10 years in minutes
-            UsageStatistic::KEY_TOTAL_REQUESTS => $this->faker->numberBetween(1000, 10000000),
-            UsageStatistic::KEY_ACTIVE_SESSIONS => $this->faker->numberBetween(0, 1000),
-            'api_calls' => $this->faker->numberBetween(100, 100000),
-            'storage_used' => $this->faker->randomFloat(2, 0.01, 10000), // GB
-            'memory_usage' => $this->faker->randomFloat(2, 0.1, 100), // Percentage
-            'cpu_usage' => $this->faker->randomFloat(2, 0.1, 100), // Percentage
-            'disk_io' => $this->faker->numberBetween(10, 10000), // MB/s
-            'network_traffic' => $this->faker->numberBetween(100, 1000000), // MB
-            default => $this->faker->randomFloat(2, 0, 10000),
+            UsageStatistic::KEY_LOGIN_COUNT => fake()->numberBetween(100, 1000000),
+            UsageStatistic::KEY_USAGE_TIME => fake()->numberBetween(60, 5256000), // 1 minute to 10 years in minutes
+            UsageStatistic::KEY_TOTAL_REQUESTS => fake()->numberBetween(1000, 10000000),
+            UsageStatistic::KEY_ACTIVE_SESSIONS => fake()->numberBetween(0, 1000),
+            'api_calls' => fake()->numberBetween(100, 100000),
+            'storage_used' => fake()->randomFloat(2, 0.01, 10000), // GB
+            'memory_usage' => fake()->randomFloat(2, 0.1, 100), // Percentage
+            'cpu_usage' => fake()->randomFloat(2, 0.1, 100), // Percentage
+            'disk_io' => fake()->numberBetween(10, 10000), // MB/s
+            'network_traffic' => fake()->numberBetween(100, 1000000), // MB
+            default => fake()->randomFloat(2, 0, 10000),
         };
 
         return [
@@ -118,7 +118,7 @@ class UsageStatisticFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'stat_key' => UsageStatistic::KEY_LOGIN_COUNT,
-                'stat_value' => $this->faker->numberBetween(100, 1000000),
+                'stat_value' => fake()->numberBetween(100, 1000000),
             ];
         });
     }
@@ -131,7 +131,7 @@ class UsageStatisticFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'stat_key' => UsageStatistic::KEY_USAGE_TIME,
-                'stat_value' => $this->faker->numberBetween(60, 5256000), // 1 minute to 10 years in minutes
+                'stat_value' => fake()->numberBetween(60, 5256000), // 1 minute to 10 years in minutes
             ];
         });
     }

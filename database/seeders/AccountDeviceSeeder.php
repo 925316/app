@@ -40,9 +40,9 @@ class AccountDeviceSeeder extends Seeder
                 ->exists();
 
             if (! $existingBound) {
-                $firstSeen = now()->subDays(rand(30, 365));
-                $lastSeen = $firstSeen->copy()->addDays(rand(0, 30));
-                $boundAt = $firstSeen->copy()->addDays(rand(1, 7));
+                $firstSeen = now()->subDays(fake()->numberBetween(30, 365));
+                $lastSeen = $firstSeen->copy()->addDays(fake()->numberBetween(0, 30));
+                $boundAt = $firstSeen->copy()->addDays(fake()->numberBetween(1, 7));
 
                 AccountDevice::factory()
                     ->for($account)
@@ -68,13 +68,13 @@ class AccountDeviceSeeder extends Seeder
 
         foreach ($accounts as $account) {
             // Random number of historical devices (0-3 per account)
-            $historicalCount = rand(0, 3);
+            $historicalCount = fake()->numberBetween(0, 3);
 
             for ($i = 0; $i < $historicalCount; $i++) {
-                $firstSeen = now()->subDays(rand(365, 730)); // 1-2 years ago
-                $bindDate = $firstSeen->copy()->addDays(rand(1, 7));
-                $unbindDate = $bindDate->copy()->addDays(rand(30, 180)); // Unbound after 1-6 months
-                $lastSeen = $unbindDate->copy()->subDays(rand(1, 7));
+                $firstSeen = now()->subDays(fake()->numberBetween(365, 730)); // 1-2 years ago
+                $bindDate = $firstSeen->copy()->addDays(fake()->numberBetween(1, 7));
+                $unbindDate = $bindDate->copy()->addDays(fake()->numberBetween(30, 180)); // Unbound after 1-6 months
+                $lastSeen = $unbindDate->copy()->subDays(fake()->numberBetween(1, 7));
 
                 AccountDevice::factory()
                     ->for($account)

@@ -67,11 +67,11 @@ class ClientSessionSeeder extends Seeder
 
         foreach ($devices as $device) {
             // Random number of historical sessions (0-2 per device)
-            $historicalCount = rand(0, 2);
+            $historicalCount = fake()->numberBetween(0, 2);
 
             for ($i = 0; $i < $historicalCount; $i++) {
-                $createdTime = now()->subDays(rand(30, 180));
-                $heartbeatTime = $createdTime->copy()->addHours(rand(1, 24));
+                $createdTime = now()->subDays(fake()->numberBetween(30, 180));
+                $heartbeatTime = $createdTime->copy()->addHours(fake()->numberBetween(1, 24));
 
                 ClientSession::factory()
                     ->forDevice($device)

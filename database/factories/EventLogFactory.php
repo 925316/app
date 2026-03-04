@@ -42,13 +42,13 @@ class EventLogFactory extends Factory
         ];
 
         // Randomly decide if we should use existing account/license or null
-        $useAccount = $this->faker->boolean(80);
-        $useLicense = $this->faker->boolean(60);
-        $useActor = $this->faker->boolean(70);
+        $useAccount = fake()->boolean(80);
+        $useLicense = fake()->boolean(60);
+        $useActor = fake()->boolean(70);
 
         return [
-            'event_type' => $this->faker->randomElement($eventTypes),
-            'event_level' => $this->faker->randomElement($eventLevels),
+            'event_type' => fake()->randomElement($eventTypes),
+            'event_level' => fake()->randomElement($eventLevels),
             'account_id' => $useAccount && Account::count() > 0
                 ? Account::inRandomOrder()->first()->id
                 : null,
@@ -60,7 +60,7 @@ class EventLogFactory extends Factory
                 ? Account::inRandomOrder()->first()->id
                 : null,
             'details' => $this->generateEventDetails(),
-            'created_at' => $this->faker->dateTimeBetween('-6 months', 'now'),
+            'created_at' => fake()->dateTimeBetween('-6 months', 'now'),
         ];
     }
 
@@ -70,10 +70,10 @@ class EventLogFactory extends Factory
     private function generateValidIpv4(): string
     {
         return sprintf('%d.%d.%d.%d',
-            rand(1, 255),
-            rand(0, 255),
-            rand(0, 255),
-            rand(0, 255)
+            fake()->numberBetween(1, 255),
+            fake()->numberBetween(0, 255),
+            fake()->numberBetween(0, 255),
+            fake()->numberBetween(0, 255)
         );
     }
 
@@ -82,7 +82,7 @@ class EventLogFactory extends Factory
      */
     private function generateEventDetails(): array
     {
-        $eventType = $this->faker->randomElement([
+        $eventType = fake()->randomElement([
             \App\Enums\EventType::LICENSE_ACTIVATED->value,
             \App\Enums\EventType::DEVICE_BOUND->value,
             \App\Enums\EventType::DEVICE_UNBOUND->value,
@@ -92,46 +92,46 @@ class EventLogFactory extends Factory
 
         return match ($eventType) {
             \App\Enums\EventType::LICENSE_ACTIVATED->value => [
-                'license_key' => strtoupper($this->faker->bothify('??##-??##-??##-??##')),
-                'activation_date' => $this->faker->dateTimeThisYear()->format('Y-m-d H:i:s'),
-                'device_count' => $this->faker->numberBetween(1, 5),
-                'plan_type' => $this->faker->randomElement(['basic', 'pro', 'enterprise']),
+                'license_key' => strtoupper(fake()->bothify('??##-??##-??##-??##')),
+                'activation_date' => fake()->dateTimeThisYear()->format('Y-m-d H:i:s'),
+                'device_count' => fake()->numberBetween(1, 5),
+                'plan_type' => fake()->randomElement(['basic', 'pro', 'enterprise']),
             ],
             \App\Enums\EventType::DEVICE_BOUND->value => [
-                'device_id' => $this->faker->uuid(),
-                'device_name' => $this->faker->randomElement([
+                'device_id' => fake()->uuid(),
+                'device_name' => fake()->randomElement([
                     'iPhone 13 Pro',
                     'Samsung Galaxy S22',
                     'Windows Laptop',
                     'MacBook Pro',
                     'iPad Pro',
                 ]),
-                'device_type' => $this->faker->randomElement(['mobile', 'tablet', 'desktop', 'laptop']),
-                'os_version' => $this->faker->randomElement(['iOS 16.4', 'Android 13', 'Windows 11', 'macOS 13.2']),
-                'binding_time' => $this->faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
+                'device_type' => fake()->randomElement(['mobile', 'tablet', 'desktop', 'laptop']),
+                'os_version' => fake()->randomElement(['iOS 16.4', 'Android 13', 'Windows 11', 'macOS 13.2']),
+                'binding_time' => fake()->dateTimeThisMonth()->format('Y-m-d H:i:s'),
             ],
             \App\Enums\EventType::DEVICE_UNBOUND->value => [
-                'device_id' => $this->faker->uuid(),
-                'device_name' => $this->faker->randomElement([
+                'device_id' => fake()->uuid(),
+                'device_name' => fake()->randomElement([
                     'iPhone 12',
                     'Android Tablet',
                     'Work Laptop',
                     'Home Desktop',
                 ]),
-                'unbind_reason' => $this->faker->randomElement([
+                'unbind_reason' => fake()->randomElement([
                     'user_initiated',
                     'device_limit_reached',
                     'license_expired',
                     'admin_action',
                 ]),
-                'unbind_time' => $this->faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
+                'unbind_time' => fake()->dateTimeThisMonth()->format('Y-m-d H:i:s'),
             ],
             \App\Enums\EventType::ACCOUNT_LOGIN->value => [
-                'attempted_location' => $this->faker->city().', '.$this->faker->country(),
-                'usual_location' => $this->faker->city().', '.$this->faker->country(),
-                'attempt_time' => $this->faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
-                'user_agent' => $this->faker->userAgent(),
-                'action_taken' => $this->faker->randomElement([
+                'attempted_location' => fake()->city().', '.fake()->country(),
+                'usual_location' => fake()->city().', '.fake()->country(),
+                'attempt_time' => fake()->dateTimeThisMonth()->format('Y-m-d H:i:s'),
+                'user_agent' => fake()->userAgent(),
+                'action_taken' => fake()->randomElement([
                     'blocked',
                     'allowed_with_verification',
                     'notified_user',
@@ -139,26 +139,26 @@ class EventLogFactory extends Factory
                 ]),
             ],
             \App\Enums\EventType::LICENSE_SUSPENDED->value => [
-                'suspension_reason' => $this->faker->randomElement([
+                'suspension_reason' => fake()->randomElement([
                     'multiple_failed_logins',
                     'violation_of_tos',
                     'payment_issue',
                     'admin_discretion',
                     'suspicious_activity',
                 ]),
-                'suspended_by' => $this->faker->name(),
-                'suspension_duration' => $this->faker->randomElement([
+                'suspended_by' => fake()->name(),
+                'suspension_duration' => fake()->randomElement([
                     '24_hours',
                     '7_days',
                     '30_days',
                     'permanent',
                 ]),
-                'appeal_possible' => $this->faker->boolean(),
-                'notification_sent' => $this->faker->boolean(90),
+                'appeal_possible' => fake()->boolean(),
+                'notification_sent' => fake()->boolean(90),
             ],
             default => [
-                'note' => $this->faker->sentence(),
-                'timestamp' => $this->faker->dateTimeThisYear()->format('Y-m-d H:i:s'),
+                'note' => fake()->sentence(),
+                'timestamp' => fake()->dateTimeThisYear()->format('Y-m-d H:i:s'),
             ],
         };
     }
@@ -221,7 +221,7 @@ class EventLogFactory extends Factory
     public function recent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'created_at' => $this->faker->dateTimeBetween('-7 days', 'now'),
+            'created_at' => fake()->dateTimeBetween('-7 days', 'now'),
         ]);
     }
 

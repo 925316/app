@@ -23,34 +23,34 @@ class AccountFactory extends Factory
      */
     public function definition(): array
     {
-        $createdAt = $this->faker->dateTimeBetween('-2 years', 'now');
-        $suspended = $this->faker->boolean(5); // 5% chance of being suspended
+        $createdAt = fake()->dateTimeBetween('-2 years', 'now');
+        $suspended = fake()->boolean(5); // 5% chance of being suspended
 
         return [
-            'username' => $this->faker->unique()->userName(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'username' => fake()->unique()->userName(),
+            'email' => fake()->unique()->safeEmail(),
             'password' => Hash::make('password'), // Default test password
-            'last_login_at' => $this->faker->optional(0.7)->dateTimeBetween($createdAt, 'now'),
-            'last_ip_address' => $this->faker->optional() ? $this->generateValidIpv4() : null,
-            'last_user_agent' => $this->faker->optional()->userAgent(),
-            'hwid_reset_count' => $this->faker->numberBetween(0, 5),
-            'hwid_last_reset_at' => $this->faker->optional(0.3)->dateTimeBetween($createdAt, 'now'),
+            'last_login_at' => fake()->optional(0.7)->dateTimeBetween($createdAt, 'now'),
+            'last_ip_address' => fake()->optional() ? $this->generateValidIpv4() : null,
+            'last_user_agent' => fake()->optional()->userAgent(),
+            'hwid_reset_count' => fake()->numberBetween(0, 5),
+            'hwid_last_reset_at' => fake()->optional(0.3)->dateTimeBetween($createdAt, 'now'),
             'is_suspended' => $suspended,
-            'suspension_reason' => $suspended ? $this->faker->randomElement([
+            'suspension_reason' => $suspended ? fake()->randomElement([
                 'Violation of terms of service',
                 'Suspicious activity detected',
                 'Payment issue',
                 'Manual suspension by admin',
                 'Multiple failed login attempts',
             ]) : null,
-            'suspended_until' => $suspended ? $this->faker->optional(0.5)->dateTimeBetween('now', '+30 days') : null,
-            'email_verified_at' => $this->faker->optional(0.8)->dateTimeBetween($createdAt, 'now'),
-            'two_factor_secret' => $this->faker->boolean(20) ? encrypt(Str::random(32)) : null,
-            'two_factor_recovery_codes' => $this->faker->boolean(20) ? encrypt(json_encode([Str::random(10), Str::random(10)])) : null,
-            'two_factor_confirmed_at' => $this->faker->optional(0.15)->dateTimeBetween($createdAt, 'now'),
+            'suspended_until' => $suspended ? fake()->optional(0.5)->dateTimeBetween('now', '+30 days') : null,
+            'email_verified_at' => fake()->optional(0.8)->dateTimeBetween($createdAt, 'now'),
+            'two_factor_secret' => fake()->boolean(20) ? encrypt(Str::random(32)) : null,
+            'two_factor_recovery_codes' => fake()->boolean(20) ? encrypt(json_encode([Str::random(10), Str::random(10)])) : null,
+            'two_factor_confirmed_at' => fake()->optional(0.15)->dateTimeBetween($createdAt, 'now'),
             'remember_token' => Str::random(10),
             'created_at' => $createdAt,
-            'updated_at' => $this->faker->dateTimeBetween($createdAt, 'now'),
+            'updated_at' => fake()->dateTimeBetween($createdAt, 'now'),
         ];
     }
 
@@ -60,10 +60,10 @@ class AccountFactory extends Factory
     private function generateValidIpv4(): string
     {
         return sprintf('%d.%d.%d.%d',
-            rand(1, 255),
-            rand(0, 255),
-            rand(0, 255),
-            rand(0, 255)
+            fake()->numberBetween(1, 255),
+            fake()->numberBetween(0, 255),
+            fake()->numberBetween(0, 255),
+            fake()->numberBetween(0, 255)
         );
     }
 
@@ -83,7 +83,7 @@ class AccountFactory extends Factory
     public function verified(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            'email_verified_at' => fake()->dateTimeBetween('-1 year', 'now'),
         ]);
     }
 
@@ -106,11 +106,11 @@ class AccountFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_suspended' => true,
-            'suspension_reason' => $reason ?? $this->faker->randomElement([
+            'suspension_reason' => $reason ?? fake()->randomElement([
                 'Violation of terms of service',
                 'Suspicious activity detected',
             ]),
-            'suspended_until' => $this->faker->optional(0.7)->dateTimeBetween('now', '+30 days'),
+            'suspended_until' => fake()->optional(0.7)->dateTimeBetween('now', '+30 days'),
         ]);
     }
 
@@ -132,9 +132,9 @@ class AccountFactory extends Factory
     public function recentlyActive(): static
     {
         return $this->state(fn (array $attributes) => [
-            'last_login_at' => now()->subMinutes($this->faker->numberBetween(1, 60)),
+            'last_login_at' => now()->subMinutes(fake()->numberBetween(1, 60)),
             'last_ip_address' => $this->generateValidIpv4(),
-            'last_user_agent' => $this->faker->userAgent(),
+            'last_user_agent' => fake()->userAgent(),
         ]);
     }
 
@@ -145,7 +145,7 @@ class AccountFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'hwid_reset_count' => $count,
-            'hwid_last_reset_at' => now()->subDays($this->faker->numberBetween(1, 30)),
+            'hwid_last_reset_at' => now()->subDays(fake()->numberBetween(1, 30)),
         ]);
     }
 }

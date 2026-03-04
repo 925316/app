@@ -201,7 +201,7 @@ class PackageReleaseSeeder extends Seeder
 
         // Add patch releases for 1.x (starting from 1.0.2 since 1.0.1 is already added)
         for ($patch = 2; $patch <= 5; $patch++) {
-            $currentDate = $currentDate->addDays(rand(14, 60)); // 2-8 weeks between releases
+            $currentDate = $currentDate->addDays(fake()->numberBetween(14, 60)); // 2-8 weeks between releases
             $releases[] = [
                 'version' => "1.0.{$patch}",
                 'release_channel' => 'stable',
@@ -211,7 +211,7 @@ class PackageReleaseSeeder extends Seeder
         }
 
         // Minor version bump to 1.1.0
-        $currentDate = $currentDate->addDays(rand(21, 90)); // 3 weeks to 3 months
+        $currentDate = $currentDate->addDays(fake()->numberBetween(21, 90)); // 3 weeks to 3 months
         $releases[] = [
             'version' => '1.1.0',
             'release_channel' => 'stable',
@@ -221,7 +221,7 @@ class PackageReleaseSeeder extends Seeder
 
         // Continue with more 1.x releases
         for ($minor = 2; $minor <= 5; $minor++) {
-            $currentDate = $currentDate->addDays(rand(30, 120)); // 1-4 months
+            $currentDate = $currentDate->addDays(fake()->numberBetween(30, 120)); // 1-4 months
             $releases[] = [
                 'version' => "1.{$minor}.0",
                 'release_channel' => 'stable',
@@ -230,9 +230,9 @@ class PackageReleaseSeeder extends Seeder
             ];
 
             // Add some patch releases
-            $patches = rand(0, 3);
+            $patches = fake()->numberBetween(0, 3);
             for ($patch = 1; $patch <= $patches; $patch++) {
-                $currentDate = $currentDate->addDays(rand(7, 30)); // 1 week to 1 month
+                $currentDate = $currentDate->addDays(fake()->numberBetween(7, 30)); // 1 week to 1 month
                 $releases[] = [
                     'version' => "1.{$minor}.{$patch}",
                     'release_channel' => 'stable',
@@ -243,7 +243,7 @@ class PackageReleaseSeeder extends Seeder
         }
 
         // Major version bump to 2.0.0
-        $currentDate = $currentDate->addDays(rand(60, 180)); // 2-6 months
+        $currentDate = $currentDate->addDays(fake()->numberBetween(60, 180)); // 2-6 months
         $releases[] = [
             'version' => '2.0.0',
             'release_channel' => 'stable',
@@ -253,7 +253,7 @@ class PackageReleaseSeeder extends Seeder
 
         // Continue with 2.x releases
         for ($minor = 1; $minor <= 3; $minor++) {
-            $currentDate = $currentDate->addDays(rand(45, 120)); // 1.5-4 months
+            $currentDate = $currentDate->addDays(fake()->numberBetween(45, 120)); // 1.5-4 months
             $releases[] = [
                 'version' => "2.{$minor}.0",
                 'release_channel' => 'stable',
@@ -262,9 +262,9 @@ class PackageReleaseSeeder extends Seeder
             ];
 
             // Add patch releases
-            $patches = rand(1, 4);
+            $patches = fake()->numberBetween(1, 4);
             for ($patch = 1; $patch <= $patches; $patch++) {
-                $currentDate = $currentDate->addDays(rand(10, 45)); // 10 days to 1.5 months
+                $currentDate = $currentDate->addDays(fake()->numberBetween(10, 45)); // 10 days to 1.5 months
                 $releases[] = [
                     'version' => "2.{$minor}.{$patch}",
                     'release_channel' => 'stable',
@@ -276,10 +276,10 @@ class PackageReleaseSeeder extends Seeder
 
         // Add some development/beta releases
         $devReleases = [
-            ['version' => '2.4.0-alpha.1', 'days' => rand(15, 45)],
-            ['version' => '2.4.0-beta.1', 'days' => rand(10, 30)],
-            ['version' => '2.4.0-beta.2', 'days' => rand(7, 21)],
-            ['version' => '2.4.0-rc.1', 'days' => rand(3, 14)],
+            ['version' => '2.4.0-alpha.1', 'days' => fake()->numberBetween(15, 45)],
+            ['version' => '2.4.0-beta.1', 'days' => fake()->numberBetween(10, 30)],
+            ['version' => '2.4.0-beta.2', 'days' => fake()->numberBetween(7, 21)],
+            ['version' => '2.4.0-rc.1', 'days' => fake()->numberBetween(3, 14)],
         ];
 
         foreach ($devReleases as $devRelease) {
@@ -293,7 +293,7 @@ class PackageReleaseSeeder extends Seeder
         }
 
         // Final stable release
-        $currentDate = $currentDate->addDays(rand(1, 7));
+        $currentDate = $currentDate->addDays(fake()->numberBetween(1, 7));
         $releases[] = [
             'version' => '2.4.0',
             'release_channel' => 'stable',
@@ -343,8 +343,8 @@ class PackageReleaseSeeder extends Seeder
             'Improved stability under high concurrent session load',
         ];
 
-        $featuresSelected = array_map(fn ($i) => $features[$i], (array) array_rand($features, rand(1, 2)));
-        $fixesSelected = array_map(fn ($i) => $fixes[$i], (array) array_rand($fixes, rand(1, 2)));
+        $featuresSelected = array_map(fn ($i) => $features[$i], (array) array_rand($features, fake()->numberBetween(1, 2)));
+        $fixesSelected = array_map(fn ($i) => $fixes[$i], (array) array_rand($fixes, fake()->numberBetween(1, 2)));
         $improvementsSelected = array_map(fn ($i) => $improvements[$i], (array) array_rand($improvements, 1));
 
         $changelog = "# {$version}\n\n{$description}\n\n";

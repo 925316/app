@@ -30,9 +30,9 @@ class ClientSessionFactory extends Factory
         $clientVersions = ['1.0.0', '1.1.0', '1.2.3', '2.0.0', '2.1.0', '2.2.5'];
         $heartbeatOptions = [
             null,
-            now()->subMinutes(rand(1, 30)),
-            now()->subHours(rand(1, 5)),
-            now()->subDays(rand(1, 7)),
+            now()->subMinutes(fake()->numberBetween(1, 30)),
+            now()->subHours(fake()->numberBetween(1, 5)),
+            now()->subDays(fake()->numberBetween(1, 7)),
         ];
 
         return [
@@ -40,10 +40,10 @@ class ClientSessionFactory extends Factory
             'account_id' => Account::factory(),
             'device_id' => AccountDevice::factory(),
             'ip_address' => $this->generateValidIpv4(),
-            'client_version' => $this->faker->randomElement($clientVersions),
-            'last_heartbeat_at' => $this->faker->randomElement($heartbeatOptions),
-            'created_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
-            'updated_at' => fn (array $attributes) => $this->faker->dateTimeBetween($attributes['created_at'], 'now'),
+            'client_version' => fake()->randomElement($clientVersions),
+            'last_heartbeat_at' => fake()->randomElement($heartbeatOptions),
+            'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+            'updated_at' => fn (array $attributes) => fake()->dateTimeBetween($attributes['created_at'], 'now'),
         ];
     }
 
@@ -53,10 +53,10 @@ class ClientSessionFactory extends Factory
     private function generateValidIpv4(): string
     {
         return sprintf('%d.%d.%d.%d',
-            rand(1, 255),
-            rand(0, 255),
-            rand(0, 255),
-            rand(0, 255)
+            fake()->numberBetween(1, 255),
+            fake()->numberBetween(0, 255),
+            fake()->numberBetween(0, 255),
+            fake()->numberBetween(0, 255)
         );
     }
 
@@ -69,7 +69,7 @@ class ClientSessionFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'last_heartbeat_at' => now()->subMinutes(rand(1, 4)),
+                'last_heartbeat_at' => now()->subMinutes(fake()->numberBetween(1, 4)),
             ];
         });
     }

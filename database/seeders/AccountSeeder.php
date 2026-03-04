@@ -57,7 +57,7 @@ class AccountSeeder extends Seeder
                 email: "{$tier['username']}@test.com",
                 privilege: $tier['privilege']
             );
-            $this->createDevice($account, now()->subDays(rand(10, 60)));
+            $this->createDevice($account, now()->subDays(fake()->numberBetween(10, 60)));
         }
     }
 
@@ -169,9 +169,9 @@ class AccountSeeder extends Seeder
             'username' => $username,
             'email' => $email,
             'password' => Hash::make(self::PASSWORD),
-            'email_verified_at' => now()->subDays(rand(1, 30)),
-            'last_login_at' => now()->subHours(rand(1, 72)),
-            'last_ip_address' => '192.168.1.'.rand(1, 254),
+            'email_verified_at' => now()->subDays(fake()->numberBetween(1, 30)),
+            'last_login_at' => now()->subHours(fake()->numberBetween(1, 72)),
+            'last_ip_address' => '192.168.1.'.fake()->numberBetween(1, 254),
         ]);
 
         License::create([
@@ -198,8 +198,8 @@ class AccountSeeder extends Seeder
             'email' => $email,
             'password' => Hash::make(self::PASSWORD),
             'email_verified_at' => now()->subMonth(),
-            'last_login_at' => now()->subDays(rand(1, 7)),
-            'last_ip_address' => '192.168.1.'.rand(1, 254),
+            'last_login_at' => now()->subDays(fake()->numberBetween(1, 7)),
+            'last_ip_address' => '192.168.1.'.fake()->numberBetween(1, 254),
         ]);
 
         License::create([
@@ -222,21 +222,21 @@ class AccountSeeder extends Seeder
             'notes' => "Previous: {$fromPrivilege->getLabel()}",
         ]);
 
-        $this->createDevice($account, now()->subDays(rand(10, 30)));
+        $this->createDevice($account, now()->subDays(fake()->numberBetween(10, 30)));
 
         return $account;
     }
 
     private function createDevice(Account $account, \DateTimeInterface $firstSeen): void
     {
-        $boundAt = now()->setTimestamp($firstSeen->getTimestamp())->addDays(rand(1, 7));
+        $boundAt = now()->setTimestamp($firstSeen->getTimestamp())->addDays(fake()->numberBetween(1, 7));
 
         AccountDevice::create([
             'account_id' => $account->id,
             'hwid_hash' => hash('sha256', $account->username.Str::random(20)),
-            'ip_address' => '192.168.1.'.rand(1, 254),
+            'ip_address' => '192.168.1.'.fake()->numberBetween(1, 254),
             'first_seen_at' => $firstSeen,
-            'last_seen_at' => now()->subHours(rand(1, 48)),
+            'last_seen_at' => now()->subHours(fake()->numberBetween(1, 48)),
             'bound_at' => $boundAt,
             'unbound_at' => null,
         ]);

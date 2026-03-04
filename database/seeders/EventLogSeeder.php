@@ -38,7 +38,7 @@ class EventLogSeeder extends Seeder
                 ->accountActivated()
                 ->sequence(function ($sequence) use ($activeLicenses) {
                     $license = $activeLicenses->values()->get($sequence->index % $activeLicenses->count());
-                    $eventDate = $license->activated_at ?? now()->subDays(rand(1, 365));
+                    $eventDate = $license->activated_at ?? now()->subDays(fake()->numberBetween(1, 365));
 
                     return [
                         'account_id' => $license->used_by,
@@ -62,8 +62,8 @@ class EventLogSeeder extends Seeder
                 ->state(['event_type' => \App\Enums\EventType::DEVICE_BOUND->value])
                 ->sequence(function ($sequence) use ($activeLicenses) {
                     $license = $activeLicenses->values()->get($sequence->index % $activeLicenses->count());
-                    $activationDate = $license->activated_at ?? now()->subDays(rand(1, 365));
-                    $bindDate = $activationDate->copy()->addMinutes(rand(1, 1440)); // Within 24 hours of activation
+                    $activationDate = $license->activated_at ?? now()->subDays(fake()->numberBetween(1, 365));
+                    $bindDate = $activationDate->copy()->addMinutes(fake()->numberBetween(1, 1440)); // Within 24 hours of activation
 
                     return [
                         'account_id' => $license->used_by,
@@ -92,7 +92,7 @@ class EventLogSeeder extends Seeder
                 ->state(['event_type' => \App\Enums\EventType::DEVICE_UNBOUND->value])
                 ->sequence(function ($sequence) use ($activeLicenses) {
                     $license = $activeLicenses->values()->get($sequence->index % $activeLicenses->count());
-                    $unbindDate = now()->subDays(rand(1, 90)); // Within last 3 months
+                    $unbindDate = now()->subDays(fake()->numberBetween(1, 90)); // Within last 3 months
 
                     return [
                         'account_id' => $license->used_by,
@@ -124,7 +124,7 @@ class EventLogSeeder extends Seeder
             ->sequence(fn ($sequence) => [
                 'account_id' => $accounts->isNotEmpty() ? $accounts->random()->id : null,
                 'ip_address' => $this->generateAnomalousIp(),
-                'created_at' => now()->subDays(rand(0, 30)),
+                'created_at' => now()->subDays(fake()->numberBetween(0, 30)),
             ])
             ->create();
 
@@ -140,7 +140,7 @@ class EventLogSeeder extends Seeder
                     'action_taken' => 'monitoring_enabled',
                     'risk_level' => 'medium',
                 ],
-                'created_at' => now()->subDays(rand(0, 45)),
+                'created_at' => now()->subDays(fake()->numberBetween(0, 45)),
             ])
             ->create();
     }
@@ -164,7 +164,7 @@ class EventLogSeeder extends Seeder
                     'suspension_duration' => '7_days',
                     'appeal_possible' => true,
                 ],
-                'created_at' => now()->subDays(rand(0, 15)),
+                'created_at' => now()->subDays(fake()->numberBetween(0, 15)),
             ])
             ->create();
 
@@ -180,7 +180,7 @@ class EventLogSeeder extends Seeder
                     'attempted_action' => 'device_binding',
                     'suggested_action' => 'renew_license',
                 ],
-                'created_at' => now()->subDays(rand(0, 7)),
+                'created_at' => now()->subDays(fake()->numberBetween(0, 7)),
             ])
             ->create();
 
@@ -194,10 +194,10 @@ class EventLogSeeder extends Seeder
                 'ip_address' => $this->generateRandomIp(),
                 'details' => [
                     'reason' => 'invalid_credentials',
-                    'failed_attempts' => rand(5, 20),
+                    'failed_attempts' => fake()->numberBetween(5, 20),
                     'lockout_triggered' => true,
                 ],
-                'created_at' => now()->subHours(rand(1, 48)),
+                'created_at' => now()->subHours(fake()->numberBetween(1, 48)),
             ])
             ->create();
     }
@@ -254,12 +254,12 @@ class EventLogSeeder extends Seeder
 
         // Generate realistic IP ranges for different countries
         return match ($country) {
-            'RU' => '195.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
-            'CN' => '120.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
-            'BR' => '200.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
-            'NG' => '105.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
-            'TR' => '88.'.rand(10, 240).'.'.rand(1, 254).'.'.rand(1, 254),
-            default => '192.168.'.rand(1, 254).'.'.rand(1, 254),
+            'RU' => '195.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
+            'CN' => '120.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
+            'BR' => '200.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
+            'NG' => '105.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
+            'TR' => '88.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
+            default => '192.168.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
         };
     }
 
@@ -268,7 +268,7 @@ class EventLogSeeder extends Seeder
      */
     private function generateRandomIp(): string
     {
-        return rand(1, 255).'.'.rand(0, 255).'.'.rand(0, 255).'.'.rand(1, 254);
+        return fake()->numberBetween(1, 255).'.'.fake()->numberBetween(0, 255).'.'.fake()->numberBetween(0, 255).'.'.fake()->numberBetween(1, 254);
     }
 
     /**
