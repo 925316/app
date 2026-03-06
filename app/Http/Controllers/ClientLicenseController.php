@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\LicenseStatus;
 use App\Http\Requests\ClientActivateRequest;
 use App\Http\Requests\ClientHeartbeatRequest;
+use App\Http\Requests\ClientLoginRequest;
 use App\Http\Requests\ClientUnbindRequest;
 use App\Models\Account;
 use App\Models\ClientSession;
@@ -13,8 +14,10 @@ use App\Models\License;
 use App\Services\CryptoService;
 use App\Services\LicenseService;
 use App\Services\NonceGuardService;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -25,7 +28,153 @@ class ClientLicenseController extends Controller
     public function __construct(
         private readonly NonceGuardService $nonceGuardService,
         private readonly CryptoService $cryptoService,
+        private readonly AuthManager $authManager,
     ) {}
+
+    public function login(ClientLoginRequest $request): JsonResponse
+    {
+        try {
+            $validated = $request->validated();
+
+            $email = $validated['email'] ?? null;
+            $password = $validated['password'] ?? null;
+            if (! is_string($email) || $email === '' || ! is_string($password) || $password === '') {
+                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+            }
+
+            $timestamp = (int) $validated['timestamp'];
+            if (abs(now()->timestamp - $timestamp) > 300) {
+                return $this->errorResponse(422, 'TIMESTAMP_OUT_OF_WINDOW', 'Timestamp is out of allowed window.');
+            }
+
+            $nonceScope = 'account.login|'.sha1($email);
+            $nonceAcquired = $this->nonceGuardService->acquire($nonceScope, (string) $validated['nonce']);
+            if (! $nonceAcquired) {
+                return $this->errorResponse(409, 'NONCE_REPLAY', 'Nonce has already been used.');
+            }
+
+            $credentials = [
+                'email' => $email,
+                'password' => $password,
+            ];
+
+            if (! $this->authManager->guard('web')->validate($credentials)) {
+                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+            }
+
+            $account = Account::query()->where('email', $email)->first();
+            if (! $account) {
+                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+            }
+
+            if ($account->isSuspended()) {
+                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+            }
+
+            if (! $account->hasPrivilege(1)) {
+                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+            }
+
+            $session = DB::transaction(function () use ($account, $validated, $request) {
+                $activeDevice = $account->devices()
+                    ->whereNotNull('bound_at')
+                    ->whereNull('unbound_at')
+                    ->lockForUpdate()
+                    ->first();
+
+                $incomingHwidHash = hash('sha256', (string) $validated['hwid']);
+
+                if (! $activeDevice) {
+                    return null;
+                }
+
+                if (! is_string($activeDevice->hwid_hash) || ! hash_equals($activeDevice->hwid_hash, $incomingHwidHash)) {
+                    return false;
+                }
+
+                $activeDevice->forceFill([
+                    'ip_address' => $request->ip(),
+                    'country_code' => $validated['country_code'] ?? $activeDevice->country_code,
+                    'last_seen_at' => now(),
+                ])->save();
+
+                ClientSession::query()
+                    ->where('account_id', $account->id)
+                    ->where('device_id', $activeDevice->id)
+                    ->delete();
+
+                $newSession = ClientSession::query()->create([
+                    'session_token' => (string) Str::uuid(),
+                    'account_id' => $account->id,
+                    'device_id' => $activeDevice->id,
+                    'ip_address' => $request->ip(),
+                    'client_version' => (string) $validated['version'],
+                    'last_heartbeat_at' => now(),
+                ]);
+
+                EventLog::query()->create([
+                    'event_type' => 'account.login',
+                    'event_level' => EventLog::LEVEL_INFO,
+                    'account_id' => $account->id,
+                    'actor_id' => $account->id,
+                    'ip_address' => $request->ip(),
+                    'details' => [
+                        'device_id' => $activeDevice->id,
+                        'session_token' => $newSession->session_token,
+                        'client_version' => $validated['version'],
+                    ],
+                ]);
+
+                return $newSession;
+            });
+
+            if ($session === null) {
+                return $this->errorResponse(422, 'DEVICE_MISMATCH', 'Device does not match bound device.');
+            }
+
+            if ($session === false) {
+                return $this->errorResponse(422, 'DEVICE_MISMATCH', 'Device does not match bound device.');
+            }
+
+            $account->recordLogin((string) $request->ip(), (string) $request->userAgent());
+
+            $effectiveLicense = License::query()
+                ->where('used_by', $account->id)
+                ->where('status', LicenseStatus::ACTIVE->value)
+                ->where('expires_at', '>', now())
+                ->orderByDesc('privilege')
+                ->first();
+
+            if (! $effectiveLicense || $effectiveLicense->expires_at === null) {
+                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+            }
+
+            return response()->json([
+                'code' => 200,
+                'error_code' => null,
+                'message' => 'OK',
+                'data' => [
+                    'session_token' => $session->session_token,
+                    'account' => [
+                        'id' => $account->id,
+                        'username' => $account->username,
+                        'email' => $account->email,
+                    ],
+                    'license' => [
+                        'license_key' => $effectiveLicense->key,
+                        'plan_level' => (int) ($effectiveLicense->privilege?->value ?? 0),
+                        'status' => 'active',
+                        'expires_at' => $effectiveLicense->expires_at->format('Y-m-d H:i:s'),
+                        'expires_timestamp' => $effectiveLicense->expires_at->timestamp,
+                    ],
+                ],
+            ], 200);
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            return $this->errorResponse(500, 'SERVER_ERROR', 'Internal server error.');
+        }
+    }
 
     public function check(ClientHeartbeatRequest $request): JsonResponse
     {

@@ -4,6 +4,11 @@ use App\Http\Controllers\ClientLicenseController;
 use App\Http\Controllers\ClientPackageController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('account')->group(function () {
+    Route::post('/login', [ClientLicenseController::class, 'login'])
+        ->name('api.account.login');
+});
+
 Route::prefix('license')->group(function () {
     Route::post('/check', [ClientLicenseController::class, 'check'])
         ->name('api.license.check');
