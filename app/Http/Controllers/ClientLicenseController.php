@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Enums\LicenseStatus;
 use App\Http\Requests\ClientActivateRequest;
 use App\Http\Requests\ClientHeartbeatRequest;
+use App\Http\Requests\ClientUnbindRequest;
 use App\Models\Account;
 use App\Models\ClientSession;
+use App\Models\EventLog;
 use App\Models\License;
 use App\Services\CryptoService;
 use App\Services\LicenseService;
 use App\Services\NonceGuardService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -218,6 +221,126 @@ class ClientLicenseController extends Controller
                         'algorithm' => self::SIGNING_ALGORITHM,
                         'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
                     ],
+                ],
+            ], 200);
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            return $this->errorResponse(500, 'SERVER_ERROR', 'Internal server error.');
+        }
+    }
+
+    public function unbind(ClientUnbindRequest $request): JsonResponse
+    {
+        try {
+            $validated = $request->validated();
+
+            $sessionTokenValue = $validated['session_token'] ?? null;
+            if (! is_string($sessionTokenValue) || $sessionTokenValue === '') {
+                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+            }
+
+            $sessionToken = $sessionTokenValue;
+
+            $timestamp = (int) $validated['timestamp'];
+            if (abs(now()->timestamp - $timestamp) > 300) {
+                return $this->errorResponse(422, 'TIMESTAMP_OUT_OF_WINDOW', 'Timestamp is out of allowed window.');
+            }
+
+            $nonceScope = 'license.unbind|'.$sessionToken;
+            $nonceAcquired = $this->nonceGuardService->acquire($nonceScope, (string) $validated['nonce']);
+            if (! $nonceAcquired) {
+                return $this->errorResponse(409, 'NONCE_REPLAY', 'Nonce has already been used.');
+            }
+
+            $session = ClientSession::query()
+                ->with(['device', 'account'])
+                ->where('session_token', $sessionToken)
+                ->first();
+
+            if (! $session) {
+                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+            }
+
+            $licenseKey = (string) $validated['license_key'];
+            if (! LicenseService::validateLicenseKeyFormat($licenseKey)) {
+                return $this->errorResponse(422, 'LICENSE_INVALID', 'License key is invalid.');
+            }
+
+            $license = License::query()->where('key', $licenseKey)->first();
+            if (! $license) {
+                return $this->errorResponse(422, 'LICENSE_INVALID', 'License key is invalid.');
+            }
+
+            if (
+                $license->status !== LicenseStatus::ACTIVE
+                || $license->expires_at === null
+                || $license->expires_at->lte(now())
+                || $license->used_by === null
+            ) {
+                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+            }
+
+            if ($license->used_by !== $session->account_id) {
+                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+            }
+
+            $incomingHwidHash = hash('sha256', (string) $validated['hwid']);
+            $boundDevice = $session->device;
+
+            if (! $boundDevice || ! is_string($boundDevice->hwid_hash) || ! hash_equals($boundDevice->hwid_hash, $incomingHwidHash)) {
+                return $this->errorResponse(422, 'DEVICE_MISMATCH', 'Device does not match bound device.');
+            }
+
+            $unboundDevice = DB::transaction(function () use ($session, $license, $request) {
+                $lockedDevice = $session->device()
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedDevice || $lockedDevice->bound_at === null || $lockedDevice->unbound_at !== null) {
+                    return null;
+                }
+
+                $lockedDevice->forceFill([
+                    'unbound_at' => now(),
+                ])->save();
+
+                ClientSession::query()
+                    ->where('account_id', $session->account_id)
+                    ->where('device_id', $lockedDevice->id)
+                    ->delete();
+
+                EventLog::query()->create([
+                    'event_type' => 'device.unbound',
+                    'event_level' => EventLog::LEVEL_INFO,
+                    'account_id' => $session->account_id,
+                    'license_id' => $license->id,
+                    'ip_address' => $request->ip(),
+                    'actor_id' => $session->account_id,
+                    'details' => [
+                        'device_id' => $lockedDevice->id,
+                        'hwid_hash' => $lockedDevice->hwid_hash,
+                        'session_token' => $session->session_token,
+                    ],
+                ]);
+
+                return $lockedDevice;
+            });
+
+            if (! $unboundDevice) {
+                return $this->errorResponse(409, 'DEVICE_NOT_BOUND', 'No active bound device was found.');
+            }
+
+            return response()->json([
+                'code' => 200,
+                'error_code' => null,
+                'message' => 'OK',
+                'data' => [
+                    'status' => 'unbound',
+                    'license_key' => $license->key,
+                    'device_id' => $unboundDevice->id,
+                    'unbound_at' => $unboundDevice->unbound_at?->format('Y-m-d H:i:s'),
+                    'unbound_timestamp' => $unboundDevice->unbound_at?->timestamp,
                 ],
             ], 200);
         } catch (Throwable $throwable) {

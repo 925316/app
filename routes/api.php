@@ -10,6 +10,9 @@ Route::prefix('license')->group(function () {
 
     Route::post('/activate', [ClientLicenseController::class, 'activate'])
         ->name('api.license.activate');
+
+    Route::post('/unbind', [ClientLicenseController::class, 'unbind'])
+        ->name('api.license.unbind');
 });
 
 Route::prefix('update')->group(function () {
