@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientLicenseController;
+use App\Http\Controllers\ClientPackageController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('license')->group(function () {
@@ -9,4 +10,9 @@ Route::prefix('license')->group(function () {
 
     Route::post('/activate', [ClientLicenseController::class, 'activate'])
         ->name('api.license.activate');
+});
+
+Route::prefix('update')->group(function () {
+    Route::get('/check', [ClientPackageController::class, 'check'])
+        ->name('api.update.check');
 });
