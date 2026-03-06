@@ -23,6 +23,13 @@ class ClientPackageController extends Controller
                 return $this->errorResponse(422, 'INVALID_CHANNEL', 'Release channel is invalid.');
             }
 
+            $currentVersionInput = $request->query('current_version');
+            if ($currentVersionInput !== null) {
+                if (! is_string($currentVersionInput) || ! PackageService::isValidSemanticVersion($currentVersionInput)) {
+                    return $this->errorResponse(422, 'INVALID_VERSION', 'Current version format is invalid.');
+                }
+            }
+
             $sessionToken = $sessionTokenInput;
             $session = ClientSession::query()
                 ->with('account')
@@ -43,13 +50,24 @@ class ClientPackageController extends Controller
                 return $this->errorResponse(404, 'PACKAGE_NOT_FOUND', 'No package release found for this channel.');
             }
 
+            $currentVersion = is_string($currentVersionInput) ? $currentVersionInput : null;
+            $updateAvailable = $currentVersion !== null
+                ? version_compare($latestRelease->version, $currentVersion, '>')
+                : null;
+            $reason = $currentVersion === null
+                ? 'no_current_version'
+                : ($updateAvailable ? 'newer_available' : 'up_to_date');
+
             return response()->json([
                 'code' => 200,
                 'error_code' => null,
                 'message' => 'OK',
                 'data' => [
+                    'current_version' => $currentVersion,
                     'version' => $latestRelease->version,
                     'release_channel' => $latestRelease->release_channel,
+                    'update_available' => $updateAvailable,
+                    'reason' => $reason,
                     'download_url' => $latestRelease->download_url,
                     'changelog' => $latestRelease->changelog,
                     'virus_detection_url' => $latestRelease->virus_detection_url,
