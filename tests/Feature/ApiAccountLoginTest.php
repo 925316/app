@@ -153,3 +153,17 @@ it('returns license ineffective when account is suspended', function () {
     $response->assertForbidden()
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
 });
+
+it('normalizes hwid and version input values before login processing', function () {
+    seedLoginApiContext();
+
+    $response = postJson('/api/account/login', apiLoginPayload([
+        'hwid' => '  HWID-LOGIN-12345  ',
+        'version' => ' 1.2.3 ',
+    ]));
+
+    $response->assertSuccessful()
+        ->assertJsonPath('code', 200)
+        ->assertJsonPath('error_code', null)
+        ->assertJsonPath('message', 'OK');
+});

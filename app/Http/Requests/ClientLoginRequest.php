@@ -49,6 +49,18 @@ class ClientLoginRequest extends FormRequest
             ]);
         }
 
+        if ($this->filled('hwid') && is_string($this->hwid)) {
+            $this->merge([
+                'hwid' => trim($this->hwid),
+            ]);
+        }
+
+        if ($this->filled('version') && is_string($this->version)) {
+            $this->merge([
+                'version' => trim($this->version),
+            ]);
+        }
+
         if ($this->filled('country_code') && is_string($this->country_code)) {
             $this->merge([
                 'country_code' => strtoupper($this->country_code),
