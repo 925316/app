@@ -146,6 +146,18 @@ it('returns auth required when session token is missing', function () {
         ->assertJsonPath('error_code', 'AUTH_REQUIRED');
 });
 
+it('returns auth required with stable message when session token field is omitted', function () {
+    seedValidApiContext();
+
+    $response = postJson('/api/license/check', apiPayload([
+        'session_token' => null,
+    ]));
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('message', 'Authentication required.');
+});
+
 it('returns license ineffective when license is not active', function () {
     seedValidApiContext();
 
@@ -171,4 +183,19 @@ it('returns license invalid and does not update heartbeat when license key forma
         ->assertJsonPath('error_code', 'LICENSE_INVALID');
 
     expect($context['session']->fresh()->last_heartbeat_at?->eq($previousHeartbeat))->toBeTrue();
+});
+
+it('normalizes session token and hwid input values before check processing', function () {
+    seedValidApiContext();
+
+    $response = postJson('/api/license/check', apiPayload([
+        'session_token' => '  session-token-001  ',
+        'hwid' => '  HWID-TEST-12345  ',
+        'version' => ' 1.0.0 ',
+    ]));
+
+    $response->assertSuccessful()
+        ->assertJsonPath('code', 200)
+        ->assertJsonPath('error_code', null)
+        ->assertJsonPath('message', 'OK');
 });
