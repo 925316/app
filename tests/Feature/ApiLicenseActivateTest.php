@@ -94,6 +94,18 @@ it('returns auth required when session token is missing', function () {
         ->assertJsonPath('error_code', 'AUTH_REQUIRED');
 });
 
+it('returns auth required with stable message when session token field is omitted', function () {
+    seedActivateApiContext();
+
+    $response = postJson('/api/license/activate', apiActivatePayload([
+        'session_token' => null,
+    ]));
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('message', 'Authentication required.');
+});
+
 it('returns nonce replay for reused nonce', function () {
     seedActivateApiContext();
 
@@ -150,4 +162,20 @@ it('returns license ineffective when trying to activate suspended license', func
 
     $response->assertForbidden()
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+});
+
+it('normalizes session token and hwid input values before activate processing', function () {
+    seedActivateApiContext();
+
+    $response = postJson('/api/license/activate', apiActivatePayload([
+        'session_token' => '  activate-session-token-001  ',
+        'hwid' => '  HWID-ACTIVATE-12345  ',
+        'version' => ' 1.0.0 ',
+    ]));
+
+    $response->assertSuccessful()
+        ->assertJsonPath('code', 200)
+        ->assertJsonPath('error_code', null)
+        ->assertJsonPath('message', 'OK')
+        ->assertJsonPath('data.status', 'active');
 });

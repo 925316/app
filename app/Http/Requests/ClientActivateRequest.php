@@ -52,9 +52,27 @@ class ClientActivateRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        if ($this->filled('session_token') && is_string($this->session_token)) {
+            $this->merge([
+                'session_token' => trim($this->session_token),
+            ]);
+        }
+
         if ($this->filled('license_key') && is_string($this->license_key)) {
             $this->merge([
                 'license_key' => strtoupper($this->license_key),
+            ]);
+        }
+
+        if ($this->filled('hwid') && is_string($this->hwid)) {
+            $this->merge([
+                'hwid' => trim($this->hwid),
+            ]);
+        }
+
+        if ($this->filled('version') && is_string($this->version)) {
+            $this->merge([
+                'version' => trim($this->version),
             ]);
         }
     }
