@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ApiErrorCode;
 use App\Enums\LicenseStatus;
 use App\Http\Requests\ClientActivateRequest;
 use App\Http\Requests\ClientHeartbeatRequest;
@@ -39,18 +40,18 @@ class ClientLicenseController extends Controller
             $email = $validated['email'] ?? null;
             $password = $validated['password'] ?? null;
             if (! is_string($email) || $email === '' || ! is_string($password) || $password === '') {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $timestamp = (int) $validated['timestamp'];
             if (abs(now()->timestamp - $timestamp) > 300) {
-                return $this->errorResponse(422, 'TIMESTAMP_OUT_OF_WINDOW', 'Timestamp is out of allowed window.');
+                return $this->errorResponse(422, ApiErrorCode::TIMESTAMP_OUT_OF_WINDOW, 'Timestamp is out of allowed window.');
             }
 
             $nonceScope = 'account.login|'.sha1($email);
             $nonceAcquired = $this->nonceGuardService->acquire($nonceScope, (string) $validated['nonce']);
             if (! $nonceAcquired) {
-                return $this->errorResponse(409, 'NONCE_REPLAY', 'Nonce has already been used.');
+                return $this->errorResponse(409, ApiErrorCode::NONCE_REPLAY, 'Nonce has already been used.');
             }
 
             $credentials = [
@@ -59,20 +60,20 @@ class ClientLicenseController extends Controller
             ];
 
             if (! $this->authManager->guard('web')->validate($credentials)) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $account = Account::query()->where('email', $email)->first();
             if (! $account) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             if ($account->isSuspended()) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             if (! $account->hasPrivilege(1)) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             $session = DB::transaction(function () use ($account, $validated, $request) {
@@ -129,11 +130,11 @@ class ClientLicenseController extends Controller
             });
 
             if ($session === null) {
-                return $this->errorResponse(422, 'DEVICE_MISMATCH', 'Device does not match bound device.');
+                return $this->errorResponse(422, ApiErrorCode::DEVICE_MISMATCH, 'Device does not match bound device.');
             }
 
             if ($session === false) {
-                return $this->errorResponse(422, 'DEVICE_MISMATCH', 'Device does not match bound device.');
+                return $this->errorResponse(422, ApiErrorCode::DEVICE_MISMATCH, 'Device does not match bound device.');
             }
 
             $account->recordLogin((string) $request->ip(), (string) $request->userAgent());
@@ -146,7 +147,7 @@ class ClientLicenseController extends Controller
                 ->first();
 
             if (! $effectiveLicense || $effectiveLicense->expires_at === null) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             return response()->json([
@@ -172,7 +173,7 @@ class ClientLicenseController extends Controller
         } catch (Throwable $throwable) {
             report($throwable);
 
-            return $this->errorResponse(500, 'SERVER_ERROR', 'Internal server error.');
+            return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.');
         }
     }
 
@@ -183,23 +184,23 @@ class ClientLicenseController extends Controller
 
             $sessionToken = $validated['session_token'] ?? null;
             if (! is_string($sessionToken) || $sessionToken === '') {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $licenseKey = (string) $validated['license_key'];
             if (! LicenseService::validateLicenseKeyFormat($licenseKey)) {
-                return $this->errorResponse(422, 'LICENSE_INVALID', 'License key is invalid.');
+                return $this->errorResponse(422, ApiErrorCode::LICENSE_INVALID, 'License key is invalid.');
             }
 
             $timestamp = (int) $validated['timestamp'];
             if (abs(now()->timestamp - $timestamp) > 300) {
-                return $this->errorResponse(422, 'TIMESTAMP_OUT_OF_WINDOW', 'Timestamp is out of allowed window.');
+                return $this->errorResponse(422, ApiErrorCode::TIMESTAMP_OUT_OF_WINDOW, 'Timestamp is out of allowed window.');
             }
 
             $nonceScope = 'license.check|'.$sessionToken;
             $nonceAcquired = $this->nonceGuardService->acquire($nonceScope, (string) $validated['nonce']);
             if (! $nonceAcquired) {
-                return $this->errorResponse(409, 'NONCE_REPLAY', 'Nonce has already been used.');
+                return $this->errorResponse(409, ApiErrorCode::NONCE_REPLAY, 'Nonce has already been used.');
             }
 
             $session = ClientSession::query()
@@ -208,12 +209,12 @@ class ClientLicenseController extends Controller
                 ->first();
 
             if (! $session) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $license = License::query()->where('key', $licenseKey)->first();
             if (! $license) {
-                return $this->errorResponse(422, 'LICENSE_INVALID', 'License key is invalid.');
+                return $this->errorResponse(422, ApiErrorCode::LICENSE_INVALID, 'License key is invalid.');
             }
 
             if (
@@ -222,18 +223,18 @@ class ClientLicenseController extends Controller
                 || $license->expires_at->lte(now())
                 || $license->used_by === null
             ) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             if ($license->used_by !== $session->account_id) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $incomingHwidHash = hash('sha256', (string) $validated['hwid']);
             $boundDevice = $session->device;
 
             if (! $boundDevice || ! is_string($boundDevice->hwid_hash) || ! hash_equals($boundDevice->hwid_hash, $incomingHwidHash)) {
-                return $this->errorResponse(422, 'DEVICE_MISMATCH', 'Device does not match bound device.');
+                return $this->errorResponse(422, ApiErrorCode::DEVICE_MISMATCH, 'Device does not match bound device.');
             }
 
             $data = [
@@ -266,7 +267,7 @@ class ClientLicenseController extends Controller
         } catch (Throwable $throwable) {
             report($throwable);
 
-            return $this->errorResponse(500, 'SERVER_ERROR', 'Internal server error.');
+            return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.');
         }
     }
 
@@ -277,18 +278,18 @@ class ClientLicenseController extends Controller
 
             $sessionToken = $validated['session_token'] ?? null;
             if (! is_string($sessionToken) || $sessionToken === '') {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $timestamp = (int) $validated['timestamp'];
             if (abs(now()->timestamp - $timestamp) > 300) {
-                return $this->errorResponse(422, 'TIMESTAMP_OUT_OF_WINDOW', 'Timestamp is out of allowed window.');
+                return $this->errorResponse(422, ApiErrorCode::TIMESTAMP_OUT_OF_WINDOW, 'Timestamp is out of allowed window.');
             }
 
             $nonceScope = 'license.activate|'.$sessionToken;
             $nonceAcquired = $this->nonceGuardService->acquire($nonceScope, (string) $validated['nonce']);
             if (! $nonceAcquired) {
-                return $this->errorResponse(409, 'NONCE_REPLAY', 'Nonce has already been used.');
+                return $this->errorResponse(409, ApiErrorCode::NONCE_REPLAY, 'Nonce has already been used.');
             }
 
             $session = ClientSession::query()
@@ -297,31 +298,31 @@ class ClientLicenseController extends Controller
                 ->first();
 
             if (! $session) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $boundDevice = $session->device;
             $incomingHwidHash = hash('sha256', (string) $validated['hwid']);
             if (! $boundDevice || ! is_string($boundDevice->hwid_hash) || ! hash_equals($boundDevice->hwid_hash, $incomingHwidHash)) {
-                return $this->errorResponse(422, 'DEVICE_MISMATCH', 'Device does not match bound device.');
+                return $this->errorResponse(422, ApiErrorCode::DEVICE_MISMATCH, 'Device does not match bound device.');
             }
 
             $license = License::query()->where('key', (string) $validated['license_key'])->first();
             if (! $license) {
-                return $this->errorResponse(422, 'LICENSE_INVALID', 'License key is invalid.');
+                return $this->errorResponse(422, ApiErrorCode::LICENSE_INVALID, 'License key is invalid.');
             }
 
             if ($license->isExpired()) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             if (! $license->canActivate()) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             $account = $session->account;
             if (! $account instanceof Account) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $activeLicense = License::query()
@@ -331,22 +332,22 @@ class ClientLicenseController extends Controller
                 ->first();
 
             if ($activeLicense && $activeLicense->id !== $license->id) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             if (! $license->canActivateByPrivilege()) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             try {
                 LicenseService::activateLicense($license, $account, $request->ip());
             } catch (ValidationException) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             $freshLicense = $license->fresh();
             if (! $freshLicense || $freshLicense->expires_at === null) {
-                return $this->errorResponse(500, 'SERVER_ERROR', 'Internal server error.');
+                return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.');
             }
 
             $data = [
@@ -375,7 +376,7 @@ class ClientLicenseController extends Controller
         } catch (Throwable $throwable) {
             report($throwable);
 
-            return $this->errorResponse(500, 'SERVER_ERROR', 'Internal server error.');
+            return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.');
         }
     }
 
@@ -386,20 +387,20 @@ class ClientLicenseController extends Controller
 
             $sessionTokenValue = $validated['session_token'] ?? null;
             if (! is_string($sessionTokenValue) || $sessionTokenValue === '') {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $sessionToken = $sessionTokenValue;
 
             $timestamp = (int) $validated['timestamp'];
             if (abs(now()->timestamp - $timestamp) > 300) {
-                return $this->errorResponse(422, 'TIMESTAMP_OUT_OF_WINDOW', 'Timestamp is out of allowed window.');
+                return $this->errorResponse(422, ApiErrorCode::TIMESTAMP_OUT_OF_WINDOW, 'Timestamp is out of allowed window.');
             }
 
             $nonceScope = 'license.unbind|'.$sessionToken;
             $nonceAcquired = $this->nonceGuardService->acquire($nonceScope, (string) $validated['nonce']);
             if (! $nonceAcquired) {
-                return $this->errorResponse(409, 'NONCE_REPLAY', 'Nonce has already been used.');
+                return $this->errorResponse(409, ApiErrorCode::NONCE_REPLAY, 'Nonce has already been used.');
             }
 
             $session = ClientSession::query()
@@ -408,17 +409,17 @@ class ClientLicenseController extends Controller
                 ->first();
 
             if (! $session) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $licenseKey = (string) $validated['license_key'];
             if (! LicenseService::validateLicenseKeyFormat($licenseKey)) {
-                return $this->errorResponse(422, 'LICENSE_INVALID', 'License key is invalid.');
+                return $this->errorResponse(422, ApiErrorCode::LICENSE_INVALID, 'License key is invalid.');
             }
 
             $license = License::query()->where('key', $licenseKey)->first();
             if (! $license) {
-                return $this->errorResponse(422, 'LICENSE_INVALID', 'License key is invalid.');
+                return $this->errorResponse(422, ApiErrorCode::LICENSE_INVALID, 'License key is invalid.');
             }
 
             if (
@@ -427,18 +428,18 @@ class ClientLicenseController extends Controller
                 || $license->expires_at->lte(now())
                 || $license->used_by === null
             ) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             if ($license->used_by !== $session->account_id) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $incomingHwidHash = hash('sha256', (string) $validated['hwid']);
             $boundDevice = $session->device;
 
             if (! $boundDevice || ! is_string($boundDevice->hwid_hash) || ! hash_equals($boundDevice->hwid_hash, $incomingHwidHash)) {
-                return $this->errorResponse(422, 'DEVICE_MISMATCH', 'Device does not match bound device.');
+                return $this->errorResponse(422, ApiErrorCode::DEVICE_MISMATCH, 'Device does not match bound device.');
             }
 
             $unboundDevice = DB::transaction(function () use ($session, $license, $request) {
@@ -477,7 +478,7 @@ class ClientLicenseController extends Controller
             });
 
             if (! $unboundDevice) {
-                return $this->errorResponse(409, 'DEVICE_NOT_BOUND', 'No active bound device was found.');
+                return $this->errorResponse(409, ApiErrorCode::DEVICE_NOT_BOUND, 'No active bound device was found.');
             }
 
             return response()->json([
@@ -495,15 +496,15 @@ class ClientLicenseController extends Controller
         } catch (Throwable $throwable) {
             report($throwable);
 
-            return $this->errorResponse(500, 'SERVER_ERROR', 'Internal server error.');
+            return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.');
         }
     }
 
-    private function errorResponse(int $httpCode, string $errorCode, string $message): JsonResponse
+    private function errorResponse(int $httpCode, ApiErrorCode $errorCode, string $message): JsonResponse
     {
         return response()->json([
             'code' => $httpCode,
-            'error_code' => $errorCode,
+            'error_code' => $errorCode->value,
             'message' => $message,
             'data' => null,
         ], $httpCode);

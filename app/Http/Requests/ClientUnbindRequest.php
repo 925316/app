@@ -17,7 +17,7 @@ class ClientUnbindRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'session_token' => ['nullable', 'string', 'max:128'],
+            'session_token' => ['required', 'string', 'max:128'],
             'license_key' => ['required', 'string', 'max:50'],
             'hwid' => ['required', 'string', 'min:8', 'max:255'],
             'nonce' => ['required', 'string', 'min:8', 'max:128'],

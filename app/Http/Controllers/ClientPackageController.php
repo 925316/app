@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ApiErrorCode;
 use App\Models\ClientSession;
 use App\Services\PackageService;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,7 @@ class ClientPackageController extends Controller
             }
 
             if (! is_string($sessionTokenInput) || $sessionTokenInput === '' || mb_strlen($sessionTokenInput) > 128) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             $releaseChannelInput = $request->query('release_channel', 'stable');
@@ -28,7 +29,7 @@ class ClientPackageController extends Controller
             }
 
             if (! is_string($releaseChannelInput) || ! in_array($releaseChannelInput, ['stable', 'dev'], true)) {
-                return $this->errorResponse(422, 'INVALID_CHANNEL', 'Release channel is invalid.');
+                return $this->errorResponse(422, ApiErrorCode::INVALID_CHANNEL, 'Release channel is invalid.');
             }
 
             $currentVersionInput = $request->query('current_version');
@@ -38,7 +39,7 @@ class ClientPackageController extends Controller
                 }
 
                 if (! is_string($currentVersionInput) || ! PackageService::isValidSemanticVersion($currentVersionInput)) {
-                    return $this->errorResponse(422, 'INVALID_VERSION', 'Current version format is invalid.');
+                    return $this->errorResponse(422, ApiErrorCode::INVALID_VERSION, 'Current version format is invalid.');
                 }
             }
 
@@ -49,17 +50,17 @@ class ClientPackageController extends Controller
                 ->first();
 
             if (! $session || ! $session->account) {
-                return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
             if (! $session->account->hasPrivilege(1)) {
-                return $this->errorResponse(403, 'LICENSE_INEFFECTIVE', 'License is not effective.');
+                return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
             $latestRelease = PackageService::getLatestRelease($releaseChannelInput);
 
             if (! $latestRelease) {
-                return $this->errorResponse(404, 'PACKAGE_NOT_FOUND', 'No package release found for this channel.');
+                return $this->errorResponse(404, ApiErrorCode::PACKAGE_NOT_FOUND, 'No package release found for this channel.');
             }
 
             $currentVersion = is_string($currentVersionInput) ? $currentVersionInput : null;
@@ -88,15 +89,15 @@ class ClientPackageController extends Controller
         } catch (Throwable $throwable) {
             report($throwable);
 
-            return $this->errorResponse(500, 'SERVER_ERROR', 'Internal server error.');
+            return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.');
         }
     }
 
-    private function errorResponse(int $httpCode, string $errorCode, string $message): JsonResponse
+    private function errorResponse(int $httpCode, ApiErrorCode $errorCode, string $message): JsonResponse
     {
         return response()->json([
             'code' => $httpCode,
-            'error_code' => $errorCode,
+            'error_code' => $errorCode->value,
             'message' => $message,
             'data' => null,
         ], $httpCode);

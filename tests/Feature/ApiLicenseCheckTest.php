@@ -142,20 +142,21 @@ it('returns auth required when session token is missing', function () {
         'session_token' => null,
     ]));
 
-    $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['session_token']);
 });
 
-it('returns auth required with stable message when session token field is omitted', function () {
+it('returns validation error when session token field is omitted', function () {
     seedValidApiContext();
 
-    $response = postJson('/api/license/check', apiPayload([
-        'session_token' => null,
-    ]));
+    $payload = apiPayload();
+    unset($payload['session_token']);
 
-    $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
-        ->assertJsonPath('message', 'Authentication required.');
+    $response = postJson('/api/license/check', $payload);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['session_token'])
+        ->assertJsonPath('message', 'Session token is required.');
 });
 
 it('returns license ineffective when license is not active', function () {

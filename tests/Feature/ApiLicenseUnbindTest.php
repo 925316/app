@@ -84,8 +84,8 @@ it('returns auth required when session token is missing', function () {
         'session_token' => null,
     ]));
 
-    $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['session_token']);
 });
 
 it('returns nonce replay for reused nonce', function () {

@@ -18,7 +18,7 @@ class ClientActivateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'session_token' => ['nullable', 'string', 'max:128'],
+            'session_token' => ['required', 'string', 'max:128'],
             'license_key' => [
                 'required',
                 'string',
@@ -42,6 +42,7 @@ class ClientActivateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'session_token.required' => 'Session token is required.',
             'license_key.required' => 'License key is required.',
             'hwid.required' => 'HWID is required.',
             'nonce.required' => 'Nonce is required.',

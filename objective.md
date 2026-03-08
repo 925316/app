@@ -26,8 +26,8 @@
 - Even in phased delivery, shared domain rules (license status machine, privilege source, key regex, bind/unbind consistency) must stay unified.
 
 **Current API phase status**:
-- Implemented now: `POST /api/license/check`, `POST /api/license/activate`.
-- Planned next: `POST /api/account/login`, `POST /api/license/unbind`, `GET /api/update/check`.
+- Implemented now: `POST /api/license/check`, `POST /api/license/activate`, `POST /api/account/login`, `POST /api/license/unbind`, `GET /api/update/check`.
+- Planned next: none (phase baseline endpoints already shipped).
 
 ### 1. Permission System
 
@@ -166,11 +166,12 @@ The client-server protocol endpoint set is phased:
 **Implemented now**:
 1. `POST /api/license/check`
 2. `POST /api/license/activate`
+3. `POST /api/account/login`
+4. `POST /api/license/unbind`
+5. `GET /api/update/check`
 
 **Planned next phase**:
-1. `POST /api/account/login`
-2. `POST /api/license/unbind`
-3. `GET /api/update/check`
+1. None (current protocol baseline is fully shipped).
 
 Session liveness is heartbeat-driven. Explicit logout endpoint is not required by protocol correctness.
 
@@ -193,7 +194,7 @@ Session liveness is heartbeat-driven. Explicit logout endpoint is not required b
 
 #### `POST /api/account/login`
 
-Status: **Planned** (not part of current shipped API surface).
+Status: **Implemented** (part of current shipped API surface).
 
 - Required contract fields: account credentials + device identity (`hwid`, `nonce`, `timestamp`, `version`).
 - Success must return: `session_token`, account summary, effective license summary.
@@ -203,7 +204,7 @@ Status: **Planned** (not part of current shipped API surface).
 
 #### `POST /api/license/unbind`
 
-Status: **Planned** (not part of current shipped API surface).
+Status: **Implemented** (part of current shipped API surface).
 
 - Required contract fields: `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
 - Must enforce one-active-device rule with transaction + lock semantics.
@@ -211,7 +212,7 @@ Status: **Planned** (not part of current shipped API surface).
 
 #### `GET /api/update/check`
 
-Status: **Planned** (not part of current shipped API surface).
+Status: **Implemented** (part of current shipped API surface).
 
 - Must return latest package metadata: `version`, `release_channel`, `download_url`, `changelog`, optional `virus_detection_url`.
 - Response format remains JSON and follows stable error-code contract.
