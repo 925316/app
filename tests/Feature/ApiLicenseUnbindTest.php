@@ -159,3 +159,19 @@ it('returns device not bound when session device is already unbound', function (
     $response->assertConflict()
         ->assertJsonPath('error_code', 'DEVICE_NOT_BOUND');
 });
+
+it('normalizes session token and hwid input values before unbind processing', function () {
+    seedUnbindApiContext();
+
+    $response = postJson('/api/license/unbind', apiUnbindPayload([
+        'session_token' => '  unbind-session-token-001  ',
+        'hwid' => '  HWID-UNBIND-12345  ',
+        'version' => ' 1.0.0 ',
+    ]));
+
+    $response->assertSuccessful()
+        ->assertJsonPath('code', 200)
+        ->assertJsonPath('error_code', null)
+        ->assertJsonPath('message', 'OK')
+        ->assertJsonPath('data.status', 'unbound');
+});
