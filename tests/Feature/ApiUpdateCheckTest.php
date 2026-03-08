@@ -194,3 +194,19 @@ it('returns invalid version when current_version is malformed', function () {
     $response->assertUnprocessable()
         ->assertJsonPath('error_code', 'INVALID_VERSION');
 });
+
+it('normalizes release_channel and session_token query values before validation', function () {
+    seedUpdateCheckContext();
+
+    PackageRelease::factory()->create([
+        'version' => '4.0.0',
+        'release_channel' => 'dev',
+        'download_url' => 'https://example.com/download/4.0.0-dev.zip',
+    ]);
+
+    $response = getJson('/api/update/check?session_token=%20update-check-session-token-001%20&release_channel=%20DEV%20');
+
+    $response->assertSuccessful()
+        ->assertJsonPath('data.release_channel', 'dev')
+        ->assertJsonPath('data.version', '4.0.0');
+});

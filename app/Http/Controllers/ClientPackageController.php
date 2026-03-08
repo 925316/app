@@ -14,17 +14,29 @@ class ClientPackageController extends Controller
     {
         try {
             $sessionTokenInput = $request->query('session_token');
+            if (is_string($sessionTokenInput)) {
+                $sessionTokenInput = trim($sessionTokenInput);
+            }
+
             if (! is_string($sessionTokenInput) || $sessionTokenInput === '' || mb_strlen($sessionTokenInput) > 128) {
                 return $this->errorResponse(401, 'AUTH_REQUIRED', 'Authentication required.');
             }
 
             $releaseChannelInput = $request->query('release_channel', 'stable');
+            if (is_string($releaseChannelInput)) {
+                $releaseChannelInput = strtolower(trim($releaseChannelInput));
+            }
+
             if (! is_string($releaseChannelInput) || ! in_array($releaseChannelInput, ['stable', 'dev'], true)) {
                 return $this->errorResponse(422, 'INVALID_CHANNEL', 'Release channel is invalid.');
             }
 
             $currentVersionInput = $request->query('current_version');
             if ($currentVersionInput !== null) {
+                if (is_string($currentVersionInput)) {
+                    $currentVersionInput = trim($currentVersionInput);
+                }
+
                 if (! is_string($currentVersionInput) || ! PackageService::isValidSemanticVersion($currentVersionInput)) {
                     return $this->errorResponse(422, 'INVALID_VERSION', 'Current version format is invalid.');
                 }
