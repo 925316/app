@@ -18,6 +18,17 @@ it('user with license can view package list', function () {
         ->assertViewIs('packages.index');
 });
 
+it('guest is redirected from package routes', function () {
+    $release = PackageRelease::factory()->create([
+        'version' => '1.0.0',
+        'release_channel' => 'stable',
+    ]);
+
+    $this->get(route('packages.index'))->assertRedirect(route('login'));
+    $this->get(route('packages.show', $release))->assertRedirect(route('login'));
+    $this->get(route('packages.download', $release))->assertRedirect(route('login'));
+});
+
 it('user without license cannot view package list', function () {
     $this->actingAs($this->userWithoutLicense)
         ->get(route('packages.index'))
@@ -56,6 +67,12 @@ it('user with license can view package details', function () {
         ->assertViewHasAll(['release', 'canDownload', 'isAdmin']);
 });
 
+it('package show returns not found for missing release model', function () {
+    $this->actingAs($this->userWithLicense)
+        ->get(route('packages.show', 999999))
+        ->assertNotFound();
+});
+
 it('user without license cannot view package details', function () {
     $release = PackageRelease::factory()->create(['version' => '1.0.0', 'release_channel' => 'stable']);
 
@@ -78,6 +95,12 @@ it('user with license can download a package', function () {
         ->assertRedirect('https://example.com/download/package-1.0.0.zip');
 });
 
+it('package download returns not found for missing release model', function () {
+    $this->actingAs($this->userWithLicense)
+        ->get(route('packages.download', 999999))
+        ->assertNotFound();
+});
+
 it('user without license cannot download a package', function () {
     $release = PackageRelease::factory()->create([
         'version' => '1.0.0',
@@ -98,9 +121,27 @@ it('admin can view package upload form', function () {
         ->assertSuccessful();
 });
 
+it('guest is redirected from package admin pages', function () {
+    $this->get(route('packages.upload'))
+        ->assertRedirect(route('login'));
+
+    $this->get(route('packages.manage'))
+        ->assertRedirect(route('login'));
+});
+
 it('non-admin cannot access package upload form', function () {
     $this->actingAs($this->userWithLicense)
         ->get(route('packages.upload'))
+        ->assertForbidden();
+});
+
+it('non-admin cannot store package upload', function () {
+    $this->actingAs($this->userWithLicense)
+        ->post(route('packages.store'), [
+            'version' => '9.9.9',
+            'release_channel' => 'stable',
+            'download_url' => 'https://example.com/download/package-9.9.9.zip',
+        ])
         ->assertForbidden();
 });
 
@@ -175,6 +216,34 @@ it('non-admin cannot access package manage page', function () {
         ->assertForbidden();
 });
 
+it('non-admin cannot update package changelog', function () {
+    $release = PackageRelease::factory()->create(['version' => '1.0.0', 'release_channel' => 'stable']);
+
+    $this->actingAs($this->userWithLicense)
+        ->post(route('packages.update-changelog', $release), [
+            'changelog' => 'blocked',
+        ])
+        ->assertForbidden();
+});
+
+it('non-admin cannot bulk delete package releases', function () {
+    $release = PackageRelease::factory()->create(['version' => '1.0.0', 'release_channel' => 'stable']);
+
+    $this->actingAs($this->userWithLicense)
+        ->delete(route('packages.bulk-delete'), [
+            'ids' => [$release->id],
+        ])
+        ->assertForbidden();
+});
+
+it('non-admin cannot delete package release', function () {
+    $release = PackageRelease::factory()->create(['version' => '1.0.0', 'release_channel' => 'stable']);
+
+    $this->actingAs($this->userWithLicense)
+        ->delete(route('packages.destroy', $release))
+        ->assertForbidden();
+});
+
 // --- Admin Delete ---
 
 it('admin can delete a package release', function () {
@@ -186,6 +255,20 @@ it('admin can delete a package release', function () {
         ->assertSessionHas('success');
 
     expect(PackageRelease::find($release->id))->toBeNull();
+});
+
+it('update changelog returns not found for missing release model', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.update-changelog', 999999), [
+            'changelog' => 'x',
+        ])
+        ->assertNotFound();
+});
+
+it('destroy package returns not found for missing release model', function () {
+    $this->actingAs($this->admin)
+        ->delete(route('packages.destroy', 999999))
+        ->assertNotFound();
 });
 
 // --- Admin Bulk Delete ---
@@ -212,6 +295,22 @@ it('bulk delete requires at least one id', function () {
         ->assertSessionHasErrors('ids');
 });
 
+it('bulk delete validates ids must be an array', function () {
+    $this->actingAs($this->admin)
+        ->delete(route('packages.bulk-delete'), [
+            'ids' => 'not-array',
+        ])
+        ->assertSessionHasErrors('ids');
+});
+
+it('bulk delete validates each id exists', function () {
+    $this->actingAs($this->admin)
+        ->delete(route('packages.bulk-delete'), [
+            'ids' => [999999],
+        ])
+        ->assertSessionHasErrors('ids.0');
+});
+
 // --- Admin Update Changelog ---
 
 it('admin can update package changelog', function () {
@@ -235,4 +334,59 @@ it('update changelog validates required field', function () {
             'changelog' => '',
         ])
         ->assertSessionHasErrors('changelog');
+});
+
+it('update changelog validates max length', function () {
+    $release = PackageRelease::factory()->create(['version' => '1.0.0', 'release_channel' => 'stable']);
+
+    $this->actingAs($this->admin)
+        ->post(route('packages.update-changelog', $release), [
+            'changelog' => str_repeat('a', 65536),
+        ])
+        ->assertSessionHasErrors('changelog');
+});
+
+it('upload validates version max length', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => str_repeat('1', 51),
+            'release_channel' => 'stable',
+            'download_url' => 'https://example.com/package.zip',
+        ])
+        ->assertSessionHasErrors('version');
+});
+
+it('upload validates download url max length', function () {
+    $longUrl = 'https://example.com/'.str_repeat('a', 240);
+
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '4.0.0',
+            'release_channel' => 'stable',
+            'download_url' => $longUrl,
+        ])
+        ->assertSessionHasErrors('download_url');
+});
+
+it('upload validates virus detection url max length', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '4.1.0',
+            'release_channel' => 'stable',
+            'download_url' => 'https://example.com/package.zip',
+            'virus_detection_url' => str_repeat('x', 2001),
+        ])
+        ->assertSessionHasErrors('virus_detection_url');
+});
+
+it('upload trims version before uniqueness validation', function () {
+    PackageRelease::factory()->create(['version' => '1.0.0', 'release_channel' => 'stable']);
+
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => ' 1.0.0 ',
+            'release_channel' => 'stable',
+            'download_url' => 'https://example.com/package.zip',
+        ])
+        ->assertSessionHasErrors('version');
 });

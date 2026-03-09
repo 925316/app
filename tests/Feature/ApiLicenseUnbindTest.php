@@ -77,15 +77,38 @@ it('unbinds bound device and returns success payload', function () {
         ->exists())->toBeTrue();
 });
 
-it('returns auth required when session token is missing', function () {
+it('validates required session token payload variants', function (?string $tokenValue, bool $omitField, ?string $expectedMessage) {
     seedUnbindApiContext();
 
-    $response = postJson('/api/license/unbind', apiUnbindPayload([
-        'session_token' => null,
-    ]));
+    $payload = apiUnbindPayload();
+    if ($omitField) {
+        unset($payload['session_token']);
+    } else {
+        $payload['session_token'] = $tokenValue;
+    }
+
+    $response = postJson('/api/license/unbind', $payload);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['session_token']);
+
+    if ($expectedMessage !== null) {
+        $response->assertJsonPath('message', $expectedMessage);
+    }
+})->with([
+    'null session token' => [null, false, null],
+    'omitted session token' => [null, true, 'Session token is required.'],
+]);
+
+it('returns auth required when session token does not exist', function () {
+    seedUnbindApiContext();
+
+    $response = postJson('/api/license/unbind', apiUnbindPayload([
+        'session_token' => 'unknown-unbind-session-token',
+    ]));
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
 });
 
 it('returns nonce replay for reused nonce', function () {
@@ -136,11 +159,36 @@ it('returns license ineffective when license is suspended', function () {
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
 });
 
+it('returns auth required when license belongs to a different account', function () {
+    seedUnbindApiContext();
+    $otherAccount = Account::factory()->create();
+
+    License::query()
+        ->where('key', 'KLMNO-12ABC-ABCDE-ABCDE-ABCDE')
+        ->update(['used_by' => $otherAccount->id]);
+
+    $response = postJson('/api/license/unbind', apiUnbindPayload());
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+});
+
 it('returns license invalid for bad license key format', function () {
     seedUnbindApiContext();
 
     $response = postJson('/api/license/unbind', apiUnbindPayload([
         'license_key' => 'BAD-KEY',
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'LICENSE_INVALID');
+});
+
+it('returns license invalid when license key is well-formed but does not exist', function () {
+    seedUnbindApiContext();
+
+    $response = postJson('/api/license/unbind', apiUnbindPayload([
+        'license_key' => 'ZZZZZ-12ABC-ABCDE-ABCDE-ABCDE',
     ]));
 
     $response->assertUnprocessable()
@@ -175,3 +223,18 @@ it('normalizes session token and hwid input values before unbind processing', fu
         ->assertJsonPath('message', 'OK')
         ->assertJsonPath('data.status', 'unbound');
 });
+
+it('validates timestamp payload type and range in unbind endpoint', function (mixed $timestamp) {
+    seedUnbindApiContext();
+
+    $response = postJson('/api/license/unbind', apiUnbindPayload([
+        'timestamp' => $timestamp,
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['timestamp']);
+})->with([
+    'string timestamp' => 'invalid',
+    'negative timestamp' => -1,
+    'float timestamp' => 1.5,
+]);

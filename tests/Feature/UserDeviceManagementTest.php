@@ -23,6 +23,14 @@ it('user without license cannot access devices index', function () {
         ->assertForbidden();
 });
 
+it('guest is redirected from user device routes', function () {
+    $this->get(route('devices.index'))->assertRedirect(route('login'));
+    $this->get(route('devices.manage'))->assertRedirect(route('login'));
+    $this->post(route('devices.bind'))->assertRedirect(route('login'));
+    $this->post(route('devices.unbind'))->assertRedirect(route('login'));
+    $this->post(route('devices.reset-hwid'))->assertRedirect(route('login'));
+});
+
 it('devices index shows only current users devices', function () {
     AccountDevice::factory()->create([
         'account_id' => $this->userWithLicense->id,
@@ -158,4 +166,61 @@ it('user cannot reset HWID within 72 hour cooldown', function () {
     $this->actingAs($this->userWithLicense)
         ->post(route('devices.reset-hwid'))
         ->assertSessionHasErrors('hwid_reset');
+});
+
+it('bind validates ip_address format', function () {
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.bind'), [
+            'hwid' => 'USER-HWID-A-12345',
+            'ip_address' => 'not-an-ip',
+            'country_code' => 'US',
+        ])
+        ->assertSessionHasErrors('ip_address');
+});
+
+it('bind validates country_code format', function () {
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.bind'), [
+            'hwid' => 'USER-HWID-A-12345',
+            'ip_address' => '192.168.1.1',
+            'country_code' => 'U1',
+        ])
+        ->assertSessionHasErrors('country_code');
+});
+
+it('bind requires hwid field', function () {
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.bind'), [
+            'ip_address' => '192.168.1.1',
+            'country_code' => 'US',
+        ])
+        ->assertSessionHasErrors('hwid');
+});
+
+it('bind validates hwid minimum length', function () {
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.bind'), [
+            'hwid' => 'SHORT',
+            'ip_address' => '192.168.1.1',
+            'country_code' => 'US',
+        ])
+        ->assertSessionHasErrors('hwid');
+});
+
+it('bind rejects same hwid when already bound to account', function () {
+    $hwid = 'USER-HWID-A-12345';
+    AccountDevice::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'hwid_hash' => hash('sha256', $hwid),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.bind'), [
+            'hwid' => $hwid,
+            'ip_address' => '192.168.1.2',
+            'country_code' => 'US',
+        ])
+        ->assertSessionHasErrors('hwid');
 });

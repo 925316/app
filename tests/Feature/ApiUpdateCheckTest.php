@@ -195,6 +195,24 @@ it('returns invalid version when current_version is malformed', function () {
         ->assertJsonPath('error_code', 'INVALID_VERSION');
 });
 
+it('returns invalid channel when release_channel is unsupported', function () {
+    seedUpdateCheckContext();
+
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=beta');
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'INVALID_CHANNEL');
+});
+
+it('returns auth required when session token exceeds max length', function () {
+    $tooLongSessionToken = str_repeat('a', 129);
+
+    $response = getJson('/api/update/check?session_token='.$tooLongSessionToken);
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+});
+
 it('normalizes release_channel and session_token query values before validation', function () {
     seedUpdateCheckContext();
 

@@ -148,3 +148,71 @@ it('non-admin cannot update a license', function () {
         ])
         ->assertForbidden();
 });
+
+it('store rejects invalid privilege enum value', function () {
+    $this->actingAs($this->admin)
+        ->post(route('licenses.store'), [
+            'privilege' => 99,
+            'status' => LicenseStatus::UNUSED->value,
+            'expires_at' => now()->addYear()->format('Y-m-d'),
+        ])
+        ->assertSessionHasErrors('privilege');
+});
+
+it('store rejects past expiration date', function () {
+    $this->actingAs($this->admin)
+        ->post(route('licenses.store'), [
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::UNUSED->value,
+            'expires_at' => now()->subDay()->format('Y-m-d'),
+        ])
+        ->assertSessionHasErrors('expires_at');
+});
+
+it('store rejects malformed custom key', function () {
+    $this->actingAs($this->admin)
+        ->post(route('licenses.store'), [
+            'key' => 'bad-key',
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::UNUSED->value,
+            'expires_at' => now()->addYear()->format('Y-m-d'),
+        ])
+        ->assertSessionHasErrors('key');
+});
+
+it('store rejects duplicate custom key', function () {
+    $license = License::factory()->create();
+
+    $this->actingAs($this->admin)
+        ->post(route('licenses.store'), [
+            'key' => strtolower($license->key),
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::UNUSED->value,
+            'expires_at' => now()->addYear()->format('Y-m-d'),
+        ])
+        ->assertSessionHasErrors('key');
+});
+
+it('store rejects non existent used_by account id', function () {
+    $this->actingAs($this->admin)
+        ->post(route('licenses.store'), [
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::UNUSED->value,
+            'expires_at' => now()->addYear()->format('Y-m-d'),
+            'used_by' => 999999,
+        ])
+        ->assertSessionHasErrors('used_by');
+});
+
+it('update rejects key that does not exist in licenses table', function () {
+    $license = License::factory()->unused()->create();
+
+    $this->actingAs($this->admin)
+        ->patch(route('licenses.update', $license), [
+            'key' => 'ABCDE-12345-ABCDE-FGHIJ-KLMNO',
+            'privilege' => LicensePrivilege::STANDARD->value,
+            'status' => LicenseStatus::UNUSED->value,
+            'expires_at' => now()->addYear()->format('Y-m-d'),
+        ])
+        ->assertSessionHasErrors('key');
+});

@@ -88,6 +88,19 @@ it('admin can unbind a device', function () {
     expect($device->fresh()->unbound_at)->not->toBeNull();
 });
 
+it('admin unbind returns error when device is not currently bound', function () {
+    $device = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'hwid_hash' => str_repeat('a', 64),
+        'bound_at' => now()->subDay(),
+        'unbound_at' => now()->subHour(),
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('devices.unbind-admin', $device))
+        ->assertSessionHasErrors('device');
+});
+
 it('admin can reset HWID for a user', function () {
     $initialCount = $this->regularUser->hwid_reset_count;
 
@@ -98,6 +111,17 @@ it('admin can reset HWID for a user', function () {
     $response->assertSessionHas('success');
 
     expect($this->regularUser->fresh()->hwid_reset_count)->toBe($initialCount + 1);
+});
+
+it('admin reset HWID returns cooldown error when account is in cooldown window', function () {
+    $cooldownUser = Account::factory()->create([
+        'hwid_last_reset_at' => now()->subHours(1),
+    ]);
+
+    $response = $this->actingAs($this->admin)
+        ->post(route('devices.reset-hwid-admin', $cooldownUser));
+
+    $response->assertSessionHasErrors('hwid_reset');
 });
 
 it('admin can perform bulk unbind', function () {
@@ -126,6 +150,21 @@ it('admin can perform bulk unbind', function () {
 
     expect($device1->fresh()->unbound_at)->not->toBeNull();
     expect($device2->fresh()->unbound_at)->not->toBeNull();
+});
+
+it('bulk unbind returns bulk action error when selected devices are already unbound', function () {
+    $device = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'hwid_hash' => str_repeat('d', 64),
+        'bound_at' => now()->subDay(),
+        'unbound_at' => now()->subHour(),
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('devices.bulk-unbind-admin'), [
+            'device_ids' => [$device->id],
+        ])
+        ->assertSessionHasErrors('bulk_action');
 });
 
 it('admin can perform bulk HWID reset', function () {
@@ -182,4 +221,40 @@ it('bulk actions validate device IDs', function () {
         ]);
 
     $response->assertSessionHasErrors('device_ids.0');
+});
+
+it('bulk reset validates at least one device id', function () {
+    $this->actingAs($this->admin)
+        ->post(route('devices.bulk-reset-hwid-admin'), [
+            'device_ids' => [],
+        ])
+        ->assertSessionHasErrors('device_ids');
+});
+
+it('bulk reset validates each device id exists', function () {
+    $this->actingAs($this->admin)
+        ->post(route('devices.bulk-reset-hwid-admin'), [
+            'device_ids' => [999999],
+        ])
+        ->assertSessionHasErrors('device_ids.0');
+});
+
+it('bulk reset returns bulk action error when all selected accounts are in cooldown', function () {
+    $cooldownUser = Account::factory()->create([
+        'hwid_last_reset_at' => now()->subHours(1),
+    ]);
+
+    $device = AccountDevice::factory()->create([
+        'account_id' => $cooldownUser->id,
+        'hwid_hash' => str_repeat('c', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $response = $this->actingAs($this->admin)
+        ->post(route('devices.bulk-reset-hwid-admin'), [
+            'device_ids' => [$device->id],
+        ]);
+
+    $response->assertSessionHasErrors('bulk_action');
 });

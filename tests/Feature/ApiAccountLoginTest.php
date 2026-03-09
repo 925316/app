@@ -130,6 +130,19 @@ it('returns device mismatch when hwid does not match currently bound device', fu
         ->assertJsonPath('error_code', 'DEVICE_MISMATCH');
 });
 
+it('returns device mismatch when account has no bound device', function () {
+    $context = seedLoginApiContext();
+
+    $context['device']->forceFill([
+        'unbound_at' => now()->subMinute(),
+    ])->save();
+
+    $response = postJson('/api/account/login', apiLoginPayload());
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'DEVICE_MISMATCH');
+});
+
 it('returns license ineffective when account has no effective license', function () {
     $context = seedLoginApiContext();
 
@@ -167,3 +180,39 @@ it('normalizes hwid and version input values before login processing', function 
         ->assertJsonPath('error_code', null)
         ->assertJsonPath('message', 'OK');
 });
+
+it('replaces existing session on repeated successful login for same account and device', function () {
+    $context = seedLoginApiContext();
+
+    $first = postJson('/api/account/login', apiLoginPayload([
+        'nonce' => 'nonce-first-login-replace',
+    ]));
+    $first->assertSuccessful();
+    $firstToken = $first->json('data.session_token');
+
+    $second = postJson('/api/account/login', apiLoginPayload([
+        'nonce' => 'nonce-second-login-replace',
+    ]));
+    $second->assertSuccessful();
+    $secondToken = $second->json('data.session_token');
+
+    expect($secondToken)->not->toBe($firstToken);
+    expect(ClientSession::query()->where('session_token', $firstToken)->exists())->toBeFalse();
+    expect(ClientSession::query()->where('session_token', $secondToken)->exists())->toBeTrue();
+    expect(ClientSession::query()->where('account_id', $context['account']->id)->where('device_id', $context['device']->id)->count())->toBe(1);
+});
+
+it('validates timestamp payload type and range in login endpoint', function (mixed $timestamp) {
+    seedLoginApiContext();
+
+    $response = postJson('/api/account/login', apiLoginPayload([
+        'timestamp' => $timestamp,
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['timestamp']);
+})->with([
+    'string timestamp' => 'invalid',
+    'negative timestamp' => -1,
+    'float timestamp' => 1.5,
+]);

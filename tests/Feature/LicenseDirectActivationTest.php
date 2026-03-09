@@ -23,6 +23,21 @@ it('user can activate an unused license directly', function () {
     expect($license->fresh()->used_by)->toBe($this->account->id);
 });
 
+it('guest is redirected from direct license activation route', function () {
+    $license = License::factory()->unused()->create([
+        'expires_at' => now()->addYear(),
+    ]);
+
+    $this->post(route('licenses.activate', $license))
+        ->assertRedirect(route('login'));
+});
+
+it('direct activate returns not found for missing license model', function () {
+    $this->actingAs($this->account)
+        ->post(route('licenses.activate', 999999))
+        ->assertNotFound();
+});
+
 it('cannot directly activate an already active license', function () {
     $otherAccount = Account::factory()->create();
     $license = License::factory()->active()->create([

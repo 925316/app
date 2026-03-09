@@ -83,28 +83,38 @@ it('activates an unused license and returns signed response', function () {
     expect($context['license']->fresh()->used_by)->toBe($context['account']->id);
 });
 
-it('returns auth required when session token is missing', function () {
-    seedActivateApiContext();
-
-    $response = postJson('/api/license/activate', apiActivatePayload([
-        'session_token' => null,
-    ]));
-
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['session_token']);
-});
-
-it('returns validation error when session token field is omitted', function () {
+it('validates required session token payload variants', function (?string $tokenValue, bool $omitField, ?string $expectedMessage) {
     seedActivateApiContext();
 
     $payload = apiActivatePayload();
-    unset($payload['session_token']);
+    if ($omitField) {
+        unset($payload['session_token']);
+    } else {
+        $payload['session_token'] = $tokenValue;
+    }
 
     $response = postJson('/api/license/activate', $payload);
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['session_token'])
-        ->assertJsonPath('message', 'Session token is required.');
+        ->assertJsonValidationErrors(['session_token']);
+
+    if ($expectedMessage !== null) {
+        $response->assertJsonPath('message', $expectedMessage);
+    }
+})->with([
+    'null session token' => [null, false, null],
+    'omitted session token' => [null, true, 'Session token is required.'],
+]);
+
+it('returns auth required when session token does not exist', function () {
+    seedActivateApiContext();
+
+    $response = postJson('/api/license/activate', apiActivatePayload([
+        'session_token' => 'unknown-activate-session-token',
+    ]));
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
 });
 
 it('returns nonce replay for reused nonce', function () {
@@ -164,6 +174,75 @@ it('returns license ineffective when trying to activate suspended license', func
     $response->assertForbidden()
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
 });
+
+it('returns license ineffective when activating the same license again with a new nonce', function () {
+    seedActivateApiContext();
+
+    postJson('/api/license/activate', apiActivatePayload([
+        'nonce' => 'nonce-first-activate',
+    ]))->assertSuccessful();
+
+    $response = postJson('/api/license/activate', apiActivatePayload([
+        'nonce' => 'nonce-second-activate',
+    ]));
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+});
+
+it('returns license ineffective when account already has another active effective license', function () {
+    $context = seedActivateApiContext();
+
+    License::factory()->create([
+        'status' => LicenseStatus::ACTIVE->value,
+        'privilege' => LicensePrivilege::ULTIMATE->value,
+        'used_by' => $context['account']->id,
+        'expires_at' => now()->addDays(90),
+    ]);
+
+    $response = postJson('/api/license/activate', apiActivatePayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+});
+
+it('returns license ineffective when target license is expired', function () {
+    seedActivateApiContext([
+        'status' => LicenseStatus::UNUSED->value,
+        'expires_at' => now()->subDay(),
+    ]);
+
+    $response = postJson('/api/license/activate', apiActivatePayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+});
+
+it('returns license ineffective when target license is revoked', function () {
+    seedActivateApiContext([
+        'status' => LicenseStatus::REVOKED->value,
+    ]);
+
+    $response = postJson('/api/license/activate', apiActivatePayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+});
+
+it('validates timestamp payload type and range in activate endpoint', function (mixed $timestamp) {
+    seedActivateApiContext();
+
+    $response = postJson('/api/license/activate', apiActivatePayload([
+        'timestamp' => $timestamp,
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['timestamp']);
+})->with([
+    'string timestamp' => 'invalid',
+    'negative timestamp' => -1,
+    'float timestamp' => 1.5,
+]);
 
 it('normalizes session token and hwid input values before activate processing', function () {
     seedActivateApiContext();

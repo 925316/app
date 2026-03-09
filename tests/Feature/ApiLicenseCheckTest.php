@@ -135,29 +135,79 @@ it('returns device mismatch when hwid does not match session bound device', func
     expect($context['session']->fresh()->last_heartbeat_at?->eq($previousHeartbeat))->toBeTrue();
 });
 
-it('returns auth required when session token is missing', function () {
-    seedValidApiContext();
-
-    $response = postJson('/api/license/check', apiPayload([
-        'session_token' => null,
-    ]));
-
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['session_token']);
-});
-
-it('returns validation error when session token field is omitted', function () {
+it('validates required session token payload variants', function (?string $tokenValue, bool $omitField, ?string $expectedMessage) {
     seedValidApiContext();
 
     $payload = apiPayload();
-    unset($payload['session_token']);
+    if ($omitField) {
+        unset($payload['session_token']);
+    } else {
+        $payload['session_token'] = $tokenValue;
+    }
 
     $response = postJson('/api/license/check', $payload);
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['session_token'])
-        ->assertJsonPath('message', 'Session token is required.');
+        ->assertJsonValidationErrors(['session_token']);
+
+    if ($expectedMessage !== null) {
+        $response->assertJsonPath('message', $expectedMessage);
+    }
+})->with([
+    'null session token' => [null, false, null],
+    'omitted session token' => [null, true, 'Session token is required.'],
+]);
+
+it('returns auth required when session token does not exist', function () {
+    seedValidApiContext();
+
+    $response = postJson('/api/license/check', apiPayload([
+        'session_token' => 'unknown-session-token',
+    ]));
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
 });
+
+it('returns license invalid when license key is well-formed but does not exist', function () {
+    seedValidApiContext();
+
+    $response = postJson('/api/license/check', apiPayload([
+        'license_key' => 'ZZZZZ-12ABC-ABCDE-ABCDE-ABCDE',
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'LICENSE_INVALID');
+});
+
+it('returns auth required when license does not belong to session account', function () {
+    seedValidApiContext();
+    $otherAccount = Account::factory()->create();
+
+    License::query()
+        ->where('key', 'ABCDE-12ABC-ABCDE-ABCDE-ABCDE')
+        ->update(['used_by' => $otherAccount->id]);
+
+    $response = postJson('/api/license/check', apiPayload());
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+});
+
+it('validates timestamp payload type and range in check endpoint', function (mixed $timestamp) {
+    seedValidApiContext();
+
+    $response = postJson('/api/license/check', apiPayload([
+        'timestamp' => $timestamp,
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['timestamp']);
+})->with([
+    'string timestamp' => 'invalid',
+    'negative timestamp' => -1,
+    'float timestamp' => 1.5,
+]);
 
 it('returns license ineffective when license is not active', function () {
     seedValidApiContext();

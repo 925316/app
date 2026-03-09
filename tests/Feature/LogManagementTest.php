@@ -81,6 +81,42 @@ it('admin can filter logs by date range', function () {
     expect($logs->total())->toBe(1);
 });
 
+it('inverted date range returns safely with no matches', function () {
+    EventLog::factory()->create(['created_at' => now()->subDays(2)]);
+    EventLog::factory()->create(['created_at' => now()->subDays(6)]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('logs.index', [
+            'start_date' => now()->format('Y-m-d'),
+            'end_date' => now()->subDays(10)->format('Y-m-d'),
+        ]));
+
+    $response->assertSuccessful();
+    $logs = $response->viewData('logs');
+    expect($logs->total())->toBe(0);
+});
+
+it('malformed event level filter does not crash index', function () {
+    EventLog::factory()->create(['event_level' => EventLog::LEVEL_INFO]);
+    EventLog::factory()->create(['event_level' => EventLog::LEVEL_WARN]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('logs.index', ['event_level' => 'not-an-int']));
+
+    $response->assertSuccessful()
+        ->assertViewHas('logs');
+});
+
+it('non numeric account id filter is handled safely', function () {
+    EventLog::factory()->create(['account_id' => null]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('logs.index', ['account_id' => 'abc']));
+
+    $response->assertSuccessful()
+        ->assertViewHas('logs');
+});
+
 it('admin can search logs by ip address', function () {
     EventLog::factory()->create(['ip_address' => '10.0.0.1']);
     EventLog::factory()->create(['ip_address' => '192.168.1.1']);
@@ -132,19 +168,43 @@ it('admin can clear old logs', function () {
 });
 
 it('clear logs validates days field is required', function () {
+    EventLog::factory()->create(['created_at' => now()->subDays(40)]);
+    EventLog::factory()->create(['created_at' => now()->subDays(10)]);
+
     $this->actingAs($this->admin)
         ->post(route('logs.clear'), [])
         ->assertSessionHasErrors('days');
+
+    expect(EventLog::count())->toBe(2);
 });
 
 it('clear logs validates days minimum of 1', function () {
+    EventLog::factory()->create(['created_at' => now()->subDays(40)]);
+
     $this->actingAs($this->admin)
         ->post(route('logs.clear'), ['days' => 0])
         ->assertSessionHasErrors('days');
+
+    expect(EventLog::count())->toBe(1);
 });
 
 it('clear logs validates days maximum of 365', function () {
+    EventLog::factory()->create(['created_at' => now()->subDays(40)]);
+
     $this->actingAs($this->admin)
         ->post(route('logs.clear'), ['days' => 400])
         ->assertSessionHasErrors('days');
+
+    expect(EventLog::count())->toBe(1);
+});
+
+it('clear logs validates days must be integer and keeps data intact', function () {
+    EventLog::factory()->create(['created_at' => now()->subDays(40)]);
+    EventLog::factory()->create(['created_at' => now()->subDays(5)]);
+
+    $this->actingAs($this->admin)
+        ->post(route('logs.clear'), ['days' => 'thirty'])
+        ->assertSessionHasErrors('days');
+
+    expect(EventLog::count())->toBe(2);
 });

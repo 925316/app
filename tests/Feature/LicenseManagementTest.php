@@ -189,3 +189,53 @@ it('cannot revoke an already revoked license', function () {
         ->post(route('licenses.revoke', $license))
         ->assertSessionHasErrors();
 });
+
+it('suspend validates reason max length', function () {
+    $license = License::factory()->active()->create(['expires_at' => now()->addYear()]);
+
+    $this->actingAs($this->admin)
+        ->post(route('licenses.suspend', $license), ['suspension_reason' => str_repeat('a', 256)])
+        ->assertSessionHasErrors('suspension_reason');
+
+    expect($license->fresh()->status)->toBe(LicenseStatus::ACTIVE);
+});
+
+it('revoke validates reason max length', function () {
+    $license = License::factory()->active()->create(['expires_at' => now()->addYear()]);
+
+    $this->actingAs($this->admin)
+        ->post(route('licenses.revoke', $license), ['revocation_reason' => str_repeat('a', 256)])
+        ->assertSessionHasErrors('revocation_reason');
+
+    expect($license->fresh()->status)->toBe(LicenseStatus::ACTIVE);
+});
+
+it('upgrade validates new privilege range and type', function (mixed $newPrivilege) {
+    $license = License::factory()->active()->create(['expires_at' => now()->addYear()]);
+
+    $this->actingAs($this->admin)
+        ->post(route('licenses.upgrade', $license), [
+            'new_privilege' => $newPrivilege,
+        ])
+        ->assertSessionHasErrors('new_privilege');
+})->with([
+    'too low' => 0,
+    'too high' => 8,
+    'non integer' => 'x',
+]);
+
+it('extend validates days range and type', function (mixed $days) {
+    $license = License::factory()->active()->create(['expires_at' => now()->addYear()]);
+
+    $originalExpiry = $license->expires_at->copy();
+
+    $this->actingAs($this->admin)
+        ->post(route('licenses.extend', $license), ['days' => $days])
+        ->assertSessionHasErrors('days');
+
+    expect($license->fresh()->expires_at->eq($originalExpiry))->toBeTrue();
+})->with([
+    'too low' => 0,
+    'too high' => 366,
+    'non integer' => 'abc',
+]);

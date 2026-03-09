@@ -206,3 +206,20 @@ it('defaults to created_at descending sort', function () {
 
     expect($items[0]->created_at->gte($items[count($items) - 1]->created_at))->toBeTrue();
 });
+
+it('invalid filter and sort inputs are handled safely with default sort fallback', function () {
+    Account::factory()->create(['created_at' => now()->subDays(2)]);
+    Account::factory()->create(['created_at' => now()->subDay()]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('accounts.index', [
+            'status' => 'unknown-status',
+            'license_count' => 'weird',
+            'sort' => 'drop_table',
+            'privilege' => 'not-an-int',
+        ]));
+
+    $response->assertSuccessful();
+    $response->assertViewHas('currentFilters', fn (array $filters) => $filters['sort'] === 'drop_table'
+        && $filters['direction'] === 'desc');
+});

@@ -64,6 +64,42 @@ it('create account validates unique email', function () {
         ->assertSessionHasErrors('email');
 });
 
+it('create account validates username character set', function () {
+    $this->actingAs($this->admin)
+        ->post(route('accounts.store'), [
+            'username' => 'bad username!',
+            'email' => 'valid@example.com',
+            'password' => 'Password1',
+            'password_confirmation' => 'Password1',
+            'email_verified' => false,
+        ])
+        ->assertSessionHasErrors('username');
+});
+
+it('create account validates password complexity', function () {
+    $this->actingAs($this->admin)
+        ->post(route('accounts.store'), [
+            'username' => 'user_password_rule',
+            'email' => 'complexity@example.com',
+            'password' => 'alllowercase',
+            'password_confirmation' => 'alllowercase',
+            'email_verified' => false,
+        ])
+        ->assertSessionHasErrors('password');
+});
+
+it('create account validates password confirmation', function () {
+    $this->actingAs($this->admin)
+        ->post(route('accounts.store'), [
+            'username' => 'user_confirm_rule',
+            'email' => 'confirm@example.com',
+            'password' => 'Password1',
+            'password_confirmation' => 'Password2',
+            'email_verified' => false,
+        ])
+        ->assertSessionHasErrors('password');
+});
+
 it('admin can view account edit form', function () {
     $account = Account::factory()->create();
 
@@ -87,6 +123,45 @@ it('admin can update account username and email', function () {
 
     expect($account->fresh()->username)->toBe('updated_user');
     expect($account->fresh()->email)->toBe('updated@example.com');
+});
+
+it('update account validates username character set', function () {
+    $account = Account::factory()->create(['username' => 'original_name']);
+
+    $this->actingAs($this->admin)
+        ->patch(route('accounts.update', $account), [
+            'username' => 'invalid username!',
+            'email' => $account->email,
+            'password' => null,
+            'password_confirmation' => null,
+        ])
+        ->assertSessionHasErrors('username');
+});
+
+it('update account validates password complexity when provided', function () {
+    $account = Account::factory()->create();
+
+    $this->actingAs($this->admin)
+        ->patch(route('accounts.update', $account), [
+            'username' => $account->username,
+            'email' => $account->email,
+            'password' => 'alllowercase',
+            'password_confirmation' => 'alllowercase',
+        ])
+        ->assertSessionHasErrors('password');
+});
+
+it('update account validates password confirmation when provided', function () {
+    $account = Account::factory()->create();
+
+    $this->actingAs($this->admin)
+        ->patch(route('accounts.update', $account), [
+            'username' => $account->username,
+            'email' => $account->email,
+            'password' => 'Password1',
+            'password_confirmation' => 'Password2',
+        ])
+        ->assertSessionHasErrors('password');
 });
 
 it('admin can suspend an account', function () {
@@ -117,6 +192,36 @@ it('admin can suspend account permanently (no duration)', function () {
 
     expect($account->fresh()->is_suspended)->toBeTrue();
     expect($account->fresh()->suspended_until)->toBeNull();
+});
+
+it('suspend validates duration lower bound', function () {
+    $account = Account::factory()->create(['is_suspended' => false]);
+
+    $this->actingAs($this->admin)
+        ->post(route('accounts.suspend', $account), [
+            'duration' => 0,
+        ])
+        ->assertSessionHasErrors('duration');
+});
+
+it('suspend validates duration upper bound', function () {
+    $account = Account::factory()->create(['is_suspended' => false]);
+
+    $this->actingAs($this->admin)
+        ->post(route('accounts.suspend', $account), [
+            'duration' => 366,
+        ])
+        ->assertSessionHasErrors('duration');
+});
+
+it('suspend validates reason max length', function () {
+    $account = Account::factory()->create(['is_suspended' => false]);
+
+    $this->actingAs($this->admin)
+        ->post(route('accounts.suspend', $account), [
+            'reason' => str_repeat('a', 256),
+        ])
+        ->assertSessionHasErrors('reason');
 });
 
 it('admin can unsuspend an account', function () {
@@ -171,6 +276,16 @@ it('admin can reset hwid for an account', function () {
 
     expect($account->fresh()->hwid_reset_count)->toBe($initialResetCount + 1);
     expect($device->fresh()->unbound_at)->not->toBeNull();
+});
+
+it('reset hwid is blocked when account is in cooldown window', function () {
+    $account = Account::factory()->create([
+        'hwid_last_reset_at' => now()->subHours(2),
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('accounts.reset-hwid', $account))
+        ->assertSessionHasErrors('hwid_reset');
 });
 
 it('admin can delete an account', function () {
