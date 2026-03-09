@@ -32,8 +32,8 @@ it('accounts index shows statistics', function () {
 // --- Status Filters ---
 
 it('can filter accounts by active status', function () {
-    Account::factory()->create(['is_suspended' => false]);
-    Account::factory()->create(['is_suspended' => true]);
+    Account::factory()->active()->create();
+    Account::factory()->suspended()->create();
 
     $response = $this->actingAs($this->admin)
         ->get(route('accounts.index', ['status' => 'active']));
@@ -41,7 +41,12 @@ it('can filter accounts by active status', function () {
     $response->assertSuccessful();
     $accounts = $response->viewData('accounts');
     foreach ($accounts->items() as $account) {
-        expect($account->isSuspended())->toBeFalse();
+        $isActiveByScope = $account->is_suspended === false
+            || ($account->is_suspended === true
+                && $account->suspended_until !== null
+                && $account->suspended_until->isPast());
+
+        expect($isActiveByScope)->toBeTrue();
     }
 });
 

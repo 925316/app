@@ -5,7 +5,9 @@ use App\Models\AccountDevice;
 
 beforeEach(function () {
     $this->admin = createAdmin();
-    $this->regularUser = Account::factory()->create();
+    $this->regularUser = Account::factory()->active()->create([
+        'hwid_last_reset_at' => null,
+    ]);
 });
 
 it('admin can access device management page', function () {
@@ -102,15 +104,21 @@ it('admin unbind returns error when device is not currently bound', function () 
 });
 
 it('admin can reset HWID for a user', function () {
-    $initialCount = $this->regularUser->hwid_reset_count;
+    $resettableUser = Account::factory()->active()->create([
+        'hwid_last_reset_at' => null,
+    ]);
+
+    expect($resettableUser->canResetHwid())->toBeTrue();
+
+    $initialCount = $resettableUser->hwid_reset_count;
 
     $response = $this->actingAs($this->admin)
-        ->post(route('devices.reset-hwid-admin', $this->regularUser));
+        ->post(route('devices.reset-hwid-admin', $resettableUser));
 
     $response->assertRedirect(route('devices.index'));
     $response->assertSessionHas('success');
 
-    expect($this->regularUser->fresh()->hwid_reset_count)->toBe($initialCount + 1);
+    expect($resettableUser->fresh()->hwid_reset_count)->toBe($initialCount + 1);
 });
 
 it('admin reset HWID returns cooldown error when account is in cooldown window', function () {
@@ -132,12 +140,14 @@ it('admin can perform bulk unbind', function () {
         'account_id' => $userA->id,
         'hwid_hash' => str_repeat('a', 64),
         'bound_at' => now(),
+        'unbound_at' => null,
     ]);
 
     $device2 = AccountDevice::factory()->create([
         'account_id' => $userB->id,
         'hwid_hash' => str_repeat('b', 64),
         'bound_at' => now(),
+        'unbound_at' => null,
     ]);
 
     $response = $this->actingAs($this->admin)
@@ -168,13 +178,20 @@ it('bulk unbind returns bulk action error when selected devices are already unbo
 });
 
 it('admin can perform bulk HWID reset', function () {
-    $device = AccountDevice::factory()->create([
-        'account_id' => $this->regularUser->id,
-        'hwid_hash' => str_repeat('a', 64),
-        'bound_at' => now(),
+    $resettableUser = Account::factory()->active()->create([
+        'hwid_last_reset_at' => null,
     ]);
 
-    $initialCount = $this->regularUser->hwid_reset_count;
+    expect($resettableUser->canResetHwid())->toBeTrue();
+
+    $device = AccountDevice::factory()->create([
+        'account_id' => $resettableUser->id,
+        'hwid_hash' => str_repeat('a', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $initialCount = $resettableUser->hwid_reset_count;
 
     $response = $this->actingAs($this->admin)
         ->post(route('devices.bulk-reset-hwid-admin'), [
@@ -184,7 +201,7 @@ it('admin can perform bulk HWID reset', function () {
     $response->assertRedirect(route('devices.index'));
     $response->assertSessionHas('success');
 
-    expect($this->regularUser->fresh()->hwid_reset_count)->toBe($initialCount + 1);
+    expect($resettableUser->fresh()->hwid_reset_count)->toBe($initialCount + 1);
 });
 
 it('admin can export device data', function () {

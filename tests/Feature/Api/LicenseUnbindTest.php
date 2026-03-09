@@ -7,7 +7,6 @@ use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\EventLog;
 use App\Models\License;
-use Illuminate\Support\Facades\Redis;
 
 use function Pest\Laravel\postJson;
 
@@ -51,7 +50,7 @@ function seedUnbindApiContext(): array
 }
 
 beforeEach(function () {
-    Redis::shouldReceive('set')->andThrow(new RuntimeException('Redis unavailable'));
+    mockRedisSetUnavailable();
 });
 
 it('unbinds bound device and returns success payload', function () {
@@ -59,13 +58,11 @@ it('unbinds bound device and returns success payload', function () {
 
     $response = postJson('/api/license/unbind', apiUnbindPayload());
 
-    $response->assertSuccessful()
-        ->assertJsonPath('code', 200)
-        ->assertJsonPath('error_code', null)
-        ->assertJsonPath('message', 'OK')
-        ->assertJsonPath('data.status', 'unbound')
-        ->assertJsonPath('data.license_key', 'KLMNO-12ABC-ABCDE-ABCDE-ABCDE')
-        ->assertJsonPath('data.device_id', $context['device']->id);
+    assertApiOk($response, [
+        'data.status' => 'unbound',
+        'data.license_key' => 'KLMNO-12ABC-ABCDE-ABCDE-ABCDE',
+        'data.device_id' => $context['device']->id,
+    ]);
 
     expect($context['device']->fresh()->unbound_at)->not->toBeNull();
     expect(ClientSession::query()->where('session_token', 'unbind-session-token-001')->exists())->toBeFalse();
@@ -217,11 +214,9 @@ it('normalizes session token and hwid input values before unbind processing', fu
         'version' => ' 1.0.0 ',
     ]));
 
-    $response->assertSuccessful()
-        ->assertJsonPath('code', 200)
-        ->assertJsonPath('error_code', null)
-        ->assertJsonPath('message', 'OK')
-        ->assertJsonPath('data.status', 'unbound');
+    assertApiOk($response, [
+        'data.status' => 'unbound',
+    ]);
 });
 
 it('validates timestamp payload type and range in unbind endpoint', function (mixed $timestamp) {

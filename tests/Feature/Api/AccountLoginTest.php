@@ -7,7 +7,6 @@ use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\EventLog;
 use App\Models\License;
-use Illuminate\Support\Facades\Redis;
 
 use function Pest\Laravel\postJson;
 
@@ -26,10 +25,11 @@ function apiLoginPayload(array $overrides = []): array
 
 function seedLoginApiContext(array $accountOverrides = []): array
 {
-    $account = Account::factory()->create(array_merge([
+    $account = Account::factory()->active()->create(array_merge([
         'email' => 'api-login@example.com',
         'password' => bcrypt('password'),
         'is_suspended' => false,
+        'suspended_until' => null,
     ], $accountOverrides));
 
     $device = AccountDevice::factory()->bound()->create([
@@ -48,7 +48,7 @@ function seedLoginApiContext(array $accountOverrides = []): array
 }
 
 beforeEach(function () {
-    Redis::shouldReceive('set')->andThrow(new RuntimeException('Redis unavailable'));
+    mockRedisSetUnavailable();
 });
 
 it('logs in and returns session token with account and license summary', function () {
@@ -56,14 +56,12 @@ it('logs in and returns session token with account and license summary', functio
 
     $response = postJson('/api/account/login', apiLoginPayload());
 
-    $response->assertSuccessful()
-        ->assertJsonPath('code', 200)
-        ->assertJsonPath('error_code', null)
-        ->assertJsonPath('message', 'OK')
-        ->assertJsonPath('data.account.id', $context['account']->id)
-        ->assertJsonPath('data.account.email', 'api-login@example.com')
-        ->assertJsonPath('data.license.status', 'active')
-        ->assertJsonPath('data.license.plan_level', LicensePrivilege::STANDARD->value);
+    assertApiOk($response, [
+        'data.account.id' => $context['account']->id,
+        'data.account.email' => 'api-login@example.com',
+        'data.license.status' => 'active',
+        'data.license.plan_level' => LicensePrivilege::STANDARD->value,
+    ]);
 
     $sessionToken = $response->json('data.session_token');
     expect(is_string($sessionToken))->toBeTrue();
@@ -99,7 +97,8 @@ it('returns auth required when password is wrong', function () {
 it('returns nonce replay for reused nonce', function () {
     seedLoginApiContext();
 
-    $payload = apiLoginPayload(['nonce' => 'nonce-fixed-login']);
+    $nonce = 'nonce-fixed-login-'.str()->random(12);
+    $payload = apiLoginPayload(['nonce' => $nonce]);
 
     postJson('/api/account/login', $payload)->assertSuccessful();
 
@@ -175,10 +174,7 @@ it('normalizes hwid and version input values before login processing', function 
         'version' => ' 1.2.3 ',
     ]));
 
-    $response->assertSuccessful()
-        ->assertJsonPath('code', 200)
-        ->assertJsonPath('error_code', null)
-        ->assertJsonPath('message', 'OK');
+    assertApiOk($response);
 });
 
 it('replaces existing session on repeated successful login for same account and device', function () {

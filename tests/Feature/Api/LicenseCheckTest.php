@@ -8,7 +8,6 @@ use App\Models\ClientSession;
 use App\Models\License;
 use App\Services\CryptoService;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Redis;
 
 use function Pest\Laravel\postJson;
 
@@ -61,7 +60,7 @@ beforeEach(function () {
         }
     });
 
-    Redis::shouldReceive('set')->andThrow(new \RuntimeException('Redis unavailable')); // fallback to Cache::add in tests
+    mockRedisSetUnavailable(); // fallback to Cache::add in tests
 });
 
 it('returns signed success payload and updates heartbeat for valid check', function () {
@@ -69,16 +68,14 @@ it('returns signed success payload and updates heartbeat for valid check', funct
 
     $response = postJson('/api/license/check', apiPayload());
 
-    $response->assertSuccessful()
-        ->assertJsonPath('code', 200)
-        ->assertJsonPath('error_code', null)
-        ->assertJsonPath('message', 'OK')
-        ->assertJsonPath('data.status', 'active')
-        ->assertJsonPath('data.plan_level', LicensePrivilege::ULTIMATE->value)
-        ->assertJsonPath('data.username', $context['account']->username)
-        ->assertJsonPath('signature', 'signed-data')
-        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
-        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
+    assertApiOk($response, [
+        'data.status' => 'active',
+        'data.plan_level' => LicensePrivilege::ULTIMATE->value,
+        'data.username' => $context['account']->username,
+        'signature' => 'signed-data',
+        'meta.signature.algorithm' => 'RSA-2048-SHA256',
+        'meta.signature.key_id' => 'main-2026-01',
+    ]);
 
     expect($context['session']->fresh()->last_heartbeat_at)->not->toBeNull();
     expect($context['session']->fresh()->last_heartbeat_at->gt(now()->subSeconds(10)))->toBeTrue();
@@ -245,8 +242,5 @@ it('normalizes session token and hwid input values before check processing', fun
         'version' => ' 1.0.0 ',
     ]));
 
-    $response->assertSuccessful()
-        ->assertJsonPath('code', 200)
-        ->assertJsonPath('error_code', null)
-        ->assertJsonPath('message', 'OK');
+    assertApiOk($response);
 });

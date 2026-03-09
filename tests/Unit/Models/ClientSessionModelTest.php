@@ -110,7 +110,9 @@ it('forAccount scope filters by account id', function () {
 });
 
 it('forDevice scope filters by device id', function () {
-    $otherDevice = AccountDevice::factory()->create(['account_id' => $this->account->id]);
+    $otherDevice = AccountDevice::factory()
+        ->neverBound()
+        ->create(['account_id' => $this->account->id]);
 
     ClientSession::factory()->create([
         'account_id' => $this->account->id,

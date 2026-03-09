@@ -7,7 +7,6 @@ use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\License;
 use App\Services\CryptoService;
-use Illuminate\Support\Facades\Redis;
 
 use function Pest\Laravel\postJson;
 
@@ -60,7 +59,7 @@ beforeEach(function () {
         }
     });
 
-    Redis::shouldReceive('set')->andThrow(new \RuntimeException('Redis unavailable'));
+    mockRedisSetUnavailable();
 });
 
 it('activates an unused license and returns signed response', function () {
@@ -68,16 +67,14 @@ it('activates an unused license and returns signed response', function () {
 
     $response = postJson('/api/license/activate', apiActivatePayload());
 
-    $response->assertSuccessful()
-        ->assertJsonPath('code', 200)
-        ->assertJsonPath('error_code', null)
-        ->assertJsonPath('message', 'OK')
-        ->assertJsonPath('data.status', 'active')
-        ->assertJsonPath('data.plan_level', LicensePrivilege::STANDARD->value)
-        ->assertJsonPath('data.username', $context['account']->username)
-        ->assertJsonPath('signature', 'signed-activate-data')
-        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
-        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
+    assertApiOk($response, [
+        'data.status' => 'active',
+        'data.plan_level' => LicensePrivilege::STANDARD->value,
+        'data.username' => $context['account']->username,
+        'signature' => 'signed-activate-data',
+        'meta.signature.algorithm' => 'RSA-2048-SHA256',
+        'meta.signature.key_id' => 'main-2026-01',
+    ]);
 
     expect($context['license']->fresh()->status)->toBe(LicenseStatus::ACTIVE);
     expect($context['license']->fresh()->used_by)->toBe($context['account']->id);
@@ -253,9 +250,7 @@ it('normalizes session token and hwid input values before activate processing', 
         'version' => ' 1.0.0 ',
     ]));
 
-    $response->assertSuccessful()
-        ->assertJsonPath('code', 200)
-        ->assertJsonPath('error_code', null)
-        ->assertJsonPath('message', 'OK')
-        ->assertJsonPath('data.status', 'active');
+    assertApiOk($response, [
+        'data.status' => 'active',
+    ]);
 });

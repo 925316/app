@@ -7,7 +7,9 @@ use App\Models\AccountDevice;
 use App\Models\License;
 
 beforeEach(function () {
-    $this->account = Account::factory()->active()->create();
+    $this->account = Account::factory()->active()->create([
+        'hwid_last_reset_at' => null,
+    ]);
 });
 
 it('can check if account is suspended', function () {
@@ -61,6 +63,8 @@ it('can unsuspend account', function () {
 });
 
 it('can check if hwid can be reset', function () {
+    $this->account->update(['hwid_last_reset_at' => null]);
+
     expect($this->account->canResetHwid())->toBeTrue();
 
     $this->account->update(['hwid_last_reset_at' => now()]);

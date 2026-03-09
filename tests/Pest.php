@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Testing\TestResponse;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -30,7 +32,7 @@ pest()->extend(Tests\TestCase::class)
 
 function createAdmin(): App\Models\Account
 {
-    $admin = App\Models\Account::factory()->create();
+    $admin = App\Models\Account::factory()->active()->create();
     App\Models\License::factory()->active()->privilege(7)->create([
         'used_by' => $admin->id,
         'expires_at' => now()->addYear(),
@@ -41,11 +43,31 @@ function createAdmin(): App\Models\Account
 
 function createUserWithLicense(int $privilege = 1): App\Models\Account
 {
-    $user = App\Models\Account::factory()->create();
+    $user = App\Models\Account::factory()->active()->create([
+        'hwid_last_reset_at' => null,
+    ]);
     App\Models\License::factory()->active()->privilege($privilege)->create([
         'used_by' => $user->id,
         'expires_at' => now()->addYear(),
     ]);
 
     return $user;
+}
+
+function assertApiOk(TestResponse $response, array $jsonPaths = []): void
+{
+    $response->assertSuccessful()
+        ->assertJsonPath('code', 200)
+        ->assertJsonPath('error_code', null)
+        ->assertJsonPath('message', 'OK');
+
+    foreach ($jsonPaths as $path => $expected) {
+        $response->assertJsonPath($path, $expected);
+    }
+}
+
+function mockRedisSetUnavailable(): void
+{
+    Illuminate\Support\Facades\Redis::shouldReceive('set')
+        ->andThrow(new RuntimeException('Redis unavailable'));
 }
