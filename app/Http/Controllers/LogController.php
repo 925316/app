@@ -18,7 +18,8 @@ class LogController extends Controller
         }
 
         $query = EventLog::with(['account', 'license'])
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc');
 
         // Filter by event type
         if ($request->filled('event_type')) {

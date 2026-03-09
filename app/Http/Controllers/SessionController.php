@@ -69,7 +69,8 @@ class SessionController extends Controller
             $direction = 'desc';
         }
 
-        $query->orderBy($sort, $direction);
+        $query->orderBy($sort, $direction)
+            ->orderBy('id', $direction);
 
         $sessions = $query->paginate(25)
             ->appends($request->except('page'));
@@ -136,7 +137,8 @@ class SessionController extends Controller
             $direction = 'desc';
         }
 
-        $query->orderBy($sort, $direction);
+        $query->orderBy($sort, $direction)
+            ->orderBy('id', $direction);
 
         $sessions = $query->paginate(25)
             ->appends($request->except('page'));

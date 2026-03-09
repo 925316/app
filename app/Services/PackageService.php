@@ -75,7 +75,8 @@ class PackageService
      */
     public static function getAllReleases(?string $channel = null): \Illuminate\Database\Eloquent\Collection
     {
-        $query = PackageRelease::orderBy('version', 'desc');
+        $query = PackageRelease::orderBy('version', 'desc')
+            ->orderBy('id', 'desc');
 
         if ($channel) {
             $query->where('release_channel', $channel);

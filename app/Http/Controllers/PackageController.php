@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PackageUploadRequest;
+use App\Models\Account;
 use App\Models\PackageRelease;
 use App\Services\PackageService;
 use Illuminate\Http\Request;
@@ -16,13 +17,17 @@ class PackageController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege to access packages
         if (! $user->hasPrivilege(1)) {
             abort(403, 'You need a valid license to access packages.');
         }
 
-        $query = PackageRelease::orderBy('version', 'desc');
+        $query = PackageRelease::orderBy('version', 'desc')
+            ->orderBy('id', 'desc');
 
         // Filter by channel
         if ($request->filled('channel')) {
@@ -77,6 +82,9 @@ class PackageController extends Controller
     public function show(PackageRelease $release)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege to view packages
         if (! $user->hasPrivilege(1)) {
@@ -99,6 +107,9 @@ class PackageController extends Controller
     public function download(PackageRelease $release)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has a valid license to download
         if (! $user->hasPrivilege(1)) {
@@ -115,6 +126,9 @@ class PackageController extends Controller
     public function manage()
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege to access package management
         if (! $user->hasPrivilege(1)) {
@@ -123,7 +137,8 @@ class PackageController extends Controller
 
         $isAdmin = $user->hasPrivilege(7);
 
-        $query = PackageRelease::orderBy('version', 'desc');
+        $query = PackageRelease::orderBy('version', 'desc')
+            ->orderBy('id', 'desc');
 
         // Filter by channel
         if (request()->filled('channel')) {

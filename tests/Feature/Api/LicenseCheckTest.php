@@ -65,6 +65,7 @@ beforeEach(function () {
 
 it('returns signed success payload and updates heartbeat for valid check', function () {
     $context = seedValidApiContext();
+    $previousHeartbeat = Carbon::parse($context['session']->last_heartbeat_at);
 
     $response = postJson('/api/license/check', apiPayload());
 
@@ -77,8 +78,10 @@ it('returns signed success payload and updates heartbeat for valid check', funct
         'meta.signature.key_id' => 'main-2026-01',
     ]);
 
-    expect($context['session']->fresh()->last_heartbeat_at)->not->toBeNull();
-    expect($context['session']->fresh()->last_heartbeat_at->gt(now()->subSeconds(10)))->toBeTrue();
+    $updatedHeartbeat = $context['session']->fresh()->last_heartbeat_at;
+
+    expect($updatedHeartbeat)->not->toBeNull();
+    expect($updatedHeartbeat?->gt($previousHeartbeat))->toBeTrue();
 });
 
 it('returns nonce replay error for reused nonce', function () {

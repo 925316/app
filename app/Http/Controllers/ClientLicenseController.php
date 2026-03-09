@@ -36,6 +36,7 @@ class ClientLicenseController extends Controller
     {
         try {
             $validated = $request->validated();
+            $currentTime = now();
 
             $email = $validated['email'] ?? null;
             $password = $validated['password'] ?? null;
@@ -44,7 +45,7 @@ class ClientLicenseController extends Controller
             }
 
             $timestamp = (int) $validated['timestamp'];
-            if (abs(now()->timestamp - $timestamp) > 300) {
+            if (abs($currentTime->timestamp - $timestamp) > 300) {
                 return $this->errorResponse(422, ApiErrorCode::TIMESTAMP_OUT_OF_WINDOW, 'Timestamp is out of allowed window.');
             }
 
@@ -76,7 +77,7 @@ class ClientLicenseController extends Controller
                 return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
-            $session = DB::transaction(function () use ($account, $validated, $request) {
+            $session = DB::transaction(function () use ($account, $validated, $request, $currentTime) {
                 $activeDevice = $account->devices()
                     ->whereNotNull('bound_at')
                     ->whereNull('unbound_at')
@@ -96,7 +97,7 @@ class ClientLicenseController extends Controller
                 $activeDevice->forceFill([
                     'ip_address' => $request->ip(),
                     'country_code' => $validated['country_code'] ?? $activeDevice->country_code,
-                    'last_seen_at' => now(),
+                    'last_seen_at' => $currentTime,
                 ])->save();
 
                 ClientSession::query()
@@ -110,7 +111,7 @@ class ClientLicenseController extends Controller
                     'device_id' => $activeDevice->id,
                     'ip_address' => $request->ip(),
                     'client_version' => (string) $validated['version'],
-                    'last_heartbeat_at' => now(),
+                    'last_heartbeat_at' => $currentTime,
                 ]);
 
                 EventLog::query()->create([
@@ -142,7 +143,7 @@ class ClientLicenseController extends Controller
             $effectiveLicense = License::query()
                 ->where('used_by', $account->id)
                 ->where('status', LicenseStatus::ACTIVE->value)
-                ->where('expires_at', '>', now())
+                ->where('expires_at', '>', $currentTime)
                 ->orderByDesc('privilege')
                 ->first();
 
@@ -181,6 +182,7 @@ class ClientLicenseController extends Controller
     {
         try {
             $validated = $request->validated();
+            $currentTime = now();
 
             $sessionToken = $validated['session_token'] ?? null;
             if (! is_string($sessionToken) || $sessionToken === '') {
@@ -193,7 +195,7 @@ class ClientLicenseController extends Controller
             }
 
             $timestamp = (int) $validated['timestamp'];
-            if (abs(now()->timestamp - $timestamp) > 300) {
+            if (abs($currentTime->timestamp - $timestamp) > 300) {
                 return $this->errorResponse(422, ApiErrorCode::TIMESTAMP_OUT_OF_WINDOW, 'Timestamp is out of allowed window.');
             }
 
@@ -220,7 +222,7 @@ class ClientLicenseController extends Controller
             if (
                 $license->status !== LicenseStatus::ACTIVE
                 || $license->expires_at === null
-                || $license->expires_at->lte(now())
+                || $license->expires_at->lte($currentTime)
                 || $license->used_by === null
             ) {
                 return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
@@ -248,7 +250,7 @@ class ClientLicenseController extends Controller
             $signature = $this->cryptoService->signData($data);
 
             $session->forceFill([
-                'last_heartbeat_at' => now(),
+                'last_heartbeat_at' => $currentTime,
             ])->save();
 
             return response()->json([
@@ -275,6 +277,7 @@ class ClientLicenseController extends Controller
     {
         try {
             $validated = $request->validated();
+            $currentTime = now();
 
             $sessionToken = $validated['session_token'] ?? null;
             if (! is_string($sessionToken) || $sessionToken === '') {
@@ -282,7 +285,7 @@ class ClientLicenseController extends Controller
             }
 
             $timestamp = (int) $validated['timestamp'];
-            if (abs(now()->timestamp - $timestamp) > 300) {
+            if (abs($currentTime->timestamp - $timestamp) > 300) {
                 return $this->errorResponse(422, ApiErrorCode::TIMESTAMP_OUT_OF_WINDOW, 'Timestamp is out of allowed window.');
             }
 
@@ -328,7 +331,7 @@ class ClientLicenseController extends Controller
             $activeLicense = License::query()
                 ->where('used_by', $account->id)
                 ->where('status', LicenseStatus::ACTIVE->value)
-                ->where('expires_at', '>', now())
+                ->where('expires_at', '>', $currentTime)
                 ->first();
 
             if ($activeLicense && $activeLicense->id !== $license->id) {
@@ -384,6 +387,7 @@ class ClientLicenseController extends Controller
     {
         try {
             $validated = $request->validated();
+            $currentTime = now();
 
             $sessionTokenValue = $validated['session_token'] ?? null;
             if (! is_string($sessionTokenValue) || $sessionTokenValue === '') {
@@ -393,7 +397,7 @@ class ClientLicenseController extends Controller
             $sessionToken = $sessionTokenValue;
 
             $timestamp = (int) $validated['timestamp'];
-            if (abs(now()->timestamp - $timestamp) > 300) {
+            if (abs($currentTime->timestamp - $timestamp) > 300) {
                 return $this->errorResponse(422, ApiErrorCode::TIMESTAMP_OUT_OF_WINDOW, 'Timestamp is out of allowed window.');
             }
 
@@ -425,7 +429,7 @@ class ClientLicenseController extends Controller
             if (
                 $license->status !== LicenseStatus::ACTIVE
                 || $license->expires_at === null
-                || $license->expires_at->lte(now())
+                || $license->expires_at->lte($currentTime)
                 || $license->used_by === null
             ) {
                 return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
@@ -442,7 +446,7 @@ class ClientLicenseController extends Controller
                 return $this->errorResponse(422, ApiErrorCode::DEVICE_MISMATCH, 'Device does not match bound device.');
             }
 
-            $unboundDevice = DB::transaction(function () use ($session, $license, $request) {
+            $unboundDevice = DB::transaction(function () use ($session, $license, $request, $currentTime) {
                 $lockedDevice = $session->device()
                     ->lockForUpdate()
                     ->first();
@@ -452,7 +456,7 @@ class ClientLicenseController extends Controller
                 }
 
                 $lockedDevice->forceFill([
-                    'unbound_at' => now(),
+                    'unbound_at' => $currentTime,
                 ])->save();
 
                 ClientSession::query()

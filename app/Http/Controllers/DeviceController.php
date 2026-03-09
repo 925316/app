@@ -18,6 +18,9 @@ class DeviceController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege to access devices
         if (! $user->hasPrivilege(1)) {
@@ -32,6 +35,7 @@ class DeviceController extends Controller
 
         $devices = $user->devices()
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate(10);
 
         $currentDevice = $user->devices()
@@ -52,7 +56,8 @@ class DeviceController extends Controller
     {
         $query = AccountDevice::query()
             ->with('account')
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc');
 
         $this->applyDeviceFilters($query, $request);
 
@@ -79,6 +84,9 @@ class DeviceController extends Controller
     public function manage()
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege to access device management
         if (! $user->hasPrivilege(1)) {
@@ -108,6 +116,9 @@ class DeviceController extends Controller
     public function bind(DeviceRequest $request)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege to bind devices
         if (! $user->hasPrivilege(1)) {
@@ -116,7 +127,8 @@ class DeviceController extends Controller
 
         // DeviceRequest already validates that the user has no bound device.
         // Wrap the operation in a transaction to prevent race conditions.
-        $device = \Illuminate\Support\Facades\DB::transaction(function () use ($user, $request) {
+        $currentTime = now();
+        $device = \Illuminate\Support\Facades\DB::transaction(function () use ($user, $request, $currentTime) {
             // Re-check inside transaction with a lock to prevent concurrent binds
             $alreadyBound = AccountDevice::where('account_id', $user->id)
                 ->whereNotNull('bound_at')
@@ -139,9 +151,9 @@ class DeviceController extends Controller
                 [
                     'ip_address' => $request->ip_address,
                     'country_code' => $request->country_code,
-                    'first_seen_at' => now(),
-                    'last_seen_at' => now(),
-                    'bound_at' => now(),
+                    'first_seen_at' => $currentTime,
+                    'last_seen_at' => $currentTime,
+                    'bound_at' => $currentTime,
                     'unbound_at' => null,
                 ]
             );
@@ -150,8 +162,8 @@ class DeviceController extends Controller
                 $device->update([
                     'ip_address' => $request->ip_address,
                     'country_code' => $request->country_code,
-                    'last_seen_at' => now(),
-                    'bound_at' => now(),
+                    'last_seen_at' => $currentTime,
+                    'bound_at' => $currentTime,
                     'unbound_at' => null,
                 ]);
             }
@@ -182,13 +194,17 @@ class DeviceController extends Controller
     public function unbind(Request $request)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege to unbind devices
         if (! $user->hasPrivilege(1)) {
             abort(403, 'You need a valid license to unbind devices.');
         }
 
-        $device = \Illuminate\Support\Facades\DB::transaction(function () use ($user, $request) {
+        $currentTime = now();
+        $device = \Illuminate\Support\Facades\DB::transaction(function () use ($user, $request, $currentTime) {
             $lockedDevice = AccountDevice::where('account_id', $user->id)
                 ->whereNotNull('bound_at')
                 ->whereNull('unbound_at')
@@ -199,7 +215,7 @@ class DeviceController extends Controller
                 return null;
             }
 
-            $lockedDevice->unbound_at = now();
+            $lockedDevice->unbound_at = $currentTime;
             $lockedDevice->save();
 
             EventLog::create([
@@ -231,6 +247,9 @@ class DeviceController extends Controller
     public function resetHwid(Request $request)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized access.');
+        }
 
         // Check if user has at least standard privilege to reset HWID
         if (! $user->hasPrivilege(1)) {
@@ -244,11 +263,13 @@ class DeviceController extends Controller
             ]);
         }
 
+        $currentTime = now();
+
         // Unbind currently bound devices; preserve hwid_hash for audit history
         $user->devices()
             ->whereNotNull('bound_at')
             ->whereNull('unbound_at')
-            ->update(['unbound_at' => now()]);
+            ->update(['unbound_at' => $currentTime]);
 
         $user->incrementHwidResetCount();
 
@@ -310,11 +331,13 @@ class DeviceController extends Controller
             ]);
         }
 
+        $currentTime = now();
+
         // Unbind currently bound devices; preserve hwid_hash for audit history
         $account->devices()
             ->whereNotNull('bound_at')
             ->whereNull('unbound_at')
-            ->update(['unbound_at' => now()]);
+            ->update(['unbound_at' => $currentTime]);
 
         $account->incrementHwidResetCount();
 
@@ -354,9 +377,10 @@ class DeviceController extends Controller
             return back()->withErrors(['bulk_action' => 'No bound devices found to unbind.']);
         }
 
+        $currentTime = now();
         $unboundCount = 0;
         foreach ($devices as $device) {
-            $device->unbound_at = now();
+            $device->unbound_at = $currentTime;
             $device->save();
             $unboundCount++;
 
@@ -396,6 +420,7 @@ class DeviceController extends Controller
             ->pluck('account')
             ->unique('id');
 
+        $currentTime = now();
         $resetCount = 0;
         foreach ($accounts as $account) {
             if ($account->canResetHwid()) {
@@ -403,7 +428,7 @@ class DeviceController extends Controller
                 $account->devices()
                     ->whereNotNull('bound_at')
                     ->whereNull('unbound_at')
-                    ->update(['unbound_at' => now()]);
+                    ->update(['unbound_at' => $currentTime]);
 
                 $account->incrementHwidResetCount();
                 $resetCount++;
@@ -438,7 +463,8 @@ class DeviceController extends Controller
     {
         $query = AccountDevice::query()
             ->with('account')
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc');
 
         $this->applyDeviceFilters($query, $request);
 
@@ -505,6 +531,8 @@ class DeviceController extends Controller
      */
     private function applyDeviceFilters(Builder $query, Request $request): Builder
     {
+        $currentTime = now();
+
         if ($request->filled('status')) {
             $status = $request->input('status');
             switch ($status) {
@@ -515,7 +543,7 @@ class DeviceController extends Controller
                     $query->whereNotNull('unbound_at');
                     break;
                 case 'active':
-                    $query->where('last_seen_at', '>=', now()->subDays(30));
+                    $query->where('last_seen_at', '>=', $currentTime->copy()->subDays(30));
                     break;
             }
         }
@@ -524,16 +552,16 @@ class DeviceController extends Controller
             $dateRange = $request->input('date_range');
             switch ($dateRange) {
                 case '24h':
-                    $query->where('created_at', '>=', now()->subHours(24));
+                    $query->where('created_at', '>=', $currentTime->copy()->subHours(24));
                     break;
                 case '7d':
-                    $query->where('created_at', '>=', now()->subDays(7));
+                    $query->where('created_at', '>=', $currentTime->copy()->subDays(7));
                     break;
                 case '30d':
-                    $query->where('created_at', '>=', now()->subDays(30));
+                    $query->where('created_at', '>=', $currentTime->copy()->subDays(30));
                     break;
                 case '90d':
-                    $query->where('created_at', '>=', now()->subDays(90));
+                    $query->where('created_at', '>=', $currentTime->copy()->subDays(90));
                     break;
             }
         }
@@ -553,20 +581,20 @@ class DeviceController extends Controller
             $accountStatus = $request->input('account_status');
             switch ($accountStatus) {
                 case 'active':
-                    $query->whereHas('account', function ($accountQuery) {
+                    $query->whereHas('account', function ($accountQuery) use ($currentTime) {
                         $accountQuery->where('is_suspended', false)
-                            ->orWhere(function ($q) {
+                            ->orWhere(function ($q) use ($currentTime) {
                                 $q->where('is_suspended', true)
-                                    ->where('suspended_until', '<', now());
+                                    ->where('suspended_until', '<', $currentTime);
                             });
                     });
                     break;
                 case 'suspended':
-                    $query->whereHas('account', function ($accountQuery) {
+                    $query->whereHas('account', function ($accountQuery) use ($currentTime) {
                         $accountQuery->where('is_suspended', true)
-                            ->where(function ($q) {
+                            ->where(function ($q) use ($currentTime) {
                                 $q->whereNull('suspended_until')
-                                    ->orWhere('suspended_until', '>', now());
+                                    ->orWhere('suspended_until', '>', $currentTime);
                             });
                     });
                     break;

@@ -209,7 +209,16 @@ it('defaults to created_at descending sort', function () {
     $accounts = $response->viewData('accounts');
     $items = $accounts->items();
 
-    expect($items[0]->created_at->gte($items[count($items) - 1]->created_at))->toBeTrue();
+    expect($items)->not->toBeEmpty();
+
+    for ($i = 1; $i < count($items); $i++) {
+        $previous = $items[$i - 1];
+        $current = $items[$i];
+
+        expect($previous->created_at->gt($current->created_at)
+            || ($previous->created_at->eq($current->created_at) && $previous->id >= $current->id)
+        )->toBeTrue();
+    }
 });
 
 it('invalid filter and sort inputs are handled safely with default sort fallback', function () {

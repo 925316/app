@@ -19,6 +19,9 @@ class LicenseController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized action.');
+        }
 
         if ($user->getPrivilegeLevel() >= 7) { // Admin - can see all licenses
             $query = License::query();
@@ -65,6 +68,7 @@ class LicenseController extends Controller
 
             $licenses = $query->with('account')
                 ->orderBy('created_at', 'desc')
+                ->orderBy('id', 'desc')
                 ->paginate(25);
 
             // Get overall statistics (not filtered by search/pagination)
@@ -90,6 +94,7 @@ class LicenseController extends Controller
         } else { // Regular user - can only see their own licenses
             $licenses = License::where('used_by', $user->id)
                 ->orderBy('created_at', 'desc')
+                ->orderBy('id', 'desc')
                 ->paginate(10);
 
             return view('licenses.index', [
@@ -143,6 +148,9 @@ class LicenseController extends Controller
     public function show(License $license)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized action.');
+        }
 
         // Regular users can only view their own licenses
         if ($user->getPrivilegeLevel() < 7 && $license->used_by !== $user->id) {
@@ -233,6 +241,9 @@ class LicenseController extends Controller
         ]);
 
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized action.');
+        }
         $licenseKey = strtoupper($request->license_key);
 
         try {
@@ -314,6 +325,9 @@ class LicenseController extends Controller
     public function activate(Request $request, License $license)
     {
         $user = Auth::user();
+        if (! $user instanceof Account) {
+            abort(403, 'Unauthorized action.');
+        }
 
         try {
             // Apply the same privilege-level rules as activateByKey

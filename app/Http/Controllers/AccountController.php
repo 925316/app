@@ -81,7 +81,8 @@ class AccountController extends Controller
 
         [$sort, $direction] = $allowedSorts[$sortValue] ?? $allowedSorts['created_at_desc'];
 
-        $query->orderBy($sort, $direction);
+        $query->orderBy($sort, $direction)
+            ->orderBy('id', $direction);
 
         $accounts = $query->withCount('licenses', 'devices')
             ->paginate(25)
@@ -171,16 +172,22 @@ class AccountController extends Controller
     {
         $account->load([
             'licenses' => function ($query) {
-                $query->orderBy('created_at', 'desc');
+                $query->orderBy('created_at', 'desc')
+                    ->orderBy('id', 'desc');
             },
             'devices' => function ($query) {
-                $query->orderBy('created_at', 'desc');
+                $query->orderBy('created_at', 'desc')
+                    ->orderBy('id', 'desc');
             },
             'sessions' => function ($query) {
-                $query->orderBy('created_at', 'desc')->limit(10);
+                $query->orderBy('created_at', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->limit(10);
             },
             'eventLogs' => function ($query) {
-                $query->orderBy('created_at', 'desc')->limit(20);
+                $query->orderBy('created_at', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->limit(20);
             },
         ]);
 

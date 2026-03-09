@@ -43,7 +43,12 @@ it('defaults to created_at_desc sort when no sort is provided', function () {
 
     expect($items)->not->toBeEmpty();
 
-    $firstItem = $items[0];
-    $lastItem = $items[count($items) - 1];
-    expect($firstItem->created_at->gte($lastItem->created_at))->toBeTrue();
+    for ($i = 1; $i < count($items); $i++) {
+        $previous = $items[$i - 1];
+        $current = $items[$i];
+
+        expect($previous->created_at->gt($current->created_at)
+            || ($previous->created_at->eq($current->created_at) && $previous->id >= $current->id)
+        )->toBeTrue();
+    }
 });
