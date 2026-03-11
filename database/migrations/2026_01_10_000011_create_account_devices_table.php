@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('account_devices', function (Blueprint $table) {
+        $driver = DB::getDriverName();
+
+        Schema::create('account_devices', function (Blueprint $table) use ($driver) {
             $table->id();
 
             $table->foreignId('account_id')
@@ -27,21 +29,19 @@ return new class extends Migration
             $table->timestamp('bound_at')->nullable();
             $table->timestamp('unbound_at')->nullable();
 
+            if ($driver === 'mysql') {
+                $table->unsignedBigInteger('active_binding_account_id')
+                    ->nullable()
+                    ->storedAs('CASE WHEN bound_at IS NOT NULL AND unbound_at IS NULL THEN account_id ELSE NULL END');
+            }
+
             $table->timestamps();
 
             $table->unique(['account_id', 'hwid_hash']);
             $table->index(['account_id', 'last_seen_at']);
         });
 
-        $driver = DB::getDriverName();
-
         if ($driver === 'mysql') {
-            Schema::table('account_devices', function (Blueprint $table) {
-                $table->unsignedBigInteger('active_binding_account_id')
-                    ->nullable()
-                    ->storedAs('CASE WHEN bound_at IS NOT NULL AND unbound_at IS NULL THEN account_id ELSE NULL END');
-            });
-
             DB::statement('CREATE UNIQUE INDEX account_devices_active_binding_unique ON account_devices (active_binding_account_id)');
 
             return;
