@@ -3,47 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ApiErrorCode;
+use App\Http\Requests\ClientUpdateCheckRequest;
 use App\Models\ClientSession;
 use App\Services\PackageService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Throwable;
 
 class ClientPackageController extends Controller
 {
-    public function check(Request $request): JsonResponse
+    public function check(ClientUpdateCheckRequest $request): JsonResponse
     {
         try {
-            $sessionTokenInput = $request->query('session_token');
-            if (is_string($sessionTokenInput)) {
-                $sessionTokenInput = trim($sessionTokenInput);
-            }
+            $validated = $request->validated();
+            $sessionToken = $validated['session_token'] ?? null;
+            $releaseChannel = $validated['release_channel'] ?? 'stable';
+            $currentVersion = $validated['current_version'] ?? null;
 
-            if (! is_string($sessionTokenInput) || $sessionTokenInput === '' || mb_strlen($sessionTokenInput) > 128) {
-                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
-            }
-
-            $releaseChannelInput = $request->query('release_channel', 'stable');
-            if (is_string($releaseChannelInput)) {
-                $releaseChannelInput = strtolower(trim($releaseChannelInput));
-            }
-
-            if (! is_string($releaseChannelInput) || ! in_array($releaseChannelInput, ['stable', 'dev'], true)) {
+            if (! is_string($releaseChannel)) {
                 return $this->errorResponse(422, ApiErrorCode::INVALID_CHANNEL, 'Release channel is invalid.');
             }
 
-            $currentVersionInput = $request->query('current_version');
-            if ($currentVersionInput !== null) {
-                if (is_string($currentVersionInput)) {
-                    $currentVersionInput = trim($currentVersionInput);
-                }
-
-                if (! is_string($currentVersionInput) || ! PackageService::isValidSemanticVersion($currentVersionInput)) {
-                    return $this->errorResponse(422, ApiErrorCode::INVALID_VERSION, 'Current version format is invalid.');
-                }
+            if (! is_string($sessionToken) || $sessionToken === '' || mb_strlen($sessionToken) > 128) {
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.');
             }
 
-            $sessionToken = $sessionTokenInput;
+            if ($currentVersion !== null && (! is_string($currentVersion) || mb_strlen($currentVersion) > 50)) {
+                return $this->errorResponse(422, ApiErrorCode::INVALID_VERSION, 'Current version format is invalid.');
+            }
+
+            if ($currentVersion !== null && ! PackageService::isValidSemanticVersion($currentVersion)) {
+                return $this->errorResponse(422, ApiErrorCode::INVALID_VERSION, 'Current version format is invalid.');
+            }
+
+            if (mb_strlen($releaseChannel) > 20 || ! in_array($releaseChannel, ['stable', 'dev'], true)) {
+                return $this->errorResponse(422, ApiErrorCode::INVALID_CHANNEL, 'Release channel is invalid.');
+            }
+
             $session = ClientSession::query()
                 ->with('account')
                 ->where('session_token', $sessionToken)
@@ -57,13 +52,12 @@ class ClientPackageController extends Controller
                 return $this->errorResponse(403, ApiErrorCode::LICENSE_INEFFECTIVE, 'License is not effective.');
             }
 
-            $latestRelease = PackageService::getLatestRelease($releaseChannelInput);
+            $latestRelease = PackageService::getLatestRelease($releaseChannel);
 
             if (! $latestRelease) {
                 return $this->errorResponse(404, ApiErrorCode::PACKAGE_NOT_FOUND, 'No package release found for this channel.');
             }
 
-            $currentVersion = is_string($currentVersionInput) ? $currentVersionInput : null;
             $updateAvailable = $currentVersion !== null
                 ? version_compare($latestRelease->version, $currentVersion, '>')
                 : null;

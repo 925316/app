@@ -170,7 +170,7 @@ it('returns auth required when license belongs to a different account', function
         ->assertJsonPath('error_code', 'AUTH_REQUIRED');
 });
 
-it('returns license invalid for bad license key format', function () {
+it('validates license key format before unbind processing', function () {
     seedUnbindApiContext();
 
     $response = postJson('/api/license/unbind', apiUnbindPayload([
@@ -178,7 +178,7 @@ it('returns license invalid for bad license key format', function () {
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'LICENSE_INVALID');
+        ->assertJsonValidationErrors(['license_key']);
 });
 
 it('returns license invalid when license key is well-formed but does not exist', function () {

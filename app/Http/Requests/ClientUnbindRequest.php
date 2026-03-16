@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\LicenseService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ClientUnbindRequest extends FormRequest
@@ -18,7 +19,16 @@ class ClientUnbindRequest extends FormRequest
     {
         return [
             'session_token' => ['required', 'string', 'max:128'],
-            'license_key' => ['required', 'string', 'max:50'],
+            'license_key' => [
+                'required',
+                'string',
+                'max:50',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! is_string($value) || ! LicenseService::validateLicenseKeyFormat($value)) {
+                        $fail('The license key format is invalid.');
+                    }
+                },
+            ],
             'hwid' => ['required', 'string', 'min:8', 'max:255'],
             'nonce' => ['required', 'string', 'min:8', 'max:128'],
             'timestamp' => ['required', 'integer', 'min:0'],

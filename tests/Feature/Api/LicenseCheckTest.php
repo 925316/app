@@ -222,7 +222,7 @@ it('returns license ineffective when license is not active', function () {
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
 });
 
-it('returns license invalid and does not update heartbeat when license key format is invalid', function () {
+it('validates license key format before check processing', function () {
     $context = seedValidApiContext();
     $previousHeartbeat = Carbon::parse($context['session']->last_heartbeat_at);
 
@@ -231,7 +231,7 @@ it('returns license invalid and does not update heartbeat when license key forma
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'LICENSE_INVALID');
+        ->assertJsonValidationErrors(['license_key']);
 
     expect($context['session']->fresh()->last_heartbeat_at?->eq($previousHeartbeat))->toBeTrue();
 });

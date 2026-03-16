@@ -70,7 +70,8 @@
 
 - **Transport Security**: ALL API requests MUST use HTTPS.
 - Replay Attack Protection:
-  - Requests MUST include `nonce` and `timestamp`.
+  - Current implementation requires `nonce` and `timestamp` for POST endpoints (`/api/account/login`, `/api/license/check`, `/api/license/activate`, `/api/license/unbind`).
+  - `GET /api/update/check` does **not** require `nonce` or `timestamp` in the current implementation.
   - Server validates timestamp drift (<= 300 seconds).
   - Server MUST reject reused nonce within 5 minutes (Redis `SET key value NX EX 300` recommended).
 - Response Signing (Anti-Tamper):
@@ -78,6 +79,7 @@
   - Signature is produced from the `data` payload using server private key.
   - Signing algorithm for this project is fixed to **RSA-2048 (SHA-256)**.
   - Canonical JSON serialization rule MUST be fixed and shared with C++ client (same key order/encoding).
+  - Other endpoints (`/api/account/login`, `/api/license/unbind`, `/api/update/check`) currently return unsigned responses (no `signature`/`meta.signature`).
 
 ---
 
@@ -86,9 +88,9 @@
 **Base URL**: `https://your-domain.com/api/`
 **Format**: JSON
 
-### 1. Common Request Structure
+### 1. Common Request Structure (POST endpoints)
 
-The C++ client should send requests in this format:
+The C++ client should send requests in this format for the POST endpoints:
 
 ```json
 {
@@ -102,10 +104,12 @@ The C++ client should send requests in this format:
 ```
 - Field naming is fixed: use `license_key` consistently (do not use `key` alias).
 - `session_token` is required for heartbeat session lookup and update.
+- `POST /api/account/login` additionally requires `email` + `password` (and uses the same `hwid`, `nonce`, `timestamp`, `version` fields).
+- `GET /api/update/check` uses query parameters instead of this body shape (see endpoint details below).
 
-### 2. Common Response Structure (With Signature)
+### 2. Signed Response Structure (Only for signed endpoints)
 
-The server must respond in this format. The client will verify the `signature` against `data`.
+The server responds in this format for **signed** endpoints only (`/api/license/check`, `/api/license/activate`). The client will verify the `signature` against `data`.
 
 ```json
 {
@@ -134,6 +138,19 @@ Rules:
 - `error_code` is a stable machine-readable business code (nullable on success).
 - Signature metadata for signed responses must be provided in `meta.signature`.
 
+### 2.1 Unsigned Response Structure (Other endpoints)
+
+For unsigned endpoints (`/api/account/login`, `/api/license/unbind`, `/api/update/check`), the response omits `signature` and `meta.signature` but keeps the same top-level envelope:
+
+```json
+{
+    "code": 200,
+    "error_code": null,
+    "message": "OK",
+    "data": { }
+}
+```
+
 ### 3. Error Code Dictionary (`/api/license/check`)
 
 | HTTP | `error_code` | Meaning |
@@ -146,6 +163,12 @@ Rules:
 | 422 | `LICENSE_INVALID` | License key not found or invalid |
 | 403 | `LICENSE_INEFFECTIVE` | License not active / suspended / revoked / expired |
 | 500 | `SERVER_ERROR` | Internal server error |
+
+Additional error codes used by other endpoints:
+- `DEVICE_NOT_BOUND` (unbind when no active binding exists)
+- `INVALID_CHANNEL` (update/check release_channel invalid)
+- `INVALID_VERSION` (update/check current_version invalid)
+- `PACKAGE_NOT_FOUND` (update/check no release for channel)
 
 ### 4. Signature Payload Canonicalization
 
@@ -196,11 +219,15 @@ Session liveness is heartbeat-driven. Explicit logout endpoint is not required b
 
 Status: **Implemented** (part of current shipped API surface).
 
-- Required contract fields: account credentials + device identity (`hwid`, `nonce`, `timestamp`, `version`).
+- Required contract fields: account credentials + device identity.
+  - Required: `email`, `password`, `hwid`, `nonce`, `timestamp`, `version`.
+  - Optional: `country_code`.
 - Success must return: `session_token`, account summary, effective license summary.
 - Server must persist/update:
   - `client_sessions` record bound to account + device,
   - device binding identity using irreversible `hwid_hash`.
+ - Response is **unsigned** (no `signature`/`meta.signature`).
+ - Error codes used: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INEFFECTIVE`, `SERVER_ERROR`.
 
 #### `POST /api/license/unbind`
 
@@ -209,6 +236,10 @@ Status: **Implemented** (part of current shipped API surface).
 - Required contract fields: `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
 - Must enforce one-active-device rule with transaction + lock semantics.
 - Success must produce event log and unbind state transition consistency.
+ - Response is **unsigned** (no `signature`/`meta.signature`).
+ - Success response shape:
+   - `data`: `{ status: "unbound", license_key, device_id, unbound_at, unbound_timestamp }`.
+ - Error codes used: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INVALID`, `LICENSE_INEFFECTIVE`, `DEVICE_NOT_BOUND`, `SERVER_ERROR`.
 
 #### `GET /api/update/check`
 
@@ -220,6 +251,15 @@ Status: **Implemented** (part of current shipped API surface).
   1. Client MUST call this endpoint once after successful login/session bootstrap.
   2. Client MUST NOT run continuous polling during the same runtime session.
   3. Client SHOULD re-check only on next login or explicit user-triggered update check.
+ - Request uses query parameters (not JSON body):
+   - Required: `session_token`
+   - Optional: `release_channel` (`stable|dev`, default `stable`)
+   - Optional: `current_version` (semantic version)
+ - Response is **unsigned** (no `signature`/`meta.signature`).
+ - Success response shape:
+   - `data`: `{ current_version, version, release_channel, update_available, reason, download_url, changelog, virus_detection_url }`
+   - `reason`: `no_current_version | newer_available | up_to_date`
+ - Error codes used: `AUTH_REQUIRED`, `LICENSE_INEFFECTIVE`, `INVALID_CHANNEL`, `INVALID_VERSION`, `PACKAGE_NOT_FOUND`, `SERVER_ERROR`.
 
 #### `POST /api/license/activate`
 
@@ -242,6 +282,10 @@ Status: **Implemented** (part of current shipped API surface).
 Current implementation note:
 - Current replay guard may use a simpler nonce key strategy during phased delivery.
 - Before enabling all planned endpoints, upgrade nonce keying to the scoped namespace rule above.
+
+Reference notes (for protocol alignment):
+- Canonical JSON: RFC 8785 (JCS) and RFC 8259 define deterministic canonicalization needs for cryptographic signing.
+- PHP signing: `openssl_sign` with `OPENSSL_ALGO_SHA256` produces RSA SHA-256 signatures.
 
 ### 8. API Test Matrix (Minimum 6-10 Cases)
 
@@ -286,7 +330,7 @@ No permission fields here. Permissions come from `licenses.privilege`.
 | `email`                     | VARCHAR(255)    | UNIQUE, NOT NULL | Email Address                        |
 | `password`                  | VARCHAR(255)    | NOT NULL         | Laravel default bcrypt               |
 | `last_login_at`             | TIMESTAMP       | NULLABLE         | Last Login Time                      |
-| `last_ip_address`           | VARCHAR(45)     | NULLABLE         | Last Login IP Address                |
+| `last_ip_address`           | BINARY(16)      | NULLABLE         | Last Login IP Address (packed)       |
 | `last_user_agent`           | TEXT            | NULLABLE         | Last User-Agent Used                 |
 | `hwid_reset_count`          | INT UNSIGNED    | DEFAULT 0        | HWID Reset Count                     |
 | `hwid_last_reset_at`        | TIMESTAMP       | NULLABLE         | Last HWID Reset Time                 |
@@ -320,11 +364,12 @@ INDEX
 | -------------------------- | --------------- | ----------------------------------- | ----------------------- |
 | `id`                       | BIGINT UNSIGNED | PK, AI                              | Primary Key             |
 | `account_id`               | BIGINT UNSIGNED | FK`accounts.id`, NOT NULL           | Associated Account ID   |
-| `hwid_hash`                | VARCHAR(64)     | NOT NULL                            | Device Hardware ID Hash |
-| `ip_address`               | VARCHAR(45)     | NOT NULL                            | IP Address              |
+| `hwid_hash`                | VARCHAR(64)     | NULLABLE                            | Device Hardware ID Hash |
+| `ip_address`               | BINARY(16)      | NOT NULL                            | IP Address (packed)     |
 | `country_code`             | CHAR(2)         | NULLABLE                            | Country Code            |
 | `first_seen_at`            | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP, NOT NULL | First Seen Time         |
 | `last_seen_at`             | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP, NOT NULL | Last Seen Time          |
+| `characteristics`          | JSON            | NULLABLE                            | Device Characteristics  |
 | `bound_at`                 | TIMESTAMP       | NULLABLE                            | Binding Time            |
 | `unbound_at`               | TIMESTAMP       | NULLABLE                            | Unbinding Time          |
 | `created_at`, `updated_at` | TIMESTAMP       |                                     | Laravel Timestamps      |
@@ -342,6 +387,10 @@ UNIQUE
 INDEX
 
 - `(account_id, last_seen_at)`
+
+**Active binding uniqueness (implemented)**
+- MySQL: generated column `active_binding_account_id` with unique index; ensures at most one active device per account.
+- Other DBs: partial unique index on `(account_id)` where `bound_at IS NOT NULL AND unbound_at IS NULL`.
 
 ---
 
@@ -404,7 +453,7 @@ INDEX
 | `event_level`              | TINYINT UNSIGNED | DEFAULT 0                 | Event Level 0=info, 1=warn, 2=error         |
 | `account_id`               | BIGINT UNSIGNED  | FK`accounts.id`, NULLABLE | Associated Account ID                       |
 | `license_id`               | BIGINT UNSIGNED  | FK`licenses.id`, NULLABLE | Associated License ID                       |
-| `ip_address`               | VARCHAR(45)      | NULLABLE                  | Operation IP Address                        |
+| `ip_address`               | BINARY(16)       | NULLABLE                  | Operation IP Address (packed)             |
 | `actor_id`                 | BIGINT UNSIGNED  | FK`accounts.id`, NULLABLE | Actor ID (User who performed the operation) |
 | `details`                  | JSON             | NULLABLE                  | Event Details                               |
 | `created_at`, `updated_at` | TIMESTAMP        | DEFAULT CURRENT_TIMESTAMP | Laravel Timestamps                          |
@@ -428,8 +477,7 @@ INDEX
 
 **Partitioning Strategy**:
 
-- Monthly Partitioning: `PARTITION BY RANGE (TO_DAYS(created_at))`
-- Keep recent 6 months of critical data, archive historical data
+- Not implemented in current migrations (no partitioning configured).
 
 ---
 
@@ -441,7 +489,7 @@ INDEX
 | `version`                  | VARCHAR(50)           | UNIQUE, NOT NULL | Version Number (Semantic Versioning) |
 | `release_channel`          | ENUM('stable', 'dev') | DEFAULT 'stable' | Release Channel                      |
 | `download_url`             | VARCHAR(255)          | NOT NULL         | Download URL                         |
-| `virus_detection_url`      | VARCHAR(255)          | NULLABLE         | Virus detection report URL           |
+| `virus_detection_url`      | TEXT                  | NULLABLE         | Virus detection report URL           |
 | `changelog`                | TEXT                  | NULLABLE         | Changelog                            |
 | `created_at`, `updated_at` | TIMESTAMP             |                  | Laravel Timestamps                   |
 
@@ -450,7 +498,6 @@ INDEX
 UNIQUE
 
 - `version`
-- `(version, release_channel)`
 
 ---
 
@@ -462,7 +509,7 @@ UNIQUE
 | `session_token`            | VARCHAR(128)    | UNIQUE, NOT NULL                 | Session Token       |
 | `account_id`               | BIGINT UNSIGNED | FK`accounts.id`, NOT NULL        | Account ID          |
 | `device_id`                | BIGINT UNSIGNED | FK`account_devices.id`, NOT NULL | Device ID           |
-| `ip_address`               | VARCHAR(45)     | NOT NULL                         | Session IP Address  |
+| `ip_address`               | BINARY(16)      | NOT NULL                         | Session IP Address (packed) |
 | `client_version`           | VARCHAR(50)     | NOT NULL                         | Client Version      |
 | `last_heartbeat_at`        | TIMESTAMP       | NULLABLE                         | Last Heartbeat Time |
 | `created_at`, `updated_at` | TIMESTAMP       |                                  | Laravel Timestamps  |
@@ -502,6 +549,10 @@ Therefore, the backend needs to calculate statistics by category; this table onl
 ```
 database/
 ├── migrations/
+│   ├── 2026_01_10_000000_create_cache_table.php
+│   ├── 2026_01_10_000001_create_queued_jobs_table.php
+│   ├── 2026_01_10_000002_create_password_reset_token.php
+│   ├── 2026_01_10_000003_create_sessions_table.php
 │   ├── 2026_01_10_000010_create_accounts_table.php
 │   ├── 2026_01_10_000011_create_account_devices_table.php
 │   ├── 2026_01_10_000012_create_licenses_table.php
@@ -540,9 +591,9 @@ C:\code\HTML\app\
 │   │   │   │   # Handles: /api/license/check (Heartbeat)
 │   │   │   │   # Logic: validates key + HWID and returns signed JSON.
 │   │   │   │
-│   │   │   ├── ClientPackageController.php (planned)
-│   │   │   │   # Planned for: /api/update/check
-│   │   │   │   # Returns latest version info + download URL when implemented.
+│   │   │   ├── ClientPackageController.php
+│   │   │   │   # Handles: /api/update/check
+│   │   │   │   # Returns latest version info + download URL.
 │   │   │   │
 │   │   │   ├── Auth/                    # Breeze Authentication Controllers (auto-generated)
 │   │   │   │   # Handles basic authentication functions: login, registration, password reset, etc.
@@ -568,10 +619,13 @@ C:\code\HTML\app\
 │   │   │   │   # Regular users: View and download packages.
 │   │   │   │   # Administrators: Upload new versions, manage historical versions.
 │   │   │   │
-│   │   │   └── LogController.php        # Log Viewing Controller
-│   │   │       # Administrator access only.
-│   │   │       # View system event logs, supports filtering and searching.
-│   │   │       # Pay special attention to log pagination and query performance.
+│   │   │   ├── LogController.php        # Log Viewing Controller
+│   │   │   │   # Administrator access only.
+│   │   │   │   # View system event logs, supports filtering and searching.
+│   │   │   │   # Pay special attention to log pagination and query performance.
+│   │   │   │
+│   │   │   ├── AccountController.php    # Account Management Controller (admin)
+│   │   │   └── SessionController.php    # Client Session Management Controller (admin/user views)
 │   │   │
 │   │   ├── Middleware/
 │   │   │   └── AdminMiddleware.php      # Administrator Permission Verification Middleware
@@ -580,8 +634,10 @@ C:\code\HTML\app\
 │   │   │       # Can be added to route groups requiring admin permissions.
 │   │   │
 │   │   └── Requests/                    # Form Request Validation Directory
-│   │       ├── ClientHeartbeatRequest.php  # Validate timestamp, hwid format
-│   │       ├── ClientActivateRequest.php   # Validate license key format
+│   │       ├── ClientHeartbeatRequest.php  # Validates heartbeat payload (session_token, license_key, hwid, nonce, timestamp)
+│   │       ├── ClientActivateRequest.php   # Validates activate payload (license key format included)
+│   │       ├── ClientLoginRequest.php      # Validates login payload (email/password + hwid/nonce/timestamp/version)
+│   │       ├── ClientUnbindRequest.php     # Validates unbind payload
 │   │       │
 │   │       ├── Auth/                    # Authentication-related request validation (Breeze-generated)
 │   │       ├── LicenseRequest.php       # License-related request validation
@@ -706,23 +762,10 @@ C:\code\HTML\app\
 │   │   # Users can modify personal info, password, etc.
 │   │
 │   ├── dashboard/                      # Dashboard Related Views
-│   │   ├── index.blade.php             # Dashboard Main Page
-│   │   │   # Homepage after user login.
-│   │   │   # Uses user privileges to determine content.
-│   │   │   # Administrators: System overview, recent activities, statistics.
-│   │   │   # Regular users: Their license status, device status, recent activities.
-│   │   │
-│   │   ├── admin-panel.blade.php       # Administrator Panel Partial View
-│   │   │   # Included in index, displays admin-only content.
-│   │   │   # System statistics cards.
-│   │   │   # Recent event log list.
-│   │   │   # Quick actions: Create license, upload package, etc.
-│   │   │
-│   │   └── user-panel.blade.php        # User Panel Partial View
-│   │       # Included in index, displays user content.
-│   │       # License status overview.
-│   │       # Device binding status.
-│   │       # Available package update notifications.
+│   │   ├── admin-panel.blade.php       # Administrator dashboard view
+│   │   │   # System overview, recent activities, statistics.
+│   │   └── user-panel.blade.php        # User dashboard view
+│   │       # License status overview, device binding status, update notifications.
 │   │
 │   ├── licenses/                       # License Management Related Views
 │   │   ├── index.blade.php             # License List Page
@@ -744,17 +787,9 @@ C:\code\HTML\app\
 │   │       # Note: Some fields (e.g., license key) cannot be modified after creation.
 │   │
 │   ├── devices/                        # Device Management Related Views
-│   │   ├── index.blade.php             # Device List Page
-│   │   │   # Displays all devices bound by the user (historical records).
-│   │   │   # Includes currently active device and historical binding records.
-│   │   │   # Shows device info, binding time, last activity time.
-│   │   │
-│   │   └── manage.blade.php            # Device Management Page
-│   │       # Device binding/unbinding page.
-│   │       # Displays current binding status.
-│   │       # Binding form: Input HWID (usually copied/pasted from client).
-│   │       # Unbind button (if already bound).
-│   │       # HWID reset count and limit prompts.
+│   │   ├── index.blade.php             # Device list page (user scope)
+│   │   ├── admin-index.blade.php       # Device list page (admin scope)
+│   │   └── manage.blade.php            # Device binding/unbinding page
 │   │
 │   ├── packages/                       # Package Management Related Views
 │   │   ├── index.blade.php             # Package List Page
@@ -769,17 +804,12 @@ C:\code\HTML\app\
 │   │   │   # File validation: size, type, virus scan (optional).
 │   │   │   # Version number conflict check.
 │   │   │
-│   │   └── version.blade.php           # Version Management Page (Admin only)
-│   │       # Package version history management.
-│   │       # Can rollback to old versions, set default version, etc.
-│   │       # View download statistics.
+│   │   ├── manage.blade.php            # Package management page (Admin only)
+│   │   └── show.blade.php              # Package detail page
 │   │
 │   ├── logs/                           # System Log Related Views
-│   │   └── index.blade.php             # Log Viewing Page (Admin only)
-│   │       # Event log list.
-│   │       # Supports: Filter by time range, event type, user.
-│   │       # Paginated display, each row shows event details.
-│   │       # Can view event details (JSON expanded).
+│   │   ├── index.blade.php             # Log Viewing Page (Admin only)
+│   │   └── show.blade.php              # Log detail page (Admin only)
 │   │
 │   ├── welcome.blade.php               # Welcome Page / Homepage
 │   │   # Homepage for unauthenticated users.
@@ -788,17 +818,16 @@ C:\code\HTML\app\
 │   │   # Software feature introduction, download link (may require login).
 │   │
 │   └── errors/                         # Error Pages Directory
-│       # Custom error pages: 404, 500, 403, etc.
-│       # Keep consistent with application style.
+│       # Not present in current implementation (no custom error pages yet).
 │
 └── routes/
    ├── api.php                         # API Route Definitions
-   │   # Group: middleware: 'throttle:api'
-   │   # POST /account/login     -> AccountController@login (planned)
+   │   # API routes are loaded via bootstrap/app.php and assigned the `api` middleware group by Laravel.
+   │   # POST /account/login     -> ClientLicenseController@login
    │   # POST /license/activate  -> ClientLicenseController@activate
    │   # POST /license/check     -> ClientLicenseController@check
-   │   # POST /license/unbind    -> ClientLicenseController@unbind (planned)
-   │   # GET  /update/check      -> ClientPackageController@check (planned)
+   │   # POST /license/unbind    -> ClientLicenseController@unbind
+   │   # GET  /update/check      -> ClientPackageController@check
    │
    │
    ├── web.php                         # Web Route Definitions
@@ -820,15 +849,19 @@ C:\code\HTML\app\
 
 ## Implementation Checklist
 
-### Phase One: Database Migration
-1. **Create migration files** (in order):
-   - `accounts` table
-   - `account_devices` table
-   - `licenses` table (core table; pay attention to the status transition rules)
-   - `event_logs` table (note JSON fields and partitioning strategy)
-   - `package_releases` table
-   - `client_sessions` table
-   - `usage_statistics` table
+### Phase One: Database Migration (Implemented)
+1. **Migration files present**:
+   - `cache`, `cache_locks`
+   - `queued_jobs`, `queued_job_batches`, `queued_failed_jobs`
+   - `password_reset_tokens`
+   - `sessions`
+   - `accounts`
+   - `account_devices`
+   - `licenses`
+   - `event_logs`
+   - `package_releases`
+   - `client_sessions`
+   - `usage_statistics`
 2. **Key Generation**: Generate an **RSA Key Pair** (Private/Public).
 * Store `private.key` securely in the Laravel `storage/` folder (DO NOT commit to Git).
 * `public.key` will be embedded into the C++ Client source code later.
@@ -838,7 +871,7 @@ C:\code\HTML\app\
 - Pay attention to foreign key relationship settings
 - The `key` field in the `licenses` table must comply with the regex format
 
-### Phase Two: Core Models and Enums
+### Phase Two: Core Models and Enums (Implemented)
 1. **Create model files**:
    - Account.php (detailed method descriptions already provided)
    - AccountDevice.php
@@ -852,7 +885,7 @@ C:\code\HTML\app\
    - LicenseStatus.php (statuses 0–5)
    - EventType.php (classified system events)
 
-### Phase Three: Business Logic Layer
+### Phase Three: Business Logic Layer (Implemented)
 1. **Create service classes**:
    - LicenseService.php (core: key generation/validation/status management)
    - PackageService.php (package management logic)
@@ -907,7 +940,7 @@ C:\code\HTML\app\
    - On success, construct `data` -> sign with `CryptoService` -> return `{ code, error_code, message, data, signature, meta }`.
    - On success, update `client_sessions.last_heartbeat_at`; on failure, do not update heartbeat timestamp.
 
-### Phase Four: Controllers and Routing
+### Phase Four: Controllers and Routing (Implemented)
 1. **Create controllers**:
    - DashboardController.php (dashboard)
    - LicenseController.php (core controller)
@@ -924,24 +957,29 @@ C:\code\HTML\app\
      - Authenticated user route group
      - Admin route group (using AdminMiddleware)
 
-### Phase Five: View Construction
+### Phase Five: View Construction (Implemented)
 1. **Create view files**:
    - Layout files: `app.blade.php`, `guest.blade.php`, `navigation.blade.php`
-   - Dashboard views: `dashboard/index.blade.php` + two panels
+    - Dashboard views: `dashboard/admin-panel.blade.php`, `dashboard/user-panel.blade.php`
    - License management views: `index`, `create`, `show`, `edit`
-   - Device management views: `index`, `manage`
-   - Package management views: `index`, `upload`, `version`
-   - Log views: `index` (admin only)
+    - Device management views: `index`, `admin-index`, `manage`
+    - Package management views: `index`, `upload`, `manage`, `show`
+    - Log views: `index`, `show` (admin only)
 
-### Phase Six: Data Seeding
+### Phase Six: Data Seeding (Implemented)
 1. **Create factories and seeders**:
     - Create a Factory for each model
     - Create seeders and populate test data in order
     - Run database seeding
 
-### Phase Seven: Testing and Verification
+### Phase Seven: Testing and Verification (Implemented)
 1. **Validate core functionalities**:
     - License generation and activation flow
     - Device binding restriction logic
     - Permission controls (user vs. admin)
     - Verify correct status transitions
+
+**Current automated coverage (Pest)**:
+- API: `AccountLoginTest`, `LicenseCheckTest`, `LicenseActivateTest`, `LicenseUnbindTest`, `UpdateCheckTest`
+- Web: `DashboardTest`, `DeviceManagementTest`, `UserDeviceManagementTest`, `License*` tests, `PackageManagementTest`, `LogManagementTest`, `SessionManagementTest`, `Account*` tests
+- Unit: models, enums, services (e.g., `NonceGuardServiceTest`, `LicenseServiceTest`, `PackageServiceTest`)
