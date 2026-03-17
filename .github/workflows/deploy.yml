@@ -24,7 +24,7 @@ jobs:
       run: composer install --no-progress --prefer-dist --optimize-autoloader --no-dev
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version: '18'
         cache: 'npm'
@@ -36,7 +36,7 @@ jobs:
       run: npm run build
 
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: production-files
         path: |
