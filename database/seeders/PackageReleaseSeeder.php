@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\PackageRelease;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class PackageReleaseSeeder extends Seeder
 {
@@ -41,6 +42,7 @@ class PackageReleaseSeeder extends Seeder
     private function createDevelopmentReleases(): void
     {
         $this->command->info('Creating development package releases...');
+        $now = now();
 
         // Create some additional development releases with random URLs
         $devReleases = [
@@ -48,16 +50,19 @@ class PackageReleaseSeeder extends Seeder
                 'version' => '3.0.0-alpha.1',
                 'release_channel' => 'dev',
                 'changelog' => $this->generateSimpleChangelog('3.0.0-alpha.1', 'Early alpha - complete rewrite of the core engine. Not recommended for production use.'),
+                'created_at' => $now->copy()->subMonths(6),
             ],
             [
                 'version' => '3.0.0-beta.1',
                 'release_channel' => 'dev',
                 'changelog' => $this->generateSimpleChangelog('3.0.0-beta.1', 'Public beta. Most features are stable; known issues with session handling under load.'),
+                'created_at' => $now->copy()->subMonths(4),
             ],
             [
                 'version' => '3.0.0-rc.1',
                 'release_channel' => 'dev',
                 'changelog' => $this->generateSimpleChangelog('3.0.0-rc.1', 'Release candidate. All planned features implemented; final round of testing before stable release.'),
+                'created_at' => $now->copy()->subMonths(2),
             ],
         ];
 
@@ -68,6 +73,8 @@ class PackageReleaseSeeder extends Seeder
                 'download_url' => $this->generateRandomDownloadUrl($release['version']),
                 'virus_detection_url' => $this->generateRandomVirusUrl(),
                 'changelog' => $release['changelog'],
+                'created_at' => $release['created_at'],
+                'updated_at' => $release['created_at'],
             ]);
         }
 
@@ -149,6 +156,12 @@ class PackageReleaseSeeder extends Seeder
      */
     private function createMilestoneReleases(): void
     {
+        $now = now();
+        $milestoneDates = [
+            '1.0.0' => $now->copy()->subYears(2),
+            '2.0.0' => $now->copy()->subYear(),
+            '2.1.0-rc' => $now->copy()->subMonths(10),
+        ];
         $milestones = [
             [
                 'version' => '1.0.0',
@@ -156,6 +169,8 @@ class PackageReleaseSeeder extends Seeder
                 'download_url' => $this->generateRandomDownloadUrl('1.0.0'),
                 'virus_detection_url' => $this->generateRandomVirusUrl(),
                 'changelog' => $this->generateSimpleChangelog('1.0.0', 'Initial release'),
+                'created_at' => $milestoneDates['1.0.0'],
+                'updated_at' => $milestoneDates['1.0.0'],
             ],
             [
                 'version' => '2.0.0',
@@ -163,6 +178,8 @@ class PackageReleaseSeeder extends Seeder
                 'download_url' => $this->generateRandomDownloadUrl('2.0.0'),
                 'virus_detection_url' => $this->generateRandomVirusUrl(),
                 'changelog' => $this->generateSimpleChangelog('2.0.0', 'Major update'),
+                'created_at' => $milestoneDates['2.0.0'],
+                'updated_at' => $milestoneDates['2.0.0'],
             ],
             [
                 'version' => '2.1.0-rc',
@@ -170,6 +187,8 @@ class PackageReleaseSeeder extends Seeder
                 'download_url' => $this->generateRandomDownloadUrl('2.1.0-rc'),
                 'virus_detection_url' => $this->generateRandomVirusUrl(),
                 'changelog' => $this->generateSimpleChangelog('2.1.0-rc', 'Release candidate'),
+                'created_at' => $milestoneDates['2.1.0-rc'],
+                'updated_at' => $milestoneDates['2.1.0-rc'],
             ],
         ];
 
@@ -189,9 +208,10 @@ class PackageReleaseSeeder extends Seeder
     private function createChronologicalReleases(): void
     {
         $releases = [];
+        $now = now();
 
         // Start with version 1.0.1 (1.0.0 is already created in milestone releases)
-        $currentDate = now()->subYears(2);
+        $currentDate = $now->copy()->subYears(2);
         $releases[] = [
             'version' => '1.0.1',
             'release_channel' => 'stable',
@@ -201,7 +221,7 @@ class PackageReleaseSeeder extends Seeder
 
         // Add patch releases for 1.x (starting from 1.0.2 since 1.0.1 is already added)
         for ($patch = 2; $patch <= 5; $patch++) {
-            $currentDate = $currentDate->addDays(fake()->numberBetween(14, 60)); // 2-8 weeks between releases
+            $currentDate = $this->advanceReleaseDate($currentDate, fake()->numberBetween(14, 60), $now); // 2-8 weeks between releases
             $releases[] = [
                 'version' => "1.0.{$patch}",
                 'release_channel' => 'stable',
@@ -211,7 +231,7 @@ class PackageReleaseSeeder extends Seeder
         }
 
         // Minor version bump to 1.1.0
-        $currentDate = $currentDate->addDays(fake()->numberBetween(21, 90)); // 3 weeks to 3 months
+        $currentDate = $this->advanceReleaseDate($currentDate, fake()->numberBetween(21, 90), $now); // 3 weeks to 3 months
         $releases[] = [
             'version' => '1.1.0',
             'release_channel' => 'stable',
@@ -221,7 +241,7 @@ class PackageReleaseSeeder extends Seeder
 
         // Continue with more 1.x releases
         for ($minor = 2; $minor <= 5; $minor++) {
-            $currentDate = $currentDate->addDays(fake()->numberBetween(30, 120)); // 1-4 months
+            $currentDate = $this->advanceReleaseDate($currentDate, fake()->numberBetween(30, 120), $now); // 1-4 months
             $releases[] = [
                 'version' => "1.{$minor}.0",
                 'release_channel' => 'stable',
@@ -232,7 +252,7 @@ class PackageReleaseSeeder extends Seeder
             // Add some patch releases
             $patches = fake()->numberBetween(0, 3);
             for ($patch = 1; $patch <= $patches; $patch++) {
-                $currentDate = $currentDate->addDays(fake()->numberBetween(7, 30)); // 1 week to 1 month
+                $currentDate = $this->advanceReleaseDate($currentDate, fake()->numberBetween(7, 30), $now); // 1 week to 1 month
                 $releases[] = [
                     'version' => "1.{$minor}.{$patch}",
                     'release_channel' => 'stable',
@@ -243,7 +263,7 @@ class PackageReleaseSeeder extends Seeder
         }
 
         // Major version bump to 2.0.0
-        $currentDate = $currentDate->addDays(fake()->numberBetween(60, 180)); // 2-6 months
+        $currentDate = $this->advanceReleaseDate($currentDate, fake()->numberBetween(60, 180), $now); // 2-6 months
         $releases[] = [
             'version' => '2.0.0',
             'release_channel' => 'stable',
@@ -253,7 +273,7 @@ class PackageReleaseSeeder extends Seeder
 
         // Continue with 2.x releases
         for ($minor = 1; $minor <= 3; $minor++) {
-            $currentDate = $currentDate->addDays(fake()->numberBetween(45, 120)); // 1.5-4 months
+            $currentDate = $this->advanceReleaseDate($currentDate, fake()->numberBetween(45, 120), $now); // 1.5-4 months
             $releases[] = [
                 'version' => "2.{$minor}.0",
                 'release_channel' => 'stable',
@@ -264,7 +284,7 @@ class PackageReleaseSeeder extends Seeder
             // Add patch releases
             $patches = fake()->numberBetween(1, 4);
             for ($patch = 1; $patch <= $patches; $patch++) {
-                $currentDate = $currentDate->addDays(fake()->numberBetween(10, 45)); // 10 days to 1.5 months
+                $currentDate = $this->advanceReleaseDate($currentDate, fake()->numberBetween(10, 45), $now); // 10 days to 1.5 months
                 $releases[] = [
                     'version' => "2.{$minor}.{$patch}",
                     'release_channel' => 'stable',
@@ -283,7 +303,7 @@ class PackageReleaseSeeder extends Seeder
         ];
 
         foreach ($devReleases as $devRelease) {
-            $currentDate = $currentDate->addDays($devRelease['days']);
+            $currentDate = $this->advanceReleaseDate($currentDate, $devRelease['days'], $now);
             $releases[] = [
                 'version' => $devRelease['version'],
                 'release_channel' => 'dev',
@@ -293,7 +313,7 @@ class PackageReleaseSeeder extends Seeder
         }
 
         // Final stable release
-        $currentDate = $currentDate->addDays(fake()->numberBetween(1, 7));
+        $currentDate = $this->advanceReleaseDate($currentDate, fake()->numberBetween(1, 7), $now);
         $releases[] = [
             'version' => '2.4.0',
             'release_channel' => 'stable',
@@ -362,5 +382,20 @@ class PackageReleaseSeeder extends Seeder
         }
 
         return $changelog;
+    }
+
+    private function advanceReleaseDate(Carbon $currentDate, int $days, Carbon $maxDate): Carbon
+    {
+        if ($currentDate->greaterThan($maxDate)) {
+            return $maxDate->copy();
+        }
+
+        $nextDate = $currentDate->copy()->addDays($days);
+
+        if ($nextDate->greaterThan($maxDate)) {
+            return $maxDate->copy();
+        }
+
+        return $nextDate;
     }
 }

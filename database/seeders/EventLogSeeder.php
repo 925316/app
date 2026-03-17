@@ -65,6 +65,10 @@ class EventLogSeeder extends Seeder
                     $activationDate = $license->activated_at ?? now()->subDays(fake()->numberBetween(1, 365));
                     $bindDate = $activationDate->copy()->addMinutes(fake()->numberBetween(1, 1440)); // Within 24 hours of activation
 
+                    if ($bindDate->greaterThan(now())) {
+                        $bindDate = now()->subMinutes(fake()->numberBetween(1, 120));
+                    }
+
                     return [
                         'account_id' => $license->used_by,
                         'license_id' => $license->id,
@@ -93,6 +97,11 @@ class EventLogSeeder extends Seeder
                 ->sequence(function ($sequence) use ($activeLicenses) {
                     $license = $activeLicenses->values()->get($sequence->index % $activeLicenses->count());
                     $unbindDate = now()->subDays(fake()->numberBetween(1, 90)); // Within last 3 months
+                    $activationDate = $license->activated_at;
+
+                    if ($activationDate && $unbindDate->lessThan($activationDate)) {
+                        $unbindDate = $activationDate->copy()->addDays(fake()->numberBetween(1, 30));
+                    }
 
                     return [
                         'account_id' => $license->used_by,
