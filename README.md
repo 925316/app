@@ -15,7 +15,7 @@ npm install && npm run build
 ```
 
 ## **Configure environment:**
-Copy `.env.example` to `.env` and configure your database settings:
+Copy the appropriate env example to `.env` and configure your database settings:
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -24,6 +24,10 @@ DB_DATABASE=laravel
 DB_USERNAME=root
 DB_PASSWORD=
 ```
+Available templates:
+- `.env.development.example` (local/dev)
+- `.env.production.example` (production)
+- `.env.full.example` (full reference)
 Then generate the application key:
 ```bash
 php artisan key:generate
