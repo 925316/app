@@ -7,6 +7,7 @@ use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\EventLog;
 use App\Models\License;
+use App\Services\CryptoService;
 
 use function Pest\Laravel\postJson;
 
@@ -48,6 +49,14 @@ function seedLoginApiContext(array $accountOverrides = []): array
 }
 
 beforeEach(function () {
+    app()->instance(CryptoService::class, new class extends CryptoService
+    {
+        public function signData(mixed $data): string
+        {
+            return 'signed-login-data';
+        }
+    });
+
     mockRedisSetUnavailable();
 });
 
@@ -61,6 +70,9 @@ it('logs in and returns session token with account and license summary', functio
         'data.account.email' => 'api-login@example.com',
         'data.license.status' => 'active',
         'data.license.plan_level' => LicensePrivilege::STANDARD->value,
+        'signature' => 'signed-login-data',
+        'meta.signature.algorithm' => 'RSA-2048-SHA256',
+        'meta.signature.key_id' => 'main-2026-01',
     ]);
 
     $sessionToken = $response->json('data.session_token');
@@ -80,7 +92,8 @@ it('returns auth required when credentials are missing', function () {
     ]));
 
     $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-login-data');
 });
 
 it('returns auth required when password is wrong', function () {
@@ -91,7 +104,8 @@ it('returns auth required when password is wrong', function () {
     ]));
 
     $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-login-data');
 });
 
 it('returns nonce replay for reused nonce', function () {
@@ -104,7 +118,8 @@ it('returns nonce replay for reused nonce', function () {
 
     postJson('/api/account/login', $payload)
         ->assertConflict()
-        ->assertJsonPath('error_code', 'NONCE_REPLAY');
+        ->assertJsonPath('error_code', 'NONCE_REPLAY')
+        ->assertJsonPath('signature', 'signed-login-data');
 });
 
 it('returns timestamp out of window for stale timestamp', function () {
@@ -115,7 +130,8 @@ it('returns timestamp out of window for stale timestamp', function () {
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW');
+        ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW')
+        ->assertJsonPath('signature', 'signed-login-data');
 });
 
 it('returns device mismatch when hwid does not match currently bound device', function () {
@@ -126,7 +142,8 @@ it('returns device mismatch when hwid does not match currently bound device', fu
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'DEVICE_MISMATCH');
+        ->assertJsonPath('error_code', 'DEVICE_MISMATCH')
+        ->assertJsonPath('signature', 'signed-login-data');
 });
 
 it('returns device mismatch when account has no bound device', function () {
@@ -139,7 +156,8 @@ it('returns device mismatch when account has no bound device', function () {
     $response = postJson('/api/account/login', apiLoginPayload());
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'DEVICE_MISMATCH');
+        ->assertJsonPath('error_code', 'DEVICE_MISMATCH')
+        ->assertJsonPath('signature', 'signed-login-data');
 });
 
 it('returns license ineffective when account has no effective license', function () {
@@ -152,7 +170,8 @@ it('returns license ineffective when account has no effective license', function
     $response = postJson('/api/account/login', apiLoginPayload());
 
     $response->assertForbidden()
-        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-login-data');
 });
 
 it('returns license ineffective when account is suspended', function () {
@@ -163,7 +182,29 @@ it('returns license ineffective when account is suspended', function () {
     $response = postJson('/api/account/login', apiLoginPayload());
 
     $response->assertForbidden()
-        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-login-data');
+});
+
+it('rate limits repeated failed login attempts', function () {
+    seedLoginApiContext();
+
+    $payload = apiLoginPayload([
+        'password' => 'wrong-password',
+    ]);
+
+    for ($i = 0; $i < 8; $i++) {
+        $response = postJson('/api/account/login', apiLoginPayload([
+            'password' => 'wrong-password',
+        ]));
+        if ($i < 7) {
+            $response->assertUnauthorized();
+        }
+    }
+
+    $response->assertStatus(429)
+        ->assertJsonPath('error_code', 'RATE_LIMITED')
+        ->assertJsonPath('signature', 'signed-login-data');
 });
 
 it('normalizes hwid and version input values before login processing', function () {
@@ -206,7 +247,8 @@ it('validates timestamp payload type and range in login endpoint', function (mix
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['timestamp']);
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
+        ->assertJsonPath('signature', 'signed-login-data');
 })->with([
     'string timestamp' => 'invalid',
     'negative timestamp' => -1,

@@ -7,6 +7,7 @@ use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\EventLog;
 use App\Models\License;
+use App\Services\CryptoService;
 
 use function Pest\Laravel\postJson;
 
@@ -50,6 +51,14 @@ function seedUnbindApiContext(): array
 }
 
 beforeEach(function () {
+    app()->instance(CryptoService::class, new class extends CryptoService
+    {
+        public function signData(mixed $data): string
+        {
+            return 'signed-unbind-data';
+        }
+    });
+
     mockRedisSetUnavailable();
 });
 
@@ -62,6 +71,9 @@ it('unbinds bound device and returns success payload', function () {
         'data.status' => 'unbound',
         'data.license_key' => 'KLMNO-12ABC-ABCDE-ABCDE-ABCDE',
         'data.device_id' => $context['device']->id,
+        'signature' => 'signed-unbind-data',
+        'meta.signature.algorithm' => 'RSA-2048-SHA256',
+        'meta.signature.key_id' => 'main-2026-01',
     ]);
 
     expect($context['device']->fresh()->unbound_at)->not->toBeNull();
@@ -87,7 +99,8 @@ it('validates required session token payload variants', function (?string $token
     $response = postJson('/api/license/unbind', $payload);
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['session_token']);
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 
     if ($expectedMessage !== null) {
         $response->assertJsonPath('message', $expectedMessage);
@@ -105,7 +118,8 @@ it('returns auth required when session token does not exist', function () {
     ]));
 
     $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
 it('returns nonce replay for reused nonce', function () {
@@ -117,7 +131,8 @@ it('returns nonce replay for reused nonce', function () {
 
     postJson('/api/license/unbind', $payload)
         ->assertConflict()
-        ->assertJsonPath('error_code', 'NONCE_REPLAY');
+        ->assertJsonPath('error_code', 'NONCE_REPLAY')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
 it('returns timestamp out of window for stale timestamp', function () {
@@ -128,7 +143,8 @@ it('returns timestamp out of window for stale timestamp', function () {
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW');
+        ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
 it('returns device mismatch when hwid does not match bound device', function () {
@@ -139,7 +155,8 @@ it('returns device mismatch when hwid does not match bound device', function () 
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'DEVICE_MISMATCH');
+        ->assertJsonPath('error_code', 'DEVICE_MISMATCH')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 
     expect($context['device']->fresh()->unbound_at)->toBeNull();
 });
@@ -153,7 +170,8 @@ it('returns license ineffective when license is suspended', function () {
     $response = postJson('/api/license/unbind', apiUnbindPayload());
 
     $response->assertForbidden()
-        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
 it('returns auth required when license belongs to a different account', function () {
@@ -167,7 +185,8 @@ it('returns auth required when license belongs to a different account', function
     $response = postJson('/api/license/unbind', apiUnbindPayload());
 
     $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
 it('validates license key format before unbind processing', function () {
@@ -178,7 +197,8 @@ it('validates license key format before unbind processing', function () {
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['license_key']);
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
 it('returns license invalid when license key is well-formed but does not exist', function () {
@@ -189,7 +209,8 @@ it('returns license invalid when license key is well-formed but does not exist',
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'LICENSE_INVALID');
+        ->assertJsonPath('error_code', 'LICENSE_INVALID')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
 it('returns device not bound when session device is already unbound', function () {
@@ -202,7 +223,8 @@ it('returns device not bound when session device is already unbound', function (
     $response = postJson('/api/license/unbind', apiUnbindPayload());
 
     $response->assertConflict()
-        ->assertJsonPath('error_code', 'DEVICE_NOT_BOUND');
+        ->assertJsonPath('error_code', 'DEVICE_NOT_BOUND')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
 it('normalizes session token and hwid input values before unbind processing', function () {
@@ -227,7 +249,8 @@ it('validates timestamp payload type and range in unbind endpoint', function (mi
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['timestamp']);
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
+        ->assertJsonPath('signature', 'signed-unbind-data');
 })->with([
     'string timestamp' => 'invalid',
     'negative timestamp' => -1,

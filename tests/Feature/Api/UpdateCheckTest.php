@@ -7,6 +7,7 @@ use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\License;
 use App\Models\PackageRelease;
+use App\Services\CryptoService;
 
 use function Pest\Laravel\getJson;
 
@@ -34,6 +35,16 @@ function seedUpdateCheckContext(): array
     return compact('account', 'session');
 }
 
+beforeEach(function () {
+    app()->instance(CryptoService::class, new class extends CryptoService
+    {
+        public function signData(mixed $data): string
+        {
+            return 'signed-update-data';
+        }
+    });
+});
+
 it('returns latest stable release payload with contract shape', function () {
     seedUpdateCheckContext();
 
@@ -59,6 +70,9 @@ it('returns latest stable release payload with contract shape', function () {
         ->assertJsonPath('code', 200)
         ->assertJsonPath('error_code', null)
         ->assertJsonPath('message', 'OK')
+        ->assertJsonPath('signature', 'signed-update-data')
+        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
+        ->assertJsonPath('meta.signature.key_id', 'main-2026-01')
         ->assertJsonPath('data.current_version', null)
         ->assertJsonPath('data.version', '1.3.0')
         ->assertJsonPath('data.release_channel', 'stable')
@@ -88,6 +102,7 @@ it('returns latest dev release when release_channel is dev', function () {
 
     $response->assertSuccessful()
         ->assertJsonPath('code', 200)
+        ->assertJsonPath('signature', 'signed-update-data')
         ->assertJsonPath('data.version', '2.1.0')
         ->assertJsonPath('data.release_channel', 'dev')
         ->assertJsonPath('data.current_version', null)
@@ -99,14 +114,16 @@ it('returns auth required when session token is missing', function () {
     $response = getJson('/api/update/check');
 
     $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-update-data');
 });
 
 it('returns auth required when session token does not exist', function () {
     $response = getJson('/api/update/check?session_token=unknown-session-token');
 
     $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-update-data');
 });
 
 it('returns license ineffective when account does not have effective privilege', function () {
@@ -129,7 +146,8 @@ it('returns license ineffective when account does not have effective privilege',
     $response = getJson('/api/update/check?session_token=update-check-session-token-no-license');
 
     $response->assertForbidden()
-        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-update-data');
 });
 
 it('returns package not found when channel has no releases', function () {
@@ -143,7 +161,8 @@ it('returns package not found when channel has no releases', function () {
     $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=dev');
 
     $response->assertNotFound()
-        ->assertJsonPath('error_code', 'PACKAGE_NOT_FOUND');
+        ->assertJsonPath('error_code', 'PACKAGE_NOT_FOUND')
+        ->assertJsonPath('signature', 'signed-update-data');
 });
 
 it('returns update decision fields when current_version is provided and update is available', function () {
@@ -160,6 +179,7 @@ it('returns update decision fields when current_version is provided and update i
     $response->assertSuccessful()
         ->assertJsonPath('data.current_version', '1.9.9')
         ->assertJsonPath('data.version', '2.0.0')
+        ->assertJsonPath('signature', 'signed-update-data')
         ->assertJsonPath('data.update_available', true)
         ->assertJsonPath('data.reason', 'newer_available');
 });
@@ -177,6 +197,7 @@ it('returns update decision fields when current_version is provided and already 
 
     $response->assertSuccessful()
         ->assertJsonPath('data.current_version', '3.0.0')
+        ->assertJsonPath('signature', 'signed-update-data')
         ->assertJsonPath('data.update_available', false)
         ->assertJsonPath('data.reason', 'up_to_date');
 });
@@ -192,7 +213,8 @@ it('returns invalid version when current_version is malformed', function () {
     $response = getJson('/api/update/check?session_token=update-check-session-token-001&current_version=bad-version');
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'INVALID_VERSION');
+        ->assertJsonPath('error_code', 'INVALID_VERSION')
+        ->assertJsonPath('signature', 'signed-update-data');
 });
 
 it('returns invalid channel when release_channel is unsupported', function () {
@@ -201,7 +223,8 @@ it('returns invalid channel when release_channel is unsupported', function () {
     $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=beta');
 
     $response->assertUnprocessable()
-        ->assertJsonPath('error_code', 'INVALID_CHANNEL');
+        ->assertJsonPath('error_code', 'INVALID_CHANNEL')
+        ->assertJsonPath('signature', 'signed-update-data');
 });
 
 it('returns auth required when session token exceeds max length', function () {
@@ -210,7 +233,8 @@ it('returns auth required when session token exceeds max length', function () {
     $response = getJson('/api/update/check?session_token='.$tooLongSessionToken);
 
     $response->assertUnauthorized()
-        ->assertJsonPath('error_code', 'AUTH_REQUIRED');
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-update-data');
 });
 
 it('normalizes release_channel and session_token query values before validation', function () {
@@ -225,6 +249,7 @@ it('normalizes release_channel and session_token query values before validation'
     $response = getJson('/api/update/check?session_token=%20update-check-session-token-001%20&release_channel=%20DEV%20');
 
     $response->assertSuccessful()
+        ->assertJsonPath('signature', 'signed-update-data')
         ->assertJsonPath('data.release_channel', 'dev')
         ->assertJsonPath('data.version', '4.0.0');
 });
