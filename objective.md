@@ -75,11 +75,11 @@
   - Server validates timestamp drift (<= 300 seconds).
   - Server MUST reject reused nonce within 5 minutes (Redis `SET key value NX EX 300` recommended).
 - Response Signing (Anti-Tamper):
-- Critical responses (`/api/license/check`, `/api/license/activate`) MUST include `signature`.
+- **All API responses** (success and error) MUST include `signature` and `meta.signature`.
   - Signature is produced from the `data` payload using server private key.
   - Signing algorithm for this project is fixed to **RSA-2048 (SHA-256)**.
   - Canonical JSON serialization rule MUST be fixed and shared with C++ client (same key order/encoding).
-  - Other endpoints (`/api/account/login`, `/api/license/unbind`, `/api/update/check`) currently return unsigned responses (no `signature`/`meta.signature`).
+  - For error responses, `data` is `null` and the signature is computed from canonical JSON of `null`.
 
 ---
 
@@ -107,9 +107,9 @@ The C++ client should send requests in this format for the POST endpoints:
 - `POST /api/account/login` additionally requires `email` + `password` (and uses the same `hwid`, `nonce`, `timestamp`, `version` fields).
 - `GET /api/update/check` uses query parameters instead of this body shape (see endpoint details below).
 
-### 2. Signed Response Structure (Only for signed endpoints)
+### 2. Signed Response Structure (All endpoints)
 
-The server responds in this format for **signed** endpoints only (`/api/license/check`, `/api/license/activate`). The client will verify the `signature` against `data`.
+The server responds in this format for **all** endpoints (success and error). The client will verify the `signature` against `data`.
 
 ```json
 {
@@ -138,16 +138,23 @@ Rules:
 - `error_code` is a stable machine-readable business code (nullable on success).
 - Signature metadata for signed responses must be provided in `meta.signature`.
 
-### 2.1 Unsigned Response Structure (Other endpoints)
+### 2.1 Error Response Structure (Signed)
 
-For unsigned endpoints (`/api/account/login`, `/api/license/unbind`, `/api/update/check`), the response omits `signature` and `meta.signature` but keeps the same top-level envelope:
+Error responses follow the same signed envelope with `data: null`:
 
 ```json
 {
-    "code": 200,
-    "error_code": null,
-    "message": "OK",
-    "data": { }
+    "code": 422,
+    "error_code": "VALIDATION_FAILED",
+    "message": "Timestamp must be an integer Unix timestamp.",
+    "data": null,
+    "signature": "base64_encoded_rsa_signature_of_data_block",
+    "meta": {
+        "signature": {
+            "algorithm": "RSA-2048-SHA256",
+            "key_id": "main-2026-01"
+        }
+    }
 }
 ```
 
@@ -162,6 +169,8 @@ For unsigned endpoints (`/api/account/login`, `/api/license/unbind`, `/api/updat
 | 422 | `DEVICE_MISMATCH` | HWID does not match active bound device |
 | 422 | `LICENSE_INVALID` | License key not found or invalid |
 | 403 | `LICENSE_INEFFECTIVE` | License not active / suspended / revoked / expired |
+| 422 | `VALIDATION_FAILED` | Request payload failed schema validation |
+| 429 | `RATE_LIMITED` | Too many requests / brute-force protection |
 | 500 | `SERVER_ERROR` | Internal server error |
 
 Additional error codes used by other endpoints:
@@ -169,6 +178,8 @@ Additional error codes used by other endpoints:
 - `INVALID_CHANNEL` (update/check release_channel invalid)
 - `INVALID_VERSION` (update/check current_version invalid)
 - `PACKAGE_NOT_FOUND` (update/check no release for channel)
+- `VALIDATION_FAILED` (schema validation failed)
+- `RATE_LIMITED` (login throttle)
 
 ### 4. Signature Payload Canonicalization
 
@@ -226,8 +237,9 @@ Status: **Implemented** (part of current shipped API surface).
 - Server must persist/update:
   - `client_sessions` record bound to account + device,
   - device binding identity using irreversible `hwid_hash`.
- - Response is **unsigned** (no `signature`/`meta.signature`).
- - Error codes used: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INEFFECTIVE`, `SERVER_ERROR`.
+- Response is **signed** (includes `signature`/`meta.signature`).
+- Rate limiting: 7 failed attempts per 60 seconds per `email + IP` returns `RATE_LIMITED` (HTTP 429).
+- Error codes used: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INEFFECTIVE`, `VALIDATION_FAILED`, `RATE_LIMITED`, `SERVER_ERROR`.
 
 #### `POST /api/license/unbind`
 
@@ -236,10 +248,10 @@ Status: **Implemented** (part of current shipped API surface).
 - Required contract fields: `session_token`, `license_key`, `hwid`, `nonce`, `timestamp`.
 - Must enforce one-active-device rule with transaction + lock semantics.
 - Success must produce event log and unbind state transition consistency.
- - Response is **unsigned** (no `signature`/`meta.signature`).
+ - Response is **signed** (includes `signature`/`meta.signature`).
  - Success response shape:
    - `data`: `{ status: "unbound", license_key, device_id, unbound_at, unbound_timestamp }`.
- - Error codes used: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INVALID`, `LICENSE_INEFFECTIVE`, `DEVICE_NOT_BOUND`, `SERVER_ERROR`.
+ - Error codes used: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INVALID`, `LICENSE_INEFFECTIVE`, `DEVICE_NOT_BOUND`, `VALIDATION_FAILED`, `SERVER_ERROR`.
 
 #### `GET /api/update/check`
 
@@ -255,11 +267,11 @@ Status: **Implemented** (part of current shipped API surface).
    - Required: `session_token`
    - Optional: `release_channel` (`stable|dev`, default `stable`)
    - Optional: `current_version` (semantic version)
- - Response is **unsigned** (no `signature`/`meta.signature`).
+ - Response is **signed** (includes `signature`/`meta.signature`).
  - Success response shape:
    - `data`: `{ current_version, version, release_channel, update_available, reason, download_url, changelog, virus_detection_url }`
    - `reason`: `no_current_version | newer_available | up_to_date`
- - Error codes used: `AUTH_REQUIRED`, `LICENSE_INEFFECTIVE`, `INVALID_CHANNEL`, `INVALID_VERSION`, `PACKAGE_NOT_FOUND`, `SERVER_ERROR`.
+ - Error codes used: `AUTH_REQUIRED`, `LICENSE_INEFFECTIVE`, `INVALID_CHANNEL`, `INVALID_VERSION`, `PACKAGE_NOT_FOUND`, `VALIDATION_FAILED`, `SERVER_ERROR`.
 
 #### `POST /api/license/activate`
 
@@ -903,7 +915,7 @@ C:\code\HTML\app\
    - Keep response shape stable as `{ code, error_code, message, data, signature, meta }`.
    - HTTP status is authoritative; `code` mirrors HTTP status.
    - Client behavior must key off `error_code`, not message text.
-   - Fixed business codes: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INVALID`, `LICENSE_INEFFECTIVE`, `SERVER_ERROR`.
+    - Fixed business codes: `AUTH_REQUIRED`, `NONCE_REPLAY`, `TIMESTAMP_OUT_OF_WINDOW`, `DEVICE_MISMATCH`, `LICENSE_INVALID`, `LICENSE_INEFFECTIVE`, `VALIDATION_FAILED`, `RATE_LIMITED`, `SERVER_ERROR`.
 
    **Signature contract**
    - Response keeps `{ code, error_code, message, data, signature, meta }`.
