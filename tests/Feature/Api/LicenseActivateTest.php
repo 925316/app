@@ -53,7 +53,7 @@ function seedActivateApiContext(array $licenseOverrides = []): array
 beforeEach(function () {
     app()->instance(CryptoService::class, new class extends CryptoService
     {
-        public function signData(array $data): string
+        public function signData(mixed $data): string
         {
             return 'signed-activate-data';
         }
@@ -93,7 +93,8 @@ it('validates required session token payload variants', function (?string $token
     $response = postJson('/api/license/activate', $payload);
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['session_token']);
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
+        ->assertJsonPath('signature', 'signed-activate-data');
 
     if ($expectedMessage !== null) {
         $response->assertJsonPath('message', $expectedMessage);
@@ -234,7 +235,8 @@ it('validates timestamp payload type and range in activate endpoint', function (
     ]));
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['timestamp']);
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
+        ->assertJsonPath('signature', 'signed-activate-data');
 })->with([
     'string timestamp' => 'invalid',
     'negative timestamp' => -1,
