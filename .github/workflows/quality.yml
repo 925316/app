@@ -2,9 +2,9 @@ name: Code Quality
 
 on:
   push:
-    branches: [ main, blade ]
+    branches: [ blade ]
   pull_request:
-    branches: [ main, blade ]
+    branches: [ blade ]
 
 jobs:
   lint:
@@ -22,7 +22,7 @@ jobs:
         coverage: none
 
     - name: Cache Composer dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
