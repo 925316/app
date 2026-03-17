@@ -25,6 +25,10 @@ class AccountFactory extends Factory
     {
         $createdAt = fake()->dateTimeBetween('-2 years', 'now');
         $suspended = fake()->boolean(5); // 5% chance of being suspended
+        $suspendedUntil = $suspended ? fake()->optional(0.5)->dateTimeBetween('now', '+30 days') : null;
+        $verificationUpperBound = $suspendedUntil ?: 'now';
+        $verificationChance = $suspendedUntil ? 0.4 : 0.8;
+        $twoFactorChance = $suspendedUntil ? 0.1 : 0.15;
 
         return [
             'username' => fake()->unique()->userName(),
@@ -43,11 +47,11 @@ class AccountFactory extends Factory
                 'Manual suspension by admin',
                 'Multiple failed login attempts',
             ]) : null,
-            'suspended_until' => $suspended ? fake()->optional(0.5)->dateTimeBetween('now', '+30 days') : null,
-            'email_verified_at' => fake()->optional(0.8)->dateTimeBetween($createdAt, 'now'),
+            'suspended_until' => $suspendedUntil,
+            'email_verified_at' => fake()->optional($verificationChance)->dateTimeBetween($createdAt, $verificationUpperBound),
             'two_factor_secret' => fake()->boolean(20) ? encrypt(Str::random(32)) : null,
             'two_factor_recovery_codes' => fake()->boolean(20) ? encrypt(json_encode([Str::random(10), Str::random(10)])) : null,
-            'two_factor_confirmed_at' => fake()->optional(0.15)->dateTimeBetween($createdAt, 'now'),
+            'two_factor_confirmed_at' => fake()->optional($twoFactorChance)->dateTimeBetween($createdAt, $verificationUpperBound),
             'remember_token' => Str::random(10),
             'created_at' => $createdAt,
             'updated_at' => fake()->dateTimeBetween($createdAt, 'now'),

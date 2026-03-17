@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\LicensePrivilege;
 use App\Enums\LicenseStatus;
+use App\Models\Account;
 use App\Models\License;
 use App\Services\LicenseService;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,14 +21,29 @@ class LicenseFactory extends Factory
      */
     public function definition(): array
     {
+        $status = fake()->randomElement(LicenseStatus::cases());
+        $expiresAt = fake()->dateTimeBetween('now', '+2 years');
+        $activatedAt = null;
+        $usedBy = null;
+        $suspendedAt = null;
+
+        if ($status !== LicenseStatus::UNUSED) {
+            $activatedAt = fake()->dateTimeBetween('-1 year', 'now');
+            $usedBy = Account::factory();
+        }
+
+        if ($status === LicenseStatus::SUSPENDED && $activatedAt) {
+            $suspendedAt = fake()->dateTimeBetween($activatedAt, 'now');
+        }
+
         return [
             'key' => $this->generateLicenseKey(),
             'privilege' => fake()->randomElement(LicensePrivilege::cases())->value,
-            'status' => fake()->randomElement(LicenseStatus::cases())->value,
-            'used_by' => null,
-            'expires_at' => fake()->dateTimeBetween('now', '+2 years'),
-            'activated_at' => fake()->optional(0.7)->dateTimeBetween('-1 year', 'now'),
-            'suspended_at' => fake()->optional(0.1)->dateTimeBetween('-6 months', 'now'),
+            'status' => $status->value,
+            'used_by' => $usedBy,
+            'expires_at' => $expiresAt,
+            'activated_at' => $activatedAt,
+            'suspended_at' => $suspendedAt,
             'created_from_ip' => fake()->ipv4(),
             'notes' => fake()->optional(0.3)->text(200),
         ];
@@ -73,6 +89,7 @@ class LicenseFactory extends Factory
             return [
                 'status' => LicenseStatus::ACTIVE->value,
                 'activated_at' => $activatedAt,
+                'used_by' => $attributes['used_by'] ?? Account::factory(),
                 'expires_at' => $expiresAt,
                 'suspended_at' => null,
             ];
@@ -84,10 +101,16 @@ class LicenseFactory extends Factory
      */
     public function suspended(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => LicenseStatus::SUSPENDED->value,
-            'suspended_at' => fake()->dateTimeBetween('-3 months', '-1 day'),
-        ]);
+        return $this->state(function (array $attributes) {
+            $activatedAt = $attributes['activated_at'] ?? fake()->dateTimeBetween('-6 months', '-1 day');
+
+            return [
+                'status' => LicenseStatus::SUSPENDED->value,
+                'used_by' => $attributes['used_by'] ?? Account::factory(),
+                'activated_at' => $activatedAt,
+                'suspended_at' => fake()->dateTimeBetween($activatedAt, 'now'),
+            ];
+        });
     }
 
     /**
@@ -98,11 +121,12 @@ class LicenseFactory extends Factory
         return $this->state(function (array $attributes) {
             $expiresAt = fake()->dateTimeBetween('-1 year', '-1 day');
             // activated_at should be before expires_at
-            $activatedAt = fake()->dateTimeBetween($expiresAt->format('Y-m-d H:i:s'), '+1 year');
+            $activatedAt = fake()->dateTimeBetween('-2 years', $expiresAt);
 
             return [
                 'status' => LicenseStatus::EXPIRED->value,
                 'activated_at' => $activatedAt,
+                'used_by' => $attributes['used_by'] ?? Account::factory(),
                 'expires_at' => $expiresAt,
             ];
         });
