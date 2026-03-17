@@ -28,9 +28,22 @@ class AccountDeviceFactory extends Factory
             : null;
 
         $isUnbound = $isBound && $faker->boolean(30);
-        $unboundAt = $isUnbound
-            ? Carbon::parse($boundAt)->addDays($faker->numberBetween(1, 60))
-            : null;
+        $unboundAt = null;
+
+        if ($isUnbound && $boundAt) {
+            $maxUnbound = Carbon::now()->subDays($faker->numberBetween(1, 7));
+            $unboundAt = Carbon::parse($boundAt)->addDays($faker->numberBetween(1, 60));
+
+            if ($unboundAt->greaterThan($maxUnbound)) {
+                $unboundAt = $maxUnbound;
+            }
+
+            $lastSeen = $unboundAt->copy()->subHours($faker->numberBetween(1, 72));
+        }
+
+        if (! $isUnbound && $isBound) {
+            $lastSeen = Carbon::now()->subHours($faker->numberBetween(1, 72));
+        }
 
         return [
             'account_id' => \App\Models\Account::factory(),
@@ -68,10 +81,21 @@ class AccountDeviceFactory extends Factory
      */
     public function bound(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'bound_at' => Carbon::parse($attributes['first_seen_at'])->addDays(fake()->numberBetween(0, 7)),
-            'unbound_at' => null,
-        ]);
+        return $this->state(function (array $attributes) {
+            $firstSeen = Carbon::parse($attributes['first_seen_at']);
+            $boundAt = $firstSeen->copy()->addDays(fake()->numberBetween(0, 7));
+            $lastSeen = Carbon::now()->subHours(fake()->numberBetween(1, 72));
+
+            if ($lastSeen->lessThan($boundAt)) {
+                $lastSeen = $boundAt->copy()->addHours(fake()->numberBetween(1, 24));
+            }
+
+            return [
+                'bound_at' => $boundAt,
+                'unbound_at' => null,
+                'last_seen_at' => $lastSeen,
+            ];
+        });
     }
 
     /**
@@ -81,10 +105,21 @@ class AccountDeviceFactory extends Factory
      */
     public function unbound(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'bound_at' => Carbon::parse($attributes['first_seen_at'])->addDays(fake()->numberBetween(0, 7)),
-            'unbound_at' => Carbon::now()->subDays(fake()->numberBetween(1, 30)),
-        ]);
+        return $this->state(function (array $attributes) {
+            $firstSeen = Carbon::parse($attributes['first_seen_at']);
+            $boundAt = $firstSeen->copy()->addDays(fake()->numberBetween(0, 7));
+            $unboundAt = Carbon::now()->subDays(fake()->numberBetween(1, 30));
+
+            if ($unboundAt->lessThan($boundAt)) {
+                $unboundAt = $boundAt->copy()->addDays(fake()->numberBetween(1, 30));
+            }
+
+            return [
+                'bound_at' => $boundAt,
+                'unbound_at' => $unboundAt,
+                'last_seen_at' => $unboundAt->copy()->subHours(fake()->numberBetween(1, 72)),
+            ];
+        });
     }
 
     /**

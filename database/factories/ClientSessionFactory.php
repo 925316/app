@@ -28,12 +28,15 @@ class ClientSessionFactory extends Factory
     public function definition(): array
     {
         $clientVersions = ['1.0.0', '1.1.0', '1.2.3', '2.0.0', '2.1.0', '2.2.5'];
+        $createdAt = fake()->dateTimeBetween('-30 days', 'now');
         $heartbeatOptions = [
             null,
-            now()->subMinutes(fake()->numberBetween(1, 30)),
-            now()->subHours(fake()->numberBetween(1, 5)),
-            now()->subDays(fake()->numberBetween(1, 7)),
+            fake()->dateTimeBetween($createdAt, 'now'),
+            fake()->dateTimeBetween($createdAt, 'now'),
+            fake()->dateTimeBetween($createdAt, 'now'),
         ];
+        $lastHeartbeat = fake()->randomElement($heartbeatOptions);
+        $updatedAt = $lastHeartbeat ?? fake()->dateTimeBetween($createdAt, 'now');
 
         return [
             'session_token' => Str::random(64),
@@ -41,9 +44,9 @@ class ClientSessionFactory extends Factory
             'device_id' => AccountDevice::factory(),
             'ip_address' => $this->generateValidIpv4(),
             'client_version' => fake()->randomElement($clientVersions),
-            'last_heartbeat_at' => fake()->randomElement($heartbeatOptions),
-            'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            'updated_at' => fn (array $attributes) => fake()->dateTimeBetween($attributes['created_at'], 'now'),
+            'last_heartbeat_at' => $lastHeartbeat,
+            'created_at' => $createdAt,
+            'updated_at' => $updatedAt,
         ];
     }
 
@@ -68,8 +71,13 @@ class ClientSessionFactory extends Factory
     public function active(): static
     {
         return $this->state(function (array $attributes) {
+            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-30 days', 'now');
+            $lastHeartbeat = fake()->dateTimeBetween($createdAt, 'now');
+
             return [
-                'last_heartbeat_at' => now()->subMinutes(fake()->numberBetween(1, 4)),
+                'created_at' => $createdAt,
+                'last_heartbeat_at' => $lastHeartbeat,
+                'updated_at' => $lastHeartbeat,
             ];
         });
     }
@@ -82,8 +90,17 @@ class ClientSessionFactory extends Factory
     public function expired(int $minutesAgo = 30): static
     {
         return $this->state(function (array $attributes) use ($minutesAgo) {
+            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-30 days', 'now');
+            $lastHeartbeat = now()->subMinutes($minutesAgo);
+
+            if ($lastHeartbeat->lessThan($createdAt)) {
+                $lastHeartbeat = fake()->dateTimeBetween($createdAt, 'now');
+            }
+
             return [
-                'last_heartbeat_at' => now()->subMinutes($minutesAgo),
+                'created_at' => $createdAt,
+                'last_heartbeat_at' => $lastHeartbeat,
+                'updated_at' => $lastHeartbeat,
             ];
         });
     }
