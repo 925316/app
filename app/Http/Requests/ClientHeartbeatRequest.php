@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Services\LicenseService;
-use Illuminate\Foundation\Http\FormRequest;
 
-class ClientHeartbeatRequest extends FormRequest
+class ClientHeartbeatRequest extends ApiFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

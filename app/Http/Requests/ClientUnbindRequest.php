@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Services\LicenseService;
-use Illuminate\Foundation\Http\FormRequest;
 
-class ClientUnbindRequest extends FormRequest
+class ClientUnbindRequest extends ApiFormRequest
 {
     public function authorize(): bool
     {

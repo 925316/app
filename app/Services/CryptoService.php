@@ -6,7 +6,7 @@ use RuntimeException;
 
 class CryptoService
 {
-    public function canonicalize(array $payload): string
+    public function canonicalize(mixed $payload): string
     {
         $normalized = $this->normalizeForCanonicalJson($payload);
 
@@ -19,7 +19,7 @@ class CryptoService
         return $json;
     }
 
-    public function signData(array $data): string
+    public function signData(mixed $data): string
     {
         $privateKeyPath = config('services.api_signing.private_key_path');
 
