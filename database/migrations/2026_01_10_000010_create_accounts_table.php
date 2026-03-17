@@ -8,7 +8,13 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('accounts', function (Blueprint $table) {
+        $driver = Schema::getConnection()->getDriverName();
+
+        Schema::create('accounts', function (Blueprint $table) use ($driver) {
+            if (in_array($driver, ['mysql', 'mariadb'], true)) {
+                $table->engine = 'InnoDB';
+            }
+
             $table->id();
             $table->string('username')->unique();
             $table->string('email')->unique();

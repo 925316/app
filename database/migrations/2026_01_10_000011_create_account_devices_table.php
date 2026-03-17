@@ -15,6 +15,10 @@ return new class extends Migration
         $driver = DB::getDriverName();
 
         Schema::create('account_devices', function (Blueprint $table) use ($driver) {
+            if (in_array($driver, ['mysql', 'mariadb'], true)) {
+                $table->engine = 'InnoDB';
+            }
+
             $table->id();
 
             $table->foreignId('account_id')
@@ -29,7 +33,7 @@ return new class extends Migration
             $table->timestamp('bound_at')->nullable();
             $table->timestamp('unbound_at')->nullable();
 
-            if ($driver === 'mysql') {
+            if (in_array($driver, ['mysql', 'mariadb'], true)) {
                 $table->unsignedBigInteger('active_binding_account_id')
                     ->nullable()
                     ->storedAs('CASE WHEN bound_at IS NOT NULL AND unbound_at IS NULL THEN account_id ELSE NULL END');
@@ -41,7 +45,7 @@ return new class extends Migration
             $table->index(['account_id', 'last_seen_at']);
         });
 
-        if ($driver === 'mysql') {
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
             DB::statement('CREATE UNIQUE INDEX account_devices_active_binding_unique ON account_devices (active_binding_account_id)');
 
             return;
