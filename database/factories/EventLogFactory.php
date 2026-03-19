@@ -32,6 +32,9 @@ class EventLogFactory extends Factory
             \App\Enums\EventType::LICENSE_ACTIVATED->value,
             \App\Enums\EventType::DEVICE_BOUND->value,
             \App\Enums\EventType::DEVICE_UNBOUND->value,
+            \App\Enums\EventType::LICENSE_UPGRADED->value,
+            \App\Enums\EventType::LICENSE_SUSPENDED->value,
+            \App\Enums\EventType::LICENSE_EXPIRED->value,
             \App\Enums\EventType::SYSTEM_PACKAGE_UPLOADED->value,
         ];
 
@@ -46,8 +49,10 @@ class EventLogFactory extends Factory
         $useLicense = fake()->boolean(60);
         $useActor = fake()->boolean(70);
 
+        $eventType = fake()->randomElement($eventTypes);
+
         return [
-            'event_type' => fake()->randomElement($eventTypes),
+            'event_type' => $eventType,
             'event_level' => fake()->randomElement($eventLevels),
             'account_id' => $useAccount && Account::count() > 0
                 ? Account::inRandomOrder()->first()->id
@@ -59,7 +64,7 @@ class EventLogFactory extends Factory
             'actor_id' => $useActor && Account::count() > 0
                 ? Account::inRandomOrder()->first()->id
                 : null,
-            'details' => $this->generateEventDetails(),
+            'details' => $this->generateEventDetails($eventType),
             'created_at' => fake()->dateTimeBetween('-6 months', 'now'),
         ];
     }
@@ -80,22 +85,23 @@ class EventLogFactory extends Factory
     /**
      * Generate realistic event details based on event type.
      */
-    private function generateEventDetails(): array
+    private function generateEventDetails(string $eventType): array
     {
-        $eventType = fake()->randomElement([
-            \App\Enums\EventType::LICENSE_ACTIVATED->value,
-            \App\Enums\EventType::DEVICE_BOUND->value,
-            \App\Enums\EventType::DEVICE_UNBOUND->value,
-            \App\Enums\EventType::ACCOUNT_LOGIN->value,
-            \App\Enums\EventType::LICENSE_SUSPENDED->value,
-        ]);
-
         return match ($eventType) {
             \App\Enums\EventType::LICENSE_ACTIVATED->value => [
                 'license_key' => strtoupper(fake()->bothify('??##-??##-??##-??##')),
                 'activation_date' => fake()->dateTimeThisYear()->format('Y-m-d H:i:s'),
                 'device_count' => fake()->numberBetween(1, 5),
                 'plan_type' => fake()->randomElement(['basic', 'pro', 'enterprise']),
+            ],
+            \App\Enums\EventType::LICENSE_UPGRADED->value => [
+                'previous_plan' => fake()->randomElement(['standard', 'upgrade']),
+                'new_plan' => fake()->randomElement(['ultimate', 'staff']),
+                'reason' => 'tier_upgrade',
+            ],
+            \App\Enums\EventType::LICENSE_EXPIRED->value => [
+                'attempted_action' => 'license_validation',
+                'suggested_action' => 'renew_license',
             ],
             \App\Enums\EventType::DEVICE_BOUND->value => [
                 'device_id' => fake()->uuid(),
