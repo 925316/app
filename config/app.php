@@ -84,6 +84,18 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
+    'supported_locales' => [
+        'en' => 'English',
+        'ko' => '한국어',
+        'ja' => '日本語',
+        'ru' => 'Русский',
+        'zh_CN' => '简体中文',
+    ],
+
+    'locale_cookie_name' => env('APP_LOCALE_COOKIE', 'locale'),
+    'locale_cookie_lifetime' => (int) env('APP_LOCALE_COOKIE_LIFETIME', 525600),
+    'locale_session_key' => env('APP_LOCALE_SESSION_KEY', 'locale'),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

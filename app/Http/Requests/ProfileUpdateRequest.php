@@ -24,15 +24,22 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         $isAdmin = $this->user()->hasPrivilege(7);
+        $supportedLocales = array_keys((array) config('app.supported_locales', []));
+        $localeRules = empty($supportedLocales)
+            ? ['nullable', 'string']
+            : ['nullable', 'string', Rule::in($supportedLocales)];
 
         // Only admin can update username and email
         if (! $isAdmin) {
-            return [];
+            return [
+                'locale' => $localeRules,
+            ];
         }
 
         return [
-            'username' => ['required', 'string', 'max:255'],
+            'username' => ['sometimes', 'required', 'string', 'max:255'],
             'email' => [
+                'sometimes',
                 'required',
                 'string',
                 'lowercase',
@@ -40,6 +47,7 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(Account::class)->ignore($this->user()->id),
             ],
+            'locale' => $localeRules,
         ];
     }
 }
