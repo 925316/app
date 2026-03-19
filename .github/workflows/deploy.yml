@@ -49,7 +49,7 @@ jobs:
           routes/
           storage/
           vendor/
-          .env.example
+          .env.production.example
           artisan
           composer.json
           composer.lock
