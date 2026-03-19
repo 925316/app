@@ -37,8 +37,17 @@ class PasswordResetLinkController extends Controller
         );
 
         return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
+                    ? back()->with('status', __('We have emailed your password reset link.'))
                     : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+                        ->withErrors(['email' => __($this->mapPasswordStatusToMessage($status))]);
+    }
+
+    private function mapPasswordStatusToMessage(string $status): string
+    {
+        return match ($status) {
+            Password::INVALID_USER => 'We can\'t find a user with that email address.',
+            Password::RESET_THROTTLED => 'Please wait before retrying.',
+            default => $status,
+        };
     }
 }
