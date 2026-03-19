@@ -44,3 +44,8 @@
 .sidebar-content-hidden {
     @apply opacity-0 w-0;
 }
+
+/* Mobile sidebar overlay */
+.sidebar-overlay {
+    @apply fixed inset-0 z-40 bg-gray-500/60 dark:bg-cool-900/70 lg:hidden;
+}
