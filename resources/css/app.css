@@ -1,6 +1,8 @@
+@import './modules/tokens.css';
 @import './modules/badges.css';
 @import './modules/buttons.css';
 @import './modules/cards.css';
+@import './modules/shell.css';
 @import './modules/sidebar.css';
 @import './modules/modals.css';
 @import './modules/tables.css';

@@ -1,0 +1,43 @@
+.app-shell-page {
+    background-image: linear-gradient(to bottom right, rgb(var(--color-surface-page)), rgb(var(--color-surface-page-alt)));
+}
+
+.app-shell-header {
+    @apply border-b backdrop-blur-sm;
+    min-height: var(--layout-header-height);
+    border-color: rgb(var(--color-border-subtle) / 0.75);
+    background-color: rgb(var(--color-surface-elevated) / 0.85);
+}
+
+.app-shell-footer {
+    @apply border-t;
+    border-color: rgb(var(--color-border-subtle) / 0.75);
+    background-color: rgb(var(--color-surface-elevated) / 0.6);
+}
+
+.app-shell-content {
+    max-width: var(--layout-content-max);
+    padding-inline: var(--layout-content-padding-x);
+}
+
+.app-shell-content-wrap {
+    @apply py-8;
+}
+
+.app-toolbar {
+    @apply flex flex-col gap-4 md:flex-row md:items-center md:justify-between;
+}
+
+.app-toolbar-title {
+    @apply text-xl font-semibold;
+    color: rgb(var(--color-text-primary));
+}
+
+.app-toolbar-subtitle {
+    @apply mt-1 text-sm;
+    color: rgb(var(--color-text-muted));
+}
+
+.app-toolbar-actions {
+    @apply flex items-center gap-2;
+}

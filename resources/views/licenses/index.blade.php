@@ -3,12 +3,11 @@
         {{ __('Licenses') }}
     </x-slot>
 
-    <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="space-y-6">
 
             @if (Auth::user()->hasPrivilege(7))
                 <!-- Statistics Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <x-stat-card :title="__('Total Licenses')" :value="$statistics['total']" icon="document" iconColor="icon-blue" />
                     <x-stat-card :title="__('Active')" :value="$statistics['active']" icon="success" iconColor="icon-green" />
                     <x-stat-card :title="__('Expired')" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
@@ -16,22 +15,27 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="card overflow-hidden">
+                <div class="p-6 text-gray-900 dark:text-gray-100 space-y-6">
                     <!-- Header with actions -->
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                            @if ($isAdmin ?? false)
-                                {{ __('All Licenses') }}
-                            @else
-                                {{ __('My Licenses') }}
-                            @endif
-                        </h3>
+                    <div class="app-toolbar">
+                        <div>
+                            <h3 class="app-toolbar-title">
+                                @if ($isAdmin ?? false)
+                                    {{ __('All Licenses') }}
+                                @else
+                                    {{ __('My Licenses') }}
+                                @endif
+                            </h3>
+                            <p class="app-toolbar-subtitle">
+                                {{ __('Review license status, expiry, and account ownership in one place.') }}
+                            </p>
+                        </div>
 
                         @if ($isAdmin ?? false)
-                            <div class="flex gap-2">
+                            <div class="app-toolbar-actions">
                                 <a href="{{ route('licenses.create') }}" class="btn btn-blue btn-sm">
-                                    Create License
+                                    {{ __('Create License') }}
                                 </a>
                             </div>
                         @endif
@@ -39,8 +43,7 @@
 
                     <!-- License Activation Form for Regular Users -->
                     @if (!$isAdmin ?? false)
-                        <div
-                            class="mb-8 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-800/50 p-6 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
+                        <div class="card-info border border-blue-200/50 dark:border-blue-700/50 bg-blue-50/70 dark:bg-blue-900/25">
                             <div class="flex items-start space-x-4">
                                 <div class="p-3 bg-blue-500/20 rounded-full">
                                     <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none"
@@ -267,12 +270,11 @@
                     </x-table>
 
                     <!-- Pagination -->
-                    <div class="mt-4">
+                    <div>
                         <x-pagination :paginator="$licenses" />
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 
 </x-app-sidebar-layout>

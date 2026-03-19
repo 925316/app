@@ -15,6 +15,9 @@
     <!-- Early theme detection to prevent FOUC -->
     <script>
         (function() {
+            const savedThemeVariant = localStorage.getItem('theme-variant') ?? 'default';
+            document.documentElement.dataset.theme = savedThemeVariant;
+
             // Check for saved theme preference or default to system preference
             const savedTheme = localStorage.getItem('theme');
             const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
@@ -76,8 +79,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body
-    class="font-sans antialiased bg-gradient-to-br from-cool-50 to-cool-100 dark:from-cool-900 dark:to-cool-800 min-h-screen overflow-x-hidden transition-colors duration-300">
+<body class="app-shell-page font-sans antialiased min-h-screen overflow-x-hidden transition-colors duration-300">
     <div class="flex min-h-screen w-full overflow-x-hidden" x-data="{
         mobileSidebarOpen: false,
         isDesktop: false,
@@ -134,8 +136,7 @@
             :class="{ 'lg:ml-64 lg:w-[calc(100%-16rem)]': $store.sidebar.open, 'lg:ml-16 lg:w-[calc(100%-4rem)]': !$store.sidebar.open }"
             :inert="mobileSidebarOpen && !isDesktop" :aria-hidden="(mobileSidebarOpen && !isDesktop).toString()" x-cloak>
             <!-- Top Header -->
-            <header
-                class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm border-b border-cool-200/50 dark:border-cool-700/50 shadow-sm">
+            <header class="app-shell-header">
                 <div class="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
                     <!-- Page Title -->
                     <div class="flex items-center gap-3">
@@ -164,24 +165,23 @@
                     </div>
 
                     <!-- Additional Header Actions (if any) -->
-                    <div class="flex items-center space-x-4">
-                        <!-- Breadcrumb or other actions can go here -->
+                    <div class="app-toolbar-actions">
+                        <x-theme-preset-toggle />
                     </div>
                 </div>
             </header>
 
             <!-- Page Content -->
             <main class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
-                <div class="py-8">
-                    <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="app-shell-content-wrap">
+                    <div class="app-shell-content mx-auto w-full sm:px-6 lg:px-8">
                         {{ $slot }}
                     </div>
                 </div>
             </main>
 
             <!-- Footer -->
-            <footer
-                class="bg-white/50 dark:bg-cool-800/50 border-t border-cool-200/50 dark:border-cool-700/50 py-4 px-4 sm:px-6 lg:px-8">
+            <footer class="app-shell-footer py-4 px-4 sm:px-6 lg:px-8">
                 <div class="text-center text-sm text-gray-600 dark:text-gray-400">
                     &copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. {{ __('All rights reserved.') }}
                 </div>

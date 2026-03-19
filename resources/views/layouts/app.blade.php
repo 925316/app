@@ -15,6 +15,9 @@
     <!-- Early theme detection to prevent FOUC -->
     <script>
         (function() {
+            const savedThemeVariant = localStorage.getItem('theme-variant') ?? 'default';
+            document.documentElement.dataset.theme = savedThemeVariant;
+
             // Check for saved theme preference or default to system preference
             const savedTheme = localStorage.getItem('theme');
             const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
@@ -56,24 +59,27 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body
-    class="font-sans antialiased bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+<body class="app-shell-page font-sans antialiased min-h-screen transition-colors duration-300">
     <div class="min-h-screen">
         @include('layouts.navigation')
 
         <!-- Page Heading -->
         @isset($header)
-            <header
-                class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm border-b border-cool-200/50 dark:border-cool-700/50 shadow-sm">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
+            <header class="app-shell-header">
+                <div class="app-shell-content mx-auto py-6 sm:px-6 lg:px-8">
+                    <div class="app-toolbar">
+                        <div>{{ $header }}</div>
+                        <div class="app-toolbar-actions">
+                            <x-theme-preset-toggle />
+                        </div>
+                    </div>
                 </div>
             </header>
         @endisset
 
         <!-- Page Content -->
         <main>
-            <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <div class="app-shell-content app-shell-content-wrap mx-auto sm:px-6 lg:px-8">
                 {{ $slot }}
             </div>
         </main>

@@ -15,6 +15,9 @@
     <!-- Early theme detection to prevent FOUC -->
     <script>
         (function() {
+            const savedThemeVariant = localStorage.getItem('theme-variant') ?? 'default';
+            document.documentElement.dataset.theme = savedThemeVariant;
+
             // Check for saved theme preference or default to system preference
             const savedTheme = localStorage.getItem('theme');
             const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
@@ -56,7 +59,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-gradient-to-br from-cool-50 to-cool-100 dark:from-cool-900 dark:to-cool-800 min-h-screen transition-colors duration-300">
+<body class="app-shell-page font-sans antialiased min-h-screen transition-colors duration-300">
     {{ $slot }}
 </body>
 

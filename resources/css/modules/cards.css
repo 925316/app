@@ -1,24 +1,46 @@
 /* Card Styles */
 .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700;
+    @apply rounded-xl border;
     @apply transition-all duration-200 hover:shadow-md;
+    border-radius: var(--radius-xl);
+    border-color: rgb(var(--color-border-subtle));
+    background-color: rgb(var(--color-surface-card));
+    box-shadow: var(--shadow-sm);
 }
 
 .card-glass {
-    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50;
+    @apply backdrop-blur-sm rounded-2xl border;
+    border-color: rgb(var(--color-border-subtle) / 0.65);
+    background-color: rgb(var(--color-surface-card) / 0.8);
+    box-shadow: var(--shadow-lg);
 }
 
 .card-stat {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5;
-    @apply transition-all duration-200 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600;
+    @apply rounded-xl border p-5 transition-all duration-200 hover:shadow-md;
+    border-radius: var(--radius-xl);
+    border-color: rgb(var(--color-border-subtle));
+    background-color: rgb(var(--color-surface-card));
+    box-shadow: var(--shadow-sm);
+}
+
+.card-stat:hover {
+    border-color: rgb(var(--color-border-strong));
 }
 
 .card-form {
-    @apply bg-white dark:bg-gray-800 overflow-hidden rounded-xl shadow-sm border border-gray-100 dark:border-gray-700;
+    @apply overflow-hidden rounded-xl border;
+    border-radius: var(--radius-xl);
+    border-color: rgb(var(--color-border-subtle));
+    background-color: rgb(var(--color-surface-card));
+    box-shadow: var(--shadow-sm);
 }
 
 .card-info {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6;
+    @apply rounded-xl border p-6;
+    border-radius: var(--radius-xl);
+    border-color: rgb(var(--color-border-subtle));
+    background-color: rgb(var(--color-surface-card));
+    box-shadow: var(--shadow-sm);
 }
 
 .card-icon-container {
