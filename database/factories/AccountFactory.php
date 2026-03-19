@@ -23,7 +23,7 @@ class AccountFactory extends Factory
      */
     public function definition(): array
     {
-        $createdAt = fake()->dateTimeBetween('-2 years', 'now');
+        $createdAt = fake()->dateTimeBetween('-365 days', 'now');
         $suspended = fake()->boolean(5); // 5% chance of being suspended
         $suspendedUntil = $suspended ? fake()->optional(0.5)->dateTimeBetween('now', '+30 days') : null;
         $verificationUpperBound = $suspendedUntil ?: 'now';

@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
@@ -17,14 +16,18 @@ class PackageReleaseFactory extends Factory
      */
     public function definition(): array
     {
-        // Generate release date between 2 years ago and now
-        $releaseDate = fake()->dateTimeBetween('-2 years', 'now');
+        $releaseDate = fake()->dateTimeBetween('-365 days', 'now');
+        $version = $this->generateVersion();
+        $downloadUrl = $this->generateDownloadUrl($version);
+        $virusToken = hash('sha256', $version.'|'.$downloadUrl);
 
         return [
-            'version' => $this->generateVersion(),
-            'release_channel' => fake()->randomElement(['stable', 'dev']),
-            'download_url' => fake()->url(),
-            'virus_detection_url' => null, // No virus detection link for seeded data
+            'version' => $version,
+            'release_channel' => str_contains($version, '-') ? 'dev' : 'stable',
+            'download_url' => $downloadUrl,
+            'virus_detection_url' => fake()->boolean(70)
+                ? "https://www.virustotal.com/gui/file/{$virusToken}"
+                : null,
             'changelog' => fake()->boolean(80)
                 ? $this->generateChangelog()
                 : null,
@@ -38,26 +41,25 @@ class PackageReleaseFactory extends Factory
      */
     private function generateVersion(): string
     {
-        $major = fake()->numberBetween(1, 5);
-        $minor = fake()->numberBetween(0, 20);
-        $patch = fake()->numberBetween(0, 50);
+        $major = fake()->randomElement([1, 2, 3]);
+        $minor = fake()->numberBetween(0, 6);
+        $patch = fake()->numberBetween(0, 12);
 
         $version = "{$major}.{$minor}.{$patch}";
 
-        // Less frequently add pre-release tag
-        if (fake()->boolean(15)) {
-            $version .= '-'.fake()->randomElement(['alpha', 'beta', 'rc']);
-            if (fake()->boolean(50)) {
-                $version .= '.'.fake()->numberBetween(1, 10);
-            }
-        }
-
-        // Rarely add build metadata
-        if (fake()->boolean(5)) {
-            $version .= '+'.Str::random(8);
+        if (fake()->boolean(20)) {
+            $version .= '-'.fake()->randomElement(['alpha', 'beta', 'rc']).'.'.fake()->numberBetween(1, 3);
         }
 
         return $version;
+    }
+
+    private function generateDownloadUrl(string $version): string
+    {
+        $channel = str_contains($version, '-') ? 'dev' : 'stable';
+        $platform = fake()->randomElement(['win-x64', 'linux-x64', 'macos-universal']);
+
+        return "https://downloads.demo-license.local/releases/{$channel}/{$version}/acme-client-{$version}-{$platform}.zip";
     }
 
     /**
@@ -68,8 +70,20 @@ class PackageReleaseFactory extends Factory
     public function stable()
     {
         return $this->state(function (array $attributes) {
+            $version = $attributes['version'] ?? $this->generateVersion();
+
+            if (is_string($version) && str_contains($version, '-')) {
+                $version = preg_replace('/-.+$/', '', $version) ?: '2.0.0';
+            }
+
+            $downloadUrl = $this->generateDownloadUrl((string) $version);
+            $virusToken = hash('sha256', $version.'|'.$downloadUrl);
+
             return [
+                'version' => $version,
                 'release_channel' => 'stable',
+                'download_url' => $downloadUrl,
+                'virus_detection_url' => "https://www.virustotal.com/gui/file/{$virusToken}",
             ];
         });
     }
@@ -82,8 +96,21 @@ class PackageReleaseFactory extends Factory
     public function dev()
     {
         return $this->state(function (array $attributes) {
+            $baseVersion = $attributes['version'] ?? $this->generateVersion();
+            $version = is_string($baseVersion) && str_contains($baseVersion, '-')
+                ? $baseVersion
+                : ((string) $baseVersion).'-beta.1';
+
+            $downloadUrl = $this->generateDownloadUrl($version);
+            $virusToken = hash('sha256', $version.'|'.$downloadUrl);
+
             return [
+                'version' => $version,
                 'release_channel' => 'dev',
+                'download_url' => $downloadUrl,
+                'virus_detection_url' => fake()->boolean(50)
+                    ? "https://www.virustotal.com/gui/file/{$virusToken}"
+                    : null,
             ];
         });
     }
@@ -96,11 +123,16 @@ class PackageReleaseFactory extends Factory
     public function majorVersion(int $major)
     {
         return $this->state(function (array $attributes) use ($major) {
-            $minor = fake()->numberBetween(0, 20);
-            $patch = fake()->numberBetween(0, 100);
+            $minor = fake()->numberBetween(0, 6);
+            $patch = fake()->numberBetween(0, 12);
+            $version = "{$major}.{$minor}.{$patch}";
+            $downloadUrl = $this->generateDownloadUrl($version);
+            $virusToken = hash('sha256', $version.'|'.$downloadUrl);
 
             return [
-                'version' => "{$major}.{$minor}.{$patch}",
+                'version' => $version,
+                'download_url' => $downloadUrl,
+                'virus_detection_url' => "https://www.virustotal.com/gui/file/{$virusToken}",
             ];
         });
     }

@@ -7,7 +7,9 @@ use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\License;
 use App\Services\LicenseService;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\License>
@@ -22,13 +24,14 @@ class LicenseFactory extends Factory
     public function definition(): array
     {
         $status = fake()->randomElement(LicenseStatus::cases());
-        $expiresAt = fake()->dateTimeBetween('now', '+2 years');
+        $createdAt = fake()->dateTimeBetween('-365 days', 'now');
+        $expiresAt = fake()->dateTimeBetween('now', '+365 days');
         $activatedAt = null;
         $usedBy = null;
         $suspendedAt = null;
 
         if ($status !== LicenseStatus::UNUSED) {
-            $activatedAt = fake()->dateTimeBetween('-1 year', 'now');
+            $activatedAt = fake()->dateTimeBetween($createdAt, 'now');
             $usedBy = Account::factory();
         }
 
@@ -46,6 +49,8 @@ class LicenseFactory extends Factory
             'suspended_at' => $suspendedAt,
             'created_from_ip' => fake()->ipv4(),
             'notes' => fake()->optional(0.3)->text(200),
+            'created_at' => $createdAt,
+            'updated_at' => $activatedAt ?? $createdAt,
         ];
     }
 
@@ -77,21 +82,21 @@ class LicenseFactory extends Factory
     public function active(): static
     {
         return $this->state(function (array $attributes) {
-            // Activated between 1-365 days ago
-            $activatedAt = fake()->dateTimeBetween('-365 days', '-1 day');
-
-            // Expires between tomorrow and 2 years from now (always in the future)
+            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-365 days', '-7 days');
+            $activatedAt = fake()->dateTimeBetween($createdAt, '-1 day');
             $minExpiry = now()->addDay();
-            $maxExpiry = now()->addYears(2);
+            $maxExpiry = now()->addDays(365);
 
             $expiresAt = fake()->dateTimeBetween($minExpiry, $maxExpiry);
 
             return [
                 'status' => LicenseStatus::ACTIVE->value,
+                'created_at' => $createdAt,
                 'activated_at' => $activatedAt,
                 'used_by' => $attributes['used_by'] ?? Account::factory(),
                 'expires_at' => $expiresAt,
                 'suspended_at' => null,
+                'updated_at' => $activatedAt,
             ];
         });
     }
@@ -102,13 +107,19 @@ class LicenseFactory extends Factory
     public function suspended(): static
     {
         return $this->state(function (array $attributes) {
-            $activatedAt = $attributes['activated_at'] ?? fake()->dateTimeBetween('-6 months', '-1 day');
+            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-365 days', '-30 days');
+            $activatedAt = $attributes['activated_at'] ?? fake()->dateTimeBetween($createdAt, '-7 days');
+            $suspendedAt = fake()->dateTimeBetween($activatedAt, 'now');
+            $expiresAt = $attributes['expires_at'] ?? fake()->dateTimeBetween('now', '+365 days');
 
             return [
                 'status' => LicenseStatus::SUSPENDED->value,
+                'created_at' => $createdAt,
                 'used_by' => $attributes['used_by'] ?? Account::factory(),
                 'activated_at' => $activatedAt,
-                'suspended_at' => fake()->dateTimeBetween($activatedAt, 'now'),
+                'suspended_at' => $suspendedAt,
+                'expires_at' => $expiresAt,
+                'updated_at' => $suspendedAt,
             ];
         });
     }
@@ -119,15 +130,37 @@ class LicenseFactory extends Factory
     public function expired(): static
     {
         return $this->state(function (array $attributes) {
-            $expiresAt = fake()->dateTimeBetween('-1 year', '-1 day');
-            // activated_at should be before expires_at
-            $activatedAt = fake()->dateTimeBetween('-2 years', $expiresAt);
+            $createdAtAttribute = $attributes['created_at'] ?? null;
+            if ($createdAtAttribute instanceof DateTimeInterface) {
+                $createdAt = Carbon::instance($createdAtAttribute);
+            } elseif (is_string($createdAtAttribute)) {
+                $createdAt = Carbon::parse($createdAtAttribute);
+            } else {
+                $createdAt = now()->subDays(fake()->numberBetween(120, 360));
+            }
+
+            $expiresAt = $createdAt->copy()->addDays(fake()->numberBetween(7, 90));
+            if ($expiresAt->greaterThan(now()->subDay())) {
+                $expiresAt = now()->subDays(fake()->numberBetween(1, 30));
+            }
+
+            if ($expiresAt->lessThanOrEqualTo($createdAt)) {
+                $createdAt = $expiresAt->copy()->subDays(fake()->numberBetween(15, 60));
+            }
+
+            $activatedAt = $createdAt->copy()->addDays(fake()->numberBetween(1, 7));
+            if ($activatedAt->greaterThan($expiresAt)) {
+                $activatedAt = $expiresAt->copy()->subDays(1);
+            }
 
             return [
                 'status' => LicenseStatus::EXPIRED->value,
+                'created_at' => $createdAt,
                 'activated_at' => $activatedAt,
                 'used_by' => $attributes['used_by'] ?? Account::factory(),
                 'expires_at' => $expiresAt,
+                'suspended_at' => null,
+                'updated_at' => $expiresAt,
             ];
         });
     }
@@ -137,9 +170,20 @@ class LicenseFactory extends Factory
      */
     public function upgraded(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => LicenseStatus::UPGRADED->value,
-        ]);
+        return $this->state(function (array $attributes) {
+            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-365 days', '-20 days');
+            $activatedAt = $attributes['activated_at'] ?? fake()->dateTimeBetween($createdAt, '-5 days');
+            $updatedAt = fake()->dateTimeBetween($activatedAt, 'now');
+
+            return [
+                'status' => LicenseStatus::UPGRADED->value,
+                'created_at' => $createdAt,
+                'used_by' => $attributes['used_by'] ?? Account::factory(),
+                'activated_at' => $activatedAt,
+                'suspended_at' => null,
+                'updated_at' => $updatedAt,
+            ];
+        });
     }
 
     /**
@@ -147,9 +191,20 @@ class LicenseFactory extends Factory
      */
     public function revoked(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => LicenseStatus::REVOKED->value,
-        ]);
+        return $this->state(function (array $attributes) {
+            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-365 days', '-20 days');
+            $activatedAt = $attributes['activated_at'] ?? fake()->dateTimeBetween($createdAt, '-5 days');
+            $updatedAt = fake()->dateTimeBetween($activatedAt, 'now');
+
+            return [
+                'status' => LicenseStatus::REVOKED->value,
+                'created_at' => $createdAt,
+                'used_by' => $attributes['used_by'] ?? Account::factory(),
+                'activated_at' => $activatedAt,
+                'suspended_at' => null,
+                'updated_at' => $updatedAt,
+            ];
+        });
     }
 
     /**

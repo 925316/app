@@ -42,7 +42,7 @@ class AccountDeviceSeeder extends Seeder
             if (! $existingBound) {
                 $firstSeen = now()->subDays(fake()->numberBetween(30, 365));
                 if ($account->created_at && $firstSeen->lessThan($account->created_at)) {
-                    $firstSeen = $account->created_at->copy()->addDays(fake()->numberBetween(0, 30));
+                    $firstSeen = $account->created_at->copy()->addDays(fake()->numberBetween(0, 7));
                 }
                 $boundAt = $firstSeen->copy()->addDays(fake()->numberBetween(1, 7));
                 $lastSeen = $boundAt->copy()->addDays(fake()->numberBetween(0, 30));
@@ -77,12 +77,22 @@ class AccountDeviceSeeder extends Seeder
             $historicalCount = fake()->numberBetween(0, 3);
 
             for ($i = 0; $i < $historicalCount; $i++) {
-                $firstSeen = now()->subDays(fake()->numberBetween(365, 730)); // 1-2 years ago
+                $firstSeen = now()->subDays(fake()->numberBetween(60, 340));
                 if ($account->created_at && $firstSeen->lessThan($account->created_at)) {
-                    $firstSeen = $account->created_at->copy()->addDays(fake()->numberBetween(0, 60));
+                    $firstSeen = $account->created_at->copy()->addDays(fake()->numberBetween(0, 10));
                 }
+
+                if ($firstSeen->greaterThan(now()->subDays(2))) {
+                    $firstSeen = now()->subDays(fake()->numberBetween(7, 60));
+                }
+
                 $bindDate = $firstSeen->copy()->addDays(fake()->numberBetween(1, 7));
-                $unbindDate = $bindDate->copy()->addDays(fake()->numberBetween(30, 180)); // Unbound after 1-6 months
+                $unbindDate = $bindDate->copy()->addDays(fake()->numberBetween(7, 120));
+
+                if ($unbindDate->greaterThan(now()->subDay())) {
+                    $unbindDate = now()->subDays(fake()->numberBetween(1, 14));
+                }
+
                 $lastSeen = $unbindDate->copy()->subDays(fake()->numberBetween(1, 7));
 
                 AccountDevice::factory()

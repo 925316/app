@@ -72,7 +72,11 @@ class ClientSessionFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-30 days', 'now');
-            $lastHeartbeat = fake()->dateTimeBetween($createdAt, 'now');
+            $lastHeartbeat = now()->subMinutes(fake()->numberBetween(0, 4));
+
+            if ($lastHeartbeat->lessThan($createdAt)) {
+                $lastHeartbeat = fake()->dateTimeBetween($createdAt, 'now');
+            }
 
             return [
                 'created_at' => $createdAt,
@@ -91,10 +95,11 @@ class ClientSessionFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($minutesAgo) {
             $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-30 days', 'now');
-            $lastHeartbeat = now()->subMinutes($minutesAgo);
+            $threshold = max($minutesAgo + 1, 6);
+            $lastHeartbeat = now()->subMinutes($threshold);
 
             if ($lastHeartbeat->lessThan($createdAt)) {
-                $lastHeartbeat = fake()->dateTimeBetween($createdAt, 'now');
+                $lastHeartbeat = fake()->dateTimeBetween($createdAt, now()->subMinutes(6));
             }
 
             return [
@@ -170,6 +175,7 @@ class ClientSessionFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($device) {
             return [
+                'account_id' => $device->account_id,
                 'device_id' => $device->id,
             ];
         });

@@ -9,6 +9,8 @@ use Illuminate\Database\Seeder;
 
 class ClientSessionSeeder extends Seeder
 {
+    private const ACTIVE_MINUTES_THRESHOLD = 5;
+
     /**
      * Run the database seeds.
      */
@@ -42,7 +44,7 @@ class ClientSessionSeeder extends Seeder
                     // Only create one active session per device
                     // Check if an active session already exists
                     $existingActive = ClientSession::where('device_id', $device->id)
-                        ->where('last_heartbeat_at', '>=', now()->subMinutes(30))
+                        ->where('last_heartbeat_at', '>=', now()->subMinutes(self::ACTIVE_MINUTES_THRESHOLD))
                         ->exists();
 
                     if (! $existingActive) {
@@ -73,6 +75,10 @@ class ClientSessionSeeder extends Seeder
                 $createdTime = now()->subDays(fake()->numberBetween(30, 180));
                 $heartbeatTime = $createdTime->copy()->addHours(fake()->numberBetween(1, 24));
 
+                if ($heartbeatTime->greaterThan(now()->subMinutes(self::ACTIVE_MINUTES_THRESHOLD + 1))) {
+                    $heartbeatTime = now()->subMinutes(fake()->numberBetween(self::ACTIVE_MINUTES_THRESHOLD + 1, 240));
+                }
+
                 ClientSession::factory()
                     ->forDevice($device)
                     ->create([
@@ -96,8 +102,8 @@ class ClientSessionSeeder extends Seeder
         $this->command->info(str_repeat('-', 50));
 
         $total = ClientSession::count();
-        $active = ClientSession::where('last_heartbeat_at', '>=', now()->subMinutes(30))->count();
-        $expired = ClientSession::where('last_heartbeat_at', '<', now()->subMinutes(30))->count();
+        $active = ClientSession::where('last_heartbeat_at', '>=', now()->subMinutes(self::ACTIVE_MINUTES_THRESHOLD))->count();
+        $expired = ClientSession::where('last_heartbeat_at', '<', now()->subMinutes(self::ACTIVE_MINUTES_THRESHOLD))->count();
         $noHeartbeat = ClientSession::whereNull('last_heartbeat_at')->count();
 
         $this->command->table(

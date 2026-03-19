@@ -10,6 +10,8 @@ use Illuminate\Database\Seeder;
 
 class LicenseSeeder extends Seeder
 {
+    private const WINDOW_DAYS = 365;
+
     /**
      * Run the database seeds.
      */
@@ -29,12 +31,14 @@ class LicenseSeeder extends Seeder
      */
     private function createSpecificTestLicenses(): void
     {
+        $now = now();
+
         // Test Case 1: Standard license - UNUSED
         License::create([
             'key' => 'STAND-12345-ABCDE-FGHIJ-KLMNO',
             'privilege' => LicensePrivilege::STANDARD->value,
             'status' => LicenseStatus::UNUSED->value,
-            'expires_at' => now()->addYear(),
+            'expires_at' => $now->copy()->addDays(365),
             'notes' => 'Test: Standard license for activation',
         ]);
 
@@ -43,7 +47,7 @@ class LicenseSeeder extends Seeder
             'key' => 'STD2U-67890-BCDEF-GHIJK-LMNOP',
             'privilege' => LicensePrivilege::UPGRADE->value,
             'status' => LicenseStatus::UNUSED->value,
-            'expires_at' => now()->addYear(),
+            'expires_at' => $now->copy()->addDays(365),
             'notes' => 'Test: Upgrade license for activation',
         ]);
 
@@ -52,7 +56,7 @@ class LicenseSeeder extends Seeder
             'key' => 'ULTIM-13579-CDEFG-HIJKL-MNOPQ',
             'privilege' => LicensePrivilege::ULTIMATE->value,
             'status' => LicenseStatus::UNUSED->value,
-            'expires_at' => now()->addYear(),
+            'expires_at' => $now->copy()->addDays(365),
             'notes' => 'Test: Ultimate license for activation',
         ]);
 
@@ -61,7 +65,7 @@ class LicenseSeeder extends Seeder
             'key' => 'STAFF-24680-DEFGH-IJKLM-NOPQR',
             'privilege' => LicensePrivilege::STAFF->value,
             'status' => LicenseStatus::UNUSED->value,
-            'expires_at' => now()->addYear(),
+            'expires_at' => $now->copy()->addDays(365),
             'notes' => 'Test: Staff license for activation',
         ]);
 
@@ -70,7 +74,7 @@ class LicenseSeeder extends Seeder
             'key' => 'UPGRA-11223-34567-38ABC-DEFGH',
             'privilege' => LicensePrivilege::ULTIMATE->value,
             'status' => LicenseStatus::UNUSED->value,
-            'expires_at' => now()->addYear(),
+            'expires_at' => $now->copy()->addDays(365),
             'notes' => 'Test: Upgrade license for activation',
         ]);
 
@@ -79,7 +83,7 @@ class LicenseSeeder extends Seeder
             'key' => 'EXPIR-44556-67234-ABCDE-FGHIJ',
             'privilege' => LicensePrivilege::STANDARD->value,
             'status' => LicenseStatus::UNUSED->value,
-            'expires_at' => now()->subDay(),
+            'expires_at' => $now->copy()->subDay(),
             'notes' => 'Test: Expired license (cannot activate)',
         ]);
 
@@ -88,7 +92,8 @@ class LicenseSeeder extends Seeder
             'key' => 'REVOK-77889-90123-ABCDE-RABCD',
             'privilege' => LicensePrivilege::STANDARD->value,
             'status' => LicenseStatus::REVOKED->value,
-            'expires_at' => now()->addYear(),
+            'activated_at' => $now->copy()->subDays(120),
+            'expires_at' => $now->copy()->addDays(245),
             'notes' => 'Test: Revoked license (cannot activate)',
         ]);
 
@@ -97,7 +102,9 @@ class LicenseSeeder extends Seeder
             'key' => 'SUSPE-12345-23456-ABCDE-FGHIJ',
             'privilege' => LicensePrivilege::STANDARD->value,
             'status' => LicenseStatus::SUSPENDED->value,
-            'expires_at' => now()->addYear(),
+            'activated_at' => $now->copy()->subDays(90),
+            'suspended_at' => $now->copy()->subDays(15),
+            'expires_at' => $now->copy()->addDays(270),
             'notes' => 'Test: Suspended license (cannot activate)',
         ]);
 
@@ -109,8 +116,8 @@ class LicenseSeeder extends Seeder
                 'privilege' => LicensePrivilege::UPGRADE->value,
                 'status' => LicenseStatus::ACTIVE->value,
                 'used_by' => $testAccount->id,
-                'activated_at' => now(),
-                'expires_at' => now()->addYear(),
+                'activated_at' => $now->copy()->subDays(12),
+                'expires_at' => $now->copy()->addDays(353),
                 'notes' => 'Test: Already active license',
             ]);
         }
@@ -121,8 +128,8 @@ class LicenseSeeder extends Seeder
      */
     private function createBulkDemoData(): void
     {
-        // Get available accounts for assignment (skip test accounts)
-        $accounts = Account::where('email', 'not like', '%@test.com')->pluck('id')->toArray();
+        // Get available accounts for assignment
+        $accounts = Account::pluck('id')->toArray();
 
         if (empty($accounts)) {
             return;
@@ -201,8 +208,7 @@ class LicenseSeeder extends Seeder
      */
     private function createLicensesForAccounts(): void
     {
-        // Skip accounts created by AccountSeeder (they have @test.com emails)
-        $accounts = Account::where('email', 'not like', '%@test.com')
+        $accounts = Account::query()
             ->take(10)
             ->get();
 
@@ -212,7 +218,7 @@ class LicenseSeeder extends Seeder
                 ->active()
                 ->state([
                     'used_by' => $account->id,
-                    'activated_at' => fake()->dateTimeBetween('-6 months', '-1 week'),
+                    'activated_at' => fake()->dateTimeBetween('-180 days', '-7 days'),
                 ])
                 ->create();
 
@@ -222,18 +228,37 @@ class LicenseSeeder extends Seeder
             if ($otherLicenseCount > 0) {
                 License::factory()
                     ->count($otherLicenseCount)
+                    ->state(['used_by' => $account->id])
                     ->state([
-                        'used_by' => $account->id,
-                        'activated_at' => fake()->dateTimeBetween('-6 months', '-1 week'),
+                        'activated_at' => fake()->dateTimeBetween('-180 days', '-7 days'),
                     ])
                     ->state(function (array $attributes) {
                         $status = fake()->randomElement([
-                            LicenseStatus::UPGRADED->value,
-                            LicenseStatus::EXPIRED->value,
-                            LicenseStatus::REVOKED->value,
+                            LicenseStatus::UPGRADED,
+                            LicenseStatus::EXPIRED,
+                            LicenseStatus::REVOKED,
                         ]);
 
-                        return ['status' => $status];
+                        return match ($status) {
+                            LicenseStatus::UPGRADED => [
+                                'status' => LicenseStatus::UPGRADED->value,
+                                'expires_at' => now()->addDays(fake()->numberBetween(30, self::WINDOW_DAYS)),
+                                'suspended_at' => null,
+                            ],
+                            LicenseStatus::EXPIRED => [
+                                'status' => LicenseStatus::EXPIRED->value,
+                                'expires_at' => now()->subDays(fake()->numberBetween(1, self::WINDOW_DAYS - 1)),
+                                'suspended_at' => null,
+                            ],
+                            LicenseStatus::REVOKED => [
+                                'status' => LicenseStatus::REVOKED->value,
+                                'expires_at' => now()->addDays(fake()->numberBetween(14, self::WINDOW_DAYS)),
+                                'suspended_at' => null,
+                            ],
+                            default => [
+                                'status' => $status->value,
+                            ],
+                        };
                     })
                     ->create();
 
