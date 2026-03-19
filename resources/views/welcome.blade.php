@@ -63,7 +63,7 @@
                 }
             }" x-cloak @click="toggle"
                 class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
-                aria-label="Toggle dark mode">
+                aria-label="{{ __('Toggle dark mode') }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
@@ -85,13 +85,13 @@
                     </svg>
                 </div>
                 <h1 class="text-4xl lg:text-6xl font-bold tracking-tight mb-4 text-gray-900 dark:text-white">
-                    Welcome to
+                    {{ __('Welcome to') }}
                     <span class="bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
                         {{ config('app.name') }}
                     </span>
                 </h1>
                 <p class="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                    A modern platform for managing licenses, devices, and software packages with ease.
+                    {{ __('A modern platform for managing licenses, devices, and software packages with ease.') }}
                 </p>
             </div>
 
@@ -101,7 +101,7 @@
                     @auth
                         <a href="{{ url('/dashboard') }}"
                             class="group inline-flex items-center px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                            <span class="mr-2">Go to Dashboard</span>
+                            <span class="mr-2">{{ __('Go to Dashboard') }}</span>
                             <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -111,7 +111,7 @@
                     @else
                         <a href="{{ route('login') }}"
                             class="group inline-flex items-center px-8 py-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-medium rounded-xl shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                            <span class="mr-2">Sign In</span>
+                            <span class="mr-2">{{ __('Sign In') }}</span>
                             <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -123,7 +123,7 @@
                         @if (Route::has('register'))
                             <a href="{{ route('register') }}"
                                 class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                                <span class="mr-2">Get Started</span>
+                                <span class="mr-2">{{ __('Get Started') }}</span>
                                 <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -148,10 +148,9 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">License Management</h3>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('License Management') }}</h3>
                     <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        Easily create, manage, and track software licenses with detailed analytics and expiration
-                        monitoring.
+                        {{ __('Easily create, manage, and track software licenses with detailed analytics and expiration monitoring.') }}
                     </p>
                 </div>
 
@@ -164,9 +163,9 @@
                                 d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Device Tracking</h3>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('Device Tracking') }}</h3>
                     <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        Monitor and manage device registrations with real-time status updates and usage statistics.
+                        {{ __('Monitor and manage device registrations with real-time status updates and usage statistics.') }}
                     </p>
                 </div>
 
@@ -180,9 +179,9 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Package Distribution</h3>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('Package Distribution') }}</h3>
                     <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        Distribute software packages securely with version control and download analytics.
+                        {{ __('Distribute software packages securely with version control and download analytics.') }}
                     </p>
                 </div>
             </div>
@@ -192,7 +191,7 @@
     <!-- Footer -->
     <footer class="border-t border-gray-200 dark:border-gray-800 py-6">
         <div class="container mx-auto px-6 text-center text-sm text-gray-500 dark:text-gray-400">
-            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. Built with Laravel & Tailwind CSS.</p>
+            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. {{ __('Built with Laravel & Tailwind CSS.') }}</p>
         </div>
     </footer>
 </body>

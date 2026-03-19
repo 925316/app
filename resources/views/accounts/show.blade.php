@@ -10,14 +10,14 @@
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $account->username }}</h1>
-                <p class="text-gray-500 dark:text-gray-400">Account ID: {{ $account->id }}</p>
+                <p class="text-gray-500 dark:text-gray-400">{{ __('Account ID:') }} {{ $account->id }}</p>
             </div>
             <div class="flex space-x-3">
                 <a href="{{ route('accounts.edit', $account) }}" class="btn btn-indigo btn-sm">
-                    Edit Account
+                    {{ __('Edit Account') }}
                 </a>
                 <a href="{{ route('accounts.index') }}" class="btn btn-secondary btn-sm">
-                    Back to Accounts
+                    {{ __('Back to Accounts') }}
                 </a>
             </div>
         </div>
@@ -25,23 +25,23 @@
         <!-- Account Overview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Account Information</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Account Information') }}</h3>
                 <div class="space-y-3">
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Username</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Username') }}</span>
                         <p class="font-medium text-gray-900 dark:text-white">{{ $account->username }}</p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Email</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Email') }}</span>
                         <p class="font-medium text-gray-900 dark:text-white">{{ $account->email }}</p>
                         @if ($account->email_verified_at)
-                            <x-status-badge status="verified" text="Verified" />
+                            <x-status-badge status="verified" :text="__('Verified')" />
                         @else
-                            <x-status-badge status="unverified" text="Unverified" />
+                            <x-status-badge status="unverified" :text="__('Unverified')" />
                         @endif
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Status</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Status') }}</span>
                         @if ($account->isCurrentlySuspended)
                             <x-status-badge status="suspended" />
                         @else
@@ -49,19 +49,19 @@
                         @endif
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Privilege Level</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Privilege Level') }}</span>
                         <p class="font-medium text-gray-900 dark:text-white">
-                            {{ $account->getPrivilegeLevel() ? ucfirst(strtolower(LicensePrivilege::tryFrom($account->getPrivilegeLevel())?->getLabel() ?? 'Unknown')) : 'None' }}
+                            {{ $account->getPrivilegeLevel() ? ucfirst(strtolower(LicensePrivilege::tryFrom($account->getPrivilegeLevel())?->getLabel() ?? __('Unknown'))) : __('None') }}
                         </p>
                     </div>
                 </div>
             </div>
 
             <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Login Information</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Login Information') }}</h3>
                 <div class="space-y-3">
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Last Login</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Last Login') }}</span>
                         <p class="font-medium text-gray-900 dark:text-white">
                             @if ($account->last_login_at)
                                 {{ $account->last_login_at->diffForHumans() }}
@@ -69,38 +69,38 @@
                                 <span
                                     class="text-xs text-gray-500 dark:text-gray-400">{{ $account->last_login_at->format('Y-m-d H:i:s') }}</span>
                             @else
-                                <span class="text-gray-500 dark:text-gray-400">Never</span>
+                                <span class="text-gray-500 dark:text-gray-400">{{ __('Never') }}</span>
                             @endif
                         </p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Last IP Address</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->last_ip_address ?? 'N/A' }}</p>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Last IP Address') }}</span>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->last_ip_address ?? __('N/A') }}</p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Registration Date</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Registration Date') }}</span>
                         <p class="font-medium text-gray-900 dark:text-white">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
                     </div>
                 </div>
             </div>
 
             <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Device Information</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Device Information') }}</h3>
                 <div class="space-y-3">
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Total Devices</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Total Devices') }}</span>
                         <p class="font-medium text-gray-900 dark:text-white">{{ $account->devices_count }}</p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Bound Devices</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Bound Devices') }}</span>
                         <p class="font-medium text-gray-900 dark:text-white">{{ $boundDevices->count() }}</p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">HWID Resets</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('HWID Resets') }}</span>
                         <p class="font-medium text-gray-900 dark:text-white">{{ $account->hwid_reset_count }}</p>
                         @if ($account->hwid_last_reset_at)
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Last
-                                reset: {{ $account->hwid_last_reset_at->diffForHumans() }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('Last reset:') }}
+                                {{ $account->hwid_last_reset_at->diffForHumans() }}</p>
                         @endif
                     </div>
                 </div>
@@ -109,18 +109,18 @@
 
         <!-- Action Buttons -->
         <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg mb-8">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Account Actions</h3>
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Account Actions') }}</h3>
             <div class="flex flex-wrap gap-3">
                 @if ($account->isCurrentlySuspended)
                     <form action="{{ route('accounts.unsuspend', $account) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="btn btn-green btn-sm">
-                            Unsuspend Account
+                            {{ __('Unsuspend Account') }}
                         </button>
                     </form>
                 @else
                     <button onclick="openSuspendModal('{{ $account->id }}')" class="btn btn-danger btn-sm">
-                        Suspend Account
+                        {{ __('Suspend Account') }}
                     </button>
                 @endif
 
@@ -128,20 +128,20 @@
                     <form action="{{ route('accounts.verify-email', $account) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="btn btn-blue btn-sm">
-                            Verify Email
+                            {{ __('Verify Email') }}
                         </button>
                     </form>
                 @endif
 
                 <button onclick="openResetHwidModal('{{ $account->id }}')" class="btn btn-yellow btn-sm">
-                    Reset HWID
+                    {{ __('Reset HWID') }}
                 </button>
 
                 <form action="{{ route('accounts.destroy', $account) }}" method="POST" class="inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger btn-sm">
-                        Delete Account
+                        {{ __('Delete Account') }}
                     </button>
                 </form>
             </div>
@@ -150,9 +150,9 @@
         <!-- Licenses -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
             <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Licenses</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Licenses') }}</h3>
                 @if ($account->licenses->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">No licenses found for this account.</p>
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('No licenses found for this account.') }}</p>
                 @else
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
@@ -160,23 +160,23 @@
                                 <tr>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        License Key
+                                        {{ __('License Key') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Privilege
+                                        {{ __('Privilege') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Status
+                                        {{ __('Status') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Expires At
+                                        {{ __('Expires At') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Actions
+                                        {{ __('Actions') }}
                                     </th>
                                 </tr>
                             </thead>
@@ -188,10 +188,10 @@
                                             {{ $license->key }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            <x-status-badge :status="strtolower($license->privilege?->getLabel() ?? 'default')" :text="$license->privilege?->getLabel() ?? 'Unknown'" />
+                                            <x-status-badge :status="strtolower($license->privilege?->getLabel() ?? 'default')" :text="$license->privilege?->getLabel() ?? __('Unknown')" />
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <x-status-badge :status="strtolower($license->status?->getLabel() ?? 'default')" :text="$license->status?->getLabel() ?? 'Unknown'" />
+                                            <x-status-badge :status="strtolower($license->status?->getLabel() ?? 'default')" :text="$license->status?->getLabel() ?? __('Unknown')" />
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                             {{ $license->expires_at->format('Y-m-d H:i:s') }}
@@ -199,7 +199,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('licenses.show', $license) }}"
                                                 class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                View
+                                                {{ __('View') }}
                                             </a>
                                         </td>
                                     </tr>
@@ -214,9 +214,9 @@
         <!-- Devices -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
             <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Devices</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Devices') }}</h3>
                 @if ($account->devices->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">No devices found for this account.</p>
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('No devices found for this account.') }}</p>
                 @else
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
@@ -224,27 +224,27 @@
                                 <tr>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Device ID
+                                        {{ __('Device ID') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        HWID Hash
+                                        {{ __('HWID Hash') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Status
+                                        {{ __('Status') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        First Seen
+                                        {{ __('First Seen') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Last Seen
+                                        {{ __('Last Seen') }}
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Bound At
+                                        {{ __('Bound At') }}
                                     </th>
                                 </tr>
                             </thead>
@@ -256,15 +256,15 @@
                                             {{ $device->id }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            {{ $device->hwid_hash ? substr($device->hwid_hash, 0, 16) . '...' : 'N/A' }}
+                                            {{ $device->hwid_hash ? substr($device->hwid_hash, 0, 16) . '...' : __('N/A') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if ($device->bound_at && !$device->unbound_at)
-                                                <x-status-badge status="active" text="Bound" />
+                                                <x-status-badge status="active" :text="__('Bound')" />
                                             @elseif($device->unbound_at)
-                                                <x-status-badge status="suspended" text="Unbound" />
+                                                <x-status-badge status="suspended" :text="__('Unbound')" />
                                             @else
-                                                <x-status-badge status="default" text="Not Bound" />
+                                                <x-status-badge status="default" :text="__('Not Bound')" />
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
@@ -274,7 +274,7 @@
                                             {{ $device->last_seen_at->format('Y-m-d H:i:s') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            {{ $device->bound_at ? $device->bound_at->format('Y-m-d H:i:s') : 'N/A' }}
+                                            {{ $device->bound_at ? $device->bound_at->format('Y-m-d H:i:s') : __('N/A') }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -288,9 +288,9 @@
         <!-- Recent Activity -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Activity</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Recent Activity') }}</h3>
                 @if ($account->eventLogs->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">No activity found for this account.</p>
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('No activity found for this account.') }}</p>
                 @else
                     <div class="space-y-4">
                         @foreach ($account->eventLogs as $log)
@@ -304,7 +304,7 @@
                                         <span
                                             class="ml-2 text-sm text-gray-500 dark:text-gray-400">{{ $log->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">ID:
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ __('ID:') }}
                                         {{ $log->id }}</span>
                                 </div>
                                 <div class="text-sm text-gray-900 dark:text-white">
@@ -330,21 +330,19 @@
                         </svg>
                     </div>
                 </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">Suspend Account</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">Enter suspension details for this
-                    account.</p>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">{{ __('Suspend Account') }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">{{ __('Enter suspension details for this account.') }}</p>
                 <form id="suspendForm" method="POST" class="mt-5">
                     @csrf
                     <div class="mb-4">
                         <label for="suspend_reason"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reason</label>
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Reason') }}</label>
                         <input type="text" name="reason" id="suspend_reason"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
                     </div>
                     <div class="mb-4">
                         <label for="suspend_duration"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Duration (days) -
-                            Optional</label>
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Duration (days) - Optional') }}</label>
                         <input type="number" name="duration" id="suspend_duration" min="1"
                             max="365"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
@@ -352,10 +350,10 @@
                     <div class="flex justify-end space-x-2">
                         <button type="button" @click="show = false"
                             class="btn btn-secondary">
-                            Cancel
+                            {{ __('Cancel') }}
                         </button>
                         <button type="submit" class="btn btn-danger">
-                            Suspend
+                            {{ __('Suspend') }}
                         </button>
                     </div>
                 </form>
@@ -375,17 +373,15 @@
                         </svg>
                     </div>
                 </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">Reset HWID</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">This will unbind all devices and reset
-                    the HWID for this account.</p>
-                <p class="text-sm text-red-600 dark:text-red-400 text-center mb-4">Warning: This action cannot be
-                    undone.</p>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">{{ __('Reset HWID') }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">{{ __('This will unbind all devices and reset the HWID for this account.') }}</p>
+                <p class="text-sm text-red-600 dark:text-red-400 text-center mb-4">{{ __('Warning: This action cannot be undone.') }}</p>
                 <form id="resetHwidForm" method="POST" class="mt-5">
                     @csrf
                     <div class="flex justify-end space-x-2">
                         <button type="button" @click="show = false"
                             class="btn btn-secondary">
-                            Cancel
+                            {{ __('Cancel') }}
                         </button>
                         <button type="submit" class="btn btn-yellow">
                             Reset HWID

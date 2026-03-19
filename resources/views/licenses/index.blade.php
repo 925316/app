@@ -9,10 +9,10 @@
             @if (Auth::user()->hasPrivilege(7))
                 <!-- Statistics Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <x-stat-card title="Total Licenses" :value="$statistics['total']" icon="document" iconColor="icon-blue" />
-                    <x-stat-card title="Active" :value="$statistics['active']" icon="success" iconColor="icon-green" />
-                    <x-stat-card title="Expired" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
-                    <x-stat-card title="Unassigned" :value="$statistics['unassigned']" icon="warning" iconColor="icon-yellow" />
+                    <x-stat-card :title="__('Total Licenses')" :value="$statistics['total']" icon="document" iconColor="icon-blue" />
+                    <x-stat-card :title="__('Active')" :value="$statistics['active']" icon="success" iconColor="icon-green" />
+                    <x-stat-card :title="__('Expired')" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
+                    <x-stat-card :title="__('Unassigned')" :value="$statistics['unassigned']" icon="warning" iconColor="icon-yellow" />
                 </div>
             @endif
 
@@ -22,9 +22,9 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
                             @if ($isAdmin ?? false)
-                                All Licenses
+                                {{ __('All Licenses') }}
                             @else
-                                My Licenses
+                                {{ __('My Licenses') }}
                             @endif
                         </h3>
 
@@ -69,10 +69,10 @@
                                             </label>
                                             <input type="text" id="license_key" name="license_key"
                                                 value="{{ old('license_key') }}"
-                                                placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
+                                                placeholder="{{ __('XXXXX-XXXXX-XXXXX-XXXXX-XXXXX') }}"
                                                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200 text-center font-mono text-lg tracking-wider uppercase @error('license_key') border-red-500 @enderror"
                                                 maxlength="29" required {{-- pattern="^[A-Z0-9]{5}-[0-9A-F]{5}-[A-Z2-7]{5}-[A-Z3-8]{5}-[A-Z0-9]{5}$" --}}
-                                                title="License key must be in the format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX">
+                                                title="{{ __('License key must be in the format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX') }}">
                                             @error('license_key')
                                                 <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}
                                                 </p>
@@ -88,7 +88,7 @@
                                                         d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
                                                     </path>
                                                 </svg>
-                                                Activate License
+                                                {{ __('Activate License') }}
                                             </button>
                                         </div>
                                     </form>
@@ -104,10 +104,10 @@
                                 <!-- Status filter -->
                                 <div class="space-y-2">
                                     <label for="status"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Status') }}</label>
                                     <select name="status" id="status"
                                         class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
-                                        <option value="">All Statuses</option>
+                                        <option value="">{{ __('All Statuses') }}</option>
                                         @foreach ($statusOptions as $value => $label)
                                             <option value="{{ $value }}"
                                                 {{ request('status', '') === (string) $value ? 'selected' : '' }}>
@@ -120,10 +120,10 @@
                                 <!-- Privilege filter -->
                                 <div class="space-y-2">
                                     <label for="privilege"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Privilege</label>
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Privilege') }}</label>
                                     <select name="privilege" id="privilege"
                                         class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
-                                        <option value="">All Privileges</option>
+                                        <option value="">{{ __('All Privileges') }}</option>
                                         @foreach ($privilegeOptions as $value => $label)
                                             <option value="{{ $value }}"
                                                 {{ request('privilege', '') === (string) $value ? 'selected' : '' }}>
@@ -136,7 +136,7 @@
                                 <!-- Search -->
                                 <div class="space-y-2 md:col-span-2">
                                     <label for="search"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Search') }}</label>
                                     <div class="flex gap-2">
                                         <div class="relative flex-1">
                                             <div
@@ -152,7 +152,7 @@
                                             <input type="text" name="search" id="search"
                                                 value="{{ request('search', '') }}"
                                                 class="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200"
-                                                placeholder="Search by key or username...">
+                                                placeholder="{{ __('Search by key or username...') }}">
                                         </div>
                                         <button type="submit" class="btn btn-blue btn-sm">
                                             <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
@@ -181,7 +181,7 @@
                                     request()->filled('privilege') ||
                                     request()->filled('search'))
                                 <div class="mt-4 flex items-center space-x-3">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Active filters:</span>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Active filters:') }}</span>
                                     <div class="flex flex-wrap gap-2">
                                         @if (request()->filled('status'))
                                             @php
@@ -189,7 +189,7 @@
                                                 $statusLabel = $statusOptions[$statusValue] ?? null;
                                             @endphp
                                             @if ($statusLabel)
-                                                <x-filter-badge label="Status: {{ ucfirst($statusLabel) }}" color="blue"
+                                                <x-filter-badge :label="__('Status:').' '.ucfirst($statusLabel)" color="blue"
                                                     :removeUrl="request()->fullUrlWithQuery(['status' => null])" />
                                             @endif
                                         @endif
@@ -199,12 +199,12 @@
                                                 $privilegeLabel = $privilegeOptions[$privilegeValue] ?? null;
                                             @endphp
                                             @if ($privilegeLabel)
-                                                <x-filter-badge label="Privilege: {{ ucfirst($privilegeLabel) }}" color="green"
+                                                <x-filter-badge :label="__('Privilege:').' '.ucfirst($privilegeLabel)" color="green"
                                                     :removeUrl="request()->fullUrlWithQuery(['privilege' => null])" />
                                             @endif
                                         @endif
                                         @if (request()->filled('search'))
-                                            <x-filter-badge label="Search: &quot;{{ request('search') }}&quot;" color="purple"
+                                            <x-filter-badge :label="__('Search:').' &quot;'.request('search').'&quot;'" color="purple"
                                                 :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
                                         @endif
                                     </div>
@@ -222,7 +222,7 @@
                                 </td>
                                 @if ($isAdmin ?? false)
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                    {{ $license->account?->username ?? 'Unassigned' }}
+                                    {{ $license->account?->username ?? __('Unassigned') }}
                                 </td>
                                 @endif
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
@@ -249,7 +249,7 @@
                                         View
                                     </a>
                                     @if ($isAdmin ?? false)
-                                        <span class="mx-1 text-gray-400">|</span>
+                                        <span class="mx-1 text-gray-400">{{ '|' }}</span>
                                         <a href="{{ route('licenses.edit', $license) }}"
                                             class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                                             Edit
@@ -260,7 +260,7 @@
                         @empty
                             <tr>
                                 <td colspan="{{ $isAdmin ?? false ? 6 : 5 }}" class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                    No licenses found.
+                                    {{ __('No licenses found.') }}
                                 </td>
                             </tr>
                         @endforelse

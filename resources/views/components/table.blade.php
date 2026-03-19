@@ -40,7 +40,7 @@
             <x-icon name="magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input type="text" 
                    id="search-{{ $name }}"
-                   placeholder="{{ $searchPlaceholder }}"
+                   placeholder="{{ __($searchPlaceholder) }}"
                    class="w-full pl-10 pr-4 py-2 text-sm 
                           bg-gray-50 dark:bg-gray-700 
                           border border-gray-200 dark:border-gray-600 
@@ -98,7 +98,7 @@
                     <td colspan="{{ $emptyColspan }}" class="table-empty">
                         <div class="flex flex-col items-center py-8">
                             <x-icon name="document" class="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
-                            <p class="text-gray-500 dark:text-gray-400">{{ $emptyMessage }}</p>
+                            <p class="text-gray-500 dark:text-gray-400">{{ __($emptyMessage) }}</p>
                         </div>
                     </td>
                 </tr>

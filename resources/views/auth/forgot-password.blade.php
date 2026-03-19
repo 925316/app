@@ -9,7 +9,7 @@
                     <div> <x-input-label for="email" :value="__('Email Address')"
                             class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" /> <x-input-with-icon
                             id="email" name="email" type="email" :value="old('email')" required autofocus
-                            placeholder="your@email.com" icon="mail" /> <x-input-error :messages="$errors->get('email')"
+                            :placeholder="__('your@email.com')" icon="mail" /> <x-input-error :messages="$errors->get('email')"
                             class="mt-2" /> </div> <!-- Submit Button -->
                     <div> <x-primary-button
                             class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">

@@ -19,7 +19,7 @@
         <!-- Toggle Button - Positioned absolutely for better clickability -->
         <button @click="$store.sidebar.toggle()"
             class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10 transition-colors duration-150"
-            :class="{ 'right-3': $store.sidebar.open, 'right-4': !$store.sidebar.open }" aria-label="Toggle sidebar">
+            :class="{ 'right-3': $store.sidebar.open, 'right-4': !$store.sidebar.open }" aria-label="{{ __('Toggle sidebar') }}">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path :class="{ 'hidden': !$store.sidebar.open, 'inline-flex': $store.sidebar.open }"
                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />

@@ -5,6 +5,10 @@
         </h2>
     </x-slot>
 
+    @php
+        $unbindDeviceConfirmation = __('Unbind this device?');
+    @endphp
+
     <div class="py-7">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
@@ -25,21 +29,20 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <h4 class="font-medium text-blue-800 dark:text-blue-200">Currently Bound
-                                            Device</h4>
+                                        <h4 class="font-medium text-blue-800 dark:text-blue-200">{{ __('Currently Bound Device') }}</h4>
                                         <div class="text-sm text-blue-600 dark:text-blue-300">
                                             <span title="{{ $currentDevice->hwid_hash }}" class="cursor-help">
                                                 {{ substr($currentDevice->hwid_hash, 0, 8) }}...
                                             </span>
                                             | {{ $currentDevice->ip_address }}
-                                            | {{ $currentDevice->country_code ?? 'Unknown' }}
+                                            | {{ $currentDevice->country_code ?? __('Unknown') }}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 text-sm">
                                     <span
                                         class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs font-medium">
-                                        Bound since {{ $currentDevice->bound_at->format('Y-m-d') }}
+                                        {{ __('Bound since') }} {{ $currentDevice->bound_at->format('Y-m-d') }}
                                     </span>
                                 </div>
                             </div>
@@ -57,9 +60,9 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h4 class="font-medium text-yellow-800 dark:text-yellow-200">No Device Bound</h4>
+                                    <h4 class="font-medium text-yellow-800 dark:text-yellow-200">{{ __('No Device Bound') }}</h4>
                                     <div class="text-sm text-yellow-600 dark:text-yellow-300">
-                                        You haven't bound any device to your account yet.
+                                        {{ __('You have not bound any device to your account yet.') }}
                                     </div>
                                 </div>
                             </div>
@@ -67,7 +70,7 @@
                     @endif
 
                     <!-- Device Table -->
-                    <x-table :headers="['HWID', 'IP / Country', 'First / Last', 'Status', 'Actions']" :emptyColspan="5">
+                    <x-table :headers="[__('HWID'), __('IP / Country'), __('First / Last'), __('Status'), __('Actions')]" :emptyColspan="5">
                         @forelse($devices as $device)
                             <tr>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm">
@@ -77,27 +80,27 @@
                                                 {{ substr($device->hwid_hash, 0, 8) }}...
                                             </span>
                                         @else
-                                            N/A
+                                            {{ __('N/A') }}
                                         @endif
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm">
                                     <span class="text-gray-900 dark:text-gray-100">{{ $device->ip_address }}</span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">({{ $device->country_code ?? 'N/A' }})</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">({{ $device->country_code ?? __('N/A') }})</span>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                    <span class="text-gray-900 dark:text-gray-100" title="First: {{ $device->first_seen_at->format('Y-m-d H:i:s') }} | Last: {{ $device->last_seen_at->format('Y-m-d H:i:s') }}">
+                                    <span class="text-gray-900 dark:text-gray-100" title="{{ __('First:') }} {{ $device->first_seen_at->format('Y-m-d H:i:s') }} | {{ __('Last:') }} {{ $device->last_seen_at->format('Y-m-d H:i:s') }}">
                                         {{ $device->first_seen_at->format('m-d') }} / {{ $device->last_seen_at->format('m-d') }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm">
                                     @if ($device->bound_at && !$device->unbound_at)
                                         <span class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
-                                            Currently Bound
+                                            {{ __('Currently Bound') }}
                                         </span>
                                     @else
                                         <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium">
-                                            Historical
+                                            {{ __('Historical') }}
                                         </span>
                                     @endif
                                 </td>
@@ -105,11 +108,11 @@
                                     <div class="flex gap-2">
                                         @if ($device->isBound())
                                             <form method="POST" action="{{ route('devices.unbind') }}" class="inline"
-                                                onsubmit="return confirm('Unbind this device?');">
+                                                onsubmit="return confirm('{{ $unbindDeviceConfirmation }}');">
                                                 @csrf
                                                 <button type="submit"
                                                     class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition">
-                                                    Unbind
+                                                    {{ __('Unbind') }}
                                                 </button>
                                             </form>
                                         @endif
@@ -119,7 +122,7 @@
                         @empty
                             <tr>
                                 <td colspan="5" class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                    No device history found.
+                                    {{ __('No device history found.') }}
                                 </td>
                             </tr>
                         @endforelse

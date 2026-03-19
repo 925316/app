@@ -1,4 +1,4 @@
-@props(['headers' => [], 'items' => null, 'emptyMessage' => 'No data found.', 'emptyColspan' => null]) <div class="table-responsive">
+@props(['headers' => [], 'items' => null, 'emptyMessage' => __('No data found.'), 'emptyColspan' => null]) <div class="table-responsive">
     <table class="data-table">
         <thead class="table-header">
             <tr>

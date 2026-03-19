@@ -63,7 +63,7 @@
                         </div>
                         <div class="relative flex justify-center text-xs uppercase">
                             <span
-                                class="px-2 bg-white/80 dark:bg-cool-800/80 text-gray-500 dark:text-gray-400">Or</span>
+                                class="px-2 bg-white/80 dark:bg-cool-800/80 text-gray-500 dark:text-gray-400">{{ __('Or') }}</span>
                         </div>
                     </div>
 

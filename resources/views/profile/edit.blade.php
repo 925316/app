@@ -82,13 +82,71 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
                     <x-primary-button>{{ __('Save') }}</x-primary-button>
 
                     @if (session('status') === 'profile-updated')
-                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                            class="text-sm text-gray-600 dark:text-gray-300">{{ __('Saved.') }}</p>
+                        @php
+                            $updatedLocale = session('locale-updated-value');
+                            $updatedLocaleLabel = is_string($updatedLocale) ? ($supportedLocales[$updatedLocale] ?? strtoupper($updatedLocale)) : null;
+                        @endphp
+                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
+                            class="text-sm text-gray-600 dark:text-gray-300">
+                            {{ __('Saved.') }}
+                            @if ($updatedLocaleLabel)
+                                {{ __('Current language:') }} {{ $updatedLocaleLabel }}
+                            @endif
+                        </p>
                     @endif
                 </div>
             </form>
         </div>
         @endif
+
+        <!-- Language Preferences -->
+        <div class="bg-white dark:bg-cool-800 rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ __('Language Preferences') }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                {{ __('Choose your preferred language. If you have not selected one, we will use your browser language.') }}
+            </p>
+
+            <form method="post" action="{{ route('profile.update-locale') }}" class="space-y-6">
+                @csrf
+                @method('patch')
+
+                <div class="space-y-2">
+                    <x-input-label for="locale" :value="__('Language')" />
+                    <select id="locale" name="locale"
+                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                        @if (count($supportedLocales) === 0)
+                            <option value="{{ $currentLocale }}" selected>
+                                {{ strtoupper($currentLocale) }}
+                            </option>
+                        @endif
+                        @foreach ($supportedLocales as $value => $label)
+                            <option value="{{ $value }}" {{ $currentLocale === $value ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <x-input-error class="mt-2" :messages="$errors->get('locale')" />
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <x-primary-button>{{ __('Save') }}</x-primary-button>
+
+                    @if (session('status') === 'locale-updated')
+                        @php
+                            $updatedLocale = session('locale-updated-value');
+                            $updatedLocaleLabel = is_string($updatedLocale) ? ($supportedLocales[$updatedLocale] ?? strtoupper($updatedLocale)) : null;
+                        @endphp
+                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                            class="text-sm text-gray-600 dark:text-gray-300">
+                            {{ __('Saved.') }}
+                            @if ($updatedLocaleLabel)
+                                {{ __('Current language:') }} {{ $updatedLocaleLabel }}
+                            @endif
+                        </p>
+                    @endif
+                </div>
+            </form>
+        </div>
 
         <!-- Update Password -->
         <div class="bg-white dark:bg-cool-800 rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">

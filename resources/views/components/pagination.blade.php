@@ -1,7 +1,7 @@
 @props([
     'paginator' => null,
     'showTotal' => true,
-    'label' => 'Showing :a to :b of :c results',
+    'label' => __('Showing :a to :b of :c results'),
     'size' => 'regular',
 ])
 
@@ -33,7 +33,7 @@
 @if($paginator->hasPages())
 <nav class="flex flex-col sm:flex-row px-4 py-3 justify-between items-center text-sm gap-3" 
      role="navigation" 
-     aria-label="Pagination Navigation">
+     aria-label="{{ __('Pagination Navigation') }}">
     
     {{-- Total Records Info --}}
     @if($showTotal && $total > 0)

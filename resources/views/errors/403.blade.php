@@ -4,23 +4,23 @@
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-200">
                 <x-icon name="lock" class="h-7 w-7" />
             </div>
-            <h1 class="mt-6 text-2xl font-semibold text-gray-900 dark:text-white">Access Denied</h1>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">You do not have permission to view this page. Please contact an administrator.</p>
+            <h1 class="mt-6 text-2xl font-semibold text-gray-900 dark:text-white">{{ __('Access Denied') }}</h1>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('You do not have permission to view this page. Please contact an administrator.') }}</p>
             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 @auth
                     <a href="{{ route('dashboard') }}"
                         class="inline-flex items-center justify-center rounded-lg bg-cool-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-cool-700">
-                        Back to Dashboard
+                        {{ __('Back to Dashboard') }}
                     </a>
                 @else
                     <a href="{{ route('login') }}"
                         class="inline-flex items-center justify-center rounded-lg bg-cool-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-cool-700">
-                        Back to Login
+                        {{ __('Back to Login') }}
                     </a>
                 @endauth
                 <a href="{{ url('/') }}"
                     class="inline-flex items-center justify-center rounded-lg border border-cool-200 px-4 py-2 text-sm font-medium text-cool-700 transition hover:bg-cool-50 dark:border-cool-700 dark:text-cool-200 dark:hover:bg-cool-800">
-                    Back to Home
+                    {{ __('Back to Home') }}
                 </a>
             </div>
         </div>

@@ -3,12 +3,17 @@
         {{ __('Device Management') }}
     </x-slot>
 
+    @php
+        $unbindDeviceConfirmation = __('Are you sure you want to unbind this device?');
+        $resetHwidConfirmation = __('Are you sure you want to reset your HWID? This will allow you to bind a new device.');
+    @endphp
+
     <div class="max-w-4xl mx-auto">
         <div
             class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
         <!-- Header -->
         <div class="mb-6">
-            <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">Device Binding Management</h3>
+            <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">{{ __('Device Binding Management') }}</h3>
             <p class="text-gray-600 dark:text-gray-300 text-sm">
                 Manage the devices bound to your account. You can only bind one device at a time.
             </p>
@@ -17,76 +22,74 @@
         <!-- Current Device Status -->
         @if ($currentDevice)
             <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/50 rounded-lg">
-                <h4 class="font-medium mb-2 text-green-800 dark:text-green-200 text-sm">Currently Bound Device</h4>
+                <h4 class="font-medium mb-2 text-green-800 dark:text-green-200 text-sm">{{ __('Currently Bound Device') }}</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm mb-3">
                     <div>
-                        <div class="text-gray-600 dark:text-gray-300 text-xs">HWID Hash:</div>
+                        <div class="text-gray-600 dark:text-gray-300 text-xs">{{ __('HWID Hash:') }}</div>
                         <div class="font-medium text-green-600 dark:text-green-300 break-all text-xs">
                             {{ $currentDevice->hwid_hash }}
                         </div>
                     </div>
                     <div>
-                        <div class="text-gray-600 dark:text-gray-300 text-xs">IP Address:</div>
+                        <div class="text-gray-600 dark:text-gray-300 text-xs">{{ __('IP Address:') }}</div>
                         <div class="font-medium text-xs text-gray-900 dark:text-white">{{ $currentDevice->ip_address }}</div>
                     </div>
                     <div>
-                        <div class="text-gray-600 dark:text-gray-300 text-xs">Country:</div>
-                        <div class="font-medium text-xs text-gray-900 dark:text-white">{{ $currentDevice->country_code ?? 'Unknown' }}</div>
+                        <div class="text-gray-600 dark:text-gray-300 text-xs">{{ __('Country:') }}</div>
+                        <div class="font-medium text-xs text-gray-900 dark:text-white">{{ $currentDevice->country_code ?? __('Unknown') }}</div>
                     </div>
                     <div>
-                        <div class="text-gray-600 dark:text-gray-300 text-xs">Bound At:</div>
+                        <div class="text-gray-600 dark:text-gray-300 text-xs">{{ __('Bound At:') }}</div>
                         <div class="font-medium text-xs text-gray-900 dark:text-white">{{ $currentDevice->bound_at->format('Y-m-d H:i') }}</div>
                     </div>
                 </div>
 
                 <!-- Unbind Action -->
                 <form action="{{ route('devices.unbind') }}" method="POST"
-                    onsubmit="return confirm('Are you sure you want to unbind this device?')">
+                    onsubmit="return confirm('{{ $unbindDeviceConfirmation }}')">
                     @csrf
                     <button type="submit"
                         class="px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition text-sm">
-                        Unbind This Device
+                        {{ __('Unbind This Device') }}
                     </button>
                 </form>
             </div>
         @else
             <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/50 rounded-lg">
-                <h4 class="font-medium mb-1 text-yellow-800 dark:text-yellow-200 text-sm">No Device Bound</h4>
-                <p class="text-yellow-600 dark:text-yellow-300 text-xs">You haven't bound any device to your account
-                    yet.</p>
+                <h4 class="font-medium mb-1 text-yellow-800 dark:text-yellow-200 text-sm">{{ __('No Device Bound') }}</h4>
+                <p class="text-yellow-600 dark:text-yellow-300 text-xs">{{ __('You have not bound any device to your account yet.') }}</p>
             </div>
         @endif
 
         <!-- Bind New Device Form -->
         @if (!$currentDevice)
             <div class="mb-4">
-                <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200 text-sm">Bind New Device</h4>
+                <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200 text-sm">{{ __('Bind New Device') }}</h4>
                 <form method="POST" action="{{ route('devices.bind') }}">
                     @csrf
 
                     <div class="mb-3">
                         <label for="hwid"
-                            class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">HWID
+                            class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('HWID') }}
                         </label>
                         <input type="text" name="hwid" id="hwid" value="{{ old('hwid') }}"
                             class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm"
-                            placeholder="Enter your device HWID string">
+                            placeholder="{{ __('Enter your device HWID string') }}">
                         @error('hwid')
                             <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Your raw HWID string will be hashed on the server side and stored as an irreversible SHA-256 hash.
+                            {{ __('Your raw HWID string will be hashed on the server side and stored as an irreversible SHA-256 hash.') }}
                         </p>
                     </div>
 
                     <div class="mb-3">
                         <label for="ip_address"
-                            class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">IP
-                            Address</label>
+                            class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('IP Address') }}</label>
                         <input type="text" name="ip_address" id="ip_address"
                             value="{{ old('ip_address', request()->ip()) }}"
                             class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm"
-                            placeholder="Your current IP address">
+                            placeholder="{{ __('Your current IP address') }}">
                         @error('ip_address')
                             <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -94,11 +97,10 @@
 
                     <div class="mb-3">
                         <label for="country_code"
-                            class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Country Code
-                            (Optional)</label>
+                            class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Country Code (Optional)') }}</label>
                         <input type="text" name="country_code" id="country_code" value="{{ old('country_code') }}"
                             class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm"
-                            placeholder="e.g., US, CN, JP" maxlength="2">
+                            placeholder="{{ __('e.g., US, CN, JP') }}" maxlength="2">
                         @error('country_code')
                             <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -106,7 +108,7 @@
 
                     <button type="submit"
                         class="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm">
-                        Bind Device
+                        {{ __('Bind Device') }}
                     </button>
                 </form>
             </div>
@@ -114,26 +116,26 @@
 
         <!-- HWID Reset Information -->
         <div class="mb-4">
-            <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200 text-sm">HWID Reset Information</h4>
+            <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200 text-sm">{{ __('HWID Reset Information') }}</h4>
             <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                 <div class="space-y-2 text-xs">
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">HWID Reset Count:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('HWID Reset Count:') }}</span>
                         <span class="font-medium text-gray-900 dark:text-white">{{ $hwidResetCount }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">Last HWID Reset:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('Last HWID Reset:') }}</span>
                         <span class="font-medium text-gray-900 dark:text-white">
-                            {{ $hwidLastReset ? $hwidLastReset->format('Y-m-d H:i') : 'Never' }}
+                            {{ $hwidLastReset ? $hwidLastReset->format('Y-m-d H:i') : __('Never') }}
                         </span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">Can Reset HWID:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('Can Reset HWID:') }}</span>
                         <span class="font-medium text-gray-900 dark:text-white">
                             @if ($canResetHwid)
-                                <span class="text-green-600 dark:text-green-400">Yes</span>
+                                <span class="text-green-600 dark:text-green-400">{{ __('Yes') }}</span>
                             @else
-                                <span class="text-red-600 dark:text-red-400">No</span>
+                                <span class="text-red-600 dark:text-red-400">{{ __('No') }}</span>
                             @endif
                         </span>
                     </div>
@@ -142,22 +144,22 @@
                 @if ($canResetHwid)
                     <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                            You can reset your HWID to bind a new device. This is useful if you've changed hardware.
+                            {{ __('You can reset your HWID to bind a new device. This is useful if you have changed hardware.') }}
                         </p>
                         <form action="{{ route('devices.reset-hwid') }}" method="POST"
-                            onsubmit="return confirm('Are you sure you want to reset your HWID? This will allow you to bind a new device.')">
+                            onsubmit="return confirm('{{ $resetHwidConfirmation }}')">
                             @csrf
                             <button type="submit"
                                 class="px-3 py-1.5 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition text-xs">
-                                Reset HWID
+                                {{ __('Reset HWID') }}
                             </button>
                         </form>
                     </div>
                 @else
                     <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                         <p class="text-xs text-yellow-600 dark:text-yellow-400">
-                            You can only reset HWID every 72 hours. Please wait until
-                            {{ $hwidLastReset ? $hwidLastReset->addHours(72)->format('Y-m-d H:i') : 'your first reset' }}
+                            {{ __('You can only reset HWID every 72 hours. Please wait until') }}
+                            {{ $hwidLastReset ? $hwidLastReset->addHours(72)->format('Y-m-d H:i') : __('your first reset') }}
                             .
                         </p>
                     </div>
@@ -169,7 +171,7 @@
         <div class="flex justify-end">
             <a href="{{ route('devices.index') }}"
                 class="px-3 py-1.5 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition text-sm">
-                Back to Device History
+                {{ __('Back to Device History') }}
             </a>
         </div>
         </div>

@@ -13,20 +13,18 @@
 
             <!-- License Key (read-only) -->
             <div class="mb-4">
-                <label for="key" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">License
-                    Key</label>
+                <label for="key" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('License Key') }}</label>
                 <input type="text" name="key" id="key" value="{{ old('key', $license->key) }}" readonly
                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
             </div>
 
             <!-- Account -->
             <div class="mb-4">
-                <label for="used_by" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assign to
-                    Account</label>
+                <label for="used_by" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Assign to Account') }}</label>
                 <select name="used_by" id="used_by"
                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
                     {{ $license->status !== LicenseStatus::UNUSED ? 'disabled' : '' }}>
-                    <option value="">Unassigned</option>
+                    <option value="">{{ __('Unassigned') }}</option>
                     @foreach ($accounts as $account)
                         <option value="{{ $account->id }}"
                             {{ old('used_by', $license->used_by) == $account->id ? 'selected' : '' }}>
@@ -36,7 +34,7 @@
                 </select>
                 @if ($license->status !== LicenseStatus::UNUSED)
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Account assignment can only be changed for unused licenses.
+                        {{ __('Account assignment can only be changed for unused licenses.') }}
                     </p>
                 @endif
                 @error('used_by')
@@ -46,8 +44,7 @@
 
             <!-- Privilege -->
             <div class="mb-4">
-                <label for="privilege" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Privilege
-                    Level</label>
+                <label for="privilege" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Privilege Level') }}</label>
                 <select name="privilege" id="privilege"
                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
                     @foreach ($privilegeOptions as $value => $label)
@@ -65,7 +62,7 @@
             <!-- Status -->
             <div class="mb-4">
                 <label for="status"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Status') }}</label>
                 <select name="status" id="status"
                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
                     @foreach ($statusOptions as $value => $label)
@@ -82,9 +79,7 @@
 
             <!-- Expiration Date -->
             <div class="mb-4">
-                <label for="expires_at"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expiration
-                    Date</label>
+                <label for="expires_at" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Expiration Date') }}</label>
                 <input type="date" name="expires_at" id="expires_at"
                     value="{{ old('expires_at', $license->expires_at->format('Y-m-d')) }}"
                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
@@ -96,7 +91,7 @@
             <!-- Notes -->
             <div class="mb-4">
                 <label for="notes"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Notes') }}</label>
                 <textarea name="notes" id="notes" rows="3"
                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">{{ old('notes', $license->notes) }}</textarea>
                 @error('notes')
@@ -108,10 +103,10 @@
             <div class="flex justify-end gap-3 mt-6">
                 <a href="{{ route('licenses.show', $license) }}"
                     class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
-                    Cancel
+                    {{ __('Cancel') }}
                 </a>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-                    Update License
+                    {{ __('Update License') }}
                 </button>
             </div>
             </form>

@@ -12,7 +12,7 @@
                         <x-input-label for="email" :value="__('Email Address')"
                             class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" />
                         <x-input-with-icon id="email" name="email" type="email" :value="old('email', $request->email)" required
-                            autofocus autocomplete="username" placeholder="your@email.com" icon="mail" />
+                            autofocus autocomplete="username" :placeholder="__('your@email.com')" icon="mail" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div> <!-- Password -->
                     <div>

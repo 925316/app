@@ -3,15 +3,19 @@
         {{ __('Session Management') }}
     </x-slot>
 
+    @php
+        $terminateSessionConfirmation = __('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.');
+    @endphp
+
     <div class="py-7">
             @if ($isAdmin && $statistics)
                 <!-- Statistics Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                    <x-stat-card title="Total Sessions" :value="$statistics['total']" icon="server" iconColor="icon-blue" />
-                    <x-stat-card title="Active Sessions" :value="$statistics['active']" icon="success" iconColor="icon-green" />
-                    <x-stat-card title="Expired Sessions" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
-                    <x-stat-card title="Unique Accounts" :value="$statistics['unique_accounts']" icon="users" iconColor="icon-purple" />
-                    <x-stat-card title="Unique Devices" :value="$statistics['unique_devices']" icon="desktop" iconColor="icon-orange" />
+                    <x-stat-card :title="__('Total Sessions')" :value="$statistics['total']" icon="server" iconColor="icon-blue" />
+                    <x-stat-card :title="__('Active Sessions')" :value="$statistics['active']" icon="success" iconColor="icon-green" />
+                    <x-stat-card :title="__('Expired Sessions')" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
+                    <x-stat-card :title="__('Unique Accounts')" :value="$statistics['unique_accounts']" icon="users" iconColor="icon-purple" />
+                    <x-stat-card :title="__('Unique Devices')" :value="$statistics['unique_devices']" icon="desktop" iconColor="icon-orange" />
                 </div>
             @endif
 
@@ -21,9 +25,9 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
                             @if ($isAdmin)
-                                Session Management
+                                {{ __('Session Management') }}
                             @else
-                                My Sessions
+                                {{ __('My Sessions') }}
                             @endif
                         </h3>
                     </div>
@@ -39,11 +43,11 @@
                                         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
                                     </path>
                                 </svg>
-                                Filter Sessions
+                                {{ __('Filter Sessions') }}
                             </h4>
                             <div class="flex items-center space-x-2">
                                 <span class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $sessions->total() }} {{ $isAdmin ? 'total' : 'my' }} sessions
+                                    {{ $sessions->total() }} {{ $isAdmin ? __('total') : __('my') }} {{ __('sessions') }}
                                 </span>
                             </div>
                         </div>
@@ -55,7 +59,7 @@
                                 <!-- Status filter -->
                                 <div class="space-y-2">
                                     <label for="status"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Status') }}</label>
                                     <select name="status" id="status"
                                         class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
                                         @foreach ($statusOptions as $value => $label)
@@ -70,18 +74,17 @@
                                 <!-- Sort with direction -->
                                 <div class="space-y-2 md:col-span-2">
                                     <label for="sort"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort
-                                        By</label>
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Sort By') }}</label>
                                     <div class="flex flex-wrap gap-2">
                                         <select name="sort" id="sort"
                                             class="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
                                             <option value="last_heartbeat_at"
                                                 {{ $currentFilters['sort'] === 'last_heartbeat_at' ? 'selected' : '' }}>
-                                                Last Heartbeat
+                                                {{ __('Last Heartbeat') }}
                                             </option>
                                             <option value="created_at"
                                                 {{ $currentFilters['sort'] === 'created_at' ? 'selected' : '' }}>
-                                                Created
+                                                {{ __('Created') }}
                                             </option>
                                         </select>
                                         <select name="direction"
@@ -104,7 +107,7 @@
                                 <!-- Search -->
                                 <div class="space-y-2 md:col-span-8">
                                     <label for="search"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Search') }}</label>
                                     <div class="relative">
                                         <div
                                             class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -117,13 +120,13 @@
                                         <input type="text" name="search" id="search"
                                             value="{{ $currentFilters['search'] }}"
                                             class="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200"
-                                            placeholder="{{ $isAdmin ? 'Search by account username, device name, or session token...' : 'Search by device name or session token...' }}">
+                                            placeholder="{{ $isAdmin ? __('Search by account username, device name, or session token...') : __('Search by device name or session token...') }}">
                                     </div>
                                 </div>
 
                                 <!-- Action Buttons -->
                                 <div class="space-y-2 md:col-span-4">
-                                    <label class="block text-sm font-medium text-transparent">Actions</label>
+                                    <label class="block text-sm font-medium text-transparent">{{ __('Actions') }}</label>
                                     <div class="flex gap-2">
                                         <button type="submit"
                                             class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-sm flex items-center justify-center gap-2">
@@ -132,7 +135,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                             </svg>
-                                            Filter
+                                            {{ __('Filter') }}
                                         </button>
                                         <a href="{{ route('sessions.index') }}"
                                             class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-sm flex items-center justify-center gap-2">
@@ -142,7 +145,7 @@
                                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                                                 </path>
                                             </svg>
-                                            Reset
+                                            {{ __('Reset') }}
                                         </a>
                                     </div>
                                 </div>
@@ -160,11 +163,11 @@
                                 <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                                     <div class="flex items-center justify-between mb-2">
                                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Active Filters
+                                            {{ __('Active Filters') }}
                                         </span>
                                         <a href="{{ route('sessions.index') }}"
                                             class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                                            Clear All
+                                            {{ __('Clear All') }}
                                         </a>
                                     </div>
                                     <div class="flex flex-wrap gap-2">
@@ -176,7 +179,7 @@
                                             @if ($statusLabel)
                                                 <span
                                                     class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                                    Status: {{ $statusLabel }}
+                                                    {{ __('Status:') }} {{ $statusLabel }}
                                                     <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}"
                                                         class="ml-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor"
@@ -191,7 +194,7 @@
                                         @if (request()->filled('search'))
                                             <span
                                                 class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                                Search: "{{ request('search') }}"
+                                                {{ __('Search:') }} "{{ request('search') }}"
                                                 <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}"
                                                     class="ml-1.5 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-200">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor"
@@ -207,15 +210,15 @@
                                                 $sortValue = request('sort');
                                                 $directionValue = request('direction', 'desc');
                                                 $sortLabel = match ($sortValue) {
-                                                    'last_heartbeat_at' => 'Last Heartbeat',
-                                                    'created_at' => 'Created',
+                                                    'last_heartbeat_at' => __('Last Heartbeat'),
+                                                    'created_at' => __('Created'),
                                                     default => ucfirst($sortValue),
                                                 };
                                                 $directionArrow = $directionValue === 'desc' ? '↓' : '↑';
                                             @endphp
                                             <span
                                                 class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                                Sort: {{ $sortLabel }} {{ $directionArrow }}
+                                                {{ __('Sort:') }} {{ $sortLabel }} {{ $directionArrow }}
                                                 <a href="{{ request()->fullUrlWithQuery(['sort' => null, 'direction' => null]) }}"
                                                     class="ml-1.5 text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-200">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor"
@@ -240,13 +243,13 @@
                                 Account
                             </th>
                             @endif
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Device</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">IP Address</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Client Version</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Last Heartbeat</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Created</th>
-                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Device') }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('IP Address') }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Client Version') }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Status') }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Last Heartbeat') }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Created') }}</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Actions') }}</th>
                         </x-slot:header>
                         @forelse($sessions as $session)
                             <tr>
@@ -269,7 +272,7 @@
                                             </div>
                                         </div>
                                     @else
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">Unknown</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Unknown') }}</span>
                                     @endif
                                 </td>
                                 @endif
@@ -277,32 +280,32 @@
                                     @if ($session->device)
                                         <div>
                                             <div class="text-sm font-medium">
-                                                {{ $session->device->hwid_hash ?? 'Unknown Device' }}
+                                                {{ $session->device->hwid_hash ?? __('Unknown Device') }}
                                             </div>
                                             <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                ID: {{ $session->device->id }}
+                                                {{ __('ID:') }} {{ $session->device->id }}
                                             </div>
                                         </div>
                                     @else
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">Unknown</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Unknown') }}</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ $session->ip_address ?? 'N/A' }}
+                                    {{ $session->ip_address ?? __('N/A') }}
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                        {{ $session->client_version ?? 'Unknown' }}
+                                        {{ $session->client_version ?? __('Unknown') }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap">
                                     @if ($session->isActive())
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                            Active
+                                            {{ __('Active') }}
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                                            Expired
+                                            {{ __('Expired') }}
                                         </span>
                                     @endif
                                 </td>
@@ -312,7 +315,7 @@
                                         <br>
                                         <span class="text-xs text-gray-500 dark:text-gray-400">{{ $session->last_heartbeat_at->format('Y-m-d H:i:s') }}</span>
                                     @else
-                                        <span class="text-gray-500 dark:text-gray-400">Never</span>
+                                        <span class="text-gray-500 dark:text-gray-400">{{ __('Never') }}</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
@@ -321,23 +324,23 @@
                                         <br>
                                         <span class="text-xs text-gray-500 dark:text-gray-400">{{ $session->created_at->format('Y-m-d H:i:s') }}</span>
                                     @else
-                                        <span class="text-gray-500 dark:text-gray-400">Unknown</span>
+                                        <span class="text-gray-500 dark:text-gray-400">{{ __('Unknown') }}</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                                     <a href="{{ route('sessions.show', $session) }}"
                                         class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        View
+                                        {{ __('View') }}
                                     </a>
-                                    <span class="mx-1 text-gray-400">|</span>
+                                    <span class="mx-1 text-gray-400">{{ '|' }}</span>
                                     <form action="{{ route('sessions.destroy', $session) }}" method="POST"
                                         class="inline"
-                                        onsubmit="return confirm('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.')">
+                                        onsubmit="return confirm('{{ $terminateSessionConfirmation }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
                                             class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                            Terminate
+                                            {{ __('Terminate') }}
                                         </button>
                                     </form>
                                 </td>
@@ -345,7 +348,7 @@
                         @empty
                             <tr>
                                 <td colspan="{{ $isAdmin ? 8 : 7 }}" class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                    No sessions found.
+                                    {{ __('No sessions found.') }}
                                 </td>
                             </tr>
                         @endforelse
