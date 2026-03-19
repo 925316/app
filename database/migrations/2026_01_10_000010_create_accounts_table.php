@@ -2,14 +2,13 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up()
     {
-        $driver = DB::getDriverName();
+        $driver = Schema::getConnection()->getDriverName();
 
         Schema::create('accounts', function (Blueprint $table) use ($driver) {
             if (in_array($driver, ['mysql', 'mariadb'], true)) {
