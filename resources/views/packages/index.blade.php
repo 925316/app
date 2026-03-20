@@ -20,7 +20,7 @@
             </div>
 
             <!-- Latest Stable Release - For All Users -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="card-shell overflow-hidden mb-6">
                 <div class="p-6">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">{{ __('Latest Stable Release') }}</h3>
 
@@ -111,7 +111,7 @@
             </div>
 
             @if (Auth::user()->hasPrivilege(7))
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card-shell overflow-hidden">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <!-- Header with actions -->
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">

@@ -15,7 +15,7 @@
                 </div>
             @endif
 
-            <div class="card overflow-hidden">
+            <div class="card-shell overflow-hidden">
                 <div class="p-6 text-gray-900 dark:text-gray-100 space-y-6">
                     <!-- Header with actions -->
                     <div class="app-toolbar">
@@ -43,7 +43,7 @@
 
                     <!-- License Activation Form for Regular Users -->
                     @if (!$isAdmin ?? false)
-                        <div class="card-info border border-blue-200/50 dark:border-blue-700/50 bg-blue-50/70 dark:bg-blue-900/25">
+                        <div class="card-shell-muted border border-sky-200/50 dark:border-sky-700/40 bg-sky-50/70 dark:bg-sky-900/20">
                             <div class="flex items-start space-x-4">
                                 <div class="p-3 bg-blue-500/20 rounded-full">
                                     <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none"
@@ -54,15 +54,14 @@
                                     </svg>
                                 </div>
                                 <div class="flex-1">
-                                    <h4 class="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">Activate
-                                        License</h4>
+                                    <p class="section-kicker mb-1">{{ __('License Redeem') }}</p>
+                                    <h4 class="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">{{ __('Activate License') }}</h4>
                                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                                         Enter your license key below to activate premium features. License keys follow
                                         the format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
                                     </p>
 
-                                    <form method="POST" action="{{ route('licenses.activate-by-key') }}"
-                                        class="space-y-4">
+                                    <form method="POST" action="{{ route('licenses.activate-by-key') }}" class="space-y-4">
                                         @csrf
 
                                         <div>
@@ -80,6 +79,11 @@
                                                 <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}
                                                 </p>
                                             @enderror
+                                        </div>
+
+                                        <div class="rounded-lg border border-cool-200/70 bg-white/70 px-4 py-3 text-sm text-gray-600 dark:border-cool-700/60 dark:bg-cool-800/60 dark:text-gray-300">
+                                            <p class="font-medium text-gray-800 dark:text-gray-200">{{ __('Terms Reminder') }}</p>
+                                            <p class="mt-1">{{ __('By activating a key, you agree that license usage is device-bound and subject to account suspension rules on abuse.') }}</p>
                                         </div>
 
                                         <div class="flex justify-end">

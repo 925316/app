@@ -23,7 +23,7 @@
                     {{ __('License Status') }}
                 </h4>
                 @if ($activeLicense)
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <div class="flex items-center space-x-3 mb-4">
                                 <span
@@ -59,7 +59,7 @@
                         </div>
                     </div>
                 @else
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <div class="flex items-start space-x-4">
                                 <div class="p-3 bg-yellow-500/20 rounded-full flex-shrink-0">
@@ -103,7 +103,7 @@
                         {{ __('Device Status') }}
                     </h4>
                     @if ($boundDevices > 0)
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="card-shell overflow-hidden">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-4">
                                     <div>
@@ -140,7 +140,7 @@
                             </div>
                         </div>
                     @else
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="card-shell overflow-hidden">
                             <div class="p-6">
                                 <div class="flex items-start space-x-4">
                                     <div class="p-3 bg-gray-500/20 rounded-full flex-shrink-0">
@@ -185,7 +185,7 @@
                         {{ __('Usage Statistics') }}
                     </h4>
                     <div class="space-y-4">
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="card-shell overflow-hidden">
                             <div class="p-6">
                                 <div class="flex items-center justify-between">
                                     <div>

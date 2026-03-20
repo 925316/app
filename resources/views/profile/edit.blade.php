@@ -9,7 +9,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
 
     <div class="max-w-4xl mx-auto space-y-6">
         <!-- Profile Header Card -->
-        <div class="bg-white dark:bg-cool-800 rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+        <div class="card-shell">
             <div class="flex items-center gap-6">
                 <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
                     <span class="text-2xl font-bold text-white">{{ $initials }}</span>
@@ -43,7 +43,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
 
         @if($isAdmin)
         <!-- Profile Information (Admin Only) -->
-        <div class="bg-white dark:bg-cool-800 rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+        <div class="card-shell">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ __('Profile Information') }}</h3>
             <form method="post" action="{{ route('profile.update') }}" class="space-y-6">
                 @csrf
@@ -66,13 +66,6 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
                         @if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail())
                             <p class="text-sm mt-2 text-gray-800 dark:text-gray-200">
                                 {{ __('Your email address is unverified.') }}
-                            <form id="send-verification" method="post" action="{{ route('verification.send') }}" class="inline">
-                                @csrf
-                                <button form="send-verification"
-                                    class="underline text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                                    {{ __('Resend verification email') }}
-                                </button>
-                            </form>
                             </p>
                         @endif
                     </div>
@@ -96,11 +89,21 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
                     @endif
                 </div>
             </form>
+
+            @if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail())
+                <form id="send-verification" method="post" action="{{ route('verification.send') }}" class="mt-3 inline">
+                    @csrf
+                    <button type="submit"
+                        class="underline text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                        {{ __('Resend verification email') }}
+                    </button>
+                </form>
+            @endif
         </div>
         @endif
 
         <!-- Language Preferences -->
-        <div class="bg-white dark:bg-cool-800 rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+        <div class="card-shell">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ __('Language Preferences') }}</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
                 {{ __('Choose your preferred language. If you have not selected one, we will use your browser language.') }}
@@ -149,7 +152,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
         </div>
 
         <!-- Update Password -->
-        <div class="bg-white dark:bg-cool-800 rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+        <div class="card-shell">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ __('Update Password') }}</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ __('Ensure your account is using a long, random password to stay secure.') }}</p>
             
@@ -194,7 +197,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
         </div>
 
         <!-- Delete Account -->
-        <div class="bg-white dark:bg-cool-800 rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+        <div class="card-shell">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ __('Delete Account') }}</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
                 {{ __('Once your account is deleted, all of its resources and data will be permanently deleted.') }}

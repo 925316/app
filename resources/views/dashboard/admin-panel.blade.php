@@ -22,7 +22,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <!-- Recent Activity -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card-shell overflow-hidden">
                     <div class="p-6">
                         <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                             <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-300" fill="none"
@@ -53,7 +53,7 @@
                 </div>
 
                 <!-- System Health -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card-shell overflow-hidden">
                     <div class="p-6">
                         <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                             <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-300" fill="none"
@@ -121,7 +121,7 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Database Info -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-300" fill="none"
@@ -164,7 +164,7 @@
                     </div>
 
                     <!-- Connection Pool -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-300" fill="none"
@@ -197,8 +197,8 @@
                                 </div>
                                 <div class="mt-4">
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                        <div class="bg-yellow-500 h-2 rounded-full transition-all duration-300"
-                                            style="width: {{ min($databaseStatus['connections']['usage_percent'] ?? 0, 100) }}%">
+                                        <div class="bg-yellow-500 h-2 rounded-full transition-all duration-300 w-[calc(var(--usage-percent)*1%)]"
+                                            style="--usage-percent: {{ min($databaseStatus['connections']['usage_percent'] ?? 0, 100) }};">
                                         </div>
                                     </div>
                                 </div>
@@ -207,7 +207,7 @@
                     </div>
 
                     <!-- Queue Jobs -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-orange-600 dark:text-orange-300" fill="none"
@@ -233,7 +233,7 @@
                     </div>
 
                     <!-- Uptime & Cache -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-green-600 dark:text-green-300" fill="none"

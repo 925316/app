@@ -8,6 +8,24 @@
     box-shadow: var(--shadow-sm);
 }
 
+.card-shell {
+    @apply rounded-2xl border p-6;
+    border-color: rgb(var(--color-border-subtle) / 0.85);
+    background: linear-gradient(145deg, rgb(var(--color-surface-card) / 0.95), rgb(var(--color-surface-card-muted) / 0.82));
+    box-shadow: var(--shadow-md);
+}
+
+.card-shell-muted {
+    @apply rounded-xl border p-4;
+    border-color: rgb(var(--color-border-subtle) / 0.75);
+    background-color: rgb(var(--color-surface-card-muted) / 0.7);
+}
+
+.section-kicker {
+    @apply text-xs font-semibold uppercase tracking-wide;
+    color: rgb(var(--color-text-muted));
+}
+
 .card-glass {
     @apply backdrop-blur-sm rounded-2xl border;
     border-color: rgb(var(--color-border-subtle) / 0.65);
