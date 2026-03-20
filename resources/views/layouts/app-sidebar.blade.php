@@ -13,47 +13,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
     <!-- Early theme detection to prevent FOUC -->
-    <script>
-        (function() {
-            const savedThemeVariant = localStorage.getItem('theme-variant') ?? 'default';
-            document.documentElement.dataset.theme = savedThemeVariant;
-
-            // Check for saved theme preference or default to system preference
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-
-            // Determine initial theme
-            let isDark = false;
-            if (savedTheme === 'dark') {
-                isDark = true;
-            } else if (savedTheme === 'light') {
-                isDark = false;
-            } else {
-                // No saved preference, use system preference
-                isDark = prefersDarkScheme.matches;
-            }
-
-            // Apply theme immediately
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-
-            // Listen for system theme changes when no explicit preference is set
-            if (savedTheme === null) {
-                prefersDarkScheme.addEventListener('change', (e) => {
-                    if (localStorage.getItem('theme') === null) {
-                        if (e.matches) {
-                            document.documentElement.classList.add('dark');
-                        } else {
-                            document.documentElement.classList.remove('dark');
-                        }
-                    }
-                });
-            }
-        })();
-    </script>
+    @include('components.theme-init-script')
 
     <!-- x-cloak styles to hide elements until Alpine.js initializes -->
     <style>
@@ -165,9 +125,7 @@
                     </div>
 
                     <!-- Additional Header Actions (if any) -->
-                    <div class="app-toolbar-actions">
-                        <x-theme-preset-toggle />
-                    </div>
+                    <div class="app-toolbar-actions"></div>
                 </div>
             </header>
 

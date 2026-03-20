@@ -12,30 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
     <!-- Early theme detection to prevent FOUC -->
-    <script>
-        (function() {
-            // Check for saved theme preference
-            const savedTheme = localStorage.getItem('theme');
-            
-            // Determine initial theme - default to dark for guests
-            let isDark = false;
-            if (savedTheme === 'dark') {
-                isDark = true;
-            } else if (savedTheme === 'light') {
-                isDark = false;
-            } else {
-                // No saved preference - default to dark for guests (unauthenticated users)
-                isDark = true;
-            }
-
-            // Apply theme immediately
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        })();
-    </script>
+    @include('components.theme-init-script')
 
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
