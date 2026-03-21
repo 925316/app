@@ -4,25 +4,33 @@
         {{ __('Edit License') }}
     </x-slot>
 
-    <div class="max-w-4xl mx-auto">
-        <div
-            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
-            <form method="POST" action="{{ route('licenses.update', $license) }}">
-            @csrf
-            @method('PUT')
+    <div class="mx-auto max-w-4xl space-y-6">
+        <div class="card-shell">
+            <div class="app-toolbar mb-6">
+                <div>
+                    <p class="section-kicker">{{ __('License Maintenance') }}</p>
+                    <h2 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ __('Edit License') }}</h2>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                        {{ __('Adjust assignment, privilege and expiration while respecting state transition rules.') }}
+                    </p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ route('licenses.update', $license) }}" class="space-y-4">
+                @csrf
+                @method('PUT')
 
             <!-- License Key (read-only) -->
             <div class="mb-4">
                 <label for="key" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('License Key') }}</label>
                 <input type="text" name="key" id="key" value="{{ old('key', $license->key) }}" readonly
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
+                    class="form-input bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
             </div>
 
             <!-- Account -->
             <div class="mb-4">
                 <label for="used_by" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Assign to Account') }}</label>
-                <select name="used_by" id="used_by"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                <select name="used_by" id="used_by" class="form-select"
                     {{ $license->status !== LicenseStatus::UNUSED ? 'disabled' : '' }}>
                     <option value="">{{ __('Unassigned') }}</option>
                     @foreach ($accounts as $account)
@@ -45,8 +53,7 @@
             <!-- Privilege -->
             <div class="mb-4">
                 <label for="privilege" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Privilege Level') }}</label>
-                <select name="privilege" id="privilege"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                <select name="privilege" id="privilege" class="form-select">
                     @foreach ($privilegeOptions as $value => $label)
                         <option value="{{ $value }}"
                             {{ old('privilege', $license->privilege->value) == $value ? 'selected' : '' }}>
@@ -63,8 +70,7 @@
             <div class="mb-4">
                 <label for="status"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Status') }}</label>
-                <select name="status" id="status"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                <select name="status" id="status" class="form-select">
                     @foreach ($statusOptions as $value => $label)
                         <option value="{{ $value }}"
                             {{ old('status', $license->status->value) == $value ? 'selected' : '' }}>
@@ -80,9 +86,7 @@
             <!-- Expiration Date -->
             <div class="mb-4">
                 <label for="expires_at" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Expiration Date') }}</label>
-                <input type="date" name="expires_at" id="expires_at"
-                    value="{{ old('expires_at', $license->expires_at->format('Y-m-d')) }}"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                <input type="date" name="expires_at" id="expires_at" value="{{ old('expires_at', $license->expires_at->format('Y-m-d')) }}" class="form-input">
                 @error('expires_at')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -92,23 +96,21 @@
             <div class="mb-4">
                 <label for="notes"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Notes') }}</label>
-                <textarea name="notes" id="notes" rows="3"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">{{ old('notes', $license->notes) }}</textarea>
+                <textarea name="notes" id="notes" rows="3" class="form-textarea">{{ old('notes', $license->notes) }}</textarea>
                 @error('notes')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
             </div>
 
-            <!-- Form Actions -->
-            <div class="flex justify-end gap-3 mt-6">
-                <a href="{{ route('licenses.show', $license) }}"
-                    class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
-                    {{ __('Cancel') }}
-                </a>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-                    {{ __('Update License') }}
-                </button>
-            </div>
+                <!-- Form Actions -->
+                <div class="flex justify-end gap-3 border-t border-cool-200/70 pt-6 dark:border-cool-700/70">
+                    <a href="{{ route('licenses.show', $license) }}" class="btn btn-secondary">
+                        {{ __('Cancel') }}
+                    </a>
+                    <button type="submit" class="btn btn-blue">
+                        {{ __('Update License') }}
+                    </button>
+                </div>
             </form>
         </div>
     </div>

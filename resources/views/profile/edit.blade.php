@@ -115,8 +115,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
 
                 <div class="space-y-2">
                     <x-input-label for="locale" :value="__('Language')" />
-                    <select id="locale" name="locale"
-                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                    <select id="locale" name="locale" class="form-select">
                         @if (count($supportedLocales) === 0)
                             <option value="{{ $currentLocale }}" selected>
                                 {{ strtoupper($currentLocale) }}

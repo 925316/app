@@ -7,12 +7,11 @@
         $terminateSessionConfirmation = __('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.');
     @endphp
 
-    <div class="py-7">
+    <div class="mx-auto max-w-7xl py-7">
             <!-- Breadcrumb and Actions -->
             <div class="mb-6 flex justify-between items-center gap-3 lg:max-xl:flex-wrap">
                 <div class="flex items-center space-x-2">
-                    <a href="{{ route('sessions.index') }}"
-                        class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm">
+                    <a href="{{ route('sessions.index') }}" class="text-cool-700 dark:text-cool-300 hover:underline text-sm">
                         {{ __('Back to Sessions') }}
                     </a>
                 </div>
@@ -20,18 +19,18 @@
                     onsubmit="return confirm('{{ $terminateSessionConfirmation }}')">
                     @csrf
                     @method('DELETE')
-                    <button type="submit"
-                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition text-sm font-medium">
+                    <button type="submit" class="btn btn-danger text-sm">
                         {{ __('Terminate Session') }}
                     </button>
                 </form>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="card-shell overflow-hidden">
+                <div class="p-6 text-gray-900 dark:text-gray-100 space-y-6">
                     <!-- Session Header -->
-                    <div class="flex justify-between items-start mb-6">
+                    <div class="flex justify-between items-start">
                         <div>
+                            <p class="section-kicker">{{ __('Heartbeat Session') }}</p>
                             <h3 class="text-2xl font-bold mb-2">{{ __('Session') }} #{{ $session->id }}</h3>
                             <div class="flex items-center space-x-2">
                                 @if ($session->isActive())
@@ -56,9 +55,9 @@
                     </div>
 
                     <!-- Session Details Grid -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Basic Information -->
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                        <div class="card-shell-muted">
                             <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Basic Information') }}</h4>
                             <dl class="space-y-3">
                                 <div>
@@ -82,7 +81,7 @@
                         </div>
 
                         <!-- Timing Information -->
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                        <div class="card-shell-muted">
                             <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Timing Information') }}</h4>
                             <dl class="space-y-3">
                                 <div>
@@ -147,13 +146,13 @@
 
                     <!-- Related Accounts -->
                     @if ($session->account)
-                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 mb-6">
+                        <div class="card-shell-muted p-6">
                             <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Related Account') }}</h4>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-12 w-12">
                                         <div
-                                            class="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                                            class="h-12 w-12 rounded-full bg-cool-600 dark:bg-cool-500 flex items-center justify-center text-white font-bold text-lg">
                                             {{ $session->account->initials() }}
                                         </div>
                                     </div>
@@ -166,14 +165,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ route('accounts.show', $session->account) }}"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+                                <a href="{{ route('accounts.show', $session->account) }}" class="btn btn-blue text-sm">
                                     {{ __('View Account') }}
                                 </a>
                             </div>
                         </div>
                     @else
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
+                        <div class="card-shell-muted p-6">
                             <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Related Account') }}</h4>
                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No account associated with this session. This may indicate a deleted account.') }}</p>
                         </div>
@@ -181,7 +179,7 @@
 
                     <!-- Related Device -->
                     @if ($session->device)
-                        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6 mb-6">
+                        <div class="card-shell-muted p-6">
                             <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Related Device') }}</h4>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
@@ -213,7 +211,7 @@
                             </div>
                         </div>
                     @else
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
+                        <div class="card-shell-muted p-6">
                             <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Related Device') }}</h4>
                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No device associated with this session. This may indicate a deleted device or an unbound session.') }}</p>
                         </div>

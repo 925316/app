@@ -4,26 +4,26 @@
     </x-slot>
 
     <div class="py-7">
+        <div class="card-shell space-y-6">
             <!-- Header with actions -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 lg:max-xl:flex-wrap">
+            <div class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center lg:max-xl:flex-wrap">
                 <div>
+                    <p class="section-kicker">{{ __('Release Operations') }}</p>
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('Package Management') }}</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Manage software packages and releases') }}</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('packages.index') }}"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                    <a href="{{ route('packages.index') }}" class="btn btn-blue">
                         {{ __('View Packages') }}
                     </a>
                     @if ($isAdmin ?? false)
-                        <a href="{{ route('packages.upload') }}"
-                            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                        <a href="{{ route('packages.upload') }}" class="btn btn-green">
                             {{ __('Add New Package') }}
                         </a>
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open"
-                                class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition flex items-center gap-2">
+                                class="btn btn-yellow flex items-center gap-2">
                                 <span>{{ __('Bulk Actions') }}</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -31,7 +31,7 @@
                                 </svg>
                             </button>
                             <div x-show="open" @click.away="open = false"
-                                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+                                class="absolute right-0 mt-2 w-48 card-shell z-50"
                                 x-cloak>
                                 <div class="py-1">
                                     <button onclick="bulkAction('delete')"
@@ -50,7 +50,7 @@
             </div>
 
             <!-- Statistics -->
-            <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <div class="card-shell-muted">
                 <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Package Statistics') }}</h4>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
@@ -75,13 +75,12 @@
             </div>
 
             <!-- Channel Filter -->
-            <div class="mb-6">
+            <div>
                 <form method="GET" action="{{ route('packages.manage') }}" class="flex items-end gap-4 lg:max-xl:flex-wrap">
                     <div>
                         <label for="channel"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Release Channel') }}</label>
-                        <select name="channel" id="channel" onchange="this.form.submit()"
-                            class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        <select name="channel" id="channel" onchange="this.form.submit()" class="form-select">
                             <option value="">{{ __('All Channels') }}</option>
                             <option value="stable" {{ request('channel') === 'stable' ? 'selected' : '' }}>{{ __('Stable') }}
                             </option>
@@ -90,8 +89,7 @@
                         </select>
                     </div>
                     @if (request('channel'))
-                        <a href="{{ route('packages.manage') }}"
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition mt-auto">
+                        <a href="{{ route('packages.manage') }}" class="btn btn-secondary mt-auto">
                             {{ __('Reset Filter') }}
                         </a>
                     @endif
@@ -111,7 +109,7 @@
                     <tr>
                         @if ($isAdmin ?? false)
                             <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                <input type="checkbox" class="release-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ $release->id }}">
+                                <input type="checkbox" class="release-checkbox form-checkbox" value="{{ $release->id }}">
                             </td>
                         @endif
                         <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -125,7 +123,7 @@
                             </span>
                             @if ($release->version === ($stats['latest_stable']?->version ?? null))
                                 <span
-                                    class="ml-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
+                                    class="ml-1 px-2 py-0.5 rounded text-xs font-medium border border-cool-200 dark:border-cool-700 text-cool-700 dark:text-cool-300 bg-cool-50/70 dark:bg-cool-800/70">
                                     {{ __('Latest') }}
                                 </span>
                             @endif
@@ -148,8 +146,7 @@
                         </td>
                         @if ($isAdmin ?? false)
                             <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('packages.show', $release) }}"
-                                    class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                <a href="{{ route('packages.show', $release) }}" class="text-cool-700 dark:text-cool-300 hover:underline">
                                     {{ __('Details') }}
                                 </a>
                                     <span class="mx-1 text-gray-400">{{ '|' }}</span>
@@ -176,7 +173,7 @@
             </x-table>
 
             <!-- Pagination -->
-            <div class="mt-4">
+            <div>
                 <x-pagination :paginator="$releases" />
             </div>
 
@@ -192,7 +189,7 @@
                         if (headerRow && !document.getElementById('select-all')) {
                             const firstHeader = headerRow.querySelector('th');
                             if (firstHeader) {
-                                firstHeader.innerHTML = '<input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">';
+                                firstHeader.innerHTML = '<input type="checkbox" id="select-all" class="form-checkbox">';
                             }
                         }
 
@@ -293,6 +290,7 @@
                     }
                 </script>
             @endif
+        </div>
     </div>
 
 </x-app-sidebar-layout>

@@ -3,18 +3,26 @@
         {{ __('Add Package') }}
     </x-slot>
 
-    <div class="max-w-4xl mx-auto">
-        <div
-            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
-            <form method="POST" action="{{ route('packages.store') }}">
-            @csrf
+    <div class="mx-auto max-w-4xl space-y-6">
+        <div class="card-shell">
+            <div class="app-toolbar mb-6">
+                <div>
+                    <p class="section-kicker">{{ __('Release Publishing') }}</p>
+                    <h2 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ __('Add Package') }}</h2>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                        {{ __('Create a new release entry with version metadata, distribution link and security references.') }}
+                    </p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ route('packages.store') }}" class="space-y-4">
+                @csrf
 
             <!-- Version -->
             <div class="mb-4">
                 <label for="version"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Version') }}</label>
-                <input type="text" name="version" id="version" value="{{ old('version') }}"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                <input type="text" name="version" id="version" value="{{ old('version') }}" class="form-input"
                     placeholder="{{ __('e.g., 1.0.0 (semantic versioning)') }}">
                 @error('version')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -28,8 +36,7 @@
             <div class="mb-4">
                 <label for="release_channel"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Release Channel') }}</label>
-                <select name="release_channel" id="release_channel"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                <select name="release_channel" id="release_channel" class="form-select">
                     <option value="stable" {{ old('release_channel') === 'stable' ? 'selected' : '' }}>{{ __('Stable') }}</option>
                     <option value="dev" {{ old('release_channel') === 'dev' ? 'selected' : '' }}>{{ __('Development') }}</option>
                 </select>
@@ -42,8 +49,7 @@
             <div class="mb-4">
                 <label for="download_url"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Download URL') }}</label>
-                <input type="url" name="download_url" id="download_url" value="{{ old('download_url') }}"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                <input type="url" name="download_url" id="download_url" value="{{ old('download_url') }}" class="form-input"
                     placeholder="{{ __('https://example.com/downloads/package.zip') }}">
                 @error('download_url')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -57,8 +63,7 @@
             <div class="mb-4">
                 <label for="virus_detection_url"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Virus Detection Link (Optional)') }}</label>
-                <textarea name="virus_detection_url" id="virus_detection_url" rows="3"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                <textarea name="virus_detection_url" id="virus_detection_url" rows="3" class="form-textarea"
                     placeholder="{{ __('https://www.virustotal.com/gui/file/abc123') }}&#10;{{ __('https://www.hybrid-analysis.com/sample/def456') }}&#10;{{ __('https://www.joesandbox.com/analysis/789') }}">{{ old('virus_detection_url') }}</textarea>
                 @error('virus_detection_url')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -72,25 +77,22 @@
             <div class="mb-4">
                 <label for="changelog"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Changelog') }}</label>
-                <textarea name="changelog" id="changelog" rows="6"
-                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                <textarea name="changelog" id="changelog" rows="6" class="form-textarea"
                     placeholder="{{ __('Describe the changes in this version...') }}">{{ old('changelog') }}</textarea>
                 @error('changelog')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
             </div>
 
-            <!-- Form Actions -->
-            <div class="flex justify-end gap-3 mt-6">
-                <a href="{{ route('packages.index') }}"
-                    class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
-                    {{ __('Cancel') }}
-                </a>
-                <button type="submit"
-                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                    {{ __('Add Package') }}
-                </button>
-            </div>
+                <!-- Form Actions -->
+                <div class="flex justify-end gap-3 border-t border-cool-200/70 pt-6 dark:border-cool-700/70">
+                    <a href="{{ route('packages.index') }}" class="btn btn-secondary">
+                        {{ __('Cancel') }}
+                    </a>
+                    <button type="submit" class="btn btn-green">
+                        {{ __('Add Package') }}
+                    </button>
+                </div>
             </form>
         </div>
     </div>

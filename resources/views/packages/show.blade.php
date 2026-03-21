@@ -11,12 +11,12 @@
 
     <div class="py-7">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="card-shell overflow-hidden">
+                <div class="p-6 text-gray-900 dark:text-gray-100 space-y-6">
                     <!-- Package Header -->
-                    <div class="mb-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
+                                <p class="section-kicker">{{ __('Release Snapshot') }}</p>
                                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('Package:') }} {{ $release->version }}</h3>
                                 <div class="mt-2 flex items-center gap-4">
                                     <span
@@ -29,22 +29,19 @@
 
                             <div class="flex gap-2">
                                 @if ($isAdmin ?? false)
-                                    <a href="{{ route('packages.manage') }}"
-                                        class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                                    <a href="{{ route('packages.manage') }}" class="btn btn-purple">
                                         {{ __('Manage Packages') }}
                                     </a>
                                 @endif
-                                <a href="{{ route('packages.index') }}"
-                                    class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                                <a href="{{ route('packages.index') }}" class="btn btn-secondary">
                                     {{ __('Back to List') }}
                                 </a>
                             </div>
                         </div>
-                    </div>
 
                     <!-- Package Details -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="card-shell-muted">
                             <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Basic Information') }}</h4>
                             <div class="space-y-2 text-sm">
                                 <div class="flex justify-between">
@@ -63,7 +60,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="card-shell-muted">
                             <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('File Information') }}</h4>
                             <div class="space-y-2 text-sm">
                                 <div class="flex justify-between">
@@ -94,9 +91,9 @@
 
                     <!-- Changelog -->
                     @if ($release->changelog)
-                        <div class="mb-6">
+                        <div>
                             <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200">{{ __('Changelog') }}</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="card-shell-muted">
                                 <div class="prose dark:prose-invert max-w-none text-sm">
                                     {!! nl2br(e($release->changelog)) !!}
                                 </div>
@@ -106,9 +103,9 @@
 
                     <!-- Virus Detection Links -->
                     @if ($release->virus_detection_url)
-                        <div class="mb-6">
+                        <div>
                             <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Virus Detection') }}</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="card-shell-muted">
                                 <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">{{ __('Verify package safety using these links:') }}</p>
                                 <div class="space-y-2">
                                     @foreach (explode("\n", $release->virus_detection_url) as $url)
@@ -122,7 +119,7 @@
                                                     </path>
                                                 </svg>
                                                 <a href="{{ trim($url) }}" target="_blank" rel="noopener noreferrer"
-                                                    class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline break-all">
+                                                    class="text-sm text-cool-700 dark:text-cool-300 hover:underline break-all">
                                                     {{ trim($url) }}
                                                 </a>
                                             </div>
@@ -134,23 +131,21 @@
                     @endif
 
                     <!-- Download Section -->
-                    <div class="mb-6">
+                    <div>
                         <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Download') }}</h4>
                         <div class="flex flex-col sm:flex-row gap-3">
                             @if ($canDownload ?? false && $release->id)
-                                <a href="{{ route('packages.download', ['release' => $release->id]) }}"
-                                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition text-center">
+                                <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="btn btn-green text-center">
                                     {{ __('Download Package') }}
                                 </a>
                             @else
-                                <button disabled class="px-4 py-2 bg-gray-400 text-white rounded-md cursor-not-allowed">
+                                <button disabled class="btn btn-secondary cursor-not-allowed opacity-60">
                                     {{ __('Download Requires Valid License') }}
                                 </button>
                             @endif
 
                             @if ($isAdmin ?? false)
-                                <button onclick="showChangelogModal()"
-                                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                                <button onclick="showChangelogModal()" class="btn btn-indigo">
                                     {{ __('Edit Changelog') }}
                                 </button>
                             @endif
@@ -159,15 +154,14 @@
 
                     <!-- Admin Actions -->
                     @if ($isAdmin ?? false)
-                        <div class="mb-6">
+                        <div>
                             <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Admin Actions') }}</h4>
                             <div class="flex flex-wrap gap-2">
                                 <form action="{{ route('packages.destroy', $release) }}" method="POST"
                                     onsubmit="return confirm('{{ $deletePackageReleaseConfirmation }}')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit"
-                                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                                    <button type="submit" class="btn btn-danger">
                                         {{ __('Delete Release') }}
                                     </button>
                                 </form>
@@ -182,23 +176,20 @@
     <!-- Changelog Modal -->
     @if ($isAdmin ?? false)
         <div id="changelogModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-2xl w-full mx-4">
+            <div class="card-shell p-6 max-w-2xl w-full mx-4">
                 <h3 class="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">{{ __('Edit Changelog') }}</h3>
                 <form action="{{ route('packages.update-changelog', $release) }}" method="POST">
                     @csrf
                     <div class="mb-4">
                         <label for="changelog"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Changelog') }}</label>
-                        <textarea name="changelog" id="changelog" rows="8"
-                            class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">{{ old('changelog', $release->changelog) }}</textarea>
+                        <textarea name="changelog" id="changelog" rows="8" class="form-textarea">{{ old('changelog', $release->changelog) }}</textarea>
                     </div>
                     <div class="flex justify-end gap-2">
-                        <button type="button" onclick="hideChangelogModal()"
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                        <button type="button" onclick="hideChangelogModal()" class="btn btn-secondary">
                             {{ __('Cancel') }}
                         </button>
-                        <button type="submit"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                        <button type="submit" class="btn btn-indigo">
                             {{ __('Update Changelog') }}
                         </button>
                     </div>
