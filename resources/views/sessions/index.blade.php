@@ -19,7 +19,7 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="card-shell overflow-hidden">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -33,8 +33,7 @@
                     </div>
 
                     <!-- Filters -->
-                    <div
-                        class="mb-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                    <div class="mb-6 card-shell-muted">
                         <div class="flex items-center justify-between mb-4 lg:max-xl:flex-wrap gap-2">
                             <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" fill="none"
@@ -60,8 +59,7 @@
                                 <div class="space-y-2">
                                     <label for="status"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Status') }}</label>
-                                    <select name="status" id="status"
-                                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                                    <select name="status" id="status" class="form-select">
                                         @foreach ($statusOptions as $value => $label)
                                             <option value="{{ $value }}"
                                                 {{ $currentFilters['status'] === $value ? 'selected' : '' }}>
@@ -76,8 +74,7 @@
                                     <label for="sort"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Sort By') }}</label>
                                     <div class="flex flex-wrap gap-2">
-                                        <select name="sort" id="sort"
-                                            class="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                                        <select name="sort" id="sort" class="form-select flex-1">
                                             <option value="last_heartbeat_at"
                                                 {{ $currentFilters['sort'] === 'last_heartbeat_at' ? 'selected' : '' }}>
                                                 {{ __('Last Heartbeat') }}
@@ -87,8 +84,7 @@
                                                 {{ __('Created') }}
                                             </option>
                                         </select>
-                                        <select name="direction"
-                                            class="w-24 px-2 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                                        <select name="direction" class="form-select w-24 px-2">
                                             <option value="desc"
                                                 {{ $currentFilters['direction'] === 'desc' ? 'selected' : '' }}>
                                                 ↓
@@ -117,9 +113,8 @@
                                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                             </svg>
                                         </div>
-                                        <input type="text" name="search" id="search"
-                                            value="{{ $currentFilters['search'] }}"
-                                            class="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200"
+                                        <input type="text" name="search" id="search" value="{{ $currentFilters['search'] }}"
+                                            class="form-input pl-10 pr-4 py-2"
                                             placeholder="{{ $isAdmin ? __('Search by account username, device name, or session token...') : __('Search by device name or session token...') }}">
                                     </div>
                                 </div>
@@ -128,8 +123,7 @@
                                 <div class="space-y-2 md:col-span-4">
                                     <label class="block text-sm font-medium text-transparent">{{ __('Actions') }}</label>
                                     <div class="flex gap-2">
-                                        <button type="submit"
-                                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-sm flex items-center justify-center gap-2">
+                                        <button type="submit" class="btn btn-blue flex-1 py-2">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -137,8 +131,7 @@
                                             </svg>
                                             {{ __('Filter') }}
                                         </button>
-                                        <a href="{{ route('sessions.index') }}"
-                                            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-sm flex items-center justify-center gap-2">
+                                        <a href="{{ route('sessions.index') }}" class="btn btn-secondary py-2">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -37,15 +37,15 @@
 :root.dark {
     --color-surface-page: 3 9 18;
     --color-surface-page-alt: 7 16 30;
-    --color-surface-card: 11 22 40;
-    --color-surface-card-muted: 17 34 58;
+    --color-surface-card: 9 18 34;
+    --color-surface-card-muted: 14 28 48;
     --color-surface-elevated: 8 19 36;
 
     --color-text-primary: 241 245 249;
     --color-text-secondary: 203 213 225;
     --color-text-muted: 148 163 184;
-    --color-border-subtle: 30 41 59;
-    --color-border-strong: 51 65 85;
+    --color-border-subtle: 38 58 82;
+    --color-border-strong: 63 88 116;
 
     --color-brand: 125 211 252;
     --color-brand-hover: 56 189 248;

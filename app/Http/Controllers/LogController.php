@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use App\Models\EventLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -80,11 +81,18 @@ class LogController extends Controller
             2 => 'Error',
         ];
 
+        $accounts = Account::query()
+            ->select(['id', 'username'])
+            ->orderBy('username')
+            ->limit(500)
+            ->get();
+
         return view('logs.index', [
             'logs' => $logs,
             'statistics' => $statistics,
             'eventTypes' => $eventTypes,
             'eventLevels' => $eventLevels,
+            'accounts' => $accounts,
             'filters' => $request->all(),
         ]);
     }

@@ -74,14 +74,32 @@
     @apply active:scale-[0.98];
 }
 
+.dark .btn-blue {
+    color: rgb(226 232 240);
+    border: 1px solid rgb(var(--color-border-strong));
+    background: linear-gradient(145deg, rgb(var(--color-surface-card-muted)), rgb(var(--color-surface-card)));
+}
+
 .btn-blue:hover {
     background-color: rgb(var(--color-brand-hover));
+}
+
+.dark .btn-blue:hover {
+    color: rgb(241 245 249);
+    border-color: rgb(var(--color-brand) / 0.55);
+    background: linear-gradient(145deg, rgb(var(--color-surface-card-muted)), rgb(var(--color-surface-elevated)));
 }
 
 .btn-green {
     color: rgb(255 255 255);
     background-color: rgb(var(--color-success));
     @apply active:scale-[0.98];
+}
+
+.dark .btn-green {
+    color: rgb(220 252 231);
+    border: 1px solid rgb(74 222 128 / 0.45);
+    background: linear-gradient(145deg, rgb(8 59 47), rgb(5 46 38));
 }
 
 .btn-green:hover {
@@ -94,6 +112,12 @@
     @apply active:scale-[0.98];
 }
 
+.dark .btn-yellow {
+    color: rgb(254 240 138);
+    border: 1px solid rgb(251 191 36 / 0.5);
+    background: linear-gradient(145deg, rgb(92 54 10), rgb(61 34 6));
+}
+
 .btn-yellow:hover {
     background-color: rgb(180 83 9);
 }
@@ -104,6 +128,12 @@
     @apply active:scale-[0.98];
 }
 
+.dark .btn-purple {
+    color: rgb(233 213 255);
+    border: 1px solid rgb(167 139 250 / 0.52);
+    background: linear-gradient(145deg, rgb(67 56 202), rgb(49 46 129));
+}
+
 .btn-purple:hover {
     background-color: rgb(109 40 217);
 }
@@ -112,6 +142,12 @@
     color: rgb(255 255 255);
     background-color: rgb(79 70 229);
     @apply active:scale-[0.98];
+}
+
+.dark .btn-indigo {
+    color: rgb(224 231 255);
+    border: 1px solid rgb(129 140 248 / 0.52);
+    background: linear-gradient(145deg, rgb(55 48 163), rgb(37 36 110));
 }
 
 .btn-indigo:hover {

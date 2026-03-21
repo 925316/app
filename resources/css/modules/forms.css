@@ -10,8 +10,18 @@
     color: rgb(var(--color-text-primary));
 }
 
+.dark .form-input {
+    color: rgb(241 245 249);
+    background-color: rgb(var(--color-surface-card-muted));
+    border-color: rgb(var(--color-border-strong) / 0.95);
+}
+
 .form-input::placeholder {
     color: rgb(var(--color-text-muted));
+}
+
+.dark .form-input::placeholder {
+    color: rgb(148 163 184 / 0.9);
 }
 
 .form-input:focus {
@@ -64,6 +74,12 @@
     color: rgb(var(--color-text-primary));
 }
 
+.dark .form-select {
+    color: rgb(241 245 249);
+    background-color: rgb(var(--color-surface-card-muted));
+    border-color: rgb(var(--color-border-strong) / 0.95);
+}
+
 .form-select:focus {
     --tw-ring-color: rgb(var(--color-brand) / 0.35);
 }
@@ -77,6 +93,12 @@
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     color: rgb(var(--color-text-primary));
+}
+
+.dark .form-textarea {
+    color: rgb(241 245 249);
+    background-color: rgb(var(--color-surface-card-muted));
+    border-color: rgb(var(--color-border-strong) / 0.95);
 }
 
 .form-textarea::placeholder {

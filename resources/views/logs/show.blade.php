@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-7">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="card-shell overflow-hidden">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Log Header -->
                     <div class="mb-6">
@@ -28,8 +28,7 @@
                             </div>
 
                             <div class="flex gap-2">
-                                <a href="{{ route('logs.index') }}"
-                                    class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                                <a href="{{ route('logs.index') }}" class="btn btn-secondary">
                                     {{ __('Back to Logs') }}
                                 </a>
                             </div>

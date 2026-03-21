@@ -14,28 +14,26 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="card-shell overflow-hidden">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header with actions -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 lg:max-xl:flex-wrap">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('System Event Logs') }}</h3>
                         @if (Auth::user()->hasPrivilege(7))
-                            <button onclick="showClearModal()"
-                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                            <button onclick="showClearModal()" class="btn btn-danger">
                                 {{ __('Clear Old Logs') }}
                             </button>
                         @endif
                     </div>
 
                     <!-- Filters -->
-                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="mb-6 card-shell-muted">
                         <form method="GET" action="{{ route('logs.index') }}" data-clean-form="true"
-                            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
+                            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 items-end">
                             <div>
                                 <label for="event_type"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Event Type') }}</label>
-                                <select name="event_type" id="event_type"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                <select name="event_type" id="event_type" class="form-select">
                                     <option value="">{{ __('All Types') }}</option>
                                     @foreach ($eventTypes as $type)
                                         <option value="{{ $type }}"
@@ -49,8 +47,7 @@
                             <div>
                                 <label for="event_level"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Event Level') }}</label>
-                                <select name="event_level" id="event_level"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                <select name="event_level" id="event_level" class="form-select">
                                     <option value="">{{ __('All Levels') }}</option>
                                     @foreach ($eventLevels as $value => $label)
                                         <option value="{{ $value }}"
@@ -62,20 +59,30 @@
                             </div>
 
                             <div>
+                                <label for="account_id"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Account') }}</label>
+                                <select name="account_id" id="account_id" class="form-select">
+                                    <option value="">{{ __('All Accounts') }}</option>
+                                    @foreach ($accounts as $account)
+                                        <option value="{{ $account->id }}" {{ (string) request('account_id') === (string) $account->id ? 'selected' : '' }}>
+                                            {{ $account->username }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
                                 <label for="search"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Search') }}</label>
-                                <input type="text" name="search" id="search" value="{{ request('search') }}"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                                <input type="text" name="search" id="search" value="{{ request('search') }}" class="form-input"
                                     placeholder="{{ __('Search by type, IP, or username') }}">
                             </div>
 
                             <div class="flex gap-2">
-                                <button type="submit"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition mt-auto">
+                                <button type="submit" class="btn btn-blue mt-auto">
                                     {{ __('Filter') }}
                                 </button>
-                                <a href="{{ route('logs.index') }}"
-                                    class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition mt-auto">
+                                <a href="{{ route('logs.index') }}" class="btn btn-secondary mt-auto">
                                     {{ __('Reset') }}
                                 </a>
                             </div>
@@ -85,16 +92,12 @@
                                 <div>
                                     <label for="start_date"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Start Date') }}</label>
-                                    <input type="datetime-local" name="start_date" id="start_date"
-                                        value="{{ request('start_date') }}"
-                                        class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                    <input type="datetime-local" name="start_date" id="start_date" value="{{ request('start_date') }}" class="form-input">
                                 </div>
                                 <div>
                                     <label for="end_date"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('End Date') }}</label>
-                                    <input type="datetime-local" name="end_date" id="end_date"
-                                        value="{{ request('end_date') }}"
-                                        class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                    <input type="datetime-local" name="end_date" id="end_date" value="{{ request('end_date') }}" class="form-input">
                                 </div>
                             </div>
                         </form>
@@ -148,7 +151,7 @@
                     <!-- Clear Logs Modal -->
                     <div id="clearModal"
                         class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
+                        <div class="card-shell p-6 max-w-md w-full mx-4">
                             <h3 class="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">{{ __('Clear Old Logs') }}</h3>
                             <form action="{{ route('logs.clear') }}" method="POST">
                                 @csrf
@@ -156,9 +159,7 @@
                                     <label for="days"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Delete logs older than') }}</label>
                                     <div class="flex gap-2 items-center">
-                                        <input type="number" name="days" id="days" min="1"
-                                            max="365" value="30"
-                                            class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                        <input type="number" name="days" id="days" min="1" max="365" value="30" class="form-input">
                                         <span class="text-gray-600 dark:text-gray-300">{{ __('days') }}</span>
                                     </div>
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -166,12 +167,10 @@
                                     </p>
                                 </div>
                                 <div class="flex justify-end gap-2">
-                                    <button type="button" onclick="hideClearModal()"
-                                        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                                    <button type="button" onclick="hideClearModal()" class="btn btn-secondary">
                                         {{ __('Cancel') }}
                                     </button>
-                                    <button type="submit"
-                                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                                    <button type="submit" class="btn btn-danger">
                                         {{ __('Clear Old Logs') }}
                                     </button>
                                 </div>
