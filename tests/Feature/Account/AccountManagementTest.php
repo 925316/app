@@ -261,7 +261,9 @@ it('cannot verify an already verified email', function () {
 });
 
 it('admin can reset hwid for an account', function () {
-    $account = Account::factory()->create();
+    $account = Account::factory()->create([
+        'hwid_last_reset_at' => null,
+    ]);
     $device = AccountDevice::factory()->create([
         'account_id' => $account->id,
         'bound_at' => now(),
@@ -285,6 +287,7 @@ it('reset hwid is blocked when account is in cooldown window', function () {
 
     $this->actingAs($this->admin)
         ->post(route('accounts.reset-hwid', $account))
+        ->assertRedirect(route('accounts.show', $account))
         ->assertSessionHasErrors('hwid_reset');
 });
 

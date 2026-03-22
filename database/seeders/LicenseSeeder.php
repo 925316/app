@@ -113,11 +113,13 @@ class LicenseSeeder extends Seeder
         // Test Case 9: Already active standard license (assigned to a test account)
         $testAccount = Account::first();
         if ($testAccount) {
+            $activeCreatedAt = $now->copy()->subDays(20);
             License::create([
                 'key' => 'ACTIV-11111-22222-33333-44444',
                 'privilege' => LicensePrivilege::STANDARD->value,
                 'status' => LicenseStatus::ACTIVE->value,
                 'used_by' => $testAccount->id,
+                'created_at' => $activeCreatedAt,
                 'activated_at' => $now->copy()->subDays(12),
                 'expires_at' => $now->copy()->addDays(353),
                 'notes' => 'Test: Already active standard license',

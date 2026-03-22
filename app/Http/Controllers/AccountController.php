@@ -337,7 +337,8 @@ class AccountController extends Controller
     public function resetHwid(Account $account)
     {
         if (! $account->canResetHwid()) {
-            return back()->withErrors(['hwid_reset' => 'HWID can only be reset once every 72 hours.']);
+            return redirect()->route('accounts.show', $account)
+                ->withErrors(['hwid_reset' => 'HWID can only be reset once every 72 hours.']);
         }
 
         // Unbind currently bound devices only; preserve hwid_hash for audit history

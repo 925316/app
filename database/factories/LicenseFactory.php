@@ -17,6 +17,26 @@ use Illuminate\Support\Carbon;
 class LicenseFactory extends Factory
 {
     /**
+     * Coerce mixed datetime input into Carbon.
+     */
+    private function toCarbon(mixed $value): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value->copy();
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::instance($value);
+        }
+
+        if (is_string($value) && $value !== '') {
+            return Carbon::parse($value);
+        }
+
+        return null;
+    }
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -82,12 +102,21 @@ class LicenseFactory extends Factory
     public function active(): static
     {
         return $this->state(function (array $attributes) {
-            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-365 days', '-7 days');
-            $activatedAt = fake()->dateTimeBetween($createdAt, '-1 day');
-            $minExpiry = now()->addDay();
-            $maxExpiry = now()->addDays(365);
+            $createdAt = $this->toCarbon($attributes['created_at'] ?? null)
+                ?? now()->subDays(fake()->numberBetween(7, 365));
+            $nowMinusMinute = now()->subMinute();
 
-            $expiresAt = fake()->dateTimeBetween($minExpiry, $maxExpiry);
+            if ($createdAt->greaterThan($nowMinusMinute)) {
+                $createdAt = $nowMinusMinute->copy();
+            }
+
+            $activationStart = $createdAt->copy()->addMinute();
+            if ($activationStart->greaterThan($nowMinusMinute)) {
+                $activationStart = $createdAt->copy();
+            }
+
+            $activatedAt = fake()->dateTimeBetween($activationStart, $nowMinusMinute);
+            $expiresAt = fake()->dateTimeBetween(now()->addDay(), now()->addDays(365));
 
             return [
                 'status' => LicenseStatus::ACTIVE->value,
