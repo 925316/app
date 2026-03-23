@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\AccountDevice;
+use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
     $this->admin = createAdmin();
@@ -34,6 +35,23 @@ it('admin can create a new account', function () {
         ->assertSessionHas('success');
 
     expect(Account::where('email', 'newuser@example.com')->exists())->toBeTrue();
+});
+
+it('admin can create a verified account when email_verified is true', function () {
+    $this->actingAs($this->admin)
+        ->post(route('accounts.store'), [
+            'username' => 'verifieduser1',
+            'email' => 'verifieduser1@example.com',
+            'password' => 'Password1',
+            'password_confirmation' => 'Password1',
+            'email_verified' => true,
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('success');
+
+    $created = Account::query()->where('email', 'verifieduser1@example.com')->first();
+    expect($created)->not->toBeNull();
+    expect($created?->email_verified_at)->not->toBeNull();
 });
 
 it('create account validates unique username', function () {
@@ -123,6 +141,62 @@ it('admin can update account username and email', function () {
 
     expect($account->fresh()->username)->toBe('updated_user');
     expect($account->fresh()->email)->toBe('updated@example.com');
+});
+
+it('admin can update account password', function () {
+    $account = Account::factory()->create();
+
+    $this->actingAs($this->admin)
+        ->patch(route('accounts.update', $account), [
+            'username' => $account->username,
+            'email' => $account->email,
+            'password' => 'NewPassword1',
+            'password_confirmation' => 'NewPassword1',
+        ])
+        ->assertRedirect(route('accounts.show', $account))
+        ->assertSessionHas('success');
+
+    expect(Hash::check('NewPassword1', $account->fresh()->password))->toBeTrue();
+});
+
+it('update account allows keeping existing username and email', function () {
+    $account = Account::factory()->create(['username' => 'same_user', 'email' => 'same@example.com']);
+
+    $this->actingAs($this->admin)
+        ->patch(route('accounts.update', $account), [
+            'username' => 'same_user',
+            'email' => 'same@example.com',
+            'password' => null,
+            'password_confirmation' => null,
+        ])
+        ->assertRedirect(route('accounts.show', $account))
+        ->assertSessionHas('success');
+
+    expect($account->fresh()->username)->toBe('same_user');
+    expect($account->fresh()->email)->toBe('same@example.com');
+});
+
+it('update account validates duplicate username and email', function () {
+    $account = Account::factory()->create(['username' => 'owner_a', 'email' => 'owner_a@example.com']);
+    $other = Account::factory()->create(['username' => 'owner_b', 'email' => 'owner_b@example.com']);
+
+    $this->actingAs($this->admin)
+        ->patch(route('accounts.update', $account), [
+            'username' => $other->username,
+            'email' => 'unique-to-update@example.com',
+            'password' => null,
+            'password_confirmation' => null,
+        ])
+        ->assertSessionHasErrors('username');
+
+    $this->actingAs($this->admin)
+        ->patch(route('accounts.update', $account), [
+            'username' => 'still_unique_for_username',
+            'email' => $other->email,
+            'password' => null,
+            'password_confirmation' => null,
+        ])
+        ->assertSessionHasErrors('email');
 });
 
 it('update account validates username character set', function () {
@@ -278,6 +352,32 @@ it('admin can reset hwid for an account', function () {
 
     expect($account->fresh()->hwid_reset_count)->toBe($initialResetCount + 1);
     expect($device->fresh()->unbound_at)->not->toBeNull();
+});
+
+it('reset hwid only unbinds currently bound devices', function () {
+    $account = Account::factory()->create([
+        'hwid_last_reset_at' => null,
+    ]);
+
+    $boundDevice = AccountDevice::factory()->create([
+        'account_id' => $account->id,
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $alreadyUnbound = AccountDevice::factory()->create([
+        'account_id' => $account->id,
+        'bound_at' => now()->subDays(2),
+        'unbound_at' => now()->subDay(),
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('accounts.reset-hwid', $account))
+        ->assertRedirect(route('accounts.show', $account))
+        ->assertSessionHas('success');
+
+    expect($boundDevice->fresh()->unbound_at)->not->toBeNull();
+    expect($alreadyUnbound->fresh()->unbound_at?->toISOString())->toBe($alreadyUnbound->unbound_at?->toISOString());
 });
 
 it('reset hwid is blocked when account is in cooldown window', function () {

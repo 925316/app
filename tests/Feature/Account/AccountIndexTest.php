@@ -92,6 +92,24 @@ it('can filter accounts by unverified status', function () {
     }
 });
 
+it('can filter accounts by two factor enabled status', function () {
+    $withTwoFactor = Account::factory()->withTwoFactor()->create();
+    $withoutTwoFactor = Account::factory()->create([
+        'two_factor_secret' => null,
+        'two_factor_confirmed_at' => null,
+    ]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('accounts.index', ['status' => '2fa-enabled']));
+
+    $response->assertSuccessful();
+    $accounts = $response->viewData('accounts');
+    $ids = collect($accounts->items())->pluck('id');
+
+    expect($ids->contains($withTwoFactor->id))->toBeTrue();
+    expect($ids->contains($withoutTwoFactor->id))->toBeFalse();
+});
+
 // --- License Count Filters ---
 
 it('can filter accounts with no licenses', function () {
@@ -151,6 +169,42 @@ it('can filter accounts by privilege level', function () {
     $ids = collect($accounts->items())->pluck('id');
     expect($ids->contains($standardUser->id))->toBeTrue();
     expect($ids->contains($ultimateUser->id))->toBeFalse();
+});
+
+it('privilege filter excludes expired and inactive licenses', function () {
+    $expiredUser = Account::factory()->create();
+    License::factory()->create([
+        'used_by' => $expiredUser->id,
+        'status' => LicenseStatus::ACTIVE->value,
+        'privilege' => LicensePrivilege::STANDARD->value,
+        'expires_at' => now()->subDay(),
+    ]);
+
+    $inactiveUser = Account::factory()->create();
+    License::factory()->create([
+        'used_by' => $inactiveUser->id,
+        'status' => LicenseStatus::SUSPENDED->value,
+        'privilege' => LicensePrivilege::STANDARD->value,
+        'expires_at' => now()->addYear(),
+    ]);
+
+    $activeUser = Account::factory()->create();
+    License::factory()->create([
+        'used_by' => $activeUser->id,
+        'status' => LicenseStatus::ACTIVE->value,
+        'privilege' => LicensePrivilege::STANDARD->value,
+        'expires_at' => now()->addYear(),
+    ]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('accounts.index', ['privilege' => LicensePrivilege::STANDARD->value]));
+
+    $response->assertSuccessful();
+    $ids = collect($response->viewData('accounts')->items())->pluck('id');
+
+    expect($ids->contains($activeUser->id))->toBeTrue();
+    expect($ids->contains($expiredUser->id))->toBeFalse();
+    expect($ids->contains($inactiveUser->id))->toBeFalse();
 });
 
 // --- Search ---

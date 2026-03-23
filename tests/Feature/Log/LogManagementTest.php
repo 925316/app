@@ -81,6 +81,21 @@ it('admin can filter logs by date range', function () {
     expect($logs->total())->toBe(1);
 });
 
+it('end date filter includes logs created on that date', function () {
+    EventLog::factory()->create(['created_at' => now()->subDays(2)->setTime(23, 0, 0)]);
+    EventLog::factory()->create(['created_at' => now()->subDays(3)->setTime(23, 59, 59)]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('logs.index', [
+            'start_date' => now()->subDays(3)->format('Y-m-d'),
+            'end_date' => now()->subDays(2)->format('Y-m-d'),
+        ]));
+
+    $response->assertSuccessful();
+    $logs = $response->viewData('logs');
+    expect($logs->total())->toBe(2);
+});
+
 it('inverted date range returns safely with no matches', function () {
     EventLog::factory()->create(['created_at' => now()->subDays(2)]);
     EventLog::factory()->create(['created_at' => now()->subDays(6)]);
@@ -138,6 +153,49 @@ it('admin can search logs by account username', function () {
     $response->assertSuccessful();
     $logs = $response->viewData('logs');
     expect($logs->total())->toBeGreaterThanOrEqual(1);
+});
+
+it('admin can search logs by event type and account email', function () {
+    $account = Account::factory()->create(['email' => 'log-search@example.com']);
+
+    EventLog::factory()->create([
+        'event_type' => EventType::ACCOUNT_LOGIN->value,
+        'account_id' => $account->id,
+    ]);
+
+    EventLog::factory()->create([
+        'event_type' => EventType::LICENSE_REVOKED->value,
+    ]);
+
+    $byType = $this->actingAs($this->admin)
+        ->get(route('logs.index', ['search' => EventType::ACCOUNT_LOGIN->value]));
+    $byType->assertSuccessful();
+    expect($byType->viewData('logs')->total())->toBeGreaterThanOrEqual(1);
+
+    $byEmail = $this->actingAs($this->admin)
+        ->get(route('logs.index', ['search' => 'log-search@example.com']));
+    $byEmail->assertSuccessful();
+    expect($byEmail->viewData('logs')->total())->toBeGreaterThanOrEqual(1);
+});
+
+it('logs pagination preserves applied filters', function () {
+    EventLog::factory()->count(30)->create([
+        'event_type' => EventType::ACCOUNT_LOGIN->value,
+    ]);
+
+    EventLog::factory()->count(10)->create([
+        'event_type' => EventType::LICENSE_REVOKED->value,
+    ]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('logs.index', [
+            'event_type' => EventType::ACCOUNT_LOGIN->value,
+        ]));
+
+    $response->assertSuccessful();
+    $logs = $response->viewData('logs');
+
+    expect($logs->nextPageUrl())->toContain('event_type='.urlencode(EventType::ACCOUNT_LOGIN->value));
 });
 
 // --- Show ---
@@ -207,4 +265,38 @@ it('clear logs validates days must be integer and keeps data intact', function (
         ->assertSessionHasErrors('days');
 
     expect(EventLog::count())->toBe(2);
+});
+
+it('clear logs deletes entries exactly on the cutoff boundary', function () {
+    $fixedNow = now()->startOfSecond();
+    \Illuminate\Support\Carbon::setTestNow($fixedNow);
+
+    EventLog::factory()->create(['created_at' => $fixedNow->copy()->subDays(30)]);
+    EventLog::factory()->create(['created_at' => $fixedNow->copy()->subDays(29)]);
+
+    $this->actingAs($this->admin)
+        ->post(route('logs.clear'), ['days' => 30])
+        ->assertRedirect()
+        ->assertSessionHas('success');
+
+    expect(EventLog::count())->toBe(1);
+
+    \Illuminate\Support\Carbon::setTestNow();
+});
+
+it('clear logs accepts boundary values one and three hundred sixty five', function () {
+    EventLog::factory()->create(['created_at' => now()->subDays(2)]);
+    EventLog::factory()->create(['created_at' => now()->subDays(370)]);
+
+    $this->actingAs($this->admin)
+        ->post(route('logs.clear'), ['days' => 1])
+        ->assertRedirect()
+        ->assertSessionHas('success');
+
+    EventLog::factory()->create(['created_at' => now()->subDays(370)]);
+
+    $this->actingAs($this->admin)
+        ->post(route('logs.clear'), ['days' => 365])
+        ->assertRedirect()
+        ->assertSessionHas('success');
 });

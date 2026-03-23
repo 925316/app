@@ -6,7 +6,9 @@ use App\Models\PackageRelease;
 beforeEach(function () {
     $this->admin = createAdmin();
     $this->userWithLicense = createUserWithLicense(1);
-    $this->userWithoutLicense = Account::factory()->create();
+    $this->userWithLicense->forceFill(['email_verified_at' => now()])->save();
+
+    $this->userWithoutLicense = Account::factory()->verified()->create();
 });
 
 // --- Package Index ---
@@ -95,6 +97,18 @@ it('user with license can download a package', function () {
         ->assertRedirect('https://example.com/download/package-1.0.0.zip');
 });
 
+it('package download returns not found when stored url is unsafe', function () {
+    $release = PackageRelease::factory()->create([
+        'version' => '6.0.0',
+        'release_channel' => 'stable',
+        'download_url' => 'http://example.com/download/package-6.0.0.zip',
+    ]);
+
+    $this->actingAs($this->userWithLicense)
+        ->get(route('packages.download', $release))
+        ->assertNotFound();
+});
+
 it('package download returns not found for missing release model', function () {
     $this->actingAs($this->userWithLicense)
         ->get(route('packages.download', 999999))
@@ -126,6 +140,27 @@ it('guest is redirected from package admin pages', function () {
         ->assertRedirect(route('login'));
 
     $this->get(route('packages.manage'))
+        ->assertRedirect(route('login'));
+});
+
+it('guest is redirected from package admin mutation routes', function () {
+    $release = PackageRelease::factory()->create(['version' => '7.7.7', 'release_channel' => 'stable']);
+
+    $this->post(route('packages.store'), [
+        'version' => '7.7.8',
+        'release_channel' => 'stable',
+        'download_url' => 'https://example.com/download/package-7.7.8.zip',
+    ])->assertRedirect(route('login'));
+
+    $this->post(route('packages.update-changelog', $release), [
+        'changelog' => 'unauthorized',
+    ])->assertRedirect(route('login'));
+
+    $this->delete(route('packages.bulk-delete'), [
+        'ids' => [$release->id],
+    ])->assertRedirect(route('login'));
+
+    $this->delete(route('packages.destroy', $release))
         ->assertRedirect(route('login'));
 });
 
@@ -189,6 +224,90 @@ it('upload validates download url', function () {
             'download_url' => 'not-a-url',
         ])
         ->assertSessionHasErrors('download_url');
+});
+
+it('upload rejects non-https download url', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '2.0.1',
+            'release_channel' => 'stable',
+            'download_url' => 'http://example.com/package.zip',
+        ])
+        ->assertSessionHasErrors('download_url');
+});
+
+it('upload rejects localhost download url', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '2.0.2',
+            'release_channel' => 'stable',
+            'download_url' => 'https://localhost/package.zip',
+        ])
+        ->assertSessionHasErrors('download_url');
+});
+
+it('upload rejects credential-bearing download url', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '2.0.3',
+            'release_channel' => 'stable',
+            'download_url' => 'https://user:pass@example.com/package.zip',
+        ])
+        ->assertSessionHasErrors('download_url');
+});
+
+it('upload rejects private network download url', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '2.0.31',
+            'release_channel' => 'stable',
+            'download_url' => 'https://192.168.1.10/package.zip',
+        ])
+        ->assertSessionHasErrors('download_url');
+});
+
+it('upload validates virus detection url format', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '2.0.4',
+            'release_channel' => 'stable',
+            'download_url' => 'https://example.com/package.zip',
+            'virus_detection_url' => 'not-a-url',
+        ])
+        ->assertSessionHasErrors('virus_detection_url');
+});
+
+it('upload rejects non-https virus detection url', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '2.0.5',
+            'release_channel' => 'stable',
+            'download_url' => 'https://example.com/package.zip',
+            'virus_detection_url' => 'http://example.com/scan',
+        ])
+        ->assertSessionHasErrors('virus_detection_url');
+});
+
+it('upload rejects localhost virus detection url', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '2.0.6',
+            'release_channel' => 'stable',
+            'download_url' => 'https://example.com/package.zip',
+            'virus_detection_url' => 'https://localhost/scan',
+        ])
+        ->assertSessionHasErrors('virus_detection_url');
+});
+
+it('upload rejects private network virus detection url', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '2.0.61',
+            'release_channel' => 'stable',
+            'download_url' => 'https://example.com/package.zip',
+            'virus_detection_url' => 'https://10.0.0.9/scan',
+        ])
+        ->assertSessionHasErrors('virus_detection_url');
 });
 
 it('upload validates release channel', function () {

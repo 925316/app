@@ -134,6 +134,18 @@ it('returns timestamp out of window for stale timestamp', function () {
         ->assertJsonPath('signature', 'signed-login-data');
 });
 
+it('returns timestamp out of window for future timestamp', function () {
+    seedLoginApiContext();
+
+    $response = postJson('/api/account/login', apiLoginPayload([
+        'timestamp' => now()->addMinutes(10)->timestamp,
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW')
+        ->assertJsonPath('signature', 'signed-login-data');
+});
+
 it('returns device mismatch when hwid does not match currently bound device', function () {
     seedLoginApiContext();
 
@@ -174,6 +186,24 @@ it('returns license ineffective when account has no effective license', function
         ->assertJsonPath('signature', 'signed-login-data');
 });
 
+it('returns license ineffective when login account lacks required privilege', function () {
+    $context = seedLoginApiContext();
+
+    $context['license']->forceFill([
+        'privilege' => LicensePrivilege::DEFAULT,
+        'status' => LicenseStatus::ACTIVE,
+        'expires_at' => now()->addDays(30),
+    ])->save();
+
+    $response = postJson('/api/account/login', apiLoginPayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-login-data')
+        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
+        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
+});
+
 it('returns license ineffective when account is suspended', function () {
     seedLoginApiContext([
         'is_suspended' => true,
@@ -203,6 +233,33 @@ it('rate limits repeated failed login attempts', function () {
     }
 
     $response->assertStatus(429)
+        ->assertJsonPath('error_code', 'RATE_LIMITED')
+        ->assertJsonPath('signature', 'signed-login-data');
+});
+
+it('clears login rate limit after a successful attempt', function () {
+    seedLoginApiContext();
+
+    for ($i = 0; $i < 3; $i++) {
+        postJson('/api/account/login', apiLoginPayload([
+            'password' => 'wrong-password',
+        ]))->assertUnauthorized();
+    }
+
+    postJson('/api/account/login', apiLoginPayload([
+        'nonce' => 'nonce-login-clear-success',
+    ]))->assertSuccessful();
+
+    for ($i = 0; $i < 7; $i++) {
+        postJson('/api/account/login', apiLoginPayload([
+            'password' => 'wrong-password',
+        ]))->assertUnauthorized();
+    }
+
+    postJson('/api/account/login', apiLoginPayload([
+        'password' => 'wrong-password',
+    ]))
+        ->assertStatus(429)
         ->assertJsonPath('error_code', 'RATE_LIMITED')
         ->assertJsonPath('signature', 'signed-login-data');
 });

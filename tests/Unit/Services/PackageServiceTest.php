@@ -20,6 +20,15 @@ it('can validate semantic version', function () {
     expect(PackageService::isValidSemanticVersion('invalid'))->toBeFalse();
 });
 
+it('safe public https url helper rejects unsafe urls', function () {
+    expect(PackageService::isSafePublicHttpsUrl('https://example.com/file.zip'))->toBeTrue();
+    expect(PackageService::isSafePublicHttpsUrl('http://example.com/file.zip'))->toBeFalse();
+    expect(PackageService::isSafePublicHttpsUrl('https://localhost/file.zip'))->toBeFalse();
+    expect(PackageService::isSafePublicHttpsUrl('https://user:pass@example.com/file.zip'))->toBeFalse();
+    expect(PackageService::isSafePublicHttpsUrl('https://192.168.1.1/file.zip'))->toBeFalse();
+    expect(PackageService::isSafePublicHttpsUrl('not-a-url'))->toBeFalse();
+});
+
 it('can upload package', function () {
     $package = PackageService::uploadPackage(
         '1.0.0',
@@ -59,6 +68,24 @@ it('throws validation error for invalid download URL', function () {
         '1.0.0',
         'stable',
         'invalid-url'
+    ))->toThrow(ValidationException::class);
+});
+
+it('throws validation error for private network download URL', function () {
+    expect(fn () => PackageService::uploadPackage(
+        '1.0.9',
+        'stable',
+        'https://10.0.0.1/private.zip'
+    ))->toThrow(ValidationException::class);
+});
+
+it('throws validation error for unsafe virus detection URL', function () {
+    expect(fn () => PackageService::uploadPackage(
+        '1.1.9',
+        'stable',
+        'https://example.com/download.zip',
+        null,
+        'https://127.0.0.1/scan'
     ))->toThrow(ValidationException::class);
 });
 

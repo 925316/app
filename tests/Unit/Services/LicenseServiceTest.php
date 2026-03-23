@@ -54,6 +54,18 @@ it('can activate license', function () {
     expect($license->used_by)->toBe($this->account->id);
 });
 
+it('cannot activate an expired unused license', function () {
+    $license = License::factory()->unused()->create([
+        'expires_at' => now()->subDay(),
+    ]);
+
+    expect(fn () => LicenseService::activateLicense($license, $this->account))
+        ->toThrow(ValidationException::class, 'License has expired.');
+
+    expect($license->fresh()->status)->toBe(LicenseStatus::UNUSED);
+    expect($license->fresh()->used_by)->toBeNull();
+});
+
 it('cannot activate already used license', function () {
     $license = License::factory()->active()->create();
 

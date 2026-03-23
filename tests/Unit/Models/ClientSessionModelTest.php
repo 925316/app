@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\AccountDevice;
 use App\Models\ClientSession;
+use Illuminate\Support\Carbon;
 
 beforeEach(function () {
     $this->account = Account::factory()->create();
@@ -37,6 +38,20 @@ it('respects custom minutes threshold', function () {
 
     expect($this->session->fresh()->isActive(5))->toBeFalse();
     expect($this->session->fresh()->isActive(10))->toBeTrue();
+});
+
+it('considers a session active just inside threshold boundary', function () {
+    Carbon::setTestNow(now());
+
+    $boundarySession = ClientSession::factory()->create([
+        'account_id' => $this->account->id,
+        'device_id' => $this->device->id,
+        'last_heartbeat_at' => now()->subMinutes(5)->addSecond(),
+    ]);
+
+    expect($boundarySession->isActive(5))->toBeTrue();
+
+    Carbon::setTestNow();
 });
 
 // --- Scopes ---

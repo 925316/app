@@ -70,8 +70,11 @@ it('has bound scope', function () {
     ]);
 
     $boundDevices = AccountDevice::bound()->get();
+    $boundIds = $boundDevices->pluck('id');
 
-    expect($boundDevices)->toHaveCount(2);
+    expect($boundIds->contains($this->device->id))->toBeTrue();
+    expect($boundIds->contains($account->devices()->whereNull('unbound_at')->first()->id))->toBeTrue();
+    expect($boundIds->contains($account->devices()->whereNotNull('unbound_at')->first()->id))->toBeFalse();
 });
 
 it('has unbound scope', function () {

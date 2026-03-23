@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\AccountDevice;
+use App\Models\ClientSession;
 
 beforeEach(function () {
     $this->userWithLicense = createUserWithLicense(1);
@@ -129,6 +130,26 @@ it('user with license can unbind their current device', function () {
     expect($device->fresh()->unbound_at)->not->toBeNull();
 });
 
+it('user unbind invalidates sessions for that device', function () {
+    $device = AccountDevice::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'hwid_hash' => str_repeat('a', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $session = ClientSession::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'device_id' => $device->id,
+    ]);
+
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.unbind'))
+        ->assertRedirect(route('devices.manage'));
+
+    expect(ClientSession::query()->whereKey($session->id)->exists())->toBeFalse();
+});
+
 it('unbind fails when no device is bound', function () {
     $this->actingAs($this->userWithLicense)
         ->post(route('devices.unbind'))
@@ -152,6 +173,26 @@ it('user with license can reset their own HWID', function () {
         ->assertSessionHas('success');
 
     expect($this->userWithLicense->fresh()->hwid_reset_count)->toBe($initialCount + 1);
+});
+
+it('user hwid reset invalidates all account sessions', function () {
+    $device = AccountDevice::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'hwid_hash' => str_repeat('c', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    ClientSession::factory()->count(2)->create([
+        'account_id' => $this->userWithLicense->id,
+        'device_id' => $device->id,
+    ]);
+
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.reset-hwid'))
+        ->assertRedirect(route('devices.manage'));
+
+    expect(ClientSession::query()->where('account_id', $this->userWithLicense->id)->count())->toBe(0);
 });
 
 it('user without license cannot reset HWID', function () {
@@ -223,4 +264,100 @@ it('bind rejects same hwid when already bound to account', function () {
             'country_code' => 'US',
         ])
         ->assertSessionHasErrors('hwid');
+});
+
+it('bind trims hwid before duplicate check', function () {
+    $hwid = 'USER-HWID-TRIM-12345';
+
+    AccountDevice::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'hwid_hash' => hash('sha256', $hwid),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.bind'), [
+            'hwid' => '  '.$hwid.'  ',
+            'ip_address' => '192.168.1.9',
+            'country_code' => 'us',
+        ])
+        ->assertSessionHasErrors('hwid');
+});
+
+it('bind normalizes lowercase country code before persisting', function () {
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.bind'), [
+            'hwid' => 'USER-HWID-COUNTRY-12345',
+            'ip_address' => '192.168.1.10',
+            'country_code' => 'us',
+        ])
+        ->assertRedirect(route('devices.manage'));
+
+    $device = $this->userWithLicense->devices()->latest('id')->first();
+    expect($device)->not->toBeNull();
+    expect($device?->country_code)->toBe('US');
+});
+
+it('user unbind only deletes sessions for currently bound device', function () {
+    $boundDevice = AccountDevice::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'hwid_hash' => str_repeat('1', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $oldDevice = AccountDevice::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'hwid_hash' => str_repeat('2', 64),
+        'bound_at' => now()->subDays(3),
+        'unbound_at' => now()->subDay(),
+    ]);
+
+    $currentSession = ClientSession::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'device_id' => $boundDevice->id,
+    ]);
+
+    $oldSession = ClientSession::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'device_id' => $oldDevice->id,
+    ]);
+
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.unbind'))
+        ->assertRedirect(route('devices.manage'));
+
+    expect(ClientSession::query()->whereKey($currentSession->id)->exists())->toBeFalse();
+    expect(ClientSession::query()->whereKey($oldSession->id)->exists())->toBeTrue();
+});
+
+it('user reset hwid does not delete sessions for other accounts', function () {
+    $device = AccountDevice::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    ClientSession::factory()->create([
+        'account_id' => $this->userWithLicense->id,
+        'device_id' => $device->id,
+    ]);
+
+    $otherAccount = Account::factory()->create();
+    $otherDevice = AccountDevice::factory()->create([
+        'account_id' => $otherAccount->id,
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+    $otherSession = ClientSession::factory()->create([
+        'account_id' => $otherAccount->id,
+        'device_id' => $otherDevice->id,
+    ]);
+
+    $this->actingAs($this->userWithLicense)
+        ->post(route('devices.reset-hwid'))
+        ->assertRedirect(route('devices.manage'));
+
+    expect(ClientSession::query()->whereKey($otherSession->id)->exists())->toBeTrue();
 });

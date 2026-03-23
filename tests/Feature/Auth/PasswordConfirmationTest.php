@@ -10,6 +10,13 @@ test('confirm password screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
+test('guests are redirected from password confirmation routes', function () {
+    $this->get('/confirm-password')->assertRedirect(route('login'));
+    $this->post('/confirm-password', [
+        'password' => 'password',
+    ])->assertRedirect(route('login'));
+});
+
 test('password can be confirmed', function () {
     $user = Account::factory()->create();
 
@@ -19,6 +26,7 @@ test('password can be confirmed', function () {
 
     $response->assertRedirect();
     $response->assertSessionHasNoErrors();
+    expect(session()->has('auth.password_confirmed_at'))->toBeTrue();
 });
 
 test('password is not confirmed with invalid password', function () {

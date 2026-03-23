@@ -13,6 +13,19 @@ test('email verification screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
+test('guests are redirected to login from verification notice', function () {
+    $this->get('/verify-email')
+        ->assertRedirect(route('login'));
+});
+
+test('verified user is redirected away from verification notice', function () {
+    $user = Account::factory()->verified()->create();
+
+    $this->actingAs($user)
+        ->get('/verify-email')
+        ->assertRedirect(route('dashboard', absolute: false));
+});
+
 test('email can be verified', function () {
     $user = Account::factory()->unverified()->create();
 
@@ -43,4 +56,12 @@ test('email is not verified with invalid hash', function () {
     $this->actingAs($user)->get($verificationUrl);
 
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
+});
+
+test('verified user requesting verification notification is redirected to dashboard', function () {
+    $user = Account::factory()->verified()->create();
+
+    $this->actingAs($user)
+        ->post(route('verification.send'))
+        ->assertRedirect(route('dashboard', absolute: false));
 });

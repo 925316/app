@@ -15,7 +15,7 @@ function seedUpdateCheckContext(): array
 {
     $account = Account::factory()->create();
 
-    AccountDevice::factory()->bound()->create([
+    $device = AccountDevice::factory()->bound()->create([
         'account_id' => $account->id,
         'hwid_hash' => hash('sha256', 'HWID-UPDATE-CHECK-001'),
     ]);
@@ -30,6 +30,7 @@ function seedUpdateCheckContext(): array
     $session = ClientSession::factory()->create([
         'session_token' => 'update-check-session-token-001',
         'account_id' => $account->id,
+        'device_id' => $device->id,
     ]);
 
     return compact('account', 'session');
@@ -120,6 +121,89 @@ it('returns auth required when session token is missing', function () {
 
 it('returns auth required when session token does not exist', function () {
     $response = getJson('/api/update/check?session_token=unknown-session-token');
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-update-data');
+});
+
+it('returns auth required when update check session account is missing', function () {
+    $account = Account::factory()->create();
+    $device = AccountDevice::factory()->bound()->create([
+        'account_id' => $account->id,
+    ]);
+
+    $session = ClientSession::factory()->create([
+        'session_token' => 'update-check-orphan-account-session',
+        'account_id' => $account->id,
+        'device_id' => $device->id,
+    ]);
+
+    $account->delete();
+
+    $response = getJson('/api/update/check?session_token=update-check-orphan-account-session');
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-update-data')
+        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
+        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
+
+    expect(ClientSession::query()->whereKey($session->id)->exists())->toBeFalse();
+});
+
+it('returns auth required when update check session device is missing', function () {
+    $account = Account::factory()->create();
+
+    License::factory()->create([
+        'status' => LicenseStatus::ACTIVE->value,
+        'privilege' => LicensePrivilege::STANDARD->value,
+        'used_by' => $account->id,
+        'expires_at' => now()->addDays(30),
+    ]);
+
+    $device = AccountDevice::factory()->bound()->create([
+        'account_id' => $account->id,
+    ]);
+
+    $session = ClientSession::factory()->create([
+        'session_token' => 'update-check-missing-device-session',
+        'account_id' => $account->id,
+        'device_id' => $device->id,
+    ]);
+
+    $device->delete();
+
+    $response = getJson('/api/update/check?session_token=update-check-missing-device-session');
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-update-data');
+
+    expect(ClientSession::query()->whereKey($session->id)->exists())->toBeFalse();
+});
+
+it('returns auth required when update check device is never bound', function () {
+    $account = Account::factory()->create();
+
+    $device = AccountDevice::factory()->neverBound()->create([
+        'account_id' => $account->id,
+    ]);
+
+    License::factory()->create([
+        'status' => LicenseStatus::ACTIVE->value,
+        'privilege' => LicensePrivilege::STANDARD->value,
+        'used_by' => $account->id,
+        'expires_at' => now()->addDays(30),
+    ]);
+
+    ClientSession::factory()->create([
+        'session_token' => 'update-check-never-bound-session',
+        'account_id' => $account->id,
+        'device_id' => $device->id,
+    ]);
+
+    $response = getJson('/api/update/check?session_token=update-check-never-bound-session');
 
     $response->assertUnauthorized()
         ->assertJsonPath('error_code', 'AUTH_REQUIRED')
@@ -217,6 +301,34 @@ it('returns invalid version when current_version is malformed', function () {
         ->assertJsonPath('signature', 'signed-update-data');
 });
 
+it('trims current_version before semantic validation and comparison', function () {
+    seedUpdateCheckContext();
+
+    PackageRelease::factory()->create([
+        'version' => '2.0.0',
+        'release_channel' => 'stable',
+        'download_url' => 'https://example.com/download/2.0.0.zip',
+    ]);
+
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&current_version=%201.9.9%20');
+
+    $response->assertSuccessful()
+        ->assertJsonPath('data.current_version', '1.9.9')
+        ->assertJsonPath('data.update_available', true)
+        ->assertJsonPath('data.reason', 'newer_available');
+});
+
+it('returns invalid version when current_version exceeds max length', function () {
+    seedUpdateCheckContext();
+
+    $longVersion = str_repeat('1', 51);
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&current_version='.$longVersion);
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'INVALID_VERSION')
+        ->assertJsonPath('signature', 'signed-update-data');
+});
+
 it('returns invalid channel when release_channel is unsupported', function () {
     seedUpdateCheckContext();
 
@@ -224,6 +336,30 @@ it('returns invalid channel when release_channel is unsupported', function () {
 
     $response->assertUnprocessable()
         ->assertJsonPath('error_code', 'INVALID_CHANNEL')
+        ->assertJsonPath('signature', 'signed-update-data');
+});
+
+it('returns validation failed when session_token is not a string', function () {
+    $response = getJson('/api/update/check?session_token[]=abc');
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
+        ->assertJsonPath('signature', 'signed-update-data');
+});
+
+it('returns validation failed when release_channel is not a string', function () {
+    $response = getJson('/api/update/check?release_channel[]=stable');
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
+        ->assertJsonPath('signature', 'signed-update-data');
+});
+
+it('returns validation failed when current_version is not a string', function () {
+    $response = getJson('/api/update/check?current_version[]=1.0.0');
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'VALIDATION_FAILED')
         ->assertJsonPath('signature', 'signed-update-data');
 });
 
@@ -252,4 +388,58 @@ it('normalizes release_channel and session_token query values before validation'
         ->assertJsonPath('signature', 'signed-update-data')
         ->assertJsonPath('data.release_channel', 'dev')
         ->assertJsonPath('data.version', '4.0.0');
+});
+
+it('rejects update check after device is unbound in web flow', function () {
+    $context = seedUpdateCheckContext();
+
+    PackageRelease::factory()->create([
+        'version' => '4.2.0',
+        'release_channel' => 'stable',
+        'download_url' => 'https://example.com/download/4.2.0.zip',
+    ]);
+
+    $this->actingAs($context['account'])
+        ->post(route('devices.unbind'))
+        ->assertRedirect(route('devices.manage'));
+
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001');
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-update-data');
+});
+
+it('returns package not found when latest release has non-https download url', function () {
+    seedUpdateCheckContext();
+
+    PackageRelease::factory()->create([
+        'version' => '5.0.0',
+        'release_channel' => 'stable',
+        'download_url' => 'http://example.com/download/5.0.0.zip',
+        'virus_detection_url' => 'https://example.com/scan/5.0.0',
+    ]);
+
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001');
+
+    $response->assertNotFound()
+        ->assertJsonPath('error_code', 'PACKAGE_NOT_FOUND')
+        ->assertJsonPath('signature', 'signed-update-data');
+});
+
+it('returns package not found when latest release has unsafe virus detection url', function () {
+    seedUpdateCheckContext();
+
+    PackageRelease::factory()->create([
+        'version' => '5.1.0',
+        'release_channel' => 'stable',
+        'download_url' => 'https://example.com/download/5.1.0.zip',
+        'virus_detection_url' => 'https://localhost/scan/5.1.0',
+    ]);
+
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001');
+
+    $response->assertNotFound()
+        ->assertJsonPath('error_code', 'PACKAGE_NOT_FOUND')
+        ->assertJsonPath('signature', 'signed-update-data');
 });

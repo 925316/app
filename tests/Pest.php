@@ -32,7 +32,7 @@ pest()->extend(Tests\TestCase::class)
 
 function createAdmin(): App\Models\Account
 {
-    $admin = App\Models\Account::factory()->active()->create();
+    $admin = App\Models\Account::factory()->active()->verified()->create();
     App\Models\License::factory()->active()->privilege(7)->create([
         'used_by' => $admin->id,
         'expires_at' => now()->addYear(),

@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\AccountDevice;
+use App\Models\ClientSession;
 
 beforeEach(function () {
     $this->admin = createAdmin();
@@ -90,6 +91,59 @@ it('admin can unbind a device', function () {
     expect($device->fresh()->unbound_at)->not->toBeNull();
 });
 
+it('admin unbind invalidates sessions for that device', function () {
+    $device = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'hwid_hash' => str_repeat('e', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $session = ClientSession::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'device_id' => $device->id,
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('devices.unbind-admin', $device))
+        ->assertRedirect(route('devices.index'));
+
+    expect(ClientSession::query()->whereKey($session->id)->exists())->toBeFalse();
+});
+
+it('admin unbind only invalidates sessions for targeted device', function () {
+    $targetDevice = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'hwid_hash' => str_repeat('1', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $otherDevice = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'hwid_hash' => str_repeat('2', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $targetSession = ClientSession::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'device_id' => $targetDevice->id,
+    ]);
+
+    $otherSession = ClientSession::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'device_id' => $otherDevice->id,
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('devices.unbind-admin', $targetDevice))
+        ->assertRedirect(route('devices.index'));
+
+    expect(ClientSession::query()->whereKey($targetSession->id)->exists())->toBeFalse();
+    expect(ClientSession::query()->whereKey($otherSession->id)->exists())->toBeTrue();
+});
+
 it('admin unbind returns error when device is not currently bound', function () {
     $device = AccountDevice::factory()->create([
         'account_id' => $this->regularUser->id,
@@ -119,6 +173,30 @@ it('admin can reset HWID for a user', function () {
     $response->assertSessionHas('success');
 
     expect($resettableUser->fresh()->hwid_reset_count)->toBe($initialCount + 1);
+});
+
+it('admin reset hwid invalidates all account sessions', function () {
+    $resettableUser = Account::factory()->active()->create([
+        'hwid_last_reset_at' => null,
+    ]);
+
+    $device = AccountDevice::factory()->create([
+        'account_id' => $resettableUser->id,
+        'hwid_hash' => str_repeat('f', 64),
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    ClientSession::factory()->count(2)->create([
+        'account_id' => $resettableUser->id,
+        'device_id' => $device->id,
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('devices.reset-hwid-admin', $resettableUser))
+        ->assertRedirect(route('devices.index'));
+
+    expect(ClientSession::query()->where('account_id', $resettableUser->id)->count())->toBe(0);
 });
 
 it('admin reset HWID returns cooldown error when account is in cooldown window', function () {
@@ -202,6 +280,58 @@ it('admin can perform bulk HWID reset', function () {
     $response->assertSessionHas('success');
 
     expect($resettableUser->fresh()->hwid_reset_count)->toBe($initialCount + 1);
+});
+
+it('bulk reset hwid deduplicates selected devices of same account', function () {
+    $user = Account::factory()->active()->create([
+        'hwid_last_reset_at' => null,
+        'hwid_reset_count' => 0,
+    ]);
+
+    $deviceA = AccountDevice::factory()->create([
+        'account_id' => $user->id,
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $deviceB = AccountDevice::factory()->create([
+        'account_id' => $user->id,
+        'bound_at' => now()->subDay(),
+        'unbound_at' => now()->subHour(),
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('devices.bulk-reset-hwid-admin'), [
+            'device_ids' => [$deviceA->id, $deviceB->id],
+        ])
+        ->assertRedirect(route('devices.index'))
+        ->assertSessionHas('success');
+
+    expect($user->fresh()->hwid_reset_count)->toBe(1);
+});
+
+it('bulk unbind mixed selection only unbinds bound devices', function () {
+    $boundDevice = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $alreadyUnbound = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'bound_at' => now()->subDay(),
+        'unbound_at' => now()->subHour(),
+    ]);
+
+    $this->actingAs($this->admin)
+        ->post(route('devices.bulk-unbind-admin'), [
+            'device_ids' => [$boundDevice->id, $alreadyUnbound->id],
+        ])
+        ->assertRedirect(route('devices.index'))
+        ->assertSessionHas('success');
+
+    expect($boundDevice->fresh()->unbound_at)->not->toBeNull();
+    expect($alreadyUnbound->fresh()->unbound_at)->not->toBeNull();
 });
 
 it('admin can export device data', function () {

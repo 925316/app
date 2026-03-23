@@ -66,6 +66,19 @@ it('cannot directly activate a suspended license', function () {
         ->assertSessionHasErrors('license');
 });
 
+it('cannot directly activate an expired unused license', function () {
+    $license = License::factory()->unused()->create([
+        'expires_at' => now()->subDay(),
+    ]);
+
+    $this->actingAs($this->account)
+        ->post(route('licenses.activate', $license))
+        ->assertSessionHasErrors('license');
+
+    expect($license->fresh()->status)->toBe(LicenseStatus::UNUSED);
+    expect($license->fresh()->used_by)->toBeNull();
+});
+
 it('cannot directly activate a license at same privilege level', function () {
     License::factory()->active()->create([
         'privilege' => LicensePrivilege::STANDARD->value,

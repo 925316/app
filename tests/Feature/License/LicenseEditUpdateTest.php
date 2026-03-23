@@ -115,6 +115,25 @@ it('cannot change used_by on an active license', function () {
     expect($license->fresh()->used_by)->toBe($originalUser->id);
 });
 
+it('ignores attempted status changes during update and preserves original status', function () {
+    $license = License::factory()->active()->create([
+        'expires_at' => now()->addYear(),
+    ]);
+
+    $this->actingAs($this->admin)
+        ->patch(route('licenses.update', $license), [
+            'key' => $license->key,
+            'privilege' => $license->privilege->value,
+            'status' => LicenseStatus::REVOKED->value,
+            'expires_at' => now()->addYear()->format('Y-m-d'),
+            'notes' => 'status tamper attempt',
+        ])
+        ->assertRedirect(route('licenses.show', $license))
+        ->assertSessionHas('success');
+
+    expect($license->fresh()->status)->toBe(LicenseStatus::ACTIVE);
+});
+
 it('update validates required privilege field', function () {
     $license = License::factory()->unused()->create();
 

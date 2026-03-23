@@ -147,6 +147,18 @@ it('returns timestamp out of window for stale timestamp', function () {
         ->assertJsonPath('signature', 'signed-unbind-data');
 });
 
+it('returns timestamp out of window for future timestamp', function () {
+    seedUnbindApiContext();
+
+    $response = postJson('/api/license/unbind', apiUnbindPayload([
+        'timestamp' => now()->addMinutes(10)->timestamp,
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW')
+        ->assertJsonPath('signature', 'signed-unbind-data');
+});
+
 it('returns device mismatch when hwid does not match bound device', function () {
     $context = seedUnbindApiContext();
 
@@ -172,6 +184,36 @@ it('returns license ineffective when license is suspended', function () {
     $response->assertForbidden()
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
         ->assertJsonPath('signature', 'signed-unbind-data');
+});
+
+it('returns license ineffective when unbind license is expired', function () {
+    seedUnbindApiContext();
+
+    License::query()->where('key', 'KLMNO-12ABC-ABCDE-ABCDE-ABCDE')
+        ->update(['expires_at' => now()->subMinute()]);
+
+    $response = postJson('/api/license/unbind', apiUnbindPayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-unbind-data')
+        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
+        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
+});
+
+it('returns license ineffective when unbind license is not owned by any account', function () {
+    seedUnbindApiContext();
+
+    License::query()->where('key', 'KLMNO-12ABC-ABCDE-ABCDE-ABCDE')
+        ->update(['used_by' => null]);
+
+    $response = postJson('/api/license/unbind', apiUnbindPayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-unbind-data')
+        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
+        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
 });
 
 it('returns auth required when license belongs to a different account', function () {

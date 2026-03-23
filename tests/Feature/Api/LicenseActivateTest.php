@@ -139,6 +139,17 @@ it('returns timestamp out of window for stale timestamp', function () {
         ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW');
 });
 
+it('returns timestamp out of window for future timestamp', function () {
+    seedActivateApiContext();
+
+    $response = postJson('/api/license/activate', apiActivatePayload([
+        'timestamp' => now()->addMinutes(10)->timestamp,
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW');
+});
+
 it('returns device mismatch when hwid does not match bound device', function () {
     seedActivateApiContext();
 
@@ -225,6 +236,22 @@ it('returns license ineffective when target license is revoked', function () {
 
     $response->assertForbidden()
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
+});
+
+it('returns license ineffective when target license cannot be activated by privilege rules', function () {
+    seedActivateApiContext([
+        'status' => LicenseStatus::UNUSED->value,
+        'privilege' => LicensePrivilege::UPGRADE->value,
+        'used_by' => null,
+    ]);
+
+    $response = postJson('/api/license/activate', apiActivatePayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-activate-data')
+        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
+        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
 });
 
 it('validates timestamp payload type and range in activate endpoint', function (mixed $timestamp) {

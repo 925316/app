@@ -1,10 +1,9 @@
 <?php
 
-use App\Enums\LicensePrivilege;
 use App\Models\Account;
 
 test('profile page is displayed', function () {
-    $user = Account::factory()->create();
+    $user = Account::factory()->verified()->create();
 
     $response = $this
         ->actingAs($user)
@@ -14,7 +13,7 @@ test('profile page is displayed', function () {
 });
 
 test('non-admin cannot update username and email', function () {
-    $user = Account::factory()->create();
+    $user = Account::factory()->verified()->create();
     $originalUsername = $user->username;
     $originalEmail = $user->email;
 
@@ -37,13 +36,7 @@ test('non-admin cannot update username and email', function () {
 });
 
 test('admin can update username and email', function () {
-    $user = Account::factory()->create();
-    $license = $user->licenses()->create([
-        'key' => 'TEST-ADMIN-KEY-12345',
-        'privilege' => LicensePrivilege::STAFF,
-        'status' => \App\Enums\LicenseStatus::ACTIVE,
-        'expires_at' => now()->addYear(),
-    ]);
+    $user = createAdmin();
 
     $response = $this
         ->actingAs($user)
@@ -64,13 +57,7 @@ test('admin can update username and email', function () {
 });
 
 test('admin can update locale without requiring username and email', function () {
-    $user = Account::factory()->create();
-    $user->licenses()->create([
-        'key' => 'TEST-ADMIN-LOCALE-KEY-12345',
-        'privilege' => LicensePrivilege::STAFF,
-        'status' => \App\Enums\LicenseStatus::ACTIVE,
-        'expires_at' => now()->addYear(),
-    ]);
+    $user = createAdmin();
 
     $response = $this
         ->actingAs($user)
@@ -87,13 +74,7 @@ test('admin can update locale without requiring username and email', function ()
 });
 
 test('selected locale is applied on subsequent profile request', function () {
-    $user = Account::factory()->create();
-    $user->licenses()->create([
-        'key' => 'TEST-ADMIN-LOCALE-APPLY-KEY-12345',
-        'privilege' => LicensePrivilege::STAFF,
-        'status' => \App\Enums\LicenseStatus::ACTIVE,
-        'expires_at' => now()->addYear(),
-    ]);
+    $user = createAdmin();
 
     $cookieName = (string) config('app.locale_cookie_name', 'locale');
     $sessionKey = (string) config('app.locale_session_key', 'locale');
@@ -116,13 +97,7 @@ test('selected locale is applied on subsequent profile request', function () {
 });
 
 test('session locale takes precedence over browser preferred language', function () {
-    $user = Account::factory()->create();
-    $user->licenses()->create([
-        'key' => 'TEST-ADMIN-LOCALE-SESSION-PRIORITY-12345',
-        'privilege' => LicensePrivilege::STAFF,
-        'status' => \App\Enums\LicenseStatus::ACTIVE,
-        'expires_at' => now()->addYear(),
-    ]);
+    $user = createAdmin();
 
     $sessionKey = (string) config('app.locale_session_key', 'locale');
 
@@ -135,13 +110,7 @@ test('session locale takes precedence over browser preferred language', function
 });
 
 test('selected english locale remains selected even when browser prefers chinese', function () {
-    $user = Account::factory()->create();
-    $user->licenses()->create([
-        'key' => 'TEST-ADMIN-LOCALE-EN-PERSIST-12345',
-        'privilege' => LicensePrivilege::STAFF,
-        'status' => \App\Enums\LicenseStatus::ACTIVE,
-        'expires_at' => now()->addYear(),
-    ]);
+    $user = createAdmin();
 
     $this->actingAs($user)
         ->withHeader('Accept-Language', 'zh-CN,zh;q=0.9,en;q=0.8')
@@ -177,8 +146,79 @@ test('email verification status is unchanged when the email address is unchanged
     $this->assertNotNull($user->refresh()->email_verified_at);
 });
 
+test('non-admin cannot mass assign sensitive account fields through profile update payload', function () {
+    $user = Account::factory()->verified()->create([
+        'is_suspended' => false,
+        'suspension_reason' => null,
+        'hwid_reset_count' => 0,
+        'email_verified_at' => now(),
+    ]);
+
+    $this->actingAs($user)
+        ->patch('/profile', [
+            'is_suspended' => true,
+            'suspension_reason' => 'tamper',
+            'hwid_reset_count' => 99,
+            'email_verified_at' => now()->subDay()->toISOString(),
+            'username' => 'hacker_name',
+            'email' => 'hacker@example.com',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/profile');
+
+    $user->refresh();
+    expect($user->is_suspended)->toBeFalse();
+    expect($user->suspension_reason)->toBeNull();
+    expect($user->hwid_reset_count)->toBe(0);
+    expect($user->username)->not->toBe('hacker_name');
+    expect($user->email)->not->toBe('hacker@example.com');
+});
+
+test('admin cannot update profile email to a duplicate email', function () {
+    $admin = createAdmin();
+    $existing = Account::factory()->verified()->create(['email' => 'duplicate@example.com']);
+
+    $this->actingAs($admin)
+        ->patch('/profile', [
+            'username' => $admin->username,
+            'email' => $existing->email,
+        ])
+        ->assertSessionHasErrors('email');
+});
+
+test('profile locale update rejects unsupported locale', function () {
+    $user = createAdmin();
+
+    $this->actingAs($user)
+        ->patch('/profile/locale', [
+            'locale' => 'xx',
+        ])
+        ->assertSessionHasErrors('locale');
+});
+
+test('unverified user is redirected from profile routes', function () {
+    $user = Account::factory()->unverified()->create();
+
+    $this->actingAs($user)
+        ->get('/profile')
+        ->assertRedirect(route('verification.notice'));
+
+    $this->actingAs($user)
+        ->patch('/profile', [
+            'username' => 'attempt',
+            'email' => 'attempt@example.com',
+        ])
+        ->assertRedirect(route('verification.notice'));
+
+    $this->actingAs($user)
+        ->patch('/profile/locale', [
+            'locale' => 'en',
+        ])
+        ->assertRedirect(route('verification.notice'));
+});
+
 test('user can delete their account', function () {
-    $user = Account::factory()->create();
+    $user = Account::factory()->verified()->create();
 
     $response = $this
         ->actingAs($user)
@@ -195,7 +235,7 @@ test('user can delete their account', function () {
 });
 
 test('correct password must be provided to delete account', function () {
-    $user = Account::factory()->create();
+    $user = Account::factory()->verified()->create();
 
     $response = $this
         ->actingAs($user)

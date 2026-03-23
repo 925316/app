@@ -205,3 +205,14 @@ it('auto uppercases license key', function () {
 
     expect($license->key)->toBe('ABCDE-12345-ABCDE-12345-ABCDE');
 });
+
+it('observer marks active license as expired when updated after expiry time', function () {
+    $license = License::factory()->active()->create([
+        'expires_at' => now()->subDay(),
+    ]);
+
+    $license->notes = 'trigger update';
+    $license->save();
+
+    expect($license->fresh()->status)->toBe(LicenseStatus::EXPIRED);
+});

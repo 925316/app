@@ -55,6 +55,7 @@ it('blocks unauthenticated users from admin routes', function () {
 
 it('blocks non-admin users from account management', function () {
     $user = createUserWithLicense(1);
+    $user->forceFill(['email_verified_at' => now()])->save();
     $session = \App\Models\ClientSession::factory()->create([
         'account_id' => $user->id,
     ]);
@@ -108,6 +109,7 @@ it('allows admin users to access log management', function () {
 
 it('blocks non-admin users from admin device operations', function () {
     $user = createUserWithLicense(1);
+    $user->forceFill(['email_verified_at' => now()])->save();
     $targetUser = Account::factory()->create();
     $device = \App\Models\AccountDevice::factory()->create([
         'account_id' => $targetUser->id,
@@ -122,6 +124,7 @@ it('blocks non-admin users from admin device operations', function () {
 
 it('blocks non-admin users from admin license operations', function () {
     $user = createUserWithLicense(1);
+    $user->forceFill(['email_verified_at' => now()])->save();
     $license = License::factory()->create();
 
     $this->actingAs($user)->get(route('licenses.create'))->assertForbidden();
@@ -147,7 +150,33 @@ it('blocks non-admin users from admin license operations', function () {
 
 it('blocks non-admin users from admin package operations', function () {
     $user = createUserWithLicense(1);
+    $user->forceFill(['email_verified_at' => now()])->save();
 
     $this->actingAs($user)->get(route('packages.upload'))->assertForbidden();
     $this->actingAs($user)->get(route('packages.manage'))->assertForbidden();
+});
+
+it('unverified admin is redirected to verification notice from admin routes', function () {
+    $admin = createAdmin();
+    $admin->forceFill(['email_verified_at' => null])->save();
+
+    $this->actingAs($admin)
+        ->get(route('accounts.index'))
+        ->assertRedirect(route('verification.notice'));
+});
+
+it('forbids users with expired staff license from admin account routes', function () {
+    $user = createUserWithLicense(7);
+    $user->forceFill(['email_verified_at' => now()])->save();
+
+    $staffLicense = $user->licenses()->first();
+    expect($staffLicense)->not->toBeNull();
+
+    $staffLicense?->update([
+        'expires_at' => now()->subDay(),
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('accounts.index'))
+        ->assertForbidden();
 });

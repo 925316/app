@@ -121,6 +121,17 @@ it('returns timestamp out of window for stale timestamp', function () {
         ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW');
 });
 
+it('returns timestamp out of window for future timestamp', function () {
+    seedValidApiContext();
+
+    $response = postJson('/api/license/check', apiPayload([
+        'timestamp' => now()->addMinutes(10)->timestamp,
+    ]));
+
+    $response->assertUnprocessable()
+        ->assertJsonPath('error_code', 'TIMESTAMP_OUT_OF_WINDOW');
+});
+
 it('returns device mismatch when hwid does not match session bound device', function () {
     $context = seedValidApiContext();
     $previousHeartbeat = Carbon::parse($context['session']->last_heartbeat_at);
@@ -224,6 +235,38 @@ it('returns license ineffective when license is not active', function () {
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE');
 });
 
+it('returns license ineffective when checked license is expired', function () {
+    seedValidApiContext();
+
+    License::query()
+        ->where('key', 'ABCDE-12ABC-ABCDE-ABCDE-ABCDE')
+        ->update(['expires_at' => now()->subMinute()]);
+
+    $response = postJson('/api/license/check', apiPayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-data')
+        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
+        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
+});
+
+it('returns license ineffective when checked license is not owned by any account', function () {
+    seedValidApiContext();
+
+    License::query()
+        ->where('key', 'ABCDE-12ABC-ABCDE-ABCDE-ABCDE')
+        ->update(['used_by' => null]);
+
+    $response = postJson('/api/license/check', apiPayload());
+
+    $response->assertForbidden()
+        ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
+        ->assertJsonPath('signature', 'signed-data')
+        ->assertJsonPath('meta.signature.algorithm', 'RSA-2048-SHA256')
+        ->assertJsonPath('meta.signature.key_id', 'main-2026-01');
+});
+
 it('validates license key format before check processing', function () {
     $context = seedValidApiContext();
     $previousHeartbeat = Carbon::parse($context['session']->last_heartbeat_at);
@@ -249,4 +292,20 @@ it('normalizes session token and hwid input values before check processing', fun
     ]));
 
     assertApiOk($response);
+});
+
+it('rejects license check after device is unbound in web flow', function () {
+    $context = seedValidApiContext();
+
+    $this->actingAs($context['account'])
+        ->post(route('devices.unbind'))
+        ->assertRedirect(route('devices.manage'));
+
+    $response = postJson('/api/license/check', apiPayload([
+        'nonce' => 'nonce-after-web-unbind-check',
+    ]));
+
+    $response->assertUnauthorized()
+        ->assertJsonPath('error_code', 'AUTH_REQUIRED')
+        ->assertJsonPath('signature', 'signed-data');
 });
