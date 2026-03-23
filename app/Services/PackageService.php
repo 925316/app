@@ -8,6 +8,42 @@ use Illuminate\Validation\ValidationException;
 
 class PackageService
 {
+    public static function isSafePublicHttpsUrl(string $url): bool
+    {
+        if (! filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        $parts = parse_url($url);
+        if (! is_array($parts)) {
+            return false;
+        }
+
+        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+        $host = (string) ($parts['host'] ?? '');
+
+        if ($scheme !== 'https' || $host === '') {
+            return false;
+        }
+
+        if (isset($parts['user']) || isset($parts['pass'])) {
+            return false;
+        }
+
+        $normalizedHost = strtolower($host);
+        if (in_array($normalizedHost, ['localhost', '127.0.0.1', '::1'], true)) {
+            return false;
+        }
+
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $isPublicIp = filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+
+            return $isPublicIp !== false;
+        }
+
+        return true;
+    }
+
     /**
      * Upload a new package release
      */
@@ -32,10 +68,15 @@ class PackageService
             ]);
         }
 
-        // Validate URL format
-        if (! filter_var($downloadUrl, FILTER_VALIDATE_URL)) {
+        if (! self::isSafePublicHttpsUrl($downloadUrl)) {
             throw ValidationException::withMessages([
                 'download_url' => 'Invalid download URL format.',
+            ]);
+        }
+
+        if ($virusDetectionLink !== null && ! self::isSafePublicHttpsUrl($virusDetectionLink)) {
+            throw ValidationException::withMessages([
+                'virus_detection_url' => 'Invalid virus detection URL format.',
             ]);
         }
 

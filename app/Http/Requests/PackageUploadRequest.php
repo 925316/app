@@ -44,11 +44,25 @@ class PackageUploadRequest extends FormRequest
                 'required',
                 'url',
                 'max:255',
+                function ($attribute, $value, $fail) {
+                    if (! is_string($value) || ! PackageService::isSafePublicHttpsUrl($value)) {
+                        $fail('The download URL must be a valid public HTTPS URL.');
+                    }
+                },
             ],
             'virus_detection_url' => [
                 'nullable',
-                'string',
+                'url',
                 'max:2000',
+                function ($attribute, $value, $fail) {
+                    if ($value === null || $value === '') {
+                        return;
+                    }
+
+                    if (! is_string($value) || ! PackageService::isSafePublicHttpsUrl($value)) {
+                        $fail('The virus detection URL must be a valid public HTTPS URL.');
+                    }
+                },
             ],
             'changelog' => [
                 'nullable',

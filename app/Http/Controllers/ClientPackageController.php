@@ -45,11 +45,16 @@ class ClientPackageController extends Controller
             }
 
             $session = ClientSession::query()
-                ->with('account')
+                ->with(['account', 'device'])
                 ->where('session_token', $sessionToken)
                 ->first();
 
             if (! $session || ! $session->account) {
+                return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.', true);
+            }
+
+            $sessionDevice = $session->device;
+            if (! $sessionDevice || $sessionDevice->bound_at === null || $sessionDevice->unbound_at !== null) {
                 return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.', true);
             }
 
@@ -60,6 +65,15 @@ class ClientPackageController extends Controller
             $latestRelease = PackageService::getLatestRelease($releaseChannel);
 
             if (! $latestRelease) {
+                return $this->errorResponse(404, ApiErrorCode::PACKAGE_NOT_FOUND, 'No package release found for this channel.', true);
+            }
+
+            if (! PackageService::isSafePublicHttpsUrl((string) $latestRelease->download_url)) {
+                return $this->errorResponse(404, ApiErrorCode::PACKAGE_NOT_FOUND, 'No package release found for this channel.', true);
+            }
+
+            $virusDetectionUrl = $latestRelease->virus_detection_url;
+            if (is_string($virusDetectionUrl) && $virusDetectionUrl !== '' && ! PackageService::isSafePublicHttpsUrl($virusDetectionUrl)) {
                 return $this->errorResponse(404, ApiErrorCode::PACKAGE_NOT_FOUND, 'No package release found for this channel.', true);
             }
 
@@ -78,7 +92,7 @@ class ClientPackageController extends Controller
                 'reason' => $reason,
                 'download_url' => $latestRelease->download_url,
                 'changelog' => $latestRelease->changelog,
-                'virus_detection_url' => $latestRelease->virus_detection_url,
+                'virus_detection_url' => $virusDetectionUrl,
             ];
 
             return $this->successResponse($data, true);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DeviceRequest;
 use App\Models\Account;
 use App\Models\AccountDevice;
+use App\Models\ClientSession;
 use App\Models\EventLog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -218,6 +219,11 @@ class DeviceController extends Controller
             $lockedDevice->unbound_at = $currentTime;
             $lockedDevice->save();
 
+            ClientSession::query()
+                ->where('account_id', $user->id)
+                ->where('device_id', $lockedDevice->id)
+                ->delete();
+
             EventLog::create([
                 'event_type' => 'device.unbound',
                 'event_level' => 0,
@@ -271,6 +277,10 @@ class DeviceController extends Controller
             ->whereNull('unbound_at')
             ->update(['unbound_at' => $currentTime]);
 
+        ClientSession::query()
+            ->where('account_id', $user->id)
+            ->delete();
+
         $user->incrementHwidResetCount();
 
         // Log the event
@@ -301,6 +311,11 @@ class DeviceController extends Controller
 
         $device->unbound_at = now();
         $device->save();
+
+        ClientSession::query()
+            ->where('account_id', $device->account_id)
+            ->where('device_id', $device->id)
+            ->delete();
 
         // Log the event
         EventLog::create([
@@ -338,6 +353,10 @@ class DeviceController extends Controller
             ->whereNotNull('bound_at')
             ->whereNull('unbound_at')
             ->update(['unbound_at' => $currentTime]);
+
+        ClientSession::query()
+            ->where('account_id', $account->id)
+            ->delete();
 
         $account->incrementHwidResetCount();
 
@@ -384,6 +403,11 @@ class DeviceController extends Controller
             $device->save();
             $unboundCount++;
 
+            ClientSession::query()
+                ->where('account_id', $device->account_id)
+                ->where('device_id', $device->id)
+                ->delete();
+
             // Log each unbind event
             EventLog::create([
                 'event_type' => 'device.admin_unbound',
@@ -429,6 +453,10 @@ class DeviceController extends Controller
                     ->whereNotNull('bound_at')
                     ->whereNull('unbound_at')
                     ->update(['unbound_at' => $currentTime]);
+
+                ClientSession::query()
+                    ->where('account_id', $account->id)
+                    ->delete();
 
                 $account->incrementHwidResetCount();
                 $resetCount++;

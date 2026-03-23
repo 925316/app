@@ -59,7 +59,8 @@ class LogController extends Controller
             });
         }
 
-        $logs = $query->paginate(25);
+        $logs = $query->paginate(25)
+            ->appends($request->except('page'));
 
         // Get overall statistics (not filtered by search/pagination) - optimized single query
         $stats = EventLog::selectRaw('COUNT(*) as total, SUM(CASE WHEN event_level = 0 THEN 1 ELSE 0 END) as info, SUM(CASE WHEN event_level = 1 THEN 1 ELSE 0 END) as warning, SUM(CASE WHEN event_level = 2 THEN 1 ELSE 0 END) as error')

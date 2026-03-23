@@ -82,6 +82,12 @@ class LicenseService
      */
     public static function activateLicense(License $license, Account $account, ?string $ipAddress = null): bool
     {
+        if ($license->isExpired()) {
+            throw ValidationException::withMessages([
+                'license' => 'License has expired.',
+            ]);
+        }
+
         if (! $license->canActivate()) {
             throw ValidationException::withMessages([
                 'license' => 'License cannot be activated. Current status: '.$license->status->getLabel(),
@@ -102,7 +108,7 @@ class LicenseService
             // Re-fetch with a pessimistic lock to prevent concurrent activations
             $locked = License::lockForUpdate()->find($license->id);
 
-            if (! $locked || ! $locked->canActivate()) {
+            if (! $locked || $locked->isExpired() || ! $locked->canActivate()) {
                 throw ValidationException::withMessages([
                     'license' => 'License cannot be activated. It may have already been activated by another request.',
                 ]);

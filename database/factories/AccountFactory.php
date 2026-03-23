@@ -27,11 +27,10 @@ class AccountFactory extends Factory
         $suspended = fake()->boolean(5); // 5% chance of being suspended
         $suspendedUntil = $suspended ? fake()->optional(0.5)->dateTimeBetween('now', '+30 days') : null;
         $verificationUpperBound = $suspendedUntil ?: 'now';
-        $verificationChance = $suspendedUntil ? 0.4 : 0.8;
         $twoFactorChance = $suspendedUntil ? 0.1 : 0.15;
 
         return [
-            'username' => fake()->unique()->userName(),
+            'username' => fake()->unique()->regexify('[A-Za-z0-9_]{12}'),
             'email' => fake()->unique()->safeEmail(),
             'password' => Hash::make('password'), // Default test password
             'last_login_at' => fake()->optional(0.7)->dateTimeBetween($createdAt, 'now'),
@@ -48,7 +47,7 @@ class AccountFactory extends Factory
                 'Multiple failed login attempts',
             ]) : null,
             'suspended_until' => $suspendedUntil,
-            'email_verified_at' => fake()->optional($verificationChance)->dateTimeBetween($createdAt, $verificationUpperBound),
+            'email_verified_at' => fake()->dateTimeBetween($createdAt, $verificationUpperBound),
             'two_factor_secret' => fake()->boolean(20) ? encrypt(Str::random(32)) : null,
             'two_factor_recovery_codes' => fake()->boolean(20) ? encrypt(json_encode([Str::random(10), Str::random(10)])) : null,
             'two_factor_confirmed_at' => fake()->optional($twoFactorChance)->dateTimeBetween($createdAt, $verificationUpperBound),

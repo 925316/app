@@ -170,11 +170,11 @@ class StatisticsService
     public static function formatUsageTime(float $hours): string
     {
         $years = floor($hours / (24 * 365));
-        $remainingHours = $hours % (24 * 365);
+        $remainingHours = fmod($hours, 24 * 365);
         $months = floor($remainingHours / (24 * 30));
-        $remainingHours = $remainingHours % (24 * 30);
+        $remainingHours = fmod($remainingHours, 24 * 30);
         $days = floor($remainingHours / 24);
-        $remainingHours = $remainingHours % 24;
+        $remainingHours = fmod($remainingHours, 24);
         $hoursPart = floor($remainingHours);
         $minutes = floor(($remainingHours - $hoursPart) * 60);
 
@@ -195,7 +195,7 @@ class StatisticsService
             $parts[] = $minutes.'m';
         }
 
-        return implode(' ', $parts);
+        return implode(' ', $parts) ?: '0h';
     }
 
     /**

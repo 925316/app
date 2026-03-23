@@ -136,9 +136,23 @@ class LicenseFactory extends Factory
     public function suspended(): static
     {
         return $this->state(function (array $attributes) {
-            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-365 days', '-30 days');
-            $activatedAt = $attributes['activated_at'] ?? fake()->dateTimeBetween($createdAt, '-7 days');
-            $suspendedAt = fake()->dateTimeBetween($activatedAt, 'now');
+            $createdAt = $this->toCarbon($attributes['created_at'] ?? null)
+                ?? now()->subDays(fake()->numberBetween(30, 365));
+            $activationEnd = now()->subDays(7);
+
+            if ($createdAt->greaterThan($activationEnd)) {
+                $createdAt = $activationEnd->copy();
+            }
+
+            $activatedAt = $this->toCarbon($attributes['activated_at'] ?? null)
+                ?? fake()->dateTimeBetween($createdAt, $activationEnd);
+            $activatedAtCarbon = $this->toCarbon($activatedAt) ?? $createdAt->copy();
+
+            if ($activatedAtCarbon->greaterThan(now())) {
+                $activatedAtCarbon = now()->copy();
+            }
+
+            $suspendedAt = fake()->dateTimeBetween($activatedAtCarbon, 'now');
             $expiresAt = $attributes['expires_at'] ?? fake()->dateTimeBetween('now', '+365 days');
 
             return [
@@ -200,8 +214,16 @@ class LicenseFactory extends Factory
     public function upgraded(): static
     {
         return $this->state(function (array $attributes) {
-            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-365 days', '-20 days');
-            $activatedAt = $attributes['activated_at'] ?? fake()->dateTimeBetween($createdAt, '-5 days');
+            $createdAt = $this->toCarbon($attributes['created_at'] ?? null)
+                ?? now()->subDays(fake()->numberBetween(20, 365));
+            $activationEnd = now()->subDays(5);
+
+            if ($createdAt->greaterThan($activationEnd)) {
+                $createdAt = $activationEnd->copy();
+            }
+
+            $activatedAt = $this->toCarbon($attributes['activated_at'] ?? null)
+                ?? fake()->dateTimeBetween($createdAt, $activationEnd);
             $updatedAt = fake()->dateTimeBetween($activatedAt, 'now');
 
             return [
@@ -221,8 +243,16 @@ class LicenseFactory extends Factory
     public function revoked(): static
     {
         return $this->state(function (array $attributes) {
-            $createdAt = $attributes['created_at'] ?? fake()->dateTimeBetween('-365 days', '-20 days');
-            $activatedAt = $attributes['activated_at'] ?? fake()->dateTimeBetween($createdAt, '-5 days');
+            $createdAt = $this->toCarbon($attributes['created_at'] ?? null)
+                ?? now()->subDays(fake()->numberBetween(20, 365));
+            $activationEnd = now()->subDays(5);
+
+            if ($createdAt->greaterThan($activationEnd)) {
+                $createdAt = $activationEnd->copy();
+            }
+
+            $activatedAt = $this->toCarbon($attributes['activated_at'] ?? null)
+                ?? fake()->dateTimeBetween($createdAt, $activationEnd);
             $updatedAt = fake()->dateTimeBetween($activatedAt, 'now');
 
             return [

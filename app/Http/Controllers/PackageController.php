@@ -116,6 +116,10 @@ class PackageController extends Controller
             abort(403, 'You need a valid license to download packages.');
         }
 
+        if (! PackageService::isSafePublicHttpsUrl((string) $release->download_url)) {
+            abort(404, 'Package file is unavailable.');
+        }
+
         // Redirect to the actual download URL
         return redirect()->away($release->download_url);
     }
