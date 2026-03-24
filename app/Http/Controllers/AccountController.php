@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\LicensePrivilege;
+use App\Enums\LicenseStatus;
 use App\Http\Requests\AccountRequest;
 use App\Models\Account;
 use App\Models\EventLog;
@@ -91,7 +92,12 @@ class AccountController extends Controller
         // Get overall statistics (not filtered by search/pagination)
         $statistics = [
             'total' => Account::count(),
-            'active' => Account::active()->count(),
+            'active' => Account::query()
+                ->whereHas('licenses', function ($q): void {
+                    $q->where('status', LicenseStatus::ACTIVE->value)
+                        ->where('expires_at', '>', now());
+                })
+                ->count(),
             'suspended' => Account::suspended()->count(),
             'verified' => Account::whereNotNull('email_verified_at')->count(),
         ];

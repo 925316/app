@@ -6,9 +6,11 @@ use App\Models\Account;
 use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\License;
+use App\Models\PackageRelease;
 use App\Services\CryptoService;
 use Illuminate\Support\Carbon;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\postJson;
 
 function apiPayload(array $overrides = []): array
@@ -18,7 +20,7 @@ function apiPayload(array $overrides = []): array
         'license_key' => 'ABCDE-12ABC-ABCDE-ABCDE-ABCDE',
         'hwid' => 'HWID-TEST-12345',
         'nonce' => 'nonce-'.str()->random(16),
-        'version' => '1.0.0',
+        'version' => '26.0.0',
         'timestamp' => now()->timestamp,
     ], $overrides);
 }
@@ -288,16 +290,60 @@ it('normalizes session token and hwid input values before check processing', fun
     $response = postJson('/api/license/check', apiPayload([
         'session_token' => '  session-token-001  ',
         'hwid' => '  HWID-TEST-12345  ',
-        'version' => ' 1.0.0 ',
+        'version' => ' 26.0.0 ',
     ]));
 
     assertApiOk($response);
 });
 
+it('updates heartbeat session version to latest stable release version', function () {
+    $context = seedValidApiContext();
+
+    $stableVersion = '26.9.88';
+
+    PackageRelease::factory()->create([
+        'version' => $stableVersion,
+        'release_channel' => 'stable',
+    ]);
+
+    $context['session']->forceFill([
+        'client_version' => '26.3.01',
+    ])->save();
+
+    $response = postJson('/api/license/check', apiPayload([
+        'version' => '26.3.02',
+        'nonce' => 'nonce-check-upgrade-session-version',
+    ]));
+
+    assertApiOk($response);
+
+    expect($context['session']->fresh()->client_version)->toBe($stableVersion);
+});
+
+it('keeps existing session version when no package releases exist during heartbeat', function () {
+    $context = seedValidApiContext();
+
+    PackageRelease::query()->delete();
+
+    $existingVersion = '11.22.33';
+    $context['session']->forceFill([
+        'client_version' => $existingVersion,
+    ])->save();
+
+    $response = postJson('/api/license/check', apiPayload([
+        'version' => '99.0.0',
+        'nonce' => 'nonce-check-no-release-fallback',
+    ]));
+
+    assertApiOk($response);
+
+    expect($context['session']->fresh()->client_version)->toBe($existingVersion);
+});
+
 it('rejects license check after device is unbound in web flow', function () {
     $context = seedValidApiContext();
 
-    $this->actingAs($context['account'])
+    actingAs($context['account'])
         ->post(route('devices.unbind'))
         ->assertRedirect(route('devices.manage'));
 

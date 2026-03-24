@@ -15,6 +15,7 @@ use App\Models\License;
 use App\Services\CryptoService;
 use App\Services\LicenseService;
 use App\Services\NonceGuardService;
+use App\Services\PackageService;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -91,6 +92,8 @@ class ClientLicenseController extends Controller
             }
 
             $session = DB::transaction(function () use ($account, $validated, $request, $currentTime) {
+                $resolvedClientVersion = $this->resolveLatestStableVersion((string) $validated['version']);
+
                 $activeDevice = $account->devices()
                     ->whereNotNull('bound_at')
                     ->whereNull('unbound_at')
@@ -123,7 +126,7 @@ class ClientLicenseController extends Controller
                     'account_id' => $account->id,
                     'device_id' => $activeDevice->id,
                     'ip_address' => $request->ip(),
-                    'client_version' => (string) $validated['version'],
+                    'client_version' => $resolvedClientVersion,
                     'last_heartbeat_at' => $currentTime,
                 ]);
 
@@ -136,7 +139,7 @@ class ClientLicenseController extends Controller
                     'details' => [
                         'device_id' => $activeDevice->id,
                         'session_token' => $newSession->session_token,
-                        'client_version' => $validated['version'],
+                        'client_version' => $resolvedClientVersion,
                     ],
                 ]);
 
@@ -269,6 +272,7 @@ class ClientLicenseController extends Controller
 
             $session->forceFill([
                 'last_heartbeat_at' => $currentTime,
+                'client_version' => $this->resolveLatestStableVersion($session->client_version),
             ])->save();
 
             return $this->successResponse($data, true);
@@ -277,6 +281,27 @@ class ClientLicenseController extends Controller
 
             return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.', true);
         }
+    }
+
+    private function resolveLatestStableVersion(?string $fallbackVersion = null): string
+    {
+        $latestStableRelease = PackageService::getLatestRelease('stable');
+
+        if ($latestStableRelease && is_string($latestStableRelease->version) && $latestStableRelease->version !== '') {
+            return $latestStableRelease->version;
+        }
+
+        $latestAnyRelease = PackageService::getLatestRelease();
+
+        if ($latestAnyRelease && is_string($latestAnyRelease->version) && $latestAnyRelease->version !== '') {
+            return $latestAnyRelease->version;
+        }
+
+        if (is_string($fallbackVersion) && $fallbackVersion !== '') {
+            return $fallbackVersion;
+        }
+
+        return 'unknown';
     }
 
     public function activate(ClientActivateRequest $request): JsonResponse

@@ -14,10 +14,19 @@ it('can validate semantic version', function () {
     expect(PackageService::isValidSemanticVersion('1.0.0-alpha'))->toBeTrue();
     expect(PackageService::isValidSemanticVersion('1.0.0-beta.1'))->toBeTrue();
     expect(PackageService::isValidSemanticVersion('1.0.0+build.123'))->toBeTrue();
+    expect(PackageService::isValidSemanticVersion('26.3.12'))->toBeTrue();
+    expect(PackageService::isValidSemanticVersion('26.3.12-beta'))->toBeTrue();
     expect(PackageService::isValidSemanticVersion('1.0'))->toBeFalse();
     expect(PackageService::isValidSemanticVersion('1'))->toBeFalse();
     expect(PackageService::isValidSemanticVersion('v1.0.0'))->toBeFalse();
     expect(PackageService::isValidSemanticVersion('invalid'))->toBeFalse();
+});
+
+it('validates timeline release version for package uploads', function () {
+    expect(PackageService::isValidTimelineVersion('26.3.12'))->toBeTrue();
+    expect(PackageService::isValidTimelineVersion('26.3.12-beta'))->toBeTrue();
+    expect(PackageService::isValidTimelineVersion('1.0.0'))->toBeFalse();
+    expect(PackageService::isValidTimelineVersion('26.3'))->toBeFalse();
 });
 
 it('safe public https url helper rejects unsafe urls', function () {
@@ -31,17 +40,17 @@ it('safe public https url helper rejects unsafe urls', function () {
 
 it('can upload package', function () {
     $package = PackageService::uploadPackage(
-        '1.0.0',
+        '26.3.12',
         'stable',
-        'https://example.com/download/package-1.0.0.zip',
+        'https://example.com/download/package-26.3.12.zip',
         'Initial release',
         'https://virustotal.com/scan/123'
     );
 
     expect($package)->toBeInstanceOf(PackageRelease::class);
-    expect($package->version)->toBe('1.0.0');
+    expect($package->version)->toBe('26.3.12');
     expect($package->release_channel)->toBe('stable');
-    expect($package->download_url)->toBe('https://example.com/download/package-1.0.0.zip');
+    expect($package->download_url)->toBe('https://example.com/download/package-26.3.12.zip');
     expect($package->changelog)->toBe('Initial release');
 });
 
@@ -54,10 +63,10 @@ it('throws validation error for invalid version format', function () {
 });
 
 it('throws validation error for duplicate version', function () {
-    PackageService::uploadPackage('1.0.0', 'stable', 'https://example.com/package.zip');
+    PackageService::uploadPackage('26.3.12', 'stable', 'https://example.com/package.zip');
 
     expect(fn () => PackageService::uploadPackage(
-        '1.0.0',
+        '26.3.12',
         'stable',
         'https://example.com/package2.zip'
     ))->toThrow(ValidationException::class);
@@ -65,7 +74,7 @@ it('throws validation error for duplicate version', function () {
 
 it('throws validation error for invalid download URL', function () {
     expect(fn () => PackageService::uploadPackage(
-        '1.0.0',
+        '26.3.12',
         'stable',
         'invalid-url'
     ))->toThrow(ValidationException::class);
@@ -73,7 +82,7 @@ it('throws validation error for invalid download URL', function () {
 
 it('throws validation error for private network download URL', function () {
     expect(fn () => PackageService::uploadPackage(
-        '1.0.9',
+        '26.3.13',
         'stable',
         'https://10.0.0.1/private.zip'
     ))->toThrow(ValidationException::class);
@@ -81,7 +90,7 @@ it('throws validation error for private network download URL', function () {
 
 it('throws validation error for unsafe virus detection URL', function () {
     expect(fn () => PackageService::uploadPackage(
-        '1.1.9',
+        '26.3.14',
         'stable',
         'https://example.com/download.zip',
         null,
@@ -90,15 +99,15 @@ it('throws validation error for unsafe virus detection URL', function () {
 });
 
 it('can get latest release', function () {
-    PackageService::uploadPackage('1.0.0', 'stable', 'https://example.com/package-1.0.0.zip');
-    PackageService::uploadPackage('2.0.0', 'stable', 'https://example.com/package-2.0.0.zip');
-    PackageService::uploadPackage('1.5.0', 'dev', 'https://example.com/package-1.5.0-dev.zip');
+    PackageService::uploadPackage('26.3.11', 'stable', 'https://example.com/package-26.3.11.zip');
+    PackageService::uploadPackage('26.3.12', 'stable', 'https://example.com/package-26.3.12.zip');
+    PackageService::uploadPackage('26.3.12-beta', 'dev', 'https://example.com/package-26.3.12-beta.zip');
 
     $latestStable = PackageService::getLatestRelease('stable');
     $latestDev = PackageService::getLatestRelease('dev');
 
-    expect($latestStable->version)->toBe('2.0.0');
-    expect($latestDev->version)->toBe('1.5.0');
+    expect($latestStable->version)->toBe('26.3.12');
+    expect($latestDev->version)->toBe('26.3.12-beta');
 });
 
 it('returns null when no release found', function () {
@@ -108,24 +117,29 @@ it('returns null when no release found', function () {
 });
 
 it('can get all releases', function () {
-    PackageService::uploadPackage('1.0.0', 'stable', 'https://example.com/package-1.0.0.zip');
-    PackageService::uploadPackage('2.0.0', 'stable', 'https://example.com/package-2.0.0.zip');
-    PackageService::uploadPackage('1.5.0', 'dev', 'https://example.com/package-1.5.0-dev.zip');
+    PackageService::uploadPackage('26.3.10', 'stable', 'https://example.com/package-26.3.10.zip');
+    PackageService::uploadPackage('26.3.11', 'stable', 'https://example.com/package-26.3.11.zip');
+    PackageService::uploadPackage('26.3.11-beta', 'dev', 'https://example.com/package-26.3.11-beta.zip');
 
     $allReleases = PackageService::getAllReleases();
     $stableReleases = PackageService::getAllReleases('stable');
 
     expect($allReleases)->toHaveCount(3);
     expect($stableReleases)->toHaveCount(2);
+    expect($allReleases->pluck('version')->values()->all())->toBe([
+        '26.3.11',
+        '26.3.11-beta',
+        '26.3.10',
+    ]);
 });
 
 it('can get release by version', function () {
-    PackageService::uploadPackage('1.0.0', 'stable', 'https://example.com/package.zip');
+    PackageService::uploadPackage('26.3.12', 'stable', 'https://example.com/package.zip');
 
-    $release = PackageService::getReleaseByVersion('1.0.0');
+    $release = PackageService::getReleaseByVersion('26.3.12');
 
     expect($release)->not->toBeNull();
-    expect($release->version)->toBe('1.0.0');
+    expect($release->version)->toBe('26.3.12');
 });
 
 it('returns null for non-existent version', function () {
@@ -135,7 +149,7 @@ it('returns null for non-existent version', function () {
 });
 
 it('can delete release', function () {
-    $package = PackageService::uploadPackage('1.0.0', 'stable', 'https://example.com/package.zip');
+    $package = PackageService::uploadPackage('26.3.12', 'stable', 'https://example.com/package.zip');
 
     $result = PackageService::deleteRelease($package);
 
@@ -144,7 +158,7 @@ it('can delete release', function () {
 });
 
 it('can update changelog', function () {
-    $package = PackageService::uploadPackage('1.0.0', 'stable', 'https://example.com/package.zip');
+    $package = PackageService::uploadPackage('26.3.12', 'stable', 'https://example.com/package.zip');
 
     $result = PackageService::updateChangelog($package, 'Updated changelog');
 
@@ -153,7 +167,7 @@ it('can update changelog', function () {
 });
 
 it('can get download URL', function () {
-    $package = PackageService::uploadPackage('1.0.0', 'stable', 'https://example.com/package.zip');
+    $package = PackageService::uploadPackage('26.3.12', 'stable', 'https://example.com/package.zip');
 
     $url = PackageService::getDownloadUrl($package);
 
@@ -168,9 +182,9 @@ it('can format file size', function () {
 });
 
 it('can get package statistics', function () {
-    PackageService::uploadPackage('1.0.0', 'stable', 'https://example.com/package-1.0.0.zip');
-    PackageService::uploadPackage('2.0.0', 'stable', 'https://example.com/package-2.0.0.zip');
-    PackageService::uploadPackage('1.5.0-dev', 'dev', 'https://example.com/package-1.5.0-dev.zip');
+    PackageService::uploadPackage('26.3.10', 'stable', 'https://example.com/package-26.3.10.zip');
+    PackageService::uploadPackage('26.3.11', 'stable', 'https://example.com/package-26.3.11.zip');
+    PackageService::uploadPackage('26.3.11-beta', 'dev', 'https://example.com/package-26.3.11-beta.zip');
 
     $stats = PackageService::getPackageStatistics();
 
@@ -179,4 +193,39 @@ it('can get package statistics', function () {
     expect($stats['dev_releases'])->toBe(1);
     expect($stats['latest_stable'])->not->toBeNull();
     expect($stats['latest_dev'])->not->toBeNull();
+});
+
+it('compares timeline versions with beta precedence', function () {
+    expect(PackageService::compareReleaseVersions('26.3.12', '26.3.11'))->toBeGreaterThan(0);
+    expect(PackageService::compareReleaseVersions('26.3.12-beta', '26.3.12'))->toBeLessThan(0);
+    expect(PackageService::compareReleaseVersions('26.4.0', '26.3.99'))->toBeGreaterThan(0);
+});
+
+it('sorts releases by numeric version magnitude instead of string order', function () {
+    PackageService::uploadPackage('26.10.2', 'stable', 'https://example.com/package-26.10.2.zip');
+    PackageService::uploadPackage('26.9.20', 'stable', 'https://example.com/package-26.9.20.zip');
+    PackageService::uploadPackage('26.10.12', 'stable', 'https://example.com/package-26.10.12.zip');
+    PackageService::uploadPackage('26.10.12-beta', 'stable', 'https://example.com/package-26.10.12-beta.zip');
+
+    $sorted = PackageService::getAllReleases('stable')->pluck('version')->values()->all();
+
+    expect($sorted)->toBe([
+        '26.10.12',
+        '26.10.12-beta',
+        '26.10.2',
+        '26.9.20',
+    ]);
+});
+
+it('paginates releases using numeric version ordering', function () {
+    PackageService::uploadPackage('26.10.2', 'stable', 'https://example.com/package-26.10.2.zip');
+    PackageService::uploadPackage('26.10.1', 'stable', 'https://example.com/package-26.10.1.zip');
+    PackageService::uploadPackage('26.9.99', 'stable', 'https://example.com/package-26.9.99.zip');
+
+    $pageOne = PackageService::getPaginatedReleases('stable', 2, 1);
+    $pageTwo = PackageService::getPaginatedReleases('stable', 2, 2);
+
+    expect($pageOne->items()[0]->version)->toBe('26.10.2')
+        ->and($pageOne->items()[1]->version)->toBe('26.10.1')
+        ->and($pageTwo->items()[0]->version)->toBe('26.9.99');
 });

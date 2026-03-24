@@ -26,15 +26,11 @@ class PackageController extends Controller
             abort(403, 'You need a valid license to access packages.');
         }
 
-        $query = PackageRelease::orderBy('version', 'desc')
-            ->orderBy('id', 'desc');
-
-        // Filter by channel
-        if ($request->filled('channel')) {
-            $query->where('release_channel', $request->channel);
-        }
-
-        $releases = $query->paginate(15);
+        $releases = PackageService::getPaginatedReleases(
+            $request->filled('channel') ? (string) $request->channel : null,
+            15,
+            $request->integer('page', 1)
+        );
 
         $stats = PackageService::getPackageStatistics();
 
@@ -141,15 +137,11 @@ class PackageController extends Controller
 
         $isAdmin = $user->hasPrivilege(7);
 
-        $query = PackageRelease::orderBy('version', 'desc')
-            ->orderBy('id', 'desc');
-
-        // Filter by channel
-        if (request()->filled('channel')) {
-            $query->where('release_channel', request()->channel);
-        }
-
-        $releases = $query->paginate(20);
+        $releases = PackageService::getPaginatedReleases(
+            request()->filled('channel') ? (string) request()->channel : null,
+            20,
+            request()->integer('page', 1)
+        );
 
         $stats = PackageService::getPackageStatistics();
 

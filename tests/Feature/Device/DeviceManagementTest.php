@@ -34,9 +34,56 @@ it('admin can see device statistics', function () {
     $response->assertViewHasAll([
         'totalDevices',
         'boundDevices',
-        'activeDevices',
         'unboundDevices',
+        'neverBoundDevices',
     ]);
+});
+
+it('never bound device stats and filter include only devices that were never bound', function () {
+    $onlineBoundDevice = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'bound_at' => now()->subDays(2),
+        'unbound_at' => null,
+        'last_seen_at' => now()->subDays(5),
+    ]);
+
+    $boundWithoutOnlineHeartbeat = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'bound_at' => now()->subDays(6),
+        'unbound_at' => null,
+        'last_seen_at' => now()->subDays(45),
+    ]);
+
+    $unboundButSessionedDevice = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'bound_at' => now()->subDays(3),
+        'unbound_at' => now()->subDay(),
+        'last_seen_at' => now()->subDays(3),
+    ]);
+
+    $neverBound = AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'bound_at' => null,
+        'unbound_at' => null,
+    ]);
+
+    $response = $this->actingAs($this->admin)
+        ->get(route('devices.index', ['status' => 'never_bound']));
+
+    $response->assertSuccessful();
+    $response->assertViewHas('neverBoundDevices', fn (int $count) => $count === 1);
+
+    $filtered = $response->viewData('devices');
+    $ids = collect($filtered->items())->pluck('id');
+
+    expect($ids)->toHaveCount(1);
+
+    $activeDevice = AccountDevice::query()->find($ids->first());
+    expect($activeDevice)->not->toBeNull();
+    expect($ids->contains($neverBound->id))->toBeTrue();
+    expect($ids->contains($onlineBoundDevice->id))->toBeFalse();
+    expect($ids->contains($unboundButSessionedDevice->id))->toBeFalse();
+    expect($ids->contains($boundWithoutOnlineHeartbeat->id))->toBeFalse();
 });
 
 it('admin can filter devices by status', function () {

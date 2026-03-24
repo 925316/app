@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Account;
 use App\Models\AccountDevice;
 use App\Models\ClientSession;
+use App\Services\PackageService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -27,7 +28,6 @@ class ClientSessionFactory extends Factory
      */
     public function definition(): array
     {
-        $clientVersions = ['1.0.0', '1.1.0', '1.2.3', '2.0.0', '2.1.0', '2.2.5'];
         $createdAt = fake()->dateTimeBetween('-30 days', 'now');
         $heartbeatOptions = [
             null,
@@ -43,11 +43,26 @@ class ClientSessionFactory extends Factory
             'account_id' => Account::factory(),
             'device_id' => AccountDevice::factory(),
             'ip_address' => $this->generateValidIpv4(),
-            'client_version' => fake()->randomElement($clientVersions),
+            'client_version' => $this->resolveDefaultClientVersion(),
             'last_heartbeat_at' => $lastHeartbeat,
             'created_at' => $createdAt,
             'updated_at' => $updatedAt,
         ];
+    }
+
+    private function resolveDefaultClientVersion(): string
+    {
+        $latestStable = PackageService::getLatestRelease('stable');
+        if ($latestStable && is_string($latestStable->version) && $latestStable->version !== '') {
+            return $latestStable->version;
+        }
+
+        $latestAny = PackageService::getLatestRelease();
+        if ($latestAny && is_string($latestAny->version) && $latestAny->version !== '') {
+            return $latestAny->version;
+        }
+
+        return 'unknown';
     }
 
     /**

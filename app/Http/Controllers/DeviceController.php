@@ -67,15 +67,15 @@ class DeviceController extends Controller
         // Calculate statistics
         $totalDevices = AccountDevice::count();
         $boundDevices = AccountDevice::whereNotNull('bound_at')->whereNull('unbound_at')->count();
-        $activeDevices = AccountDevice::where('last_seen_at', '>=', now()->subDays(30))->count();
         $unboundDevices = AccountDevice::whereNotNull('unbound_at')->count();
+        $neverBoundDevices = AccountDevice::whereNull('bound_at')->count();
 
         return view('devices.admin-index', [
             'devices' => $devices,
             'totalDevices' => $totalDevices,
             'boundDevices' => $boundDevices,
-            'activeDevices' => $activeDevices,
             'unboundDevices' => $unboundDevices,
+            'neverBoundDevices' => $neverBoundDevices,
         ]);
     }
 
@@ -570,8 +570,8 @@ class DeviceController extends Controller
                 case 'unbound':
                     $query->whereNotNull('unbound_at');
                     break;
-                case 'active':
-                    $query->where('last_seen_at', '>=', $currentTime->copy()->subDays(30));
+                case 'never_bound':
+                    $query->whereNull('bound_at');
                     break;
             }
         }

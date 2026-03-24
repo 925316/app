@@ -13,6 +13,8 @@ class LicenseSeeder extends Seeder
 {
     private const WINDOW_DAYS = 365;
 
+    private const INVENTORY_MULTIPLIER = 2;
+
     /**
      * Run the database seeds.
      */
@@ -133,28 +135,30 @@ class LicenseSeeder extends Seeder
     private function createUnusedLicensePool(): void
     {
         License::factory()
-            ->count(18)
+            ->count(18 * self::INVENTORY_MULTIPLIER)
             ->unused()
             ->standard()
             ->create();
 
         License::factory()
-            ->count(10)
+            ->count(10 * self::INVENTORY_MULTIPLIER)
             ->unused()
             ->upgrade()
             ->create();
 
         License::factory()
-            ->count(12)
+            ->count(12 * self::INVENTORY_MULTIPLIER)
             ->unused()
             ->ultimate()
             ->create();
 
         License::factory()
-            ->count(6)
+            ->count(6 * self::INVENTORY_MULTIPLIER)
             ->unused()
             ->staff()
             ->create();
+
+        $this->command->info('Scaled unused license inventory by x'.self::INVENTORY_MULTIPLIER);
     }
 
     /**
@@ -164,6 +168,7 @@ class LicenseSeeder extends Seeder
     private function createLicensesForAccounts(): void
     {
         $accounts = Account::query()
+            ->where('email', 'not like', '%@test.com')
             ->take(20)
             ->get();
 
@@ -201,7 +206,10 @@ class LicenseSeeder extends Seeder
 
     private function createUpgradeChains(): void
     {
-        $accounts = Account::query()->take(6)->get();
+        $accounts = Account::query()
+            ->where('email', 'not like', '%@test.com')
+            ->take(6)
+            ->get();
 
         foreach ($accounts as $account) {
             $existingUpgradeHistory = License::query()
@@ -253,7 +261,9 @@ class LicenseSeeder extends Seeder
                 'notes' => 'Seed: Upgraded from this base license',
             ]);
 
-            if ($activeLicense->activated_at === null || $activeLicense->activated_at->lessThan($upgradeAt)) {
+            $shouldRetimelineActiveLicense = $activeLicense->notes === 'Seed: Active license generated for timeline';
+
+            if ($shouldRetimelineActiveLicense && ($activeLicense->activated_at === null || $activeLicense->activated_at->lessThan($upgradeAt))) {
                 $activeLicense->forceFill([
                     'activated_at' => $upgradeAt->copy()->addHours(fake()->numberBetween(1, 36)),
                     'created_at' => $baseCreatedAt->copy()->addDays(fake()->numberBetween(5, 30)),

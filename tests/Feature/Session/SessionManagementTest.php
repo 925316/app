@@ -15,6 +15,7 @@ it('admin can view sessions index', function () {
         ->get(route('sessions.index'))
         ->assertSuccessful()
         ->assertViewIs('sessions.index')
+        ->assertSee(__('Client Version'))
         ->assertViewHasAll(['sessions', 'statistics', 'statusOptions', 'currentFilters']);
 });
 
@@ -160,6 +161,47 @@ it('admin can view session details', function () {
         ->assertSuccessful()
         ->assertViewIs('sessions.show')
         ->assertViewHas('session');
+});
+
+it('sessions index renders copy-friendly truncated cells for long device and version strings', function () {
+    $account = Account::factory()->create();
+    $device = AccountDevice::factory()->create([
+        'account_id' => $account->id,
+        'hwid_hash' => str_repeat('a', 64),
+    ]);
+
+    ClientSession::factory()->create([
+        'account_id' => $account->id,
+        'device_id' => $device->id,
+        'client_version' => '26.3.30-build-with-a-very-long-suffix-for-ui-checks',
+    ]);
+
+    $this->actingAs($this->admin)
+        ->get(route('sessions.index'))
+        ->assertSuccessful()
+        ->assertSee('data-copy-value="26.3.30-build-with-a-very-long-suffix-for-ui-checks"', false)
+        ->assertSee('onclick="copyTextValue(this)"', false)
+        ->assertSee('max-w-[220px] truncate', false);
+});
+
+it('session detail page renders truncated copy button for full session token', function () {
+    $account = Account::factory()->create();
+    $device = AccountDevice::factory()->create(['account_id' => $account->id]);
+    $longToken = str_repeat('tok', 30);
+
+    $session = ClientSession::factory()->create([
+        'account_id' => $account->id,
+        'device_id' => $device->id,
+        'session_token' => $longToken,
+        'client_version' => '26.3.30-super-long-build-tag',
+    ]);
+
+    $this->actingAs($this->admin)
+        ->get(route('sessions.show', $session))
+        ->assertSuccessful()
+        ->assertSee('data-copy-value="'.$longToken.'"', false)
+        ->assertSee('onclick="copySessionField(this)"', false)
+        ->assertSee('Copied');
 });
 
 // --- Destroy ---

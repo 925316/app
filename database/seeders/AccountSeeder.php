@@ -268,6 +268,18 @@ class AccountSeeder extends Seeder
 
     private function createSeedAccount(array $attributes, Carbon $createdAt, Carbon $updatedAt): Account
     {
+        if (isset($attributes['username']) && is_string($attributes['username'])) {
+            $normalizedUsername = strtolower(preg_replace('/[^a-z0-9]/', '', $attributes['username']) ?? '');
+            if ($normalizedUsername === '') {
+                $normalizedUsername = 'user'.fake()->unique()->numberBetween(1000, 999999);
+            }
+            $attributes['username'] = $normalizedUsername;
+        }
+
+        if (isset($attributes['email']) && is_string($attributes['email'])) {
+            $attributes['email'] = strtolower($attributes['email']);
+        }
+
         $account = Account::create($attributes);
 
         Account::withoutTimestamps(function () use ($account, $createdAt, $updatedAt): void {

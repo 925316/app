@@ -18,7 +18,7 @@ function apiUnbindPayload(array $overrides = []): array
         'license_key' => 'KLMNO-12ABC-ABCDE-ABCDE-ABCDE',
         'hwid' => 'HWID-UNBIND-12345',
         'nonce' => 'nonce-'.str()->random(16),
-        'version' => '1.0.0',
+        'version' => '26.0.0',
         'timestamp' => now()->timestamp,
     ], $overrides);
 }

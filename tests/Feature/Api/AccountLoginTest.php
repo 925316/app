@@ -7,6 +7,7 @@ use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\EventLog;
 use App\Models\License;
+use App\Models\PackageRelease;
 use App\Services\CryptoService;
 
 use function Pest\Laravel\postJson;
@@ -19,7 +20,7 @@ function apiLoginPayload(array $overrides = []): array
         'hwid' => 'HWID-LOGIN-12345',
         'nonce' => 'nonce-'.str()->random(16),
         'timestamp' => now()->timestamp,
-        'version' => '1.2.3',
+        'version' => '26.0.0',
         'country_code' => 'US',
     ], $overrides);
 }
@@ -269,10 +270,58 @@ it('normalizes hwid and version input values before login processing', function 
 
     $response = postJson('/api/account/login', apiLoginPayload([
         'hwid' => '  HWID-LOGIN-12345  ',
-        'version' => ' 1.2.3 ',
+        'version' => ' 26.0.0 ',
     ]));
 
     assertApiOk($response);
+});
+
+it('falls back to incoming client version when no package release records exist', function () {
+    seedLoginApiContext();
+
+    PackageRelease::query()->delete();
+
+    $fallbackVersion = '77.1.9';
+    $response = postJson('/api/account/login', apiLoginPayload([
+        'version' => $fallbackVersion,
+        'nonce' => 'nonce-no-release-login-fallback',
+    ]));
+
+    assertApiOk($response);
+
+    $sessionToken = (string) $response->json('data.session_token');
+    $storedSession = ClientSession::query()->where('session_token', $sessionToken)->firstOrFail();
+
+    expect($storedSession->client_version)->toBe($fallbackVersion);
+});
+
+it('stores latest stable package version in session instead of incoming client payload version', function () {
+    seedLoginApiContext();
+
+    $stableVersion = '26.9.99';
+    $devVersion = $stableVersion.'-beta';
+
+    PackageRelease::factory()->create([
+        'version' => $stableVersion,
+        'release_channel' => 'stable',
+    ]);
+
+    PackageRelease::factory()->create([
+        'version' => $devVersion,
+        'release_channel' => 'dev',
+    ]);
+
+    $response = postJson('/api/account/login', apiLoginPayload([
+        'version' => '26.3.01',
+        'nonce' => 'nonce-latest-stable-session-version',
+    ]));
+
+    assertApiOk($response);
+
+    $sessionToken = (string) $response->json('data.session_token');
+    $storedSession = ClientSession::query()->where('session_token', $sessionToken)->firstOrFail();
+
+    expect($storedSession->client_version)->toBe($stableVersion);
 });
 
 it('replaces existing session on repeated successful login for same account and device', function () {

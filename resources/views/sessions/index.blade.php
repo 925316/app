@@ -230,7 +230,7 @@
 
                     <!-- Sessions table -->
                     <x-table :emptyColspan="$isAdmin ? 8 : 7">
-                        <x-slot:header>
+                        <x-slot:headers>
                             @if ($isAdmin)
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Account
@@ -243,7 +243,7 @@
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Last Heartbeat') }}</th>
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Created') }}</th>
                             <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Actions') }}</th>
-                        </x-slot:header>
+                        </x-slot:headers>
                         @forelse($sessions as $session)
                             <tr>
                                 @if ($isAdmin)
@@ -272,7 +272,7 @@
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                     @if ($session->device)
                                         <div>
-                                            <div class="text-sm font-medium">
+                                            <div class="text-sm font-medium max-w-[220px] truncate" title="{{ $session->device->hwid_hash ?? __('Unknown Device') }}">
                                                 {{ $session->device->hwid_hash ?? __('Unknown Device') }}
                                             </div>
                                             <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -283,13 +283,21 @@
                                         <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Unknown') }}</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white max-w-[180px] truncate" title="{{ $session->ip_address ?? __('N/A') }}">
                                     {{ $session->ip_address ?? __('N/A') }}
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                        {{ $session->client_version ?? __('Unknown') }}
-                                    </span>
+                                    @php
+                                        $clientVersion = $session->client_version ?? __('Unknown');
+                                    @endphp
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center max-w-[170px] truncate px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                                        title="{{ $clientVersion }}"
+                                        data-copy-value="{{ $clientVersion }}"
+                                        onclick="copyTextValue(this)">
+                                        {{ $clientVersion }}
+                                    </button>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap">
                                     @if ($session->isActive())
@@ -356,3 +364,25 @@
     </div>
 
 </x-app-sidebar-layout>
+
+<script>
+    function copyTextValue(element) {
+        const value = element?.getAttribute('data-copy-value') ?? '';
+        if (!value) {
+            return;
+        }
+
+        navigator.clipboard?.writeText(value).then(() => {
+            const originalTitle = element.getAttribute('title') ?? value;
+            element.setAttribute('title', "{{ __('Copied') }}");
+            setTimeout(() => element.setAttribute('title', originalTitle), 1200);
+        }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = value;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        });
+    }
+</script>

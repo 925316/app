@@ -31,6 +31,7 @@ class AccountDeviceSeeder extends Seeder
     private function createPrimaryDeviceBindings(): void
     {
         $accounts = Account::all();
+        $now = now();
 
         foreach ($accounts as $account) {
             // Check if account already has a bound device
@@ -40,14 +41,37 @@ class AccountDeviceSeeder extends Seeder
                 ->exists();
 
             if (! $existingBound) {
-                $firstSeen = now()->subDays(fake()->numberBetween(30, 365));
+                $firstSeen = $now->copy()->subDays(fake()->numberBetween(30, 365));
                 if ($account->created_at && $firstSeen->lessThan($account->created_at)) {
                     $firstSeen = $account->created_at->copy()->addDays(fake()->numberBetween(0, 7));
                 }
+
+                if ($firstSeen->greaterThan($now->copy()->subDays(2))) {
+                    $firstSeen = $now->copy()->subDays(fake()->numberBetween(7, 60));
+                }
+
                 $boundAt = $firstSeen->copy()->addDays(fake()->numberBetween(1, 7));
+
+                if ($boundAt->greaterThan($now->copy()->subHours(1))) {
+                    $boundAt = $now->copy()->subHours(fake()->numberBetween(2, 48));
+
+                    if ($boundAt->lessThan($firstSeen)) {
+                        $firstSeen = $boundAt->copy()->subDays(fake()->numberBetween(1, 7));
+                    }
+                }
+
                 $lastSeen = $boundAt->copy()->addDays(fake()->numberBetween(0, 30));
-                if ($lastSeen->greaterThan(now())) {
-                    $lastSeen = now()->subHours(fake()->numberBetween(1, 72));
+
+                if ($lastSeen->greaterThan($now)) {
+                    $lastSeen = $now->copy()->subHours(fake()->numberBetween(1, 72));
+                }
+
+                if ($lastSeen->lessThan($boundAt)) {
+                    $lastSeen = $boundAt->copy()->addHours(fake()->numberBetween(1, 24));
+
+                    if ($lastSeen->greaterThan($now)) {
+                        $lastSeen = $now->copy()->subMinutes(fake()->numberBetween(1, 45));
+                    }
                 }
 
                 AccountDevice::factory()
@@ -71,29 +95,50 @@ class AccountDeviceSeeder extends Seeder
     private function createHistoricalDevices(): void
     {
         $accounts = Account::all();
+        $now = now();
 
         foreach ($accounts as $account) {
             // Random number of historical devices (0-3 per account)
             $historicalCount = fake()->numberBetween(0, 3);
 
             for ($i = 0; $i < $historicalCount; $i++) {
-                $firstSeen = now()->subDays(fake()->numberBetween(60, 340));
+                $firstSeen = $now->copy()->subDays(fake()->numberBetween(60, 340));
                 if ($account->created_at && $firstSeen->lessThan($account->created_at)) {
                     $firstSeen = $account->created_at->copy()->addDays(fake()->numberBetween(0, 10));
                 }
 
-                if ($firstSeen->greaterThan(now()->subDays(2))) {
-                    $firstSeen = now()->subDays(fake()->numberBetween(7, 60));
+                if ($firstSeen->greaterThan($now->copy()->subDays(2))) {
+                    $firstSeen = $now->copy()->subDays(fake()->numberBetween(7, 60));
                 }
 
                 $bindDate = $firstSeen->copy()->addDays(fake()->numberBetween(1, 7));
                 $unbindDate = $bindDate->copy()->addDays(fake()->numberBetween(7, 120));
 
-                if ($unbindDate->greaterThan(now()->subDay())) {
-                    $unbindDate = now()->subDays(fake()->numberBetween(1, 14));
+                if ($unbindDate->greaterThan($now->copy()->subDay())) {
+                    $unbindDate = $now->copy()->subDays(fake()->numberBetween(1, 14));
+
+                    if ($unbindDate->lessThanOrEqualTo($bindDate)) {
+                        $bindDate = $unbindDate->copy()->subDays(fake()->numberBetween(1, 7));
+
+                        if ($bindDate->lessThan($firstSeen)) {
+                            $firstSeen = $bindDate->copy()->subDays(fake()->numberBetween(1, 5));
+                        }
+                    }
                 }
 
-                $lastSeen = $unbindDate->copy()->subDays(fake()->numberBetween(1, 7));
+                $lastSeen = $bindDate->copy()->addDays(fake()->numberBetween(1, 30));
+
+                if ($lastSeen->greaterThan($unbindDate)) {
+                    $lastSeen = $unbindDate->copy()->subHours(fake()->numberBetween(1, 24));
+                }
+
+                if ($lastSeen->lessThan($bindDate)) {
+                    $lastSeen = $bindDate->copy()->addHours(fake()->numberBetween(1, 12));
+
+                    if ($lastSeen->greaterThan($unbindDate)) {
+                        $lastSeen = $unbindDate->copy()->subMinute();
+                    }
+                }
 
                 AccountDevice::factory()
                     ->for($account)

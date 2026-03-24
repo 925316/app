@@ -57,6 +57,24 @@ it('package list can be filtered by channel', function () {
     expect($releases->first()->release_channel)->toBe('stable');
 });
 
+it('package list uses numeric version ordering instead of lexicographic order', function () {
+    PackageRelease::factory()->create(['version' => '26.9.20', 'release_channel' => 'stable']);
+    PackageRelease::factory()->create(['version' => '26.10.2', 'release_channel' => 'stable']);
+    PackageRelease::factory()->create(['version' => '26.10.12', 'release_channel' => 'stable']);
+
+    $response = $this->actingAs($this->userWithLicense)
+        ->get(route('packages.index', ['channel' => 'stable']));
+
+    $response->assertSuccessful();
+    $versions = $response->viewData('releases')->pluck('version')->values()->all();
+
+    expect($versions)->toBe([
+        '26.10.12',
+        '26.10.2',
+        '26.9.20',
+    ]);
+});
+
 // --- Package Show ---
 
 it('user with license can view package details', function () {
@@ -183,15 +201,15 @@ it('non-admin cannot store package upload', function () {
 it('admin can upload a new package', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '3.0.0',
+            'version' => '26.3.12',
             'release_channel' => 'stable',
-            'download_url' => 'https://example.com/download/package-3.0.0.zip',
+            'download_url' => 'https://example.com/download/package-26.3.12.zip',
             'changelog' => 'New release',
         ])
         ->assertRedirect(route('packages.index'))
         ->assertSessionHas('success');
 
-    expect(PackageRelease::where('version', '3.0.0')->exists())->toBeTrue();
+    expect(PackageRelease::where('version', '26.3.12')->exists())->toBeTrue();
 });
 
 it('upload validates version format', function () {
@@ -205,11 +223,11 @@ it('upload validates version format', function () {
 });
 
 it('upload validates duplicate version', function () {
-    PackageRelease::factory()->create(['version' => '1.0.0']);
+    PackageRelease::factory()->create(['version' => '26.3.12']);
 
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '1.0.0',
+            'version' => '26.3.12',
             'release_channel' => 'stable',
             'download_url' => 'https://example.com/package.zip',
         ])
@@ -219,7 +237,7 @@ it('upload validates duplicate version', function () {
 it('upload validates download url', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.0',
+            'version' => '26.3.1',
             'release_channel' => 'stable',
             'download_url' => 'not-a-url',
         ])
@@ -229,7 +247,7 @@ it('upload validates download url', function () {
 it('upload rejects non-https download url', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.1',
+            'version' => '26.3.2',
             'release_channel' => 'stable',
             'download_url' => 'http://example.com/package.zip',
         ])
@@ -239,7 +257,7 @@ it('upload rejects non-https download url', function () {
 it('upload rejects localhost download url', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.2',
+            'version' => '26.3.3',
             'release_channel' => 'stable',
             'download_url' => 'https://localhost/package.zip',
         ])
@@ -249,7 +267,7 @@ it('upload rejects localhost download url', function () {
 it('upload rejects credential-bearing download url', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.3',
+            'version' => '26.3.4',
             'release_channel' => 'stable',
             'download_url' => 'https://user:pass@example.com/package.zip',
         ])
@@ -259,7 +277,7 @@ it('upload rejects credential-bearing download url', function () {
 it('upload rejects private network download url', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.31',
+            'version' => '26.3.5',
             'release_channel' => 'stable',
             'download_url' => 'https://192.168.1.10/package.zip',
         ])
@@ -269,7 +287,7 @@ it('upload rejects private network download url', function () {
 it('upload validates virus detection url format', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.4',
+            'version' => '26.3.6',
             'release_channel' => 'stable',
             'download_url' => 'https://example.com/package.zip',
             'virus_detection_url' => 'not-a-url',
@@ -280,7 +298,7 @@ it('upload validates virus detection url format', function () {
 it('upload rejects non-https virus detection url', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.5',
+            'version' => '26.3.7',
             'release_channel' => 'stable',
             'download_url' => 'https://example.com/package.zip',
             'virus_detection_url' => 'http://example.com/scan',
@@ -291,7 +309,7 @@ it('upload rejects non-https virus detection url', function () {
 it('upload rejects localhost virus detection url', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.6',
+            'version' => '26.3.8',
             'release_channel' => 'stable',
             'download_url' => 'https://example.com/package.zip',
             'virus_detection_url' => 'https://localhost/scan',
@@ -302,7 +320,7 @@ it('upload rejects localhost virus detection url', function () {
 it('upload rejects private network virus detection url', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.61',
+            'version' => '26.3.9',
             'release_channel' => 'stable',
             'download_url' => 'https://example.com/package.zip',
             'virus_detection_url' => 'https://10.0.0.9/scan',
@@ -313,7 +331,7 @@ it('upload rejects private network virus detection url', function () {
 it('upload validates release channel', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '2.0.0',
+            'version' => '26.3.10',
             'release_channel' => 'invalid-channel',
             'download_url' => 'https://example.com/package.zip',
         ])
@@ -480,7 +498,7 @@ it('upload validates download url max length', function () {
 
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '4.0.0',
+            'version' => '26.3.11',
             'release_channel' => 'stable',
             'download_url' => $longUrl,
         ])
@@ -490,7 +508,7 @@ it('upload validates download url max length', function () {
 it('upload validates virus detection url max length', function () {
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => '4.1.0',
+            'version' => '26.3.11-beta',
             'release_channel' => 'stable',
             'download_url' => 'https://example.com/package.zip',
             'virus_detection_url' => str_repeat('x', 2001),
@@ -499,13 +517,24 @@ it('upload validates virus detection url max length', function () {
 });
 
 it('upload trims version before uniqueness validation', function () {
-    PackageRelease::factory()->create(['version' => '1.0.0', 'release_channel' => 'stable']);
+    PackageRelease::factory()->create(['version' => '26.3.12', 'release_channel' => 'stable']);
 
     $this->actingAs($this->admin)
         ->post(route('packages.store'), [
-            'version' => ' 1.0.0 ',
+            'version' => ' 26.3.12 ',
             'release_channel' => 'stable',
             'download_url' => 'https://example.com/package.zip',
         ])
         ->assertSessionHasErrors('version');
+});
+
+it('upload accepts timeline beta version format', function () {
+    $this->actingAs($this->admin)
+        ->post(route('packages.store'), [
+            'version' => '26.3.12-beta',
+            'release_channel' => 'dev',
+            'download_url' => 'https://example.com/package-beta.zip',
+        ])
+        ->assertRedirect(route('packages.index'))
+        ->assertSessionHas('success');
 });

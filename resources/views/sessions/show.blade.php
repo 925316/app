@@ -62,8 +62,20 @@
                             <dl class="space-y-3">
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Session Token') }}</dt>
+                                    @php
+                                        $sessionToken = (string) $session->session_token;
+                                        $sessionTokenPreview = \Illuminate\Support\Str::limit($sessionToken, 24, '...');
+                                    @endphp
                                     <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono">
-                                        {{ $session->session_token }}</dd>
+                                        <button
+                                            type="button"
+                                            class="max-w-[280px] truncate text-left hover:text-blue-600 dark:hover:text-blue-300"
+                                            title="{{ $sessionToken }}"
+                                            data-copy-value="{{ $sessionToken }}"
+                                            onclick="copySessionField(this)">
+                                            {{ $sessionTokenPreview }}
+                                        </button>
+                                    </dd>
                                 </div>
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('IP Address') }}</dt>
@@ -73,8 +85,19 @@
                                 </div>
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Client Version') }}</dt>
+                                    @php
+                                        $sessionClientVersion = (string) ($session->client_version ?? __('Unknown'));
+                                        $sessionClientVersionPreview = \Illuminate\Support\Str::limit($sessionClientVersion, 18, '...');
+                                    @endphp
                                     <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                        {{ $session->client_version ?? __('Unknown') }}
+                                        <button
+                                            type="button"
+                                            class="max-w-[180px] truncate text-left hover:text-blue-600 dark:hover:text-blue-300"
+                                            title="{{ $sessionClientVersion }}"
+                                            data-copy-value="{{ $sessionClientVersion }}"
+                                            onclick="copySessionField(this)">
+                                            {{ $sessionClientVersionPreview }}
+                                        </button>
                                     </dd>
                                 </div>
                             </dl>
@@ -222,3 +245,25 @@
     </div>
 
 </x-app-sidebar-layout>
+
+<script>
+    function copySessionField(element) {
+        const value = element?.getAttribute('data-copy-value') ?? '';
+        if (!value) {
+            return;
+        }
+
+        navigator.clipboard?.writeText(value).then(() => {
+            const originalTitle = element.getAttribute('title') ?? value;
+            element.setAttribute('title', "{{ __('Copied') }}");
+            setTimeout(() => element.setAttribute('title', originalTitle), 1200);
+        }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = value;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        });
+    }
+</script>

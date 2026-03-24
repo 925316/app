@@ -78,7 +78,7 @@ class ClientPackageController extends Controller
             }
 
             $updateAvailable = $currentVersion !== null
-                ? version_compare($latestRelease->version, $currentVersion, '>')
+                ? PackageService::compareReleaseVersions($latestRelease->version, $currentVersion) > 0
                 : null;
             $reason = $currentVersion === null
                 ? 'no_current_version'

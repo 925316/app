@@ -6,6 +6,7 @@ use App\Enums\EventType;
 use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\AccountDevice;
+use App\Models\ClientSession;
 use App\Models\EventLog;
 use App\Models\License;
 use Illuminate\Database\Seeder;
@@ -18,17 +19,26 @@ class EventLogSeeder extends Seeder
      */
     public function run(): void
     {
-        $accounts = Account::query()->limit(30)->get()->keyBy('id');
+        EventLog::query()->delete();
+
+        $accounts = Account::query()
+            ->orderBy('id')
+            ->get()
+            ->keyBy('id');
         $licenses = License::query()
             ->whereNotNull('used_by')
             ->with('account')
             ->orderBy('created_at')
             ->get();
         $devices = AccountDevice::query()->orderBy('first_seen_at')->get()->groupBy('account_id');
+        $sessionsByAccount = ClientSession::query()
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy('account_id');
 
         $this->createLicenseLifecycleEvents($licenses, $devices);
         $this->createDeviceLifecycleEvents($devices, $licenses);
-        $this->createAccountSecurityEvents($accounts);
+        $this->createAccountJourneyEvents($accounts, $licenses, $devices, $sessionsByAccount);
         $this->displayEventLogStats();
     }
 
@@ -104,7 +114,14 @@ class EventLogSeeder extends Seeder
                     'license_id' => $license->id,
                     'actor_id' => $accountId,
                     'details' => [
-                        'suspension_reason' => $this->getRandomSuspensionReason(),
+                        'suspension_reason' => $this->pickFromSeed([
+                            'multiple_failed_logins',
+                            'violation_of_tos',
+                            'payment_issue',
+                            'admin_discretion',
+                            'suspicious_activity',
+                            'spam_behavior',
+                        ], (int) $license->id),
                     ],
                     'created_at' => $suspendedAt,
                     'updated_at' => $suspendedAt,
@@ -137,7 +154,11 @@ class EventLogSeeder extends Seeder
                     'license_id' => $license->id,
                     'actor_id' => $accountId,
                     'details' => [
-                        'revocation_reason' => fake()->randomElement(['policy_violation', 'manual_admin_action', 'payment_issue']),
+                        'revocation_reason' => $this->pickFromSeed([
+                            'policy_violation',
+                            'manual_admin_action',
+                            'payment_issue',
+                        ], (int) $license->id + 7),
                     ],
                     'created_at' => $revokedAt,
                     'updated_at' => $revokedAt,
@@ -155,14 +176,15 @@ class EventLogSeeder extends Seeder
 
         foreach ($devicesByAccount as $accountId => $devices) {
             $license = $activeLicenseByAccount->get($accountId);
+            if (! $license) {
+                continue;
+            }
             $account = Account::query()->find($accountId);
             $accountAnchor = $account?->created_at ? $this->safeTime($account->created_at) : null;
             $licenseAnchor = null;
-            if ($license) {
-                $createdAt = $this->safeTime($license->created_at, $accountAnchor);
-                $activatedAt = $license->activated_at ? $this->safeTime($license->activated_at, $createdAt) : $createdAt;
-                $licenseAnchor = $activatedAt->greaterThan($createdAt) ? $activatedAt : $createdAt;
-            }
+            $createdAt = $this->safeTime($license->created_at, $accountAnchor);
+            $activatedAt = $license->activated_at ? $this->safeTime($license->activated_at, $createdAt) : $createdAt;
+            $licenseAnchor = $activatedAt->greaterThan($createdAt) ? $activatedAt : $createdAt;
 
             $eventAnchor = $licenseAnchor ?? $accountAnchor;
 
@@ -210,7 +232,11 @@ class EventLogSeeder extends Seeder
                         'details' => [
                             'device_id' => $device->id,
                             'hwid_hash' => $device->hwid_hash,
-                            'unbind_reason' => fake()->randomElement(['user_initiated', 'device_replacement', 'security_policy']),
+                            'unbind_reason' => $this->pickFromSeed([
+                                'user_initiated',
+                                'device_replacement',
+                                'security_policy',
+                            ], (int) $device->id),
                         ],
                         'created_at' => $unboundAt,
                         'updated_at' => $unboundAt,
@@ -220,45 +246,236 @@ class EventLogSeeder extends Seeder
         }
     }
 
-    private function createAccountSecurityEvents($accounts): void
+    private function createAccountJourneyEvents($accounts, $licenses, $devicesByAccount, $sessionsByAccount): void
     {
+        $activeLicenseByAccount = $licenses
+            ->filter(fn (License $license) => $license->status === LicenseStatus::ACTIVE)
+            ->groupBy('used_by')
+            ->map(fn ($group) => $group->sortByDesc('activated_at')->first());
+
         foreach ($accounts as $account) {
-            $hasAnomaly = fake()->boolean(35);
-            if (! $hasAnomaly) {
+            $accountCreatedAt = $this->safeTime($account->created_at);
+            $activeLicense = $activeLicenseByAccount->get($account->id);
+            $accountDevices = $devicesByAccount->get($account->id, collect());
+
+            /** @var AccountDevice|null $primaryDevice */
+            $primaryDevice = $accountDevices
+                ->sortByDesc(fn (AccountDevice $device) => $device->bound_at?->timestamp ?? 0)
+                ->first();
+
+            $session = $sessionsByAccount->get($account->id, collect())
+                ->sortByDesc(fn (ClientSession $clientSession) => $clientSession->last_heartbeat_at?->timestamp ?? 0)
+                ->first();
+
+            $registeredAt = $accountCreatedAt;
+            $verifiedAt = $account->email_verified_at
+                ? $this->safeTime($account->email_verified_at, $registeredAt)
+                : null;
+
+            EventLog::query()->create([
+                'event_type' => EventType::ACCOUNT_REGISTERED->value,
+                'event_level' => EventLog::LEVEL_INFO,
+                'account_id' => $account->id,
+                'actor_id' => $account->id,
+                'ip_address' => $this->buildDeterministicIpForAccount($account->id),
+                'details' => [
+                    'flow' => 'user_journey',
+                    'step' => 'register',
+                ],
+                'created_at' => $registeredAt,
+                'updated_at' => $registeredAt,
+            ]);
+
+            if ($verifiedAt) {
+                EventLog::query()->create([
+                    'event_type' => EventType::ACCOUNT_EMAIL_VERIFIED->value,
+                    'event_level' => EventLog::LEVEL_INFO,
+                    'account_id' => $account->id,
+                    'actor_id' => $account->id,
+                    'details' => [
+                        'flow' => 'user_journey',
+                        'step' => 'email_verified',
+                    ],
+                    'created_at' => $verifiedAt,
+                    'updated_at' => $verifiedAt,
+                ]);
+            }
+
+            if (! $activeLicense || ! $primaryDevice) {
                 continue;
             }
 
-            $anchor = $this->safeTime($account->last_login_at ?? now()->subDays(fake()->numberBetween(1, 45)), $this->safeTime($account->created_at));
+            $licenseActivatedAt = $activeLicense->activated_at
+                ? $this->safeTime($activeLicense->activated_at, $registeredAt)
+                : $this->safeTime($registeredAt->copy()->addDays(1), $registeredAt);
+
+            $boundAt = $primaryDevice->bound_at
+                ? $this->safeTime($primaryDevice->bound_at, $licenseActivatedAt)
+                : $this->safeTime($licenseActivatedAt->copy()->addHours(2), $licenseActivatedAt);
+
+            $clientLoginAt = $session && $session->created_at
+                ? $this->safeTime($session->created_at, $boundAt)
+                : $this->safeTime($boundAt->copy()->addHours(1), $boundAt);
+
+            $heartbeatAt = $session && $session->last_heartbeat_at
+                ? $this->safeTime($session->last_heartbeat_at, $clientLoginAt)
+                : $this->safeTime($clientLoginAt->copy()->addMinutes(20), $clientLoginAt);
+
+            $logoutAt = $this->safeTime($heartbeatAt->copy()->addMinutes(fake()->numberBetween(30, 240)), $heartbeatAt);
+
             EventLog::query()->create([
                 'event_type' => EventType::ACCOUNT_LOGIN->value,
-                'event_level' => EventLog::LEVEL_WARN,
+                'event_level' => EventLog::LEVEL_INFO,
                 'account_id' => $account->id,
+                'license_id' => $activeLicense->id,
                 'actor_id' => $account->id,
-                'ip_address' => $this->generateAnomalousIp(),
+                'ip_address' => $primaryDevice->ip_address,
                 'details' => [
-                    'detected_pattern' => $this->getRandomSuspiciousPattern(),
-                    'action_taken' => fake()->randomElement(['monitoring_enabled', 'step_up_auth_required', 'notified_user']),
-                    'risk_level' => 'medium',
+                    'flow' => 'user_journey',
+                    'step' => 'client_login',
+                    'device_id' => $primaryDevice->id,
+                    'session_token' => $session?->session_token,
                 ],
-                'created_at' => $anchor,
-                'updated_at' => $anchor,
+                'created_at' => $clientLoginAt,
+                'updated_at' => $clientLoginAt,
             ]);
 
-            if (fake()->boolean(20)) {
-                $errorAt = $this->safeTime($anchor->copy()->addHours(fake()->numberBetween(1, 12)), $anchor);
+            EventLog::query()->create([
+                'event_type' => EventType::ACCOUNT_LOGIN->value,
+                'event_level' => EventLog::LEVEL_INFO,
+                'account_id' => $account->id,
+                'license_id' => $activeLicense->id,
+                'actor_id' => $account->id,
+                'ip_address' => $primaryDevice->ip_address,
+                'details' => [
+                    'flow' => 'user_journey',
+                    'step' => 'heartbeat_check',
+                    'device_id' => $primaryDevice->id,
+                ],
+                'created_at' => $heartbeatAt,
+                'updated_at' => $heartbeatAt,
+            ]);
+
+            EventLog::query()->create([
+                'event_type' => EventType::ACCOUNT_LOGOUT->value,
+                'event_level' => EventLog::LEVEL_INFO,
+                'account_id' => $account->id,
+                'license_id' => $activeLicense->id,
+                'actor_id' => $account->id,
+                'ip_address' => $primaryDevice->ip_address,
+                'details' => [
+                    'flow' => 'user_journey',
+                    'step' => 'offline',
+                    'device_id' => $primaryDevice->id,
+                ],
+                'created_at' => $logoutAt,
+                'updated_at' => $logoutAt,
+            ]);
+
+            if ($account->id % 6 === 0) {
+                $passwordChangedAt = $this->safeTime($heartbeatAt->copy()->addMinutes(fake()->numberBetween(10, 120)), $heartbeatAt);
+
                 EventLog::query()->create([
-                    'event_type' => EventType::ACCOUNT_LOGIN->value,
-                    'event_level' => EventLog::LEVEL_ERROR,
+                    'event_type' => EventType::ACCOUNT_PROFILE_UPDATED->value,
+                    'event_level' => EventLog::LEVEL_INFO,
                     'account_id' => $account->id,
                     'actor_id' => $account->id,
-                    'ip_address' => $this->generateRandomIp(),
+                    'ip_address' => $this->buildDeterministicIpForAccount($account->id),
                     'details' => [
-                        'reason' => 'invalid_credentials',
-                        'failed_attempts' => fake()->numberBetween(5, 12),
-                        'lockout_triggered' => true,
+                        'flow' => 'password_maintenance',
+                        'step' => 'password_changed',
                     ],
-                    'created_at' => $errorAt,
-                    'updated_at' => $errorAt,
+                    'created_at' => $passwordChangedAt,
+                    'updated_at' => $passwordChangedAt,
+                ]);
+            }
+
+            if ($account->hwid_reset_count > 0 || $account->id % 8 === 0) {
+                $resetAt = $account->hwid_last_reset_at
+                    ? $this->safeTime($account->hwid_last_reset_at, $clientLoginAt)
+                    : $this->safeTime($clientLoginAt->copy()->addDays(1), $clientLoginAt);
+
+                EventLog::query()->create([
+                    'event_type' => EventType::ACCOUNT_HWID_RESET->value,
+                    'event_level' => EventLog::LEVEL_WARN,
+                    'account_id' => $account->id,
+                    'actor_id' => $account->id,
+                    'ip_address' => $this->buildDeterministicIpForAccount($account->id),
+                    'details' => [
+                        'flow' => 'device_migration',
+                        'step' => 'hwid_reset',
+                        'reset_count' => max($account->hwid_reset_count, 1),
+                    ],
+                    'created_at' => $resetAt,
+                    'updated_at' => $resetAt,
+                ]);
+
+                if ($primaryDevice->unbound_at || $primaryDevice->bound_at) {
+                    $deviceUnboundAt = $primaryDevice->unbound_at
+                        ? $this->safeTime($primaryDevice->unbound_at, $resetAt)
+                        : $this->safeTime($resetAt->copy()->addMinutes(15), $resetAt);
+
+                    EventLog::query()->create([
+                        'event_type' => EventType::DEVICE_UNBOUND->value,
+                        'event_level' => EventLog::LEVEL_INFO,
+                        'account_id' => $account->id,
+                        'license_id' => $activeLicense->id,
+                        'actor_id' => $account->id,
+                        'ip_address' => $primaryDevice->ip_address,
+                        'details' => [
+                            'flow' => 'device_migration',
+                            'step' => 'old_device_unbound',
+                            'device_id' => $primaryDevice->id,
+                            'unbind_reason' => 'hwid_reset',
+                        ],
+                        'created_at' => $deviceUnboundAt,
+                        'updated_at' => $deviceUnboundAt,
+                    ]);
+
+                    $nextDevice = $accountDevices
+                        ->filter(fn (AccountDevice $device): bool => $device->id !== $primaryDevice->id)
+                        ->sortByDesc(fn (AccountDevice $device): int => $device->bound_at?->timestamp ?? 0)
+                        ->first();
+
+                    if ($nextDevice) {
+                        $deviceBoundAt = $nextDevice->bound_at
+                            ? $this->safeTime($nextDevice->bound_at, $deviceUnboundAt)
+                            : $this->safeTime($deviceUnboundAt->copy()->addMinutes(20), $deviceUnboundAt);
+
+                        EventLog::query()->create([
+                            'event_type' => EventType::DEVICE_BOUND->value,
+                            'event_level' => EventLog::LEVEL_INFO,
+                            'account_id' => $account->id,
+                            'license_id' => $activeLicense->id,
+                            'actor_id' => $account->id,
+                            'ip_address' => $nextDevice->ip_address,
+                            'details' => [
+                                'flow' => 'device_migration',
+                                'step' => 'new_device_bound',
+                                'device_id' => $nextDevice->id,
+                                'binding_method' => 'post_hwid_reset',
+                            ],
+                            'created_at' => $deviceBoundAt,
+                            'updated_at' => $deviceBoundAt,
+                        ]);
+                    }
+                }
+            }
+
+            if ($account->is_suspended || $account->suspended_until?->isFuture()) {
+                $suspiciousLoginAt = $this->safeTime($logoutAt->copy()->addHours(2), $logoutAt);
+                EventLog::query()->create([
+                    'event_type' => EventType::ACCOUNT_LOGIN->value,
+                    'event_level' => EventLog::LEVEL_WARN,
+                    'account_id' => $account->id,
+                    'actor_id' => $account->id,
+                    'ip_address' => $this->buildAnomalousIpForAccount($account->id),
+                    'details' => [
+                        'flow' => 'risk_branch',
+                        'step' => 'suspended_login_attempt',
+                    ],
+                    'created_at' => $suspiciousLoginAt,
+                    'updated_at' => $suspiciousLoginAt,
                 ]);
             }
         }
@@ -305,62 +522,59 @@ class EventLogSeeder extends Seeder
     private function safeTime(?Carbon $candidate, ?Carbon $notBefore = null): Carbon
     {
         $time = $candidate ? $candidate->copy() : now()->subDays(fake()->numberBetween(1, 60));
+        $upperBound = now()->subSecond();
 
-        if ($notBefore && $time->lessThan($notBefore)) {
-            $time = $notBefore->copy()->addMinutes(fake()->numberBetween(1, 120));
+        $effectiveNotBefore = $notBefore?->copy();
+        if ($effectiveNotBefore && $effectiveNotBefore->greaterThan($upperBound)) {
+            $effectiveNotBefore = $upperBound->copy();
+        }
+
+        if ($effectiveNotBefore && $time->lessThan($effectiveNotBefore)) {
+            $time = $effectiveNotBefore->copy()->addMinutes(fake()->numberBetween(1, 120));
         }
 
         if ($time->greaterThan(now())) {
             $time = now()->subMinutes(fake()->numberBetween(1, 60));
         }
 
+        if ($effectiveNotBefore && $time->lessThan($effectiveNotBefore)) {
+            $time = $effectiveNotBefore->copy();
+        }
+
         return $time;
     }
 
-    private function generateAnomalousIp(): string
+    private function buildAnomalousIpForAccount(int $accountId): string
     {
         $anomalousCountries = ['RU', 'CN', 'BR', 'NG', 'TR'];
-        $country = $anomalousCountries[array_rand($anomalousCountries)];
+        $country = $anomalousCountries[$accountId % count($anomalousCountries)];
 
         return match ($country) {
-            'RU' => '195.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
-            'CN' => '120.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
-            'BR' => '200.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
-            'NG' => '105.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
-            'TR' => '88.'.fake()->numberBetween(10, 240).'.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
-            default => '192.168.'.fake()->numberBetween(1, 254).'.'.fake()->numberBetween(1, 254),
+            'RU' => '195.11.'.($accountId % 250 + 1).'.'.($accountId % 200 + 20),
+            'CN' => '120.22.'.($accountId % 250 + 1).'.'.($accountId % 200 + 20),
+            'BR' => '200.33.'.($accountId % 250 + 1).'.'.($accountId % 200 + 20),
+            'NG' => '105.44.'.($accountId % 250 + 1).'.'.($accountId % 200 + 20),
+            'TR' => '88.55.'.($accountId % 250 + 1).'.'.($accountId % 200 + 20),
+            default => '192.168.10.'.($accountId % 200 + 20),
         };
     }
 
-    private function generateRandomIp(): string
+    private function buildDeterministicIpForAccount(int $accountId): string
     {
-        return fake()->numberBetween(1, 255).'.'.fake()->numberBetween(0, 255).'.'.fake()->numberBetween(0, 255).'.'.fake()->numberBetween(1, 254);
+        return '172.16.'.($accountId % 200 + 10).'.'.($accountId % 240 + 12);
     }
 
-    private function getRandomSuspiciousPattern(): string
+    /**
+     * @param  array<int, string>  $items
+     */
+    private function pickFromSeed(array $items, int $seed): string
     {
-        $patterns = [
-            'multiple_failed_logins',
-            'unusual_geo_pattern',
-            'brute_force_attempt',
-            'credential_stuffing',
-            'session_hijacking_attempt',
-        ];
+        if ($items === []) {
+            return 'unknown';
+        }
 
-        return $patterns[array_rand($patterns)];
-    }
+        $index = abs($seed) % count($items);
 
-    private function getRandomSuspensionReason(): string
-    {
-        $reasons = [
-            'multiple_failed_logins',
-            'violation_of_tos',
-            'payment_issue',
-            'admin_discretion',
-            'suspicious_activity',
-            'spam_behavior',
-        ];
-
-        return $reasons[array_rand($reasons)];
+        return $items[$index];
     }
 }

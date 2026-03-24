@@ -10,8 +10,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <x-stat-card :title="__('Total Devices')" :value="$totalDevices" icon="desktop" iconColor="icon-blue" />
                 <x-stat-card :title="__('Bound Devices')" :value="$boundDevices" icon="success" iconColor="icon-green" />
-                <x-stat-card :title="__('Active (30d)')" :value="$activeDevices" icon="lightning" iconColor="icon-yellow" />
                 <x-stat-card :title="__('Unbound')" :value="$unboundDevices" icon="ban" iconColor="icon-gray" />
+                <x-stat-card :title="__('Never Bound')" :value="$neverBoundDevices" icon="question" iconColor="icon-yellow" />
             </div>
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -43,8 +43,8 @@
                                     <option value="unbound" {{ request('status') === 'unbound' ? 'selected' : '' }}>
                                         {{ __('Unbound') }}
                                     </option>
-                                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active
-                                        {{ __('(30d)') }}
+                                    <option value="never_bound" {{ request('status') === 'never_bound' ? 'selected' : '' }}>
+                                        {{ __('Never Bound') }}
                                     </option>
                                 </select>
                             </div>

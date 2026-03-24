@@ -29,8 +29,8 @@ class PackageUploadRequest extends FormRequest
                 'string',
                 'max:50',
                 function ($attribute, $value, $fail) {
-                    if (! PackageService::isValidSemanticVersion($value)) {
-                        $fail('The version must follow semantic versioning format (e.g., 1.0.0).');
+                    if (! PackageService::isValidTimelineVersion($value)) {
+                        $fail('The version must follow YY.M.N format (e.g., 26.3.12 or 26.3.12-beta).');
                     }
                 },
                 'unique:package_releases,version',
@@ -97,6 +97,12 @@ class PackageUploadRequest extends FormRequest
         if ($this->filled('version') && is_string($this->version)) {
             $this->merge([
                 'version' => trim($this->version),
+            ]);
+        }
+
+        if ($this->filled('release_channel') && is_string($this->release_channel)) {
+            $this->merge([
+                'release_channel' => strtolower(trim($this->release_channel)),
             ]);
         }
     }

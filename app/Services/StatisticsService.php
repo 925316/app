@@ -2,11 +2,15 @@
 
 namespace App\Services;
 
+use App\Enums\LicenseStatus;
 use App\Models\Account;
+use App\Models\AccountDevice;
 use App\Models\ClientSession;
 use App\Models\EventLog;
 use App\Models\License;
 use App\Models\UsageStatistic;
+use Database\Seeders\ClientSessionSeeder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class StatisticsService
@@ -16,23 +20,122 @@ class StatisticsService
      */
     public static function updateGlobalStatistics(): void
     {
+        $simulationAccountIds = self::resolveSimulationAccountIds();
+        $simulationAccountCount = $simulationAccountIds->count();
+
+        $effectiveLicenseQuery = License::query()
+            ->where('status', LicenseStatus::ACTIVE->value)
+            ->where('expires_at', '>', now())
+            ->whereIn('used_by', $simulationAccountIds);
+
+        $effectiveLicensedAccountIds = (clone $effectiveLicenseQuery)
+            ->whereNotNull('used_by')
+            ->distinct('used_by')
+            ->pluck('used_by');
+        $effectiveLicensedAccounts = $effectiveLicensedAccountIds->count();
+
+        $onlineUsers = ClientSession::query()
+            ->whereIn('account_id', $simulationAccountIds)
+            ->where('last_heartbeat_at', '>=', now()->subMinutes(5))
+            ->distinct('account_id')
+            ->count('account_id');
+
+        $dailyActiveUsers = ClientSession::query()
+            ->whereIn('account_id', $simulationAccountIds)
+            ->where('last_heartbeat_at', '>=', now()->subDay())
+            ->distinct('account_id')
+            ->count('account_id');
+
+        $recentActiveUsers = ClientSession::query()
+            ->whereIn('account_id', $simulationAccountIds)
+            ->where('last_heartbeat_at', '>=', now()->subDays(30))
+            ->distinct('account_id')
+            ->count('account_id');
+
+        $licensedOnlineUsers = ClientSession::query()
+            ->whereIn('account_id', $effectiveLicensedAccountIds)
+            ->where('last_heartbeat_at', '>=', now()->subMinutes(5))
+            ->distinct('account_id')
+            ->count('account_id');
+
+        $licensedDailyActiveUsers = ClientSession::query()
+            ->whereIn('account_id', $effectiveLicensedAccountIds)
+            ->where('last_heartbeat_at', '>=', now()->subDay())
+            ->distinct('account_id')
+            ->count('account_id');
+
+        $licensedRecentActiveUsers = ClientSession::query()
+            ->whereIn('account_id', $effectiveLicensedAccountIds)
+            ->where('last_heartbeat_at', '>=', now()->subDays(30))
+            ->distinct('account_id')
+            ->count('account_id');
+
+        $dailyActiveUsers = max($dailyActiveUsers, $onlineUsers);
+        $recentActiveUsers = max($recentActiveUsers, $dailyActiveUsers);
+        $licensedDailyActiveUsers = max($licensedDailyActiveUsers, $licensedOnlineUsers);
+        $licensedRecentActiveUsers = max($licensedRecentActiveUsers, $licensedDailyActiveUsers);
+        $licensedRecentActiveUsers = min($licensedRecentActiveUsers, $effectiveLicensedAccounts);
+        $residentBoundUsers = AccountDevice::query()
+            ->whereIn('account_id', $simulationAccountIds)
+            ->whereNotNull('bound_at')
+            ->whereNull('unbound_at')
+            ->distinct('account_id')
+            ->count('account_id');
+
         // Global login count
-        $loginCount = EventLog::where('event_type', 'account.login')->count();
+        $loginCount = EventLog::query()
+            ->where('event_type', 'account.login')
+            ->whereIn('account_id', $simulationAccountIds)
+            ->count();
         self::updateStatistic('global', 'login_count', $loginCount);
 
         // Global total usage time (in hours)
-        $totalUsageHours = ClientSession::selectRaw(self::usageHoursExpression().' as usage_hours')->value('usage_hours') ?? 0;
+        $totalUsageHours = ClientSession::query()
+            ->whereIn('account_id', $simulationAccountIds)
+            ->selectRaw(self::usageHoursExpression().' as usage_hours')
+            ->value('usage_hours') ?? 0;
         self::updateStatistic('global', 'total_usage_hours', $totalUsageHours);
 
         // Active licenses count
-        self::updateStatistic('global', 'active_licenses', License::active()->count());
+        self::updateStatistic('global', 'active_licenses', (clone $effectiveLicenseQuery)->count());
+
+        // Activity windows (all users)
+        self::updateStatistic('global', 'active_users', $onlineUsers);
+        self::updateStatistic('global', 'daily_active_users', $dailyActiveUsers);
+        self::updateStatistic('global', 'recent_active_users', $recentActiveUsers);
+
+        // Activity windows (effective licensed users)
+        self::updateStatistic('global', 'licensed_active_users', $licensedOnlineUsers);
+        self::updateStatistic('global', 'licensed_daily_active_users', $licensedDailyActiveUsers);
+        self::updateStatistic('global', 'licensed_recent_active_users', $licensedRecentActiveUsers);
+
+        // Accounts with effective license
+        self::updateStatistic('global', 'effective_licensed_accounts', $effectiveLicensedAccounts);
+
+        // Resident users with currently bound devices
+        self::updateStatistic('global', 'resident_bound_users', $residentBoundUsers);
 
         // Total accounts
-        self::updateStatistic('global', 'total_accounts', Account::count());
+        self::updateStatistic('global', 'total_accounts', $simulationAccountCount);
 
-        // Active accounts (logged in last 30 days)
-        $activeAccounts = Account::where('last_login_at', '>=', now()->subDays(30))->count();
+        // Active accounts (non-suspended account population)
+        $activeAccounts = Account::query()
+            ->whereIn('id', $simulationAccountIds)
+            ->active()
+            ->count();
         self::updateStatistic('global', 'active_accounts', $activeAccounts);
+
+        $verifiedAccounts = Account::query()
+            ->whereIn('id', $simulationAccountIds)
+            ->verified()
+            ->count();
+        self::updateStatistic('global', 'verified_accounts', $verifiedAccounts);
+
+        $suspendedAccounts = Account::query()
+            ->whereIn('id', $simulationAccountIds)
+            ->suspended()
+            ->count();
+        self::updateStatistic('global', 'suspended_accounts', $suspendedAccounts);
     }
 
     /**
@@ -61,7 +164,7 @@ class StatisticsService
 
         // User active licenses
         $activeLicenses = License::where('used_by', $accountId)
-            ->where('status', \App\Enums\LicenseStatus::ACTIVE->value)
+            ->where('status', LicenseStatus::ACTIVE->value)
             ->count();
 
         self::updateStatistic('user', "user_{$accountId}_active_licenses", $activeLicenses);
@@ -204,14 +307,36 @@ class StatisticsService
     public static function getRecentActivity(int $days = 7): array
     {
         $startDate = now()->subDays($days);
+        $simulationAccountIds = self::resolveSimulationAccountIds();
 
         return [
-            'new_accounts' => Account::where('created_at', '>=', $startDate)->count(),
-            'active_sessions' => ClientSession::where('last_heartbeat_at', '>=', $startDate)->count(),
+            'new_accounts' => Account::query()
+                ->whereIn('id', $simulationAccountIds)
+                ->where('created_at', '>=', $startDate)
+                ->count(),
+            'active_sessions' => ClientSession::query()
+                ->whereIn('account_id', $simulationAccountIds)
+                ->where('last_heartbeat_at', '>=', $startDate)
+                ->distinct('account_id')
+                ->count('account_id'),
             'login_events' => EventLog::where('event_type', 'account.login')
+                ->whereIn('account_id', $simulationAccountIds)
                 ->where('created_at', '>=', $startDate)
                 ->count(),
         ];
+    }
+
+    /**
+     * Resolve simulation account ids used by seeded dashboard metrics.
+     *
+     * @return Collection<int, int>
+     */
+    protected static function resolveSimulationAccountIds(): Collection
+    {
+        return Account::query()
+            ->orderBy('id')
+            ->limit(ClientSessionSeeder::TARGET_TOTAL_USERS)
+            ->pluck('id');
     }
 
     /**
@@ -219,13 +344,23 @@ class StatisticsService
      */
     public static function getSystemHealth(): array
     {
+        $simulationAccountIds = self::resolveSimulationAccountIds();
+        $assignedLicenseQuery = License::query()
+            ->whereNotNull('used_by')
+            ->whereIn('used_by', $simulationAccountIds);
+
         return [
-            'total_accounts' => Account::count(),
-            'total_licenses' => License::count(),
-            'active_licenses' => License::active()->count(),
-            'suspended_accounts' => Account::suspended()->count(),
-            'expired_licenses' => License::expired()->count(),
-            'unverified_accounts' => Account::unverified()->count(),
+            'total_accounts' => $simulationAccountIds->count(),
+            'total_licenses' => (clone $assignedLicenseQuery)->count(),
+            'active_licenses' => (clone $assignedLicenseQuery)
+                ->where('status', LicenseStatus::ACTIVE->value)
+                ->where('expires_at', '>', now())
+                ->count(),
+            'suspended_accounts' => Account::query()->whereIn('id', $simulationAccountIds)->suspended()->count(),
+            'expired_licenses' => (clone $assignedLicenseQuery)
+                ->where('status', LicenseStatus::EXPIRED->value)
+                ->count(),
+            'unverified_accounts' => Account::query()->whereIn('id', $simulationAccountIds)->unverified()->count(),
         ];
     }
 

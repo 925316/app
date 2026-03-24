@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use App\Enums\LicenseStatus;
 use App\Models\Account;
-use App\Models\ClientSession;
 use App\Models\License;
 use App\Models\UsageStatistic;
+use App\Services\StatisticsService;
 use Illuminate\Database\Seeder;
 
 class UsageStatisticSeeder extends Seeder
@@ -64,39 +64,44 @@ class UsageStatisticSeeder extends Seeder
      */
     private function createGlobalStatistics(): void
     {
-        $accountCount = Account::count();
-        $sessionCount = ClientSession::count();
-        $activeSessionCount = ClientSession::query()
-            ->where('last_heartbeat_at', '>=', now()->subMinutes(5))
-            ->count();
+        StatisticsService::updateGlobalStatistics();
 
-        $estimatedLoginCount = max($accountCount * fake()->numberBetween(12, 35), $sessionCount * fake()->numberBetween(4, 9));
-        $estimatedUsageMinutes = max($sessionCount * fake()->numberBetween(120, 960), $accountCount * fake()->numberBetween(240, 1440));
-        $estimatedTotalRequests = max($estimatedLoginCount * fake()->numberBetween(25, 80), $sessionCount * fake()->numberBetween(300, 1400));
+        $stats = StatisticsService::getGlobalStatistics();
+        $onlineUsers = (int) ($stats['active_users'] ?? 0);
+        $dailyActiveUsers = (int) ($stats['daily_active_users'] ?? 0);
+        $recentActiveUsers = (int) ($stats['recent_active_users'] ?? 0);
+        $accountCount = (int) ($stats['total_accounts'] ?? 0);
+        $dormantUsers = max($accountCount - $recentActiveUsers, 0);
 
-        UsageStatistic::create([
-            'stat_type' => UsageStatistic::TYPE_GLOBAL,
-            'stat_key' => UsageStatistic::KEY_LOGIN_COUNT,
-            'stat_value' => $estimatedLoginCount,
-        ]);
+        UsageStatistic::updateOrCreate(
+            [
+                'stat_type' => UsageStatistic::TYPE_GLOBAL,
+                'stat_key' => UsageStatistic::KEY_USAGE_TIME,
+            ],
+            [
+                'stat_value' => max($dailyActiveUsers * 45 + $onlineUsers * 90, 0),
+            ]
+        );
 
-        UsageStatistic::create([
-            'stat_type' => UsageStatistic::TYPE_GLOBAL,
-            'stat_key' => UsageStatistic::KEY_USAGE_TIME,
-            'stat_value' => $estimatedUsageMinutes,
-        ]);
+        UsageStatistic::updateOrCreate(
+            [
+                'stat_type' => UsageStatistic::TYPE_GLOBAL,
+                'stat_key' => UsageStatistic::KEY_TOTAL_REQUESTS,
+            ],
+            [
+                'stat_value' => max($dailyActiveUsers * 120 + $onlineUsers * 240, 0),
+            ]
+        );
 
-        UsageStatistic::create([
-            'stat_type' => UsageStatistic::TYPE_GLOBAL,
-            'stat_key' => UsageStatistic::KEY_TOTAL_REQUESTS,
-            'stat_value' => $estimatedTotalRequests,
-        ]);
-
-        UsageStatistic::create([
-            'stat_type' => UsageStatistic::TYPE_GLOBAL,
-            'stat_key' => 'active_users',
-            'stat_value' => min($accountCount, max($activeSessionCount, 1)),
-        ]);
+        UsageStatistic::updateOrCreate(
+            [
+                'stat_type' => UsageStatistic::TYPE_GLOBAL,
+                'stat_key' => 'dormant_users',
+            ],
+            [
+                'stat_value' => $dormantUsers,
+            ]
+        );
     }
 
     /**
@@ -104,9 +109,18 @@ class UsageStatisticSeeder extends Seeder
      */
     private function createLicenseStatistics(): void
     {
-        $activeLicenses = License::query()->where('status', LicenseStatus::ACTIVE->value)->count();
-        $expiredLicenses = License::query()->where('status', LicenseStatus::EXPIRED->value)->count();
-        $upgradedLicenses = License::query()->where('status', LicenseStatus::UPGRADED->value)->count();
+        $stats = StatisticsService::getSystemHealth();
+        $simulationAccountIds = Account::query()
+            ->orderBy('id')
+            ->limit(ClientSessionSeeder::TARGET_TOTAL_USERS)
+            ->pluck('id');
+
+        $activeLicenses = (int) ($stats['active_licenses'] ?? 0);
+        $expiredLicenses = (int) ($stats['expired_licenses'] ?? 0);
+        $upgradedLicenses = License::query()
+            ->whereIn('used_by', $simulationAccountIds)
+            ->where('status', LicenseStatus::UPGRADED->value)
+            ->count();
 
         UsageStatistic::create([
             'stat_type' => UsageStatistic::TYPE_LICENSE,

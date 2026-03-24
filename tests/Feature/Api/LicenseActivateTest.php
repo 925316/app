@@ -17,7 +17,7 @@ function apiActivatePayload(array $overrides = []): array
         'license_key' => 'FGHIJ-12ABC-ABCDE-ABCDE-ABCDE',
         'hwid' => 'HWID-ACTIVATE-12345',
         'nonce' => 'nonce-'.str()->random(16),
-        'version' => '1.0.0',
+        'version' => '26.0.0',
         'timestamp' => now()->timestamp,
     ], $overrides);
 }
@@ -276,7 +276,7 @@ it('normalizes session token and hwid input values before activate processing', 
     $response = postJson('/api/license/activate', apiActivatePayload([
         'session_token' => '  activate-session-token-001  ',
         'hwid' => '  HWID-ACTIVATE-12345  ',
-        'version' => ' 1.0.0 ',
+        'version' => ' 26.0.0 ',
     ]));
 
     assertApiOk($response, [

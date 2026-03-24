@@ -110,3 +110,56 @@ it('creates event logs that are causally aligned with referenced entities', func
         }
     }
 });
+
+it('seeds template-based normal user journey events for active accounts', function () {
+    $activeAccountIds = License::query()
+        ->where('status', LicenseStatus::ACTIVE->value)
+        ->whereNotNull('used_by')
+        ->pluck('used_by')
+        ->unique()
+        ->values();
+
+    expect($activeAccountIds)->not->toBeEmpty();
+
+    $sampleAccountIds = $activeAccountIds->take(8)->all();
+
+    foreach ($sampleAccountIds as $accountId) {
+        $events = EventLog::query()
+            ->where('account_id', $accountId)
+            ->orderBy('created_at')
+            ->get();
+
+        $registeredEvent = $events->first(fn (EventLog $event): bool => $event->event_type === EventType::ACCOUNT_REGISTERED->value);
+        $clientLoginEvent = $events->first(fn (EventLog $event): bool => $event->event_type === EventType::ACCOUNT_LOGIN->value
+            && (($event->details['step'] ?? null) === 'client_login'));
+        $heartbeatEvent = $events->first(fn (EventLog $event): bool => $event->event_type === EventType::ACCOUNT_LOGIN->value
+            && (($event->details['step'] ?? null) === 'heartbeat_check'));
+        $logoutEvent = $events->first(fn (EventLog $event): bool => $event->event_type === EventType::ACCOUNT_LOGOUT->value);
+
+        expect($registeredEvent)->not->toBeNull();
+        expect($clientLoginEvent)->not->toBeNull();
+        expect($heartbeatEvent)->not->toBeNull();
+        expect($logoutEvent)->not->toBeNull();
+
+        expect($clientLoginEvent->created_at->greaterThanOrEqualTo($registeredEvent->created_at))->toBeTrue();
+        expect($heartbeatEvent->created_at->greaterThanOrEqualTo($registeredEvent->created_at))->toBeTrue();
+        expect($logoutEvent->created_at->greaterThanOrEqualTo($heartbeatEvent->created_at))->toBeTrue();
+    }
+});
+
+it('seeds branch flow events for password maintenance and device migration', function () {
+    $passwordBranchCount = EventLog::query()
+        ->where('event_type', EventType::ACCOUNT_PROFILE_UPDATED->value)
+        ->get()
+        ->filter(fn (EventLog $event): bool => ($event->details['flow'] ?? null) === 'password_maintenance')
+        ->count();
+
+    $hwidMigrationCount = EventLog::query()
+        ->where('event_type', EventType::ACCOUNT_HWID_RESET->value)
+        ->get()
+        ->filter(fn (EventLog $event): bool => ($event->details['flow'] ?? null) === 'device_migration')
+        ->count();
+
+    expect($passwordBranchCount)->toBeGreaterThanOrEqual(1);
+    expect($hwidMigrationCount)->toBeGreaterThanOrEqual(1);
+});

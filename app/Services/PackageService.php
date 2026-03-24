@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\PackageRelease;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
@@ -54,10 +56,10 @@ class PackageService
         ?string $changelog = null,
         ?string $virusDetectionLink = null
     ): PackageRelease {
-        // Validate version format (semantic versioning)
-        if (! self::isValidSemanticVersion($version)) {
+        // Validate version format (YY.M.N[-beta])
+        if (! self::isValidTimelineVersion($version)) {
             throw ValidationException::withMessages([
-                'version' => 'Invalid version format. Must follow semantic versioning (e.g., 1.0.0).',
+                'version' => 'Invalid version format. Must follow YY.M.N naming style (e.g., 26.3.12 or 26.3.12-beta).',
             ]);
         }
 
@@ -90,11 +92,61 @@ class PackageService
     }
 
     /**
-     * Validate semantic version format
+     * Validate a generic client version.
+     * Accepts historical semantic versions and current YY.M.N[-beta] release versions.
      */
     public static function isValidSemanticVersion(string $version): bool
     {
+        if (self::isValidTimelineVersion($version)) {
+            return true;
+        }
+
         return preg_match('/^\d+\.\d+\.\d+(?:-[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*)?(?:\+[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*)?$/', $version) === 1;
+    }
+
+    /**
+     * Validate release timeline version format (YY.M.N[-beta]).
+     */
+    public static function isValidTimelineVersion(string $version): bool
+    {
+        return preg_match('/^\d{2}\.\d{1,2}\.\d+(?:-beta)?$/', $version) === 1;
+    }
+
+    public static function compareReleaseVersions(string $left, string $right): int
+    {
+        $leftParts = self::parseReleaseVersion($left);
+        $rightParts = self::parseReleaseVersion($right);
+
+        if ($leftParts === null || $rightParts === null) {
+            return version_compare($left, $right);
+        }
+
+        foreach (['year', 'month', 'sequence'] as $key) {
+            if ($leftParts[$key] === $rightParts[$key]) {
+                continue;
+            }
+
+            return $leftParts[$key] <=> $rightParts[$key];
+        }
+
+        return ($leftParts['is_beta'] <=> $rightParts['is_beta']) * -1;
+    }
+
+    /**
+     * @return array{year:int, month:int, sequence:int, is_beta:int}|null
+     */
+    private static function parseReleaseVersion(string $version): ?array
+    {
+        if (! preg_match('/^(\d{2})\.(\d{1,2})\.(\d+)(-beta)?$/', $version, $matches)) {
+            return null;
+        }
+
+        return [
+            'year' => (int) $matches[1],
+            'month' => (int) $matches[2],
+            'sequence' => (int) $matches[3],
+            'is_beta' => isset($matches[4]) && $matches[4] !== '' ? 1 : 0,
+        ];
     }
 
     /**
@@ -102,28 +154,60 @@ class PackageService
      */
     public static function getLatestRelease(string $channel = 'stable'): ?PackageRelease
     {
-        $releases = PackageRelease::where('release_channel', $channel)->get();
+        $releases = self::getAllReleases($channel);
 
         if ($releases->isEmpty()) {
             return null;
         }
 
-        return $releases->sort(fn ($a, $b) => version_compare($b->version, $a->version))->first();
+        return $releases->first();
     }
 
     /**
      * Get all package releases
      */
-    public static function getAllReleases(?string $channel = null): \Illuminate\Database\Eloquent\Collection
+    public static function getAllReleases(?string $channel = null): EloquentCollection
     {
-        $query = PackageRelease::orderBy('version', 'desc')
-            ->orderBy('id', 'desc');
+        $query = PackageRelease::query();
 
         if ($channel) {
             $query->where('release_channel', $channel);
         }
 
-        return $query->get();
+        /** @var EloquentCollection<int, PackageRelease> $releases */
+        $releases = $query->get();
+
+        /** @var EloquentCollection<int, PackageRelease> $sorted */
+        $sorted = $releases
+            ->sort(function (PackageRelease $left, PackageRelease $right): int {
+                $versionComparison = self::compareReleaseVersions($right->version, $left->version);
+                if ($versionComparison !== 0) {
+                    return $versionComparison;
+                }
+
+                return $right->id <=> $left->id;
+            })
+            ->values();
+
+        return $sorted;
+    }
+
+    public static function getPaginatedReleases(?string $channel = null, int $perPage = 15, ?int $page = null): LengthAwarePaginator
+    {
+        $releases = self::getAllReleases($channel);
+        $currentPage = $page ?? \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+        $items = $releases->forPage($currentPage, $perPage)->values();
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $items,
+            $releases->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
     }
 
     /**
