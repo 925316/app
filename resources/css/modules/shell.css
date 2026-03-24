@@ -1,18 +1,23 @@
 .app-shell-page {
-    background-image: linear-gradient(to bottom right, rgb(var(--color-surface-page)), rgb(var(--color-surface-page-alt)));
+    background-color: rgb(var(--color-surface-page));
+    background-image:
+        linear-gradient(rgb(var(--color-border-subtle) / 0.22) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(var(--color-border-subtle) / 0.22) 1px, transparent 1px);
+    background-size: 36px 36px;
 }
 
 .app-shell-header {
-    @apply border-b backdrop-blur-sm;
+    @apply border-b backdrop-blur-xl sticky top-0 z-30;
     min-height: var(--layout-header-height);
-    border-color: rgb(var(--color-border-subtle) / 0.75);
-    background-color: rgb(var(--color-surface-elevated) / 0.85);
+    border-color: rgb(var(--color-border-subtle) / 0.9);
+    background-color: rgb(var(--color-surface-elevated) / 0.9);
+    box-shadow: 0 14px 32px -26px rgb(0 0 0 / 0.78);
 }
 
 .app-shell-footer {
     @apply border-t;
-    border-color: rgb(var(--color-border-subtle) / 0.75);
-    background-color: rgb(var(--color-surface-elevated) / 0.6);
+    border-color: rgb(var(--color-border-subtle) / 0.85);
+    background-color: rgb(var(--color-surface-elevated) / 0.72);
 }
 
 .app-shell-content {
@@ -21,7 +26,14 @@
 }
 
 .app-shell-content-wrap {
-    @apply py-8;
+    @apply py-10;
+}
+
+.app-shell-panel {
+    @apply rounded-2xl border shadow-xl backdrop-blur;
+    border-color: rgb(var(--color-border-subtle) / 0.85);
+    background-color: rgb(var(--color-surface-card) / 0.74);
+    box-shadow: 0 18px 38px -30px rgb(0 0 0 / 0.75);
 }
 
 .app-toolbar {

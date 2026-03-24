@@ -9,7 +9,7 @@
         default => 'icon-blue',
     };
     $titleColorClass = match ($color) {
-        'blue' => 'text-blue-800 dark:text-blue-200',
+        'blue' => 'text-zinc-800 dark:text-zinc-200',
         'green' => 'text-green-800 dark:text-green-200',
         'yellow' => 'text-yellow-800 dark:text-yellow-200',
         'red' => 'text-red-800 dark:text-red-200',

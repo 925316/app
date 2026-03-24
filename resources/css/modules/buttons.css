@@ -1,6 +1,6 @@
 /* Button Styles */
 .btn {
-    @apply inline-flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg font-medium text-sm;
+    @apply inline-flex items-center justify-center px-4 py-2.5 border border-transparent rounded-xl font-semibold text-sm;
     @apply focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
     border-radius: var(--radius-lg);
@@ -9,44 +9,50 @@
 
 .btn-primary {
     color: rgb(255 255 255);
-    background-color: rgb(var(--color-text-primary));
+    background-image: var(--gradient-brand);
+    box-shadow: 0 10px 22px -16px rgb(0 0 0 / 0.55);
     @apply focus:ring-offset-0;
-    @apply active:scale-[0.98];
+    @apply active:scale-[0.99] hover:-translate-y-0.5;
 }
 
 .btn-primary:hover {
-    background-color: rgb(var(--color-text-secondary));
+    box-shadow: 0 14px 28px -18px rgb(0 0 0 / 0.62);
+    filter: brightness(1.08);
 }
 
 .btn-secondary {
     @apply border;
     color: rgb(var(--color-text-secondary));
-    background-color: rgb(var(--color-surface-card));
+    background-color: rgb(var(--color-surface-card) / 0.9);
     border-color: rgb(var(--color-border-subtle));
-    @apply active:scale-[0.98];
+    @apply active:scale-[0.98] hover:-translate-y-0.5;
 }
 
 .btn-secondary:hover {
     color: rgb(var(--color-text-primary));
-    background-color: rgb(var(--color-surface-card-muted));
-    border-color: rgb(var(--color-border-strong));
+    background-color: rgb(var(--color-surface-card-muted) / 0.95);
+    border-color: rgb(var(--color-border-strong) / 0.9);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-danger {
     color: rgb(255 255 255);
-    background-color: rgb(var(--color-danger));
-    @apply active:scale-[0.98];
+    background-color: rgb(82 82 91);
+    border: 1px solid rgb(113 113 122 / 0.85);
+    @apply active:scale-[0.98] hover:-translate-y-0.5;
 }
 
 .btn-danger:hover {
-    background-color: rgb(185 28 28);
+    background-color: rgb(63 63 70);
+    border-color: rgb(161 161 170 / 0.95);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-gradient {
     @apply py-3 px-6 rounded-xl shadow-lg text-sm font-medium text-white;
-    background-image: linear-gradient(to right, rgb(var(--color-brand)), rgb(var(--color-brand-hover)));
+    background-image: var(--gradient-brand);
     @apply hover:shadow-xl transform transition-all duration-200;
-    @apply hover:scale-[1.02] active:scale-[0.98];
+    @apply hover:scale-[1.01] active:scale-[0.98];
 }
 
 .btn-icon {
@@ -69,87 +75,108 @@
 }
 
 .btn-blue {
-    color: rgb(255 255 255);
-    background-color: rgb(var(--color-brand));
-    @apply active:scale-[0.98];
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-card-muted) / 0.95);
+    border: 1px solid rgb(var(--color-border-strong) / 0.9);
+    @apply active:scale-[0.98] hover:-translate-y-0.5;
 }
 
 .dark .btn-blue {
-    color: rgb(226 232 240);
-    border: 1px solid rgb(var(--color-border-strong));
-    background: linear-gradient(145deg, rgb(var(--color-surface-card-muted)), rgb(var(--color-surface-card)));
+    color: rgb(var(--color-text-primary));
+    border: 1px solid rgb(255 255 255 / 0.2);
+    background-color: rgb(255 255 255 / 0.1);
 }
 
 .btn-blue:hover {
-    background-color: rgb(var(--color-brand-hover));
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-elevated));
+    border-color: rgb(var(--color-border-strong) / 0.95);
+    box-shadow: var(--shadow-md);
 }
 
 .dark .btn-blue:hover {
-    color: rgb(241 245 249);
-    border-color: rgb(var(--color-brand) / 0.55);
-    background: linear-gradient(145deg, rgb(var(--color-surface-card-muted)), rgb(var(--color-surface-elevated)));
+    color: rgb(var(--color-text-primary));
+    border-color: rgb(255 255 255 / 0.28);
+    background-color: rgb(255 255 255 / 0.16);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-green {
-    color: rgb(255 255 255);
-    background-color: rgb(var(--color-success));
-    @apply active:scale-[0.98];
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-card-muted) / 0.95);
+    border: 1px solid rgb(var(--color-border-strong) / 0.9);
+    @apply active:scale-[0.98] hover:-translate-y-0.5;
 }
 
 .dark .btn-green {
-    color: rgb(220 252 231);
-    border: 1px solid rgb(74 222 128 / 0.45);
-    background: linear-gradient(145deg, rgb(8 59 47), rgb(5 46 38));
+    color: rgb(var(--color-text-primary));
+    border: 1px solid rgb(255 255 255 / 0.2);
+    background-color: rgb(255 255 255 / 0.1);
 }
 
 .btn-green:hover {
-    background-color: rgb(21 128 61);
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-elevated));
+    border-color: rgb(var(--color-border-strong) / 0.95);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-yellow {
-    color: rgb(255 255 255);
-    background-color: rgb(var(--color-warning));
-    @apply active:scale-[0.98];
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-card-muted) / 0.95);
+    border: 1px solid rgb(var(--color-border-strong) / 0.9);
+    @apply active:scale-[0.98] hover:-translate-y-0.5;
 }
 
 .dark .btn-yellow {
-    color: rgb(254 240 138);
-    border: 1px solid rgb(251 191 36 / 0.5);
-    background: linear-gradient(145deg, rgb(92 54 10), rgb(61 34 6));
+    color: rgb(var(--color-text-primary));
+    border: 1px solid rgb(255 255 255 / 0.2);
+    background-color: rgb(255 255 255 / 0.1);
 }
 
 .btn-yellow:hover {
-    background-color: rgb(180 83 9);
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-elevated));
+    border-color: rgb(var(--color-border-strong) / 0.95);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-purple {
-    color: rgb(255 255 255);
-    background-color: rgb(124 58 237);
-    @apply active:scale-[0.98];
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-card-muted) / 0.95);
+    border: 1px solid rgb(var(--color-border-strong) / 0.9);
+    @apply active:scale-[0.98] hover:-translate-y-0.5;
 }
 
 .dark .btn-purple {
-    color: rgb(233 213 255);
-    border: 1px solid rgb(167 139 250 / 0.52);
-    background: linear-gradient(145deg, rgb(67 56 202), rgb(49 46 129));
+    color: rgb(var(--color-text-primary));
+    border: 1px solid rgb(255 255 255 / 0.2);
+    background-color: rgb(255 255 255 / 0.1);
 }
 
 .btn-purple:hover {
-    background-color: rgb(109 40 217);
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-elevated));
+    border-color: rgb(var(--color-border-strong) / 0.95);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-indigo {
-    color: rgb(255 255 255);
-    background-color: rgb(79 70 229);
-    @apply active:scale-[0.98];
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-card-muted) / 0.95);
+    border: 1px solid rgb(var(--color-border-strong) / 0.9);
+    @apply active:scale-[0.98] hover:-translate-y-0.5;
 }
 
 .dark .btn-indigo {
-    color: rgb(224 231 255);
-    border: 1px solid rgb(129 140 248 / 0.52);
-    background: linear-gradient(145deg, rgb(55 48 163), rgb(37 36 110));
+    color: rgb(var(--color-text-primary));
+    border: 1px solid rgb(255 255 255 / 0.2);
+    background-color: rgb(255 255 255 / 0.1);
 }
 
 .btn-indigo:hover {
-    background-color: rgb(67 56 202);
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-surface-elevated));
+    border-color: rgb(var(--color-border-strong) / 0.95);
+    box-shadow: var(--shadow-md);
 }

@@ -9,8 +9,8 @@
         $deletePackageReleaseConfirmation = __('Are you sure you want to delete this package release? This action cannot be undone.');
     @endphp
 
-    <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div>
+        <div class="w-full">
             <div class="card-shell overflow-hidden">
                 <div class="p-6 text-gray-900 dark:text-gray-100 space-y-6">
                     <!-- Package Header -->
@@ -20,8 +20,7 @@
                                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('Package:') }} {{ $release->version }}</h3>
                                 <div class="mt-2 flex items-center gap-4">
                                     <span
-                                        class="px-3 py-1 rounded-full text-sm font-medium
-                                        {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' }}">
+                                        class="px-3 py-1 rounded-full text-sm font-medium {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200' }}">
                                         {{ ucfirst($release->release_channel) }} {{ __('Release') }}
                                     </span>
                                 </div>
@@ -29,7 +28,7 @@
 
                             <div class="flex gap-2">
                                 @if ($isAdmin ?? false)
-                                    <a href="{{ route('packages.manage') }}" class="btn btn-purple">
+                                    <a href="{{ route('packages.manage') }}" class="btn btn-secondary">
                                         {{ __('Manage Packages') }}
                                     </a>
                                 @endif
@@ -119,7 +118,7 @@
                                                     </path>
                                                 </svg>
                                                 <a href="{{ trim($url) }}" target="_blank" rel="noopener noreferrer"
-                                                    class="text-sm text-cool-700 dark:text-cool-300 hover:underline break-all">
+                                                    class="text-sm text-zinc-700 dark:text-zinc-300 hover:underline break-all">
                                                     {{ trim($url) }}
                                                 </a>
                                             </div>
@@ -135,7 +134,7 @@
                         <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Download') }}</h4>
                         <div class="flex flex-col sm:flex-row gap-3">
                             @if ($canDownload ?? false && $release->id)
-                                <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="btn btn-green text-center">
+                                <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="btn btn-secondary text-center">
                                     {{ __('Download Package') }}
                                 </a>
                             @else
@@ -145,7 +144,7 @@
                             @endif
 
                             @if ($isAdmin ?? false)
-                                <button onclick="showChangelogModal()" class="btn btn-indigo">
+                                <button onclick="showChangelogModal()" class="btn btn-secondary">
                                     {{ __('Edit Changelog') }}
                                 </button>
                             @endif
@@ -189,7 +188,7 @@
                         <button type="button" onclick="hideChangelogModal()" class="btn btn-secondary">
                             {{ __('Cancel') }}
                         </button>
-                        <button type="submit" class="btn btn-indigo">
+                        <button type="submit" class="btn btn-secondary">
                             {{ __('Update Changelog') }}
                         </button>
                     </div>

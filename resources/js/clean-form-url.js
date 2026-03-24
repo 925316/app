@@ -40,7 +40,7 @@ class CleanFormURL {
         window.addEventListener('popstate', () => this.cleanupUrl());
 
         // Handle form submission
-        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        this.form.addEventListener('submit', (event) => this.handleSubmit(event));
     }
 
     shouldExcludeParam(key, value) {
@@ -58,31 +58,36 @@ class CleanFormURL {
         return !value || value.trim() === '';
     }
 
-    handleSubmit(e) {
-        e.preventDefault();
+    handleSubmit(event) {
+        if (this.form.method.toUpperCase() !== 'GET') {
+            return;
+        }
 
+        event.preventDefault();
+
+        const action = this.form.getAttribute('action') || window.location.pathname;
+        const actionUrl = new URL(action, window.location.origin);
         const formData = new FormData(this.form);
         const params = new URLSearchParams();
-        const baseUrl = this.form.action.split('?')[0];
 
-        // Only include non-default parameters
-        for (const [key, value] of formData.entries()) {
-            const trimmedValue = value.toString().trim();
-
-            // Skip excluded parameters
-            if (this.shouldExcludeParam(key, trimmedValue)) {
+        for (const [key, rawValue] of formData.entries()) {
+            if (typeof rawValue !== 'string') {
                 continue;
             }
 
-            params.append(key, trimmedValue);
+            const value = rawValue.trim();
+
+            if (this.shouldExcludeParam(key, value)) {
+                continue;
+            }
+
+            params.append(key, value);
         }
 
-        // Build clean URL
         const queryString = params.toString();
-        const url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+        const targetUrl = queryString ? `${actionUrl.pathname}?${queryString}` : actionUrl.pathname;
 
-        // Navigate to clean URL
-        window.location.href = url;
+        window.location.assign(targetUrl);
     }
 
     cleanupUrl() {
@@ -113,7 +118,9 @@ class CleanFormURL {
 // Initialize all clean-form-url instances on page load
 document.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('[data-clean-form="true"]');
-    forms.forEach(form => new CleanFormURL(form));
+    forms.forEach((form) => {
+        new CleanFormURL(form);
+    });
 });
 
 // Export for manual initialization if needed

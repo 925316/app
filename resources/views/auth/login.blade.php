@@ -31,13 +31,13 @@
                     <div class="flex items-center justify-between">
                         <label for="remember_me" class="flex items-center">
                             <input id="remember_me" type="checkbox"
-                                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded transition-colors duration-200"
+                                class="h-4 w-4 text-zinc-600 focus:ring-white/30 border-gray-300 dark:border-gray-600 rounded-lg transition-colors duration-200"
                                 name="remember">
                             <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">{{ __('Remember me') }}</span>
                         </label>
 
                         @if (Route::has('password.request'))
-                            <a class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors duration-200"
+                            <a class="text-sm font-medium text-zinc-600 hover:text-zinc-500 dark:text-zinc-300 dark:hover:text-zinc-200 transition-colors duration-200"
                                 href="{{ route('password.request') }}">
                                 {{ __('Forgot your password?') }}
                             </a>
@@ -46,8 +46,7 @@
 
                     <!-- Submit Button -->
                     <div>
-                        <x-primary-button
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                        <x-primary-button class="w-full flex justify-center py-3 px-4">
                             <span class="flex items-center">
                                 <x-icon name="login" class="w-4 h-4 mr-2" />
                                 {{ __('Sign in') }}
@@ -61,7 +60,7 @@
                     <p class="text-sm text-gray-600 dark:text-gray-300">
                         {{ __("Don't have an account?") }}
                         <a href="{{ route('register') }}"
-                            class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors duration-200">
+                            class="font-medium text-zinc-600 hover:text-zinc-500 dark:text-zinc-300 dark:hover:text-zinc-200 transition-colors duration-200">
                             {{ __('Sign up for free') }}
                         </a>
                     </p>

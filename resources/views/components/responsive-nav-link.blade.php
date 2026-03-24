@@ -3,8 +3,8 @@
 @php
     $classes =
         $active ?? false
-            ? 'block w-full ps-3 pe-4 py-2 border-l-4 border-indigo-400 text-start text-base font-medium text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/50 focus:outline-none focus:text-indigo-800 dark:focus:text-indigo-200 focus:bg-indigo-100 focus:border-indigo-700 transition duration-150 ease-in-out'
-            : 'block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-cool-700 hover:border-gray-300 focus:outline-none focus:text-gray-800 dark:focus:text-gray-100 focus:bg-gray-50 dark:focus:bg-cool-700 focus:border-gray-300 transition duration-150 ease-in-out';
+            ? 'block w-full rounded-2xl border border-[rgb(var(--color-border-strong))/0.5] bg-[rgb(var(--color-surface-card-muted))/0.9] px-4 py-2.5 text-start text-base font-semibold text-[rgb(var(--color-text-primary))] shadow-sm transition duration-200 ease-in-out dark:border-white/20 dark:bg-white/12'
+            : 'block w-full rounded-2xl border border-transparent px-4 py-2.5 text-start text-base font-semibold text-[rgb(var(--color-text-secondary))] transition duration-150 ease-in-out hover:border-[rgb(var(--color-border-subtle))/0.9] hover:bg-[rgb(var(--color-surface-card-muted))/0.82] hover:text-[rgb(var(--color-text-primary))] dark:text-[rgb(var(--color-text-secondary))] dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-[rgb(var(--color-text-primary))]';
 @endphp
 
 <a {{ $attributes->merge(['class' => $classes]) }}>

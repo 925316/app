@@ -1,17 +1,16 @@
 /* Form Styles */
 .form-input {
-    @apply block w-full rounded-lg border;
-    @apply px-4 py-2.5 focus:outline-none focus:ring-2;
-    @apply focus:border-transparent transition-all duration-200;
+    @apply block w-full rounded-xl border;
+    @apply px-4 py-2.5 focus:outline-none focus:ring-0;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     color: rgb(var(--color-text-primary));
 }
 
 .dark .form-input {
-    color: rgb(241 245 249);
+    color: rgb(244 244 245);
     background-color: rgb(var(--color-surface-card-muted));
     border-color: rgb(var(--color-border-strong) / 0.95);
 }
@@ -21,11 +20,11 @@
 }
 
 .dark .form-input::placeholder {
-    color: rgb(148 163 184 / 0.9);
+    color: rgb(161 161 170 / 0.9);
 }
 
 .form-input:focus {
-    --tw-ring-color: rgb(var(--color-brand) / 0.35);
+    border-color: rgb(var(--color-border-strong));
 }
 
 .input-icon-wrapper {
@@ -64,30 +63,82 @@
 }
 
 .form-select {
-    @apply block w-full rounded-lg border;
-    @apply px-4 py-2.5 focus:outline-none focus:ring-2;
-    @apply focus:border-transparent transition-all duration-200;
+    @apply block w-full rounded-xl border;
+    @apply px-4 py-2.5 pr-11 focus:outline-none focus:ring-0;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    border-radius: var(--radius-lg);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition:
+        border-color var(--motion-fast) var(--ease-standard),
+        box-shadow var(--motion-fast) var(--ease-standard),
+        background-color var(--motion-fast) var(--ease-standard);
+    border-radius: var(--radius-xl);
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     color: rgb(var(--color-text-primary));
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236b7280' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 1rem 1rem;
+}
+
+.form-select-enhanced {
+    padding-right: 2.75rem;
+}
+
+.dark .form-select-enhanced {
+    padding-right: 2.75rem;
+}
+
+.form-select-enhanced:active {
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .form-select,
+    .form-select:hover,
+    .form-select:focus,
+    .form-select-enhanced:active {
+        transition: none;
+        transform: none;
+    }
+}
+
+.form-select:hover {
+    border-color: rgb(var(--color-border-strong));
+    box-shadow: 0 10px 20px -20px rgb(0 0 0 / 0.55);
 }
 
 .dark .form-select {
-    color: rgb(241 245 249);
+    color: rgb(244 244 245);
     background-color: rgb(var(--color-surface-card-muted));
     border-color: rgb(var(--color-border-strong) / 0.95);
+    color-scheme: dark;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23a1a1aa' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
 
 .form-select:focus {
-    --tw-ring-color: rgb(var(--color-brand) / 0.35);
+    border-color: rgb(var(--color-border-strong));
+    transform: none;
+    box-shadow: 0 0 0 2px rgb(24 24 27 / 0.12);
+}
+
+.dark .form-select:focus,
+.dark .form-select:focus-visible {
+    box-shadow: none;
+}
+
+.dark .form-select:hover,
+.dark .form-select:active,
+.dark .form-select-enhanced:active {
+    transform: none;
+    box-shadow: none;
 }
 
 .form-textarea {
     @apply block w-full rounded-lg border;
-    @apply px-4 py-2.5 focus:outline-none focus:ring-2;
-    @apply focus:border-transparent transition-all duration-200;
+    @apply px-4 py-2.5 focus:outline-none focus:ring-0;
     @apply resize-y min-h-[100px];
     border-radius: var(--radius-lg);
     border-color: rgb(var(--color-border-subtle));
@@ -96,7 +147,7 @@
 }
 
 .dark .form-textarea {
-    color: rgb(241 245 249);
+    color: rgb(244 244 245);
     background-color: rgb(var(--color-surface-card-muted));
     border-color: rgb(var(--color-border-strong) / 0.95);
 }
@@ -106,7 +157,7 @@
 }
 
 .form-textarea:focus {
-    --tw-ring-color: rgb(var(--color-brand) / 0.35);
+    border-color: rgb(var(--color-border-strong));
 }
 
 .form-section {
@@ -116,4 +167,8 @@
 .form-help {
     @apply text-sm mt-1.5;
     color: rgb(var(--color-text-muted));
+}
+
+.form-pill {
+    border-radius: 9999px !important;
 }

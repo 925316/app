@@ -5,7 +5,7 @@
     </x-slot>
 
     <div>
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="w-full">
             <div class="flex items-center justify-between mb-6">
                 <div class="text-sm text-gray-500 dark:text-gray-400">
                     {{ __('Last updated:') }} {{ now()->format('M d, Y H:i') }}
@@ -56,7 +56,7 @@
                 <div class="card-shell overflow-hidden">
                     <div class="p-6">
                         <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-300" fill="none"
+                            <svg class="w-5 h-5 mr-2 text-slate-600 dark:text-zinc-300" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
@@ -96,7 +96,7 @@
             <!-- Database Status -->
             <div>
                 <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-300" fill="none"
+                    <svg class="w-5 h-5 mr-2 text-slate-600 dark:text-zinc-300" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4">
@@ -107,7 +107,7 @@
 
                 @if (isset($databaseStatus['error']))
                     <div
-                        class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                        class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -124,7 +124,7 @@
                     <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-300" fill="none"
+                                <svg class="w-5 h-5 mr-2 text-slate-600 dark:text-zinc-300" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4">
@@ -167,7 +167,7 @@
                     <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-300" fill="none"
+                                <svg class="w-5 h-5 mr-2 text-slate-600 dark:text-zinc-300" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 10V3L4 14h7v7l9-11h-7z"></path>
@@ -183,7 +183,7 @@
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">{{ __('Threads Connected:') }}</span>
                                     <span
-                                        class="font-semibold text-blue-600 dark:text-blue-300">{{ $databaseStatus['connections']['threads_connected'] ?? 0 }}</span>
+                                        class="font-semibold text-slate-600 dark:text-zinc-300">{{ $databaseStatus['connections']['threads_connected'] ?? 0 }}</span>
                                 </div>
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">{{ __('Threads Running:') }}</span>
@@ -210,7 +210,7 @@
                     <div class="card-shell overflow-hidden">
                         <div class="p-6">
                             <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-orange-600 dark:text-orange-300" fill="none"
+                                <svg class="w-5 h-5 mr-2 text-slate-600 dark:text-zinc-300" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -221,7 +221,7 @@
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">{{ __('Pending Jobs:') }}</span>
                                     <span
-                                        class="font-semibold text-blue-600 dark:text-blue-300">{{ $databaseStatus['queues']['pending_jobs'] ?? 0 }}</span>
+                                        class="font-semibold text-slate-600 dark:text-zinc-300">{{ $databaseStatus['queues']['pending_jobs'] ?? 0 }}</span>
                                 </div>
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 dark:text-gray-300">{{ __('Failed Jobs:') }}</span>

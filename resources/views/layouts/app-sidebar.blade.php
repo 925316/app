@@ -5,15 +5,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#fafafa">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800&display=swap" rel="stylesheet" />
 
     <!-- Early theme detection to prevent FOUC -->
     @include('components.theme-init-script')
+
+    <script>
+        (function () {
+            const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+            if (!metaThemeColor) {
+                return;
+            }
+
+            const isDark = document.documentElement.classList.contains('dark');
+            metaThemeColor.setAttribute('content', isDark ? '#000000' : '#fafafa');
+        })();
+    </script>
 
     <!-- x-cloak styles to hide elements until Alpine.js initializes -->
     <style>
@@ -39,7 +52,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="app-shell-page font-sans antialiased min-h-screen overflow-x-hidden transition-colors duration-300">
+<body class="app-shell-page min-h-screen overflow-x-hidden overscroll-y-none font-sans antialiased">
     <div class="flex min-h-screen w-full overflow-x-hidden" x-data="{
         mobileSidebarOpen: false,
         isDesktop: false,
@@ -94,13 +107,13 @@
         <!-- Main Content Area -->
         <div class="relative z-0 flex flex-col w-full min-w-0 transition-all duration-300 ml-0"
             :class="{ 'lg:ml-64 lg:w-[calc(100%-16rem)]': $store.sidebar.open, 'lg:ml-16 lg:w-[calc(100%-4rem)]': !$store.sidebar.open }"
-            :inert="mobileSidebarOpen && !isDesktop" :aria-hidden="(mobileSidebarOpen && !isDesktop).toString()" x-cloak>
+            :inert="mobileSidebarOpen && !isDesktop" :aria-hidden="(mobileSidebarOpen && !isDesktop).toString()">
             <!-- Top Header -->
             <header class="app-shell-header">
                 <div class="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
                     <!-- Page Title -->
                     <div class="flex items-center gap-3">
-                        <button type="button" class="inline-flex items-center justify-center rounded-md p-2 text-gray-500 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200 lg:hidden"
+                        <button type="button" class="inline-flex items-center justify-center rounded-2xl border border-[rgb(var(--color-border-subtle))] bg-[rgb(var(--color-surface-card))/0.8] p-2 text-[rgb(var(--color-text-secondary))] shadow-sm transition duration-150 hover:border-white/20 hover:bg-white/10 hover:text-[rgb(var(--color-text-primary))] focus:outline-none focus:ring-2 focus:ring-white/30 lg:hidden"
                             @click="openMobileSidebar($el)" :aria-expanded="mobileSidebarOpen.toString()"
                             aria-controls="app-sidebar" aria-label="{{ __('Open navigation menu') }}">
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +122,7 @@
                         </button>
 
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                            <h1 class="text-2xl font-bold text-[rgb(var(--color-text-primary))]">
                                 @isset($header)
                                     {{ $header }}
                                 @else
@@ -117,7 +130,7 @@
                                 @endisset
                             </h1>
                             @isset($subheader)
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                <p class="mt-1 text-sm text-[rgb(var(--color-text-muted))]">
                                     {{ $subheader }}
                                 </p>
                             @endisset
@@ -140,7 +153,7 @@
 
             <!-- Footer -->
             <footer class="app-shell-footer py-4 px-4 sm:px-6 lg:px-8">
-                <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+                <div class="text-center text-sm text-[rgb(var(--color-text-muted))]">
                     &copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. {{ __('All rights reserved.') }}
                 </div>
             </footer>

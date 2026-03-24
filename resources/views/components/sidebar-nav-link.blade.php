@@ -25,8 +25,8 @@
     $iconSvg = $icons[$icon] ?? $icons['document-text'];
 
     $classes = $active ?? false
-        ? 'sidebar-link bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-l-2 border-gray-900 dark:border-gray-100'
-        : 'sidebar-link text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 border-l-2 border-transparent';
+        ? 'sidebar-link sidebar-link-active'
+        : 'sidebar-link sidebar-link-inactive';
 @endphp
 
 <a {{ $attributes->merge(['class' => $classes]) }}>

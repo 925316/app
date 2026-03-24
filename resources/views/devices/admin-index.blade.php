@@ -5,37 +5,31 @@
         </h2>
     </x-slot>
 
-    <div class="py-7">
+    <div>
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <x-stat-card :title="__('Total Devices')" :value="$totalDevices" icon="desktop" iconColor="icon-blue" />
+                <x-stat-card :title="__('Total Devices')" :value="$totalDevices" icon="desktop" iconColor="icon-gray" />
                 <x-stat-card :title="__('Bound Devices')" :value="$boundDevices" icon="success" iconColor="icon-green" />
                 <x-stat-card :title="__('Active (30d)')" :value="$activeDevices" icon="lightning" iconColor="icon-yellow" />
                 <x-stat-card :title="__('Unbound')" :value="$unboundDevices" icon="ban" iconColor="icon-gray" />
             </div>
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow-sm sm:rounded-xl border border-zinc-200/60 dark:border-zinc-700/60">
+                <div class="p-6 text-zinc-900 dark:text-zinc-100">
                     <!-- Filters Section -->
-                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <h4 class="text-sm font-medium mb-3">{{ __('Filters') }}</h4>
-                        <form method="GET" action="{{ route('devices.index') }}" data-clean-form="true"
-                            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                            <!-- Search -->
-                            <div>
+                    <x-filter-box :action="route('devices.index')" :title="__('Filter Devices')" :showTotal="true" :totalCount="$devices->total()">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                            <div class="space-y-2">
                                 <label for="search"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Search') }}</label>
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Search') }}</label>
                                 <input type="text" name="search" id="search" value="{{ request('search') }}"
-                                    placeholder="{{ __('HWID, IP, Username, Email') }}"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
+                                    placeholder="{{ __('HWID, IP, Username, Email') }}" class="form-input form-pill py-2 text-sm">
                             </div>
 
-                            <!-- Status Filter -->
-                            <div>
+                            <div class="space-y-2">
                                 <label for="status"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Status') }}</label>
-                                <select name="status" id="status"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Status') }}</label>
+                                <select name="status" id="status" class="form-select form-pill form-select-enhanced py-2 text-sm">
                                     <option value="">{{ __('All') }}</option>
                                     <option value="bound" {{ request('status') === 'bound' ? 'selected' : '' }}>
                                         {{ __('Currently Bound') }}
@@ -43,87 +37,73 @@
                                     <option value="unbound" {{ request('status') === 'unbound' ? 'selected' : '' }}>
                                         {{ __('Unbound') }}
                                     </option>
-                                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active
-                                        {{ __('(30d)') }}
+                                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>
+                                        {{ __('Active (30d)') }}
                                     </option>
                                 </select>
                             </div>
 
-                            <!-- Date Range Filter -->
-                            <div>
+                            <div class="space-y-2">
                                 <label for="date_range"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Date Range') }}</label>
-                                <select name="date_range" id="date_range"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Date Range') }}</label>
+                                <select name="date_range" id="date_range" class="form-select form-pill form-select-enhanced py-2 text-sm">
                                     <option value="">{{ __('All Time') }}</option>
-                                    <option value="24h" {{ request('date_range') === '24h' ? 'selected' : '' }}>Last
+                                    <option value="24h" {{ request('date_range') === '24h' ? 'selected' : '' }}>
                                         {{ __('Last 24 Hours') }}
                                     </option>
-                                    <option value="7d" {{ request('date_range') === '7d' ? 'selected' : '' }}>Last
+                                    <option value="7d" {{ request('date_range') === '7d' ? 'selected' : '' }}>
                                         {{ __('Last 7 Days') }}
                                     </option>
-                                    <option value="30d" {{ request('date_range') === '30d' ? 'selected' : '' }}>Last
+                                    <option value="30d" {{ request('date_range') === '30d' ? 'selected' : '' }}>
                                         {{ __('Last 30 Days') }}
                                     </option>
-                                    <option value="90d" {{ request('date_range') === '90d' ? 'selected' : '' }}>Last
+                                    <option value="90d" {{ request('date_range') === '90d' ? 'selected' : '' }}>
                                         {{ __('Last 90 Days') }}
                                     </option>
                                 </select>
                             </div>
 
-                            <!-- Country Code Filter -->
-                            <div>
+                            <div class="space-y-2">
                                 <label for="country_code"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Country Code') }}</label>
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Country Code') }}</label>
                                 <input type="text" name="country_code" id="country_code"
-                                    value="{{ request('country_code') }}" placeholder="{{ __('e.g., US, CN') }}"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 uppercase">
+                                    value="{{ request('country_code') }}" placeholder="{{ __('e.g., US, CN') }}" class="form-input form-pill py-2 text-sm uppercase">
                             </div>
 
-                            <!-- HWID Reset Count Filter -->
-                            <div>
+                            <div class="space-y-2">
                                 <label for="min_reset_count"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Min HWID Reset') }}</label>
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Min HWID Reset') }}</label>
                                 <input type="number" name="min_reset_count" id="min_reset_count"
-                                    value="{{ request('min_reset_count') }}" min="0"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
+                                    value="{{ request('min_reset_count') }}" min="0" class="form-input form-pill py-2 text-sm">
                             </div>
 
-                            <!-- Account Status Filter -->
-                            <div>
+                            <div class="space-y-2">
                                 <label for="account_status"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Account Status') }}</label>
-                                <select name="account_status" id="account_status"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Account Status') }}</label>
+                                <select name="account_status" id="account_status" class="form-select form-pill form-select-enhanced py-2 text-sm">
                                     <option value="">{{ __('All') }}</option>
-                                    <option value="active"
-                                        {{ request('account_status') === 'active' ? 'selected' : '' }}>
+                                    <option value="active" {{ request('account_status') === 'active' ? 'selected' : '' }}>
                                         {{ __('Active') }}
                                     </option>
-                                    <option value="suspended"
-                                        {{ request('account_status') === 'suspended' ? 'selected' : '' }}>
+                                    <option value="suspended" {{ request('account_status') === 'suspended' ? 'selected' : '' }}>
                                         {{ __('Suspended') }}
                                     </option>
                                 </select>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="col-span-full flex gap-2 mt-2">
-                                <button type="submit"
-                                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
+                            <div class="flex items-end gap-2 xl:col-span-2 xl:justify-end">
+                                <button type="submit" class="btn btn-secondary btn-sm">
                                     {{ __('Apply Filters') }}
                                 </button>
-                                <a href="{{ route('devices.index') }}"
-                                    class="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition">
+                                <a href="{{ route('devices.index') }}" class="btn btn-secondary btn-sm">
                                     {{ __('Reset') }}
                                 </a>
-                                <a href="{{ route('devices.export', request()->query()) }}"
-                                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition">
+                                <a href="{{ route('devices.export', request()->query()) }}" class="btn btn-secondary btn-sm">
                                     {{ __('Export CSV') }}
                                 </a>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </x-filter-box>
 
                     <!-- Device Table -->
 
@@ -170,12 +150,12 @@
                                 <td class="px-4 py-2 whitespace-nowrap text-sm">
                                     @if ($device->isBound())
                                         <span
-                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
+                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg text-xs font-medium">
                                             {{ __('Currently Bound') }}
                                         </span>
                                     @else
                                         <span
-                                            class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium">
+                                            class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg text-xs font-medium">
                                             {{ __('Historical') }}
                                         </span>
                                     @endif
@@ -183,12 +163,12 @@
                                 <td class="px-4 py-2 whitespace-nowrap text-sm">
                                     @if ($device->account->isSuspended())
                                         <span
-                                            class="px-2 py-0.5 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded text-xs font-medium">
+                                            class="px-2 py-0.5 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg text-xs font-medium">
                                             {{ __('Suspended') }}
                                         </span>
                                     @else
                                         <span
-                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
+                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg text-xs font-medium">
                                             {{ __('Active') }}
                                         </span>
                                     @endif
@@ -204,7 +184,7 @@
                                                 onsubmit="return confirm('Unbind device from {{ $device->account->username }}?');">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition">
+                                                    class="px-2 py-1 bg-yellow-600 text-white text-xs rounded-lg hover:bg-yellow-700 transition">
                                                     {{ __('Unbind') }}
                                                 </button>
                                             </form>
@@ -216,7 +196,7 @@
                                                 onsubmit="return confirm('Reset HWID for {{ $device->account->username }}? This will unbind all devices.');">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition">
+                                                    class="px-2 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700 transition">
                                                     {{ __('Reset HWID') }}
                                                 </button>
                                             </form>

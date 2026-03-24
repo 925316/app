@@ -4,7 +4,7 @@
         {{ __('Edit License') }}
     </x-slot>
 
-    <div class="mx-auto max-w-4xl space-y-6">
+    <div class="mx-auto max-w-7xl space-y-6">
         <div class="card-shell">
             <div class="app-toolbar mb-6">
                 <div>
@@ -24,13 +24,13 @@
             <div class="mb-4">
                 <label for="key" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('License Key') }}</label>
                 <input type="text" name="key" id="key" value="{{ old('key', $license->key) }}" readonly
-                    class="form-input bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
+                    class="form-input form-pill bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
             </div>
 
             <!-- Account -->
             <div class="mb-4">
                 <label for="used_by" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Assign to Account') }}</label>
-                <select name="used_by" id="used_by" class="form-select"
+                        <select name="used_by" id="used_by" class="form-select form-pill form-select-enhanced"
                     {{ $license->status !== LicenseStatus::UNUSED ? 'disabled' : '' }}>
                     <option value="">{{ __('Unassigned') }}</option>
                     @foreach ($accounts as $account)
@@ -53,7 +53,7 @@
             <!-- Privilege -->
             <div class="mb-4">
                 <label for="privilege" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Privilege Level') }}</label>
-                <select name="privilege" id="privilege" class="form-select">
+                        <select name="privilege" id="privilege" class="form-select form-pill form-select-enhanced">
                     @foreach ($privilegeOptions as $value => $label)
                         <option value="{{ $value }}"
                             {{ old('privilege', $license->privilege->value) == $value ? 'selected' : '' }}>
@@ -70,7 +70,7 @@
             <div class="mb-4">
                 <label for="status"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Status') }}</label>
-                <select name="status" id="status" class="form-select">
+                        <select name="status" id="status" class="form-select form-pill form-select-enhanced">
                     @foreach ($statusOptions as $value => $label)
                         <option value="{{ $value }}"
                             {{ old('status', $license->status->value) == $value ? 'selected' : '' }}>
@@ -86,7 +86,7 @@
             <!-- Expiration Date -->
             <div class="mb-4">
                 <label for="expires_at" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Expiration Date') }}</label>
-                <input type="date" name="expires_at" id="expires_at" value="{{ old('expires_at', $license->expires_at->format('Y-m-d')) }}" class="form-input">
+                <input type="date" name="expires_at" id="expires_at" value="{{ old('expires_at', $license->expires_at->format('Y-m-d')) }}" class="form-input form-pill">
                 @error('expires_at')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -103,13 +103,13 @@
             </div>
 
                 <!-- Form Actions -->
-                <div class="flex justify-end gap-3 border-t border-cool-200/70 pt-6 dark:border-cool-700/70">
+            <div class="flex justify-end gap-3 border-t border-zinc-200/70 pt-6 dark:border-zinc-700/70">
                     <a href="{{ route('licenses.show', $license) }}" class="btn btn-secondary">
                         {{ __('Cancel') }}
                     </a>
-                    <button type="submit" class="btn btn-blue">
-                        {{ __('Update License') }}
-                    </button>
+            <button type="submit" class="btn btn-secondary">
+                {{ __('Update License') }}
+            </button>
                 </div>
             </form>
         </div>

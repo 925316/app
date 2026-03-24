@@ -3,7 +3,7 @@
         {{ __('Add Package') }}
     </x-slot>
 
-    <div class="mx-auto max-w-4xl space-y-6">
+    <div class="mx-auto max-w-7xl space-y-6">
         <div class="card-shell">
             <div class="app-toolbar mb-6">
                 <div>
@@ -22,7 +22,7 @@
             <div class="mb-4">
                 <label for="version"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Version') }}</label>
-                <input type="text" name="version" id="version" value="{{ old('version') }}" class="form-input"
+                <input type="text" name="version" id="version" value="{{ old('version') }}" class="form-input form-pill"
                     placeholder="{{ __('e.g., 1.0.0 (semantic versioning)') }}">
                 @error('version')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -36,7 +36,7 @@
             <div class="mb-4">
                 <label for="release_channel"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Release Channel') }}</label>
-                <select name="release_channel" id="release_channel" class="form-select">
+                            <select name="release_channel" id="release_channel" class="form-select form-pill form-select-enhanced">
                     <option value="stable" {{ old('release_channel') === 'stable' ? 'selected' : '' }}>{{ __('Stable') }}</option>
                     <option value="dev" {{ old('release_channel') === 'dev' ? 'selected' : '' }}>{{ __('Development') }}</option>
                 </select>
@@ -49,7 +49,7 @@
             <div class="mb-4">
                 <label for="download_url"
                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Download URL') }}</label>
-                <input type="url" name="download_url" id="download_url" value="{{ old('download_url') }}" class="form-input"
+                <input type="url" name="download_url" id="download_url" value="{{ old('download_url') }}" class="form-input form-pill"
                     placeholder="{{ __('https://example.com/downloads/package.zip') }}">
                 @error('download_url')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -85,11 +85,11 @@
             </div>
 
                 <!-- Form Actions -->
-                <div class="flex justify-end gap-3 border-t border-cool-200/70 pt-6 dark:border-cool-700/70">
+                <div class="flex justify-end gap-3 border-t border-zinc-200/70 pt-6 dark:border-zinc-700/70">
                     <a href="{{ route('packages.index') }}" class="btn btn-secondary">
                         {{ __('Cancel') }}
                     </a>
-                    <button type="submit" class="btn btn-green">
+                    <button type="submit" class="btn btn-secondary">
                         {{ __('Add Package') }}
                     </button>
                 </div>

@@ -15,10 +15,19 @@
     box-shadow: var(--shadow-md);
 }
 
+.dark .card-shell {
+    background: rgb(var(--color-surface-card));
+}
+
 .card-shell-muted {
     @apply rounded-xl border p-4;
     border-color: rgb(var(--color-border-subtle) / 0.75);
     background-color: rgb(var(--color-surface-card-muted) / 0.7);
+}
+
+.dark .card-shell-muted {
+    border-color: rgb(var(--color-border-subtle) / 0.92);
+    background-color: rgb(var(--color-surface-card-muted));
 }
 
 .section-kicker {
@@ -66,7 +75,8 @@
 }
 
 .icon-blue {
-    @apply bg-blue-500/20 text-blue-600 dark:text-blue-300;
+    @apply text-zinc-600 dark:text-zinc-300;
+    background-color: rgb(var(--color-brand) / 0.2);
 }
 
 .icon-green {
@@ -86,11 +96,12 @@
 }
 
 .icon-orange {
-    @apply bg-orange-500/20 text-orange-600 dark:text-orange-300;
+    @apply bg-zinc-500/20 text-zinc-600 dark:text-zinc-300;
 }
 
 .icon-indigo {
-    @apply bg-indigo-500/20 text-indigo-600 dark:text-indigo-300;
+    @apply text-zinc-700 dark:text-zinc-300;
+    background-color: rgb(var(--color-brand-soft) / 0.78);
 }
 
 .icon-gray {

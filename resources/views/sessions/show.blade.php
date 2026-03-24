@@ -7,11 +7,11 @@
         $terminateSessionConfirmation = __('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.');
     @endphp
 
-    <div class="mx-auto max-w-7xl py-7">
+    <div class="mx-auto max-w-7xl">
             <!-- Breadcrumb and Actions -->
             <div class="mb-6 flex justify-between items-center gap-3 lg:max-xl:flex-wrap">
                 <div class="flex items-center space-x-2">
-                    <a href="{{ route('sessions.index') }}" class="text-cool-700 dark:text-cool-300 hover:underline text-sm">
+                    <a href="{{ route('sessions.index') }}" class="text-zinc-700 dark:text-zinc-300 hover:underline text-sm">
                         {{ __('Back to Sessions') }}
                     </a>
                 </div>
@@ -152,7 +152,7 @@
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-12 w-12">
                                         <div
-                                            class="h-12 w-12 rounded-full bg-cool-600 dark:bg-cool-500 flex items-center justify-center text-white font-bold text-lg">
+                                            class="h-12 w-12 rounded-full bg-zinc-600 dark:bg-zinc-500 flex items-center justify-center text-white font-bold text-lg">
                                             {{ $session->account->initials() }}
                                         </div>
                                     </div>
@@ -165,9 +165,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ route('accounts.show', $session->account) }}" class="btn btn-blue text-sm">
-                                    {{ __('View Account') }}
-                                </a>
+                    <a href="{{ route('accounts.show', $session->account) }}" class="btn btn-secondary text-sm">
+                        {{ __('View Account') }}
+                    </a>
                             </div>
                         </div>
                     @else

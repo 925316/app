@@ -23,5 +23,5 @@
         @if ($placeholder) placeholder="{{ $placeholder }}" @endif
         @if ($required) required @endif @if ($autofocus) autofocus @endif
         @if ($autocomplete) autocomplete="{{ $autocomplete }}" @endif
-        class="block w-full pl-10 pr-3 py-3 border border-cool-300/50 dark:border-cool-600/50 rounded-lg bg-white/50 dark:bg-cool-700/50 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 input-with-icon" />
+        class="input-with-icon block w-full rounded-xl border border-[rgb(var(--color-border-subtle))] bg-[rgb(var(--color-surface-card))/0.92] py-3 pl-10 pr-3 text-[rgb(var(--color-text-primary))] placeholder:text-[rgb(var(--color-text-muted))] transition-all duration-200 focus:border-[rgb(var(--color-border-strong))/0.85] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-border-strong))/0.2] dark:border-[rgb(var(--color-border-strong))/0.85] dark:bg-[rgb(var(--color-surface-card-muted))/0.9] dark:text-[rgb(var(--color-text-primary))] dark:placeholder:text-[rgb(var(--color-text-muted))] dark:focus:ring-white/20" />
 </div>

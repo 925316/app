@@ -11,15 +11,14 @@
                             id="email" name="email" type="email" :value="old('email')" required autofocus
                             :placeholder="__('your@email.com')" icon="mail" /> <x-input-error :messages="$errors->get('email')"
                             class="mt-2" /> </div> <!-- Submit Button -->
-                    <div> <x-primary-button
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                    <div> <x-primary-button class="w-full flex justify-center py-3 px-4">
                             <span class="flex items-center"> <x-icon name="mail" class="w-4 h-4 mr-2" />
                                 {{ __('Send Reset Link') }} </span> </x-primary-button> </div>
                 </form> <!-- Back to Login Link -->
                 <div class="mt-6 text-center">
                     <p class="text-sm text-gray-600 dark:text-gray-300"> {{ __('Remember your password?') }} <a
                             href="{{ route('login') }}"
-                            class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors duration-200">
+                            class="font-medium text-zinc-600 hover:text-zinc-500 dark:text-zinc-300 dark:hover:text-zinc-200 transition-colors duration-200">
                             {{ __('Sign in here') }} </a> </p>
                 </div>
             </x-auth-card> </div>

@@ -7,11 +7,11 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
         {{ __('Profile') }}
     </x-slot>
 
-    <div class="max-w-4xl mx-auto space-y-6">
+    <div class="mx-auto max-w-7xl space-y-6">
         <!-- Profile Header Card -->
         <div class="card-shell">
             <div class="flex items-center gap-6">
-                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-slate-600 to-zinc-500 flex items-center justify-center shadow-lg flex-shrink-0">
                     <span class="text-2xl font-bold text-white">{{ $initials }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
@@ -115,7 +115,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
 
                 <div class="space-y-2">
                     <x-input-label for="locale" :value="__('Language')" />
-                    <select id="locale" name="locale" class="form-select">
+                    <select id="locale" name="locale" class="form-select form-pill">
                         @if (count($supportedLocales) === 0)
                             <option value="{{ $currentLocale }}" selected>
                                 {{ strtoupper($currentLocale) }}

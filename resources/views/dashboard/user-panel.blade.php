@@ -4,7 +4,7 @@
     </x-slot>
 
     <div>
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="w-full">
             <div class="flex items-center justify-between mb-6">
                 <div class="text-sm text-gray-500 dark:text-gray-400">
                     {{ __('Last updated:') }} {{ now()->format('M d, Y H:i') }}
@@ -37,19 +37,19 @@
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">{{ __('License Key') }}</div>
                             <div
-                                class="text-lg font-mono font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+                                class="text-lg font-mono font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl border border-gray-200 dark:border-gray-600">
                                 {{ $activeLicense->key }}
                             </div>
                             <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div
-                                    class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                                    class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
                                     <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">{{ __('Expires') }}</div>
                                     <div class="text-lg font-semibold text-gray-900 dark:text-white">
                                         {{ $activeLicense->expires_at->format('Y-m-d') }}
                                     </div>
                                 </div>
                                 <div
-                                    class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                                    class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
                                     <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">{{ __('Days Remaining') }}</div>
                                     <div class="text-lg font-semibold text-green-600 dark:text-green-300">
                                         {{ $activeLicense->daysUntilExpiry() }} {{ __('days') }}
@@ -76,7 +76,7 @@
                                         {{ __('You do not have an active license. Please contact support or purchase a license to access premium features.') }}
                                     </p>
                                     <a href="{{ route('licenses.index') }}"
-                                        class="btn btn-blue btn-sm">
+                                        class="btn btn-secondary btn-sm">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -95,7 +95,7 @@
                 <!-- Device Status -->
                 <div>
                     <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor"
+                        <svg class="w-5 h-5 mr-2 text-zinc-600 dark:text-zinc-300" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
@@ -108,12 +108,12 @@
                                 <div class="flex items-center justify-between mb-4">
                                     <div>
                                         <span
-                                            class="px-3 py-1 text-sm font-medium rounded-full bg-blue-500/20 text-blue-800 dark:text-blue-200 border border-blue-500/30">
+                                            class="px-3 py-1 text-sm font-medium rounded-full bg-zinc-500/20 text-zinc-800 dark:text-zinc-200 border border-zinc-500/30">
                                             {{ $boundDevices }} {{ __('Device(s) Bound') }}
                                         </span>
                                     </div>
-                                    <div class="p-3 bg-blue-500/20 rounded-full">
-                                        <svg class="w-8 h-8 text-blue-600 dark:text-blue-300" fill="none"
+                                    <div class="p-3 bg-zinc-500/20 rounded-full">
+                                        <svg class="w-8 h-8 text-zinc-600 dark:text-zinc-300" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -126,7 +126,7 @@
                                     {{ __('Your devices are successfully bound to your account and can access licensed software.') }}
                                 </p>
                                 <a href="{{ route('devices.manage') }}"
-                                    class="btn btn-blue btn-sm">
+                                    class="btn btn-secondary btn-sm">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -158,7 +158,7 @@
                                             {{ __('You have not bound any device to your account yet. Bind a device to start using licensed software.') }}
                                         </p>
                                         <a href="{{ route('devices.manage') }}"
-                                            class="btn btn-blue btn-sm">
+                                            class="btn btn-secondary btn-sm">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -205,17 +205,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-xl">
                             <div class="p-6">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <div class="text-sm text-indigo-600 dark:text-indigo-300 mb-1">{{ __('Login Count') }}
+                                        <div class="text-sm text-slate-600 dark:text-zinc-300 mb-1">{{ __('Login Count') }}
                                         </div>
-                                        <div class="text-2xl font-bold text-indigo-800 dark:text-indigo-200">
+                                        <div class="text-2xl font-bold text-slate-800 dark:text-zinc-100">
                                             {{ $userStats['login_count'] ?? 0 }}</div>
                                     </div>
-                                    <div class="p-3 bg-indigo-500/20 rounded-full">
-                                        <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-300" fill="none"
+                                    <div class="p-3 bg-slate-500/20 rounded-full">
+                                        <svg class="w-8 h-8 text-slate-600 dark:text-zinc-300" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

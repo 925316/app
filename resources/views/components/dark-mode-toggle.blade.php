@@ -11,7 +11,7 @@
         }
     }
 }" x-cloak @click="toggle"
-    class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+    class="inline-flex items-center justify-center rounded-full border border-[rgb(var(--color-border-subtle))/0.9] bg-[rgb(var(--color-surface-card))/0.85] p-2 text-[rgb(var(--color-text-secondary))] shadow-sm backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--color-brand))/0.45] hover:text-[rgb(var(--color-brand-hover))] dark:bg-[rgb(var(--color-surface-card))/0.78] dark:text-[rgb(var(--color-text-secondary))] dark:hover:border-[rgb(var(--color-brand))/0.52] dark:hover:text-[rgb(var(--color-text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-brand))/0.45] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-[rgb(var(--color-brand))/0.5] dark:focus:ring-offset-[rgb(var(--color-surface-page))]"
     aria-label="{{ __('Toggle dark mode') }}">
     <!-- Single icon that works in both themes -->
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

@@ -41,12 +41,7 @@
             <input type="text" 
                    id="search-{{ $name }}"
                    placeholder="{{ __($searchPlaceholder) }}"
-                   class="w-full pl-10 pr-4 py-2 text-sm 
-                          bg-gray-50 dark:bg-gray-700 
-                          border border-gray-200 dark:border-gray-600 
-                          rounded-lg text-gray-900 dark:text-gray-100
-                          placeholder-gray-400 dark:placeholder-gray-500
-                          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                   class="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-zinc-500"
                    oninput="filterTable_{{ str_replace('-', '_', $name) }}(this.value)">
         </div>
     </div>
@@ -147,11 +142,11 @@
         
         // Update sort icons
         table.querySelectorAll('th').forEach(header => {
-            header.querySelector('.sort-icon')?.classList.remove('text-primary-600', 'dark:text-primary-400');
+            header.querySelector('.sort-icon')?.classList.remove('text-zinc-600', 'dark:text-zinc-400');
             header.querySelector('.sort-icon')?.classList.add('text-gray-400', 'dark:text-gray-500');
         });
         th.querySelector('.sort-icon')?.classList.remove('text-gray-400', 'dark:text-gray-500');
-        th.querySelector('.sort-icon')?.classList.add('text-primary-600', 'dark:text-primary-400');
+        th.querySelector('.sort-icon')?.classList.add('text-zinc-600', 'dark:text-zinc-400');
         
         // Sort rows
         rows.sort((a, b) => {

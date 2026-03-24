@@ -48,8 +48,7 @@
 
                     <!-- Submit Button -->
                     <div>
-                        <x-primary-button
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gradient-to-r from-accent-600 to-accent-700 hover:from-accent-700 hover:to-accent-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                        <x-primary-button class="w-full flex justify-center py-3 px-4">
                             <span class="flex items-center">
                                 <x-icon name="plus" class="w-4 h-4 mr-2" />
                                 {{ __('Create Account') }}

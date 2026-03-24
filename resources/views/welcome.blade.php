@@ -9,7 +9,7 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800" rel="stylesheet" />
 
     <!-- Early theme detection to prevent FOUC -->
     @include('components.theme-init-script')
@@ -23,154 +23,160 @@
     @endif
 </head>
 
-<body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
-    <!-- Theme Toggle - Only for authenticated users -->
-    @auth
-        <div class="fixed top-4 right-4 z-50">
-            <button x-data="{
-                dark: document.documentElement.classList.contains('dark'),
-                toggle() {
-                    this.dark = !this.dark;
-                    document.documentElement.classList.toggle('dark');
-                    if (this.dark) {
-                        localStorage.setItem('theme', 'dark');
-                    } else {
-                        localStorage.setItem('theme', 'light');
+<body class="min-h-screen overscroll-y-none bg-[rgb(var(--color-surface-page))] text-[rgb(var(--color-text-primary))] antialiased"
+    style="background: rgb(var(--color-surface-page));">
+    <div class="relative isolate min-h-screen overflow-hidden">
+        <div class="pointer-events-none absolute inset-0">
+            <div class="absolute inset-0 opacity-[0.55] dark:opacity-[0.05]"
+                style="background-image: linear-gradient(rgb(var(--color-border-subtle) / 0.48) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--color-border-subtle) / 0.48) 1px, transparent 1px); background-size: 42px 42px;"></div>
+            <div class="absolute inset-0"
+                style="background-image: radial-gradient(70% 55% at 50% 0%, rgb(var(--color-border-strong) / 0.2) 0%, transparent 70%);"></div>
+        </div>
+
+        @auth
+            <div class="fixed right-5 top-5 z-50">
+                <button x-data="{
+                    dark: document.documentElement.classList.contains('dark'),
+                    toggle() {
+                        this.dark = !this.dark;
+                        document.documentElement.classList.toggle('dark');
+                        localStorage.setItem('theme', this.dark ? 'dark' : 'light');
                     }
-                }
-            }" x-cloak @click="toggle"
-                class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
-                aria-label="{{ __('Toggle dark mode') }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                </svg>
-            </button>
-        </div>
-    @endauth
-
-    <div class="container mx-auto px-6 py-12 flex-1 flex items-center justify-center">
-        <div class="max-w-4xl w-full mx-auto">
-            <!-- Logo and Title Section -->
-            <div class="text-center mb-16">
-                <div
-                    class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full shadow-lg mb-6">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
+                }" x-cloak @click="toggle"
+                    class="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--color-border-subtle))/0.8] bg-[rgb(var(--color-surface-card))/0.78] px-3 py-2 text-sm font-medium text-[rgb(var(--color-text-secondary))] shadow-md backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-[rgb(var(--color-brand))/0.45] hover:bg-[rgb(var(--color-surface-card))] dark:bg-[rgb(var(--color-surface-card))/0.75] dark:hover:bg-[rgb(var(--color-surface-card-muted))/0.72]"
+                    aria-label="{{ __('Toggle dark mode') }}">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
-                </div>
-                <h1 class="text-4xl lg:text-6xl font-bold tracking-tight mb-4 text-gray-900 dark:text-white">
-                    {{ __('Welcome to') }}
-                    <span class="bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
-                        {{ config('app.name') }}
-                    </span>
-                </h1>
-                <p class="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                    {{ __('A modern platform for managing licenses, devices, and software packages with ease.') }}
-                </p>
+                    <span>{{ __('Theme') }}</span>
+                </button>
             </div>
+        @endauth
 
-            <!-- Navigation Section -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <main class="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-between px-6 pb-8 pt-8 sm:px-10 lg:px-14">
+            <header class="flex items-center justify-between border-b border-[rgb(var(--color-border-subtle))/0.55] pb-6">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-[2rem] text-white shadow-lg"
+                        style="background: var(--gradient-brand);">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.32em] text-[rgb(var(--color-text-muted))]">{{ __('Software Command Center') }}</p>
+                        <p class="text-lg font-semibold">{{ config('app.name') }}</p>
+                    </div>
+                </div>
+
                 @if (Route::has('login'))
-                    @auth
-                        <a href="{{ url('/dashboard') }}"
-                            class="group inline-flex items-center px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                            <span class="mr-2">{{ __('Go to Dashboard') }}</span>
-                            <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                            </svg>
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}"
-                            class="group inline-flex items-center px-8 py-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-medium rounded-xl shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                            <span class="mr-2">{{ __('Sign In') }}</span>
-                            <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1">
-                                </path>
-                            </svg>
-                        </a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}"
-                                class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                                <span class="mr-2">{{ __('Get Started') }}</span>
-                                <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
+                    <div class="flex items-center gap-3">
+                        @auth
+                            <a href="{{ url('/dashboard') }}"
+                                class="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--color-brand))/0.38] bg-[rgb(var(--color-brand))] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[rgb(var(--color-brand))/0.35] transition hover:-translate-y-0.5 hover:bg-[rgb(var(--color-brand-hover))] dark:border-[rgb(var(--color-brand))/0.48] dark:bg-[rgb(var(--color-brand-soft))/0.95] dark:text-[rgb(var(--color-text-primary))] dark:shadow-none dark:hover:bg-[rgb(var(--color-brand-soft))]">
+                                {{ __('Go to Dashboard') }}
+                                <span aria-hidden="true">→</span>
                             </a>
-                        @endif
-                    @endauth
+                        @else
+                            <a href="{{ route('login') }}"
+                                class="inline-flex items-center rounded-full border border-[rgb(var(--color-border-subtle))] bg-[rgb(var(--color-surface-card))/0.82] px-5 py-2.5 text-sm font-semibold text-[rgb(var(--color-text-secondary))] backdrop-blur transition hover:-translate-y-0.5 hover:border-[rgb(var(--color-brand))/0.45] hover:text-[rgb(var(--color-brand-hover))] dark:bg-[rgb(var(--color-surface-card))/0.72] dark:hover:border-[rgb(var(--color-brand))/0.5] dark:hover:text-[rgb(var(--color-text-primary))]">
+                                {{ __('Sign In') }}
+                            </a>
+
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}"
+                                    class="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5"
+                                    style="background: var(--gradient-brand);">
+                                    {{ __('Get Started') }}
+                                    <span aria-hidden="true">→</span>
+                                </a>
+                            @endif
+                        @endauth
+                    </div>
                 @endif
-            </div>
+            </header>
 
-            <!-- Features Section -->
-            <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="text-center group">
-                    <div
-                        class="inline-flex items-center justify-center w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl mb-4">
-                        <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('License Management') }}</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        {{ __('Easily create, manage, and track software licenses with detailed analytics and expiration monitoring.') }}
+            <section class="grid flex-1 items-center gap-12 py-12 lg:grid-cols-[1.1fr,0.9fr]">
+                <div class="space-y-8">
+                    <p class="inline-flex items-center rounded-full border border-[rgb(var(--color-brand))/0.32] bg-[rgb(var(--color-surface-card))/0.76] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[rgb(var(--color-brand-hover))] backdrop-blur dark:border-[rgb(var(--color-brand))/0.42] dark:bg-[rgb(var(--color-brand-soft))/0.62] dark:text-[rgb(var(--color-brand-hover))]">
+                        {{ __('Release control, but make it elegant') }}
                     </p>
+
+                    <div class="space-y-6">
+                        <h1 class="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+                            {{ __('Run licenses, devices, and package delivery from one decisive surface.') }}
+                        </h1>
+                        <p class="max-w-2xl text-base leading-relaxed text-[rgb(var(--color-text-secondary))] sm:text-lg">
+                            {{ __('Built for teams that want strict control with less operational drag. Move from tracking to action in minutes, not meetings.') }}
+                        </p>
+                    </div>
+
+                    <dl class="grid max-w-2xl grid-cols-1 gap-6 border-y border-[rgb(var(--color-border-subtle))/0.7] py-6 sm:grid-cols-3">
+                        <div>
+                            <dt class="text-xs uppercase tracking-[0.2em] text-[rgb(var(--color-text-muted))]">{{ __('License Ops') }}</dt>
+                            <dd class="mt-2 text-2xl font-semibold">{{ __('Realtime') }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs uppercase tracking-[0.2em] text-[rgb(var(--color-text-muted))]">{{ __('Device State') }}</dt>
+                            <dd class="mt-2 text-2xl font-semibold">{{ __('Traceable') }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs uppercase tracking-[0.2em] text-[rgb(var(--color-text-muted))]">{{ __('Package Rollout') }}</dt>
+                            <dd class="mt-2 text-2xl font-semibold">{{ __('Versioned') }}</dd>
+                        </div>
+                    </dl>
                 </div>
 
-                <div class="text-center group">
-                    <div
-                        class="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl mb-4">
-                        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('Device Tracking') }}</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        {{ __('Monitor and manage device registrations with real-time status updates and usage statistics.') }}
-                    </p>
-                </div>
+                <div class="relative">
+                    <div class="absolute -inset-8 rounded-[2.5rem] bg-zinc-400/20 blur-3xl dark:bg-zinc-100/6"></div>
+                    <div class="relative overflow-hidden rounded-[2rem] border border-[rgb(var(--color-border-subtle))/0.7] bg-[rgb(var(--color-surface-card))/0.88] p-8 shadow-2xl backdrop-blur-xl dark:bg-[rgb(var(--color-surface-card))/0.88]">
+                        <p class="text-xs uppercase tracking-[0.24em] text-[rgb(var(--color-text-muted))]">{{ __('Operational Snapshot') }}</p>
 
-                <div class="text-center group">
-                    <div
-                        class="inline-flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4">
-                        <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                            </path>
-                        </svg>
+                        <div class="mt-6 space-y-5">
+                            <div class="space-y-2">
+                                <div class="flex items-end justify-between text-sm text-[rgb(var(--color-text-secondary))]">
+                                    <span>{{ __('License health') }}</span>
+                                    <span class="font-semibold text-emerald-500">98.4%</span>
+                                </div>
+                                <div class="h-2 rounded-full bg-slate-200/80 dark:bg-slate-700/70">
+                                    <div class="h-full rounded-full bg-emerald-500" style="width: 98.4%"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex items-end justify-between text-sm text-[rgb(var(--color-text-secondary))]">
+                                    <span>{{ __('Online devices') }}</span>
+                                    <span class="font-semibold text-[rgb(var(--color-brand))]">1,248</span>
+                                </div>
+                                <div class="h-2 rounded-full bg-slate-200/80 dark:bg-slate-700/70">
+                                    <div class="h-full rounded-full bg-[rgb(var(--color-brand))]" style="width: 84%"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex items-end justify-between text-sm text-[rgb(var(--color-text-secondary))]">
+                                    <span>{{ __('Deployment velocity') }}</span>
+                                    <span class="font-semibold text-[rgb(var(--color-brand))]">+32%</span>
+                                </div>
+                                <div class="h-2 rounded-full bg-slate-200/80 dark:bg-slate-700/70">
+                                    <div class="h-full rounded-full bg-[rgb(var(--color-brand))]" style="width: 72%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 grid gap-4 border-t border-[rgb(var(--color-border-subtle))/0.7] pt-5 text-sm text-[rgb(var(--color-text-secondary))] sm:grid-cols-2">
+                            <p>{{ __('Ship updates with controlled access and full audit visibility.') }}</p>
+                            <p>{{ __('Make ownership, expiration, and distribution status obvious at a glance.') }}</p>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('Package Distribution') }}</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        {{ __('Distribute software packages securely with version control and download analytics.') }}
-                    </p>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            <footer class="border-t border-[rgb(var(--color-border-subtle))/0.6] pt-6 text-sm text-[rgb(var(--color-text-muted))]">
+                <p>&copy; {{ date('Y') }} {{ config('app.name') }} · {{ __('Built with Laravel & Tailwind CSS.') }}</p>
+            </footer>
+        </main>
     </div>
-
-    <!-- Footer -->
-    <footer class="border-t border-gray-200 dark:border-gray-800 py-6">
-        <div class="container mx-auto px-6 text-center text-sm text-gray-500 dark:text-gray-400">
-            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. {{ __('Built with Laravel & Tailwind CSS.') }}</p>
-        </div>
-    </footer>
 </body>
 
 </html>

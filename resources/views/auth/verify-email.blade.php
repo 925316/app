@@ -20,14 +20,14 @@
             </div>
 
             <div
-                class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm py-8 px-6 shadow-xl rounded-2xl border border-cool-200/50 dark:border-cool-700/50">
+                class="bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm py-8 px-6 shadow-xl rounded-[2rem] border border-zinc-200/50 dark:border-zinc-700/50">
                 <div class="text-center text-sm text-gray-600 dark:text-gray-300 mb-6">
                     {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
                 </div>
 
                 @if (session('status') == 'verification-link-sent')
                     <div
-                        class="mb-6 p-4 bg-green-50/50 dark:bg-green-900/30 border border-green-200/50 dark:border-green-700/50 rounded-lg">
+                        class="mb-6 p-4 bg-green-50/50 dark:bg-green-900/30 border border-green-200/50 dark:border-green-700/50 rounded-xl">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-green-600 dark:text-green-300 mr-2" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -44,8 +44,7 @@
                 <div class="space-y-4">
                     <form method="POST" action="{{ route('verification.send') }}" class="w-full">
                         @csrf
-                        <x-primary-button
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                        <x-primary-button class="w-full flex justify-center py-3 px-4">
                             <span class="flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -59,18 +58,18 @@
 
                     <div class="relative">
                         <div class="absolute inset-0 flex items-center">
-                            <span class="w-full border-t border-cool-200/50 dark:border-cool-600/50"></span>
+                            <span class="w-full border-t border-zinc-200/50 dark:border-zinc-600/50"></span>
                         </div>
                         <div class="relative flex justify-center text-xs uppercase">
                             <span
-                                class="px-2 bg-white/80 dark:bg-cool-800/80 text-gray-500 dark:text-gray-400">{{ __('Or') }}</span>
+                                class="px-2 bg-white/80 dark:bg-zinc-800/80 text-gray-500 dark:text-gray-400">{{ __('Or') }}</span>
                         </div>
                     </div>
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <button type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-cool-300/50 dark:border-cool-600/50 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-cool-700/50 hover:bg-gray-50 dark:hover:bg-cool-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cool-500 transition-all duration-200">
+                            class="w-full flex justify-center py-3 px-4 border border-zinc-300/50 dark:border-zinc-600/50 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-zinc-700/50 hover:bg-gray-50 dark:hover:bg-zinc-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500 transition-all duration-200">
                             <span class="flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">

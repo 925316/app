@@ -37,10 +37,10 @@
     
     {{-- Total Records Info --}}
     @if($showTotal && $total > 0)
-    <div class="text-gray-600 dark:text-gray-400">
-        {!! str_replace(':c', '<span class="font-semibold text-gray-900 dark:text-white">'.$total.'</span>',
-            str_replace(':b', '<span class="font-semibold text-gray-900 dark:text-white">'.$to.'</span>',
-            str_replace(':a', '<span class="font-semibold text-gray-900 dark:text-white">'.$from.'</span>', $label))) !!}
+    <div class="text-zinc-600 dark:text-zinc-400">
+        {!! str_replace(':c', '<span class="font-semibold text-zinc-900 dark:text-zinc-100">'.$total.'</span>',
+            str_replace(':b', '<span class="font-semibold text-zinc-900 dark:text-zinc-100">'.$to.'</span>',
+            str_replace(':a', '<span class="font-semibold text-zinc-900 dark:text-zinc-100">'.$from.'</span>', $label))) !!}
     </div>
     @endif
     
@@ -48,18 +48,13 @@
     <div class="flex items-center gap-1">
         {{-- Previous Page --}}
         @if($paginator->onFirstPage())
-        <span class="inline-flex items-center {{ $btnSize }} text-gray-400 dark:text-gray-600 cursor-not-allowed rounded-md">
+        <span class="inline-flex items-center {{ $btnSize }} text-zinc-400 dark:text-zinc-600 cursor-not-allowed rounded-lg">
             <x-icon name="arrow-left" class="w-4 h-4" />
         </span>
         @else
         <a href="{{ $paginator->previousPageUrl() }}" 
            rel="prev"
-           class="inline-flex items-center {{ $btnSize }} text-gray-600 dark:text-gray-400 
-                  bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                  rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 
-                  hover:text-gray-900 dark:hover:text-gray-200
-                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 
-                  dark:focus:ring-offset-gray-800 transition-colors">
+           class="inline-flex items-center {{ $btnSize }} text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 transition-colors">
             <x-icon name="arrow-left" class="w-4 h-4" />
         </a>
         @endif
@@ -82,31 +77,23 @@
             {{-- First Page --}}
             @if($start > 1)
             <a href="{{ $paginator->url(1) }}" 
-               class="inline-flex items-center {{ $btnSize }} text-gray-600 dark:text-gray-400 
-                      bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                      rounded-md hover:bg-gray-50 dark:hover:bg-gray-700
-                      hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+               class="inline-flex items-center {{ $btnSize }} text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">
                 1
             </a>
             @if($start > 2)
-            <span class="px-2 text-gray-400 dark:text-gray-600">...</span>
+            <span class="px-2 text-zinc-400 dark:text-zinc-600">...</span>
             @endif
             @endif
             
             {{-- Page Links --}}
             @for($page = $start; $page <= $end; $page++)
                 @if($page == $currentPage)
-                <span class="inline-flex items-center {{ $btnSize }} font-semibold 
-                            text-white bg-primary-600 dark:bg-primary-500 
-                            border border-primary-600 dark:border-primary-500 rounded-md">
+                <span class="inline-flex items-center {{ $btnSize }} font-semibold text-zinc-900 dark:text-zinc-100 bg-zinc-200 dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-600 rounded-lg">
                     {{ $page }}
                 </span>
                 @else
                 <a href="{{ $paginator->url($page) }}" 
-                   class="inline-flex items-center {{ $btnSize }} text-gray-600 dark:text-gray-400 
-                          bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                          rounded-md hover:bg-gray-50 dark:hover:bg-gray-700
-                          hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+                   class="inline-flex items-center {{ $btnSize }} text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">
                     {{ $page }}
                 </a>
                 @endif
@@ -115,21 +102,18 @@
             {{-- Last Page --}}
             @if($end < $lastPage)
             @if($end < $lastPage - 1)
-            <span class="px-2 text-gray-400 dark:text-gray-600">...</span>
+            <span class="px-2 text-zinc-400 dark:text-zinc-600">...</span>
             @endif
             <a href="{{ $paginator->url($lastPage) }}" 
-               class="inline-flex items-center {{ $btnSize }} text-gray-600 dark:text-gray-400 
-                      bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                      rounded-md hover:bg-gray-50 dark:hover:bg-gray-700
-                      hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+               class="inline-flex items-center {{ $btnSize }} text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">
                 {{ $lastPage }}
             </a>
             @endif
         </div>
         
         {{-- Current Page Info (Mobile) --}}
-        <span class="sm:hidden px-3 text-gray-600 dark:text-gray-400">
-            <span class="font-semibold text-gray-900 dark:text-white">{{ $currentPage }}</span>
+        <span class="sm:hidden px-3 text-zinc-600 dark:text-zinc-400">
+            <span class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $currentPage }}</span>
             <span>/ {{ $lastPage }}</span>
         </span>
         
@@ -137,16 +121,11 @@
         @if($paginator->hasMorePages())
         <a href="{{ $paginator->nextPageUrl() }}" 
            rel="next"
-           class="inline-flex items-center {{ $btnSize }} text-gray-600 dark:text-gray-400 
-                  bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                  rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 
-                  hover:text-gray-900 dark:hover:text-gray-200
-                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 
-                  dark:focus:ring-offset-gray-800 transition-colors">
+           class="inline-flex items-center {{ $btnSize }} text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 transition-colors">
             <x-icon name="arrow-right" class="w-4 h-4" />
         </a>
         @else
-        <span class="inline-flex items-center {{ $btnSize }} text-gray-400 dark:text-gray-600 cursor-not-allowed rounded-md">
+        <span class="inline-flex items-center {{ $btnSize }} text-zinc-400 dark:text-zinc-600 cursor-not-allowed rounded-lg">
             <x-icon name="arrow-right" class="w-4 h-4" />
         </span>
         @endif

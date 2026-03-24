@@ -3,7 +3,7 @@
         {{ __('Package Management') }}
     </x-slot>
 
-    <div class="py-7">
+    <div>
         <div class="card-shell space-y-6">
             <!-- Header with actions -->
             <div class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center lg:max-xl:flex-wrap">
@@ -14,16 +14,16 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('packages.index') }}" class="btn btn-blue">
+                    <a href="{{ route('packages.index') }}" class="btn btn-secondary">
                         {{ __('View Packages') }}
                     </a>
                     @if ($isAdmin ?? false)
-                        <a href="{{ route('packages.upload') }}" class="btn btn-green">
+                        <a href="{{ route('packages.upload') }}" class="btn btn-secondary">
                             {{ __('Add New Package') }}
                         </a>
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open"
-                                class="btn btn-yellow flex items-center gap-2">
+                                class="btn btn-secondary flex items-center gap-2">
                                 <span>{{ __('Bulk Actions') }}</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -80,7 +80,7 @@
                     <div>
                         <label for="channel"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Release Channel') }}</label>
-                        <select name="channel" id="channel" onchange="this.form.submit()" class="form-select">
+                        <select name="channel" id="channel" class="form-select form-pill form-select-enhanced">
                             <option value="">{{ __('All Channels') }}</option>
                             <option value="stable" {{ request('channel') === 'stable' ? 'selected' : '' }}>{{ __('Stable') }}
                             </option>
@@ -88,6 +88,9 @@
                             </option>
                         </select>
                     </div>
+                    <button type="submit" class="btn btn-secondary mt-auto">
+                        {{ __('Filter') }}
+                    </button>
                     @if (request('channel'))
                         <a href="{{ route('packages.manage') }}" class="btn btn-secondary mt-auto">
                             {{ __('Reset Filter') }}
@@ -117,13 +120,12 @@
                         </td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm">
                             <span
-                                class="px-2 py-0.5 rounded text-xs font-medium
-                            {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' }}">
+                                class="px-2 py-0.5 rounded-lg text-xs font-medium {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200' }}">
                                 {{ ucfirst($release->release_channel) }}
                             </span>
                             @if ($release->version === ($stats['latest_stable']?->version ?? null))
                                 <span
-                                    class="ml-1 px-2 py-0.5 rounded text-xs font-medium border border-cool-200 dark:border-cool-700 text-cool-700 dark:text-cool-300 bg-cool-50/70 dark:bg-cool-800/70">
+                                    class="ml-1 px-2 py-0.5 rounded-lg text-xs font-medium border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 bg-zinc-50/70 dark:bg-zinc-800/70">
                                     {{ __('Latest') }}
                                 </span>
                             @endif
@@ -134,19 +136,19 @@
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                             @if ($release->virus_detection_url)
                                 <span
-                                    class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                    class="px-2 py-0.5 rounded-lg text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                                     {{ __('Available') }}
                                 </span>
                             @else
                                 <span
-                                    class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
+                                    class="px-2 py-0.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
                                     {{ __('None') }}
                                 </span>
                             @endif
                         </td>
                         @if ($isAdmin ?? false)
                             <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('packages.show', $release) }}" class="text-cool-700 dark:text-cool-300 hover:underline">
+                                <a href="{{ route('packages.show', $release) }}" class="text-zinc-700 dark:text-zinc-300 hover:underline">
                                     {{ __('Details') }}
                                 </a>
                                     <span class="mx-1 text-gray-400">{{ '|' }}</span>

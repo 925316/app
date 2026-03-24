@@ -4,16 +4,16 @@
         {{ __('Account Details') }}
     </x-slot>
 
-    <div class="max-w-6xl mx-auto">
+    <div class="mx-auto max-w-7xl">
         <div
-            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
+            class="bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-zinc-200/50 dark:border-zinc-700/50 p-6">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $account->username }}</h1>
-                <p class="text-gray-500 dark:text-gray-400">{{ __('Account ID:') }} {{ $account->id }}</p>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $account->username }}</h1>
+                <p class="text-zinc-500 dark:text-zinc-400">{{ __('Account ID:') }} {{ $account->id }}</p>
             </div>
             <div class="flex space-x-3">
-                <a href="{{ route('accounts.edit', $account) }}" class="btn btn-indigo btn-sm">
+                <a href="{{ route('accounts.edit', $account) }}" class="btn btn-secondary btn-sm">
                     {{ __('Edit Account') }}
                 </a>
                 <a href="{{ route('accounts.index') }}" class="btn btn-secondary btn-sm">
@@ -24,16 +24,16 @@
 
         <!-- Account Overview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Account Information') }}</h3>
+                    <div class="bg-zinc-50 dark:bg-zinc-800 p-6 rounded-xl">
+                <h3 class="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-100">{{ __('Account Information') }}</h3>
                 <div class="space-y-3">
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Username') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->username }}</p>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Username') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $account->username }}</p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Email') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->email }}</p>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Email') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $account->email }}</p>
                         @if ($account->email_verified_at)
                             <x-status-badge status="verified" :text="__('Verified')" />
                         @else
@@ -41,7 +41,7 @@
                         @endif
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Status') }}</span>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Status') }}</span>
                         @if ($account->isCurrentlySuspended)
                             <x-status-badge status="suspended" />
                         @else
@@ -49,57 +49,57 @@
                         @endif
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Privilege Level') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Privilege Level') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">
                             {{ $account->getPrivilegeLevel() ? ucfirst(strtolower(LicensePrivilege::tryFrom($account->getPrivilegeLevel())?->getLabel() ?? __('Unknown'))) : __('None') }}
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Login Information') }}</h3>
+            <div class="bg-zinc-50 dark:bg-zinc-800 p-6 rounded-xl">
+                <h3 class="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-100">{{ __('Login Information') }}</h3>
                 <div class="space-y-3">
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Last Login') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Last Login') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">
                             @if ($account->last_login_at)
                                 {{ $account->last_login_at->diffForHumans() }}
                                 <br>
                                 <span
-                                    class="text-xs text-gray-500 dark:text-gray-400">{{ $account->last_login_at->format('Y-m-d H:i:s') }}</span>
+                                    class="text-xs text-zinc-500 dark:text-zinc-400">{{ $account->last_login_at->format('Y-m-d H:i:s') }}</span>
                             @else
-                                <span class="text-gray-500 dark:text-gray-400">{{ __('Never') }}</span>
+                                <span class="text-zinc-500 dark:text-zinc-400">{{ __('Never') }}</span>
                             @endif
                         </p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Last IP Address') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->last_ip_address ?? __('N/A') }}</p>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Last IP Address') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $account->last_ip_address ?? __('N/A') }}</p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Registration Date') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Registration Date') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Device Information') }}</h3>
+            <div class="bg-zinc-50 dark:bg-zinc-800 p-6 rounded-xl">
+                <h3 class="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-100">{{ __('Device Information') }}</h3>
                 <div class="space-y-3">
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Total Devices') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->devices_count }}</p>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Total Devices') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $account->devices_count }}</p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Bound Devices') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $boundDevices->count() }}</p>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Bound Devices') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $boundDevices->count() }}</p>
                     </div>
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('HWID Resets') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->hwid_reset_count }}</p>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('HWID Resets') }}</span>
+                        <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $account->hwid_reset_count }}</p>
                         @if ($account->hwid_last_reset_at)
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('Last reset:') }}
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{{ __('Last reset:') }}
                                 {{ $account->hwid_last_reset_at->diffForHumans() }}</p>
                         @endif
                     </div>
@@ -108,13 +108,13 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg mb-8">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Account Actions') }}</h3>
+        <div class="bg-zinc-50 dark:bg-zinc-800 p-6 rounded-xl mb-8">
+            <h3 class="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-100">{{ __('Account Actions') }}</h3>
             <div class="flex flex-wrap gap-3">
                 @if ($account->isCurrentlySuspended)
                     <form action="{{ route('accounts.unsuspend', $account) }}" method="POST" class="inline">
                         @csrf
-                        <button type="submit" class="btn btn-green btn-sm">
+                        <button type="submit" class="btn btn-secondary btn-sm">
                             {{ __('Unsuspend Account') }}
                         </button>
                     </form>
@@ -127,13 +127,13 @@
                 @if (!$account->email_verified_at)
                     <form action="{{ route('accounts.verify-email', $account) }}" method="POST" class="inline">
                         @csrf
-                        <button type="submit" class="btn btn-blue btn-sm">
+                        <button type="submit" class="btn btn-secondary btn-sm">
                             {{ __('Verify Email') }}
                         </button>
                     </form>
                 @endif
 
-                <button onclick="openResetHwidModal('{{ $account->id }}')" class="btn btn-yellow btn-sm">
+                <button onclick="openResetHwidModal('{{ $account->id }}')" class="btn btn-secondary btn-sm">
                     {{ __('Reset HWID') }}
                 </button>
 
@@ -148,18 +148,18 @@
         </div>
 
         <!-- Licenses -->
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Licenses') }}</h3>
+        <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow-sm sm:rounded-xl mb-8">
+            <div class="p-6 border-b border-zinc-200 dark:border-zinc-700">
+                <h3 class="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-100">{{ __('Licenses') }}</h3>
                 @if ($account->licenses->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('No licenses found for this account.') }}</p>
+                    <p class="text-zinc-500 dark:text-zinc-400">{{ __('No licenses found for this account.') }}</p>
                 @else
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
+                        <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+                            <thead class="bg-zinc-50 dark:bg-zinc-800">
                                 <tr>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                                         {{ __('License Key') }}
                                     </th>
                                     <th
@@ -180,25 +180,25 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                            <tbody class="bg-white dark:bg-zinc-900 divide-y divide-zinc-200 dark:divide-zinc-700">
                                 @foreach ($account->licenses as $license)
                                     <tr>
                                         <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-zinc-100">
                                             {{ $license->key }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
                                             <x-status-badge :status="strtolower($license->privilege?->getLabel() ?? 'default')" :text="$license->privilege?->getLabel() ?? __('Unknown')" />
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <x-status-badge :status="strtolower($license->status?->getLabel() ?? 'default')" :text="$license->status?->getLabel() ?? __('Unknown')" />
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
                                             {{ $license->expires_at->format('Y-m-d H:i:s') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('licenses.show', $license) }}"
-                                                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                                class="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100">
                                                 {{ __('View') }}
                                             </a>
                                         </td>
@@ -212,18 +212,18 @@
         </div>
 
         <!-- Devices -->
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Devices') }}</h3>
+        <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow-sm sm:rounded-xl mb-8">
+            <div class="p-6 border-b border-zinc-200 dark:border-zinc-700">
+                <h3 class="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-100">{{ __('Devices') }}</h3>
                 @if ($account->devices->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('No devices found for this account.') }}</p>
+                    <p class="text-zinc-500 dark:text-zinc-400">{{ __('No devices found for this account.') }}</p>
                 @else
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
+                        <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+                            <thead class="bg-zinc-50 dark:bg-zinc-800">
                                 <tr>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                                         {{ __('Device ID') }}
                                     </th>
                                     <th
@@ -248,14 +248,14 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                            <tbody class="bg-white dark:bg-zinc-900 divide-y divide-zinc-200 dark:divide-zinc-700">
                                 @foreach ($account->devices as $device)
                                     <tr>
                                         <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 dark:text-zinc-100">
                                             {{ $device->id }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
                                             {{ $device->hwid_hash ? substr($device->hwid_hash, 0, 16) . '...' : __('N/A') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -267,13 +267,13 @@
                                                 <x-status-badge status="default" :text="__('Not Bound')" />
                                             @endif
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
                                             {{ $device->first_seen_at->format('Y-m-d H:i:s') }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
                                             {{ $device->last_seen_at->format('Y-m-d H:i:s') }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
                                             {{ $device->bound_at ? $device->bound_at->format('Y-m-d H:i:s') : __('N/A') }}
                                         </td>
                                     </tr>
@@ -286,29 +286,29 @@
         </div>
 
         <!-- Recent Activity -->
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Recent Activity') }}</h3>
+        <div class="bg-white dark:bg-zinc-900 overflow-hidden shadow-sm sm:rounded-xl">
+            <div class="p-6 border-b border-zinc-200 dark:border-zinc-700">
+                <h3 class="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-100">{{ __('Recent Activity') }}</h3>
                 @if ($account->eventLogs->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('No activity found for this account.') }}</p>
+                    <p class="text-zinc-500 dark:text-zinc-400">{{ __('No activity found for this account.') }}</p>
                 @else
                     <div class="space-y-4">
                         @foreach ($account->eventLogs as $log)
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="bg-zinc-50 dark:bg-zinc-800 p-4 rounded-xl">
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
                                         <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
                                             {{ $log->event_type }}
                                         </span>
                                         <span
-                                            class="ml-2 text-sm text-gray-500 dark:text-gray-400">{{ $log->created_at->diffForHumans() }}</span>
+                                            class="ml-2 text-sm text-zinc-500 dark:text-zinc-400">{{ $log->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ __('ID:') }}
+                                    <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('ID:') }}
                                         {{ $log->id }}</span>
                                 </div>
-                                <div class="text-sm text-gray-900 dark:text-white">
-                                    <pre class="bg-gray-100 dark:bg-gray-900 p-3 rounded text-xs overflow-x-auto">{{ json_encode($log->details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
+                                <div class="text-sm text-zinc-900 dark:text-zinc-100">
+                                    <pre class="bg-zinc-100 dark:bg-zinc-900 p-3 rounded-lg text-xs overflow-x-auto">{{ json_encode($log->details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
                                 </div>
                             </div>
                         @endforeach
@@ -330,22 +330,22 @@
                         </svg>
                     </div>
                 </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">{{ __('Suspend Account') }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">{{ __('Enter suspension details for this account.') }}</p>
+                <h3 class="text-lg leading-6 font-medium text-zinc-900 dark:text-zinc-100 text-center mb-2">{{ __('Suspend Account') }}</h3>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-4">{{ __('Enter suspension details for this account.') }}</p>
                 <form id="suspendForm" method="POST" class="mt-5">
                     @csrf
                     <div class="mb-4">
                         <label for="suspend_reason"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Reason') }}</label>
+                            class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Reason') }}</label>
                         <input type="text" name="reason" id="suspend_reason"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                            class="mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-500 focus:ring-white/30 dark:bg-zinc-700 dark:border-zinc-500 dark:text-zinc-100">
                     </div>
                     <div class="mb-4">
                         <label for="suspend_duration"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Duration (days) - Optional') }}</label>
+                            class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Duration (days) - Optional') }}</label>
                         <input type="number" name="duration" id="suspend_duration" min="1"
                             max="365"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                            class="mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-500 focus:ring-white/30 dark:bg-zinc-700 dark:border-zinc-500 dark:text-zinc-100">
                     </div>
                     <div class="flex justify-end space-x-2">
                         <button type="button" @click="show = false"
@@ -373,8 +373,8 @@
                         </svg>
                     </div>
                 </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">{{ __('Reset HWID') }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">{{ __('This will unbind all devices and reset the HWID for this account.') }}</p>
+                <h3 class="text-lg leading-6 font-medium text-zinc-900 dark:text-zinc-100 text-center mb-2">{{ __('Reset HWID') }}</h3>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-2">{{ __('This will unbind all devices and reset the HWID for this account.') }}</p>
                 <p class="text-sm text-red-600 dark:text-red-400 text-center mb-4">{{ __('Warning: This action cannot be undone.') }}</p>
                 <form id="resetHwidForm" method="POST" class="mt-5">
                     @csrf
@@ -383,7 +383,7 @@
                             class="btn btn-secondary">
                             {{ __('Cancel') }}
                         </button>
-                        <button type="submit" class="btn btn-yellow">
+                        <button type="submit" class="btn btn-secondary">
                             Reset HWID
                         </button>
                     </div>
