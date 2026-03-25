@@ -1,6 +1,7 @@
 {
     "agents": [
         "cursor",
+        "opencode",
         "phpstorm"
     ],
     "editors": [
