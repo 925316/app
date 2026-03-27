@@ -39,7 +39,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="app-shell-page font-sans antialiased min-h-screen overflow-x-hidden transition-colors duration-300">
+    <body class="app-shell-page app-shell-grid font-sans antialiased min-h-screen overflow-x-hidden transition-colors duration-300">
     <div class="flex min-h-screen w-full overflow-x-hidden" x-data="{
         mobileSidebarOpen: false,
         isDesktop: false,
