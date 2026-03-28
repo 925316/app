@@ -1,10 +1,11 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
+import './modules/clean-form-url';
+import registerLandingSignalBoard from './modules/landing-signal-board';
 
 window.Alpine = Alpine;
 
-Alpine.start();
+registerLandingSignalBoard(Alpine);
 
-// Import clean form URL module
-import './clean-form-url';
+Alpine.start();

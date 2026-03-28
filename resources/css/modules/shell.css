@@ -2,6 +2,15 @@
     background-image: linear-gradient(to bottom right, rgb(var(--color-surface-page)), rgb(var(--color-surface-page-alt)));
 }
 
+.app-shell-grid {
+    background-image:
+        linear-gradient(to right, rgb(var(--color-border-subtle) / 0.2) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(var(--color-border-subtle) / 0.2) 1px, transparent 1px),
+        linear-gradient(to bottom right, rgb(var(--color-surface-page)), rgb(var(--color-surface-page-alt)));
+    background-size: 22px 22px, 22px 22px, 100% 100%;
+    background-attachment: fixed;
+}
+
 .app-shell-header {
     @apply border-b backdrop-blur-sm;
     min-height: var(--layout-header-height);

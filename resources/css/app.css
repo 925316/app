@@ -7,7 +7,11 @@
 @import './modules/modals.css';
 @import './modules/tables.css';
 @import './modules/forms.css';
+@import './modules/landing.css';
 
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are processed during the Vite build. */
 @tailwind base;
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are processed during the Vite build. */
 @tailwind components;
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are processed during the Vite build. */
 @tailwind utilities;

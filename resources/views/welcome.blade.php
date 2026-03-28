@@ -1,176 +1,347 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="landing-page">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>{{ config('app.name', 'Laravel') }}</title>
+    <meta name="description"
+        content="{{ __('Operational control for licenses, devices, package releases, and event logs in one cinematic command surface.') }}">
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:500,600,700|ibm-plex-sans:400,500,600,700" rel="stylesheet" />
 
-    <!-- Early theme detection to prevent FOUC -->
     @include('components.theme-init-script')
 
-    <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <style>
-        </style>
     @endif
+
 </head>
 
-<body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
-    <!-- Theme Toggle - Only for authenticated users -->
+@php
+    $heroHighlights = [
+        [
+            'title' => __('License Policy'),
+            'description' => __('Suspend, extend, upgrade, and audit entitlements without leaving the command flow.'),
+        ],
+        [
+            'title' => __('Device Recovery'),
+            'description' => __('Reset hardware identity safely, monitor bindings, and spot unusual session patterns fast.'),
+        ],
+        [
+            'title' => __('Release Channels'),
+            'description' => __('Promote stable and dev package releases with tighter rollout visibility.'),
+        ],
+        [
+            'title' => __('Event Visibility'),
+            'description' => __('Trace warnings, errors, and actor activity before a support queue turns into a fire.'),
+        ],
+    ];
+
+    $signalFeedEntries = [
+        [
+            'message' => __('Stable package release v2.8.4 cleared for production rollout.'),
+            'elapsed' => __('02m'),
+        ],
+        [
+            'message' => __('23 device reset requests resolved with full event trace intact.'),
+            'elapsed' => __('09m'),
+        ],
+        [
+            'message' => __('Warning and error logs triaged before session churn escalated.'),
+            'elapsed' => __('14m'),
+        ],
+    ];
+
+    $systemSurfaces = [
+        [
+            'axis' => __('Axis 01'),
+            'title' => __('Licenses'),
+            'description' => __('Issue, suspend, extend, and upgrade access while keeping privilege tiers explicit.'),
+            'meta' => __('Activation keys · expiry windows'),
+        ],
+        [
+            'axis' => __('Axis 02'),
+            'title' => __('Devices'),
+            'description' => __('Track hardware bindings, recover identity safely, and watch session behavior with context.'),
+            'meta' => __('Bound state · HWID reset · session trace'),
+        ],
+        [
+            'axis' => __('Axis 03'),
+            'title' => __('Packages'),
+            'description' => __('Ship releases through stable and dev channels with cleaner rollout confidence.'),
+            'meta' => __('Release channels · changelog control'),
+        ],
+        [
+            'axis' => __('Axis 04'),
+            'title' => __('Logs'),
+            'description' => __('Read event trails instantly and preserve compliance-grade visibility under pressure.'),
+            'meta' => __('Actors · IPs · warnings · errors'),
+        ],
+    ];
+
+    $controlHighlights = [
+        [
+            'title' => __('Operator View'),
+            'description' => __('See the highest-risk signals first instead of digging through disconnected pages.'),
+        ],
+        [
+            'title' => __('Audit Readiness'),
+            'description' => __('Tie license actions, device changes, and log activity into one operational narrative.'),
+        ],
+    ];
+
+    $controlSequenceSteps = [
+        [
+            'label' => __('01 · Issue or Extend'),
+            'description' => __('Operators can move from account review to license action without losing privilege or expiry context.'),
+        ],
+        [
+            'label' => __('02 · Bind or Recover'),
+            'description' => __('Device resets and binding state changes remain visible, deliberate, and easy to audit.'),
+        ],
+        [
+            'label' => __('03 · Release and Trace'),
+            'description' => __('Package promotions and event logs stay visually connected so a release decision can be explained after the fact, not just executed in the moment.'),
+            'span' => 'sm:col-span-2',
+            'showProgress' => true,
+            'meta' => __('11 customer groups synchronized · 37 policy changes propagated in the last 24 hours'),
+        ],
+    ];
+@endphp
+
+<body class="landing-body min-h-screen bg-[rgb(var(--landing-bg))] text-[rgb(var(--landing-ink))] antialiased transition-colors duration-300">
+    <a href="#main-content"
+        class="landing-focus-ring sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-[rgb(var(--landing-ink))] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[rgb(var(--landing-bg))]">
+        {{ __('Skip to homepage content') }}
+    </a>
+
     @auth
-        <div class="fixed top-4 right-4 z-50">
-            <button x-data="{
-                dark: document.documentElement.classList.contains('dark'),
-                toggle() {
-                    this.dark = !this.dark;
-                    document.documentElement.classList.toggle('dark');
-                    if (this.dark) {
-                        localStorage.setItem('theme', 'dark');
-                    } else {
-                        localStorage.setItem('theme', 'light');
-                    }
-                }
-            }" x-cloak @click="toggle"
-                class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
-                aria-label="{{ __('Toggle dark mode') }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                </svg>
-            </button>
+        <div class="fixed right-4 top-4 z-50">
+            <x-dark-mode-toggle />
         </div>
     @endauth
 
-    <div class="container mx-auto px-6 py-12 flex-1 flex items-center justify-center">
-        <div class="max-w-4xl w-full mx-auto">
-            <!-- Logo and Title Section -->
-            <div class="text-center mb-16">
-                <div
-                    class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full shadow-lg mb-6">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                </div>
-                <h1 class="text-4xl lg:text-6xl font-bold tracking-tight mb-4 text-gray-900 dark:text-white">
-                    {{ __('Welcome to') }}
-                    <span class="bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
-                        {{ config('app.name') }}
+    <div class="landing-grain landing-hero-mesh relative isolate overflow-hidden">
+        <div class="landing-grid-overlay pointer-events-none absolute inset-0"></div>
+        <div class="pointer-events-none absolute -left-20 top-[-8rem] h-80 w-80 rounded-full bg-[rgb(var(--landing-brand)/0.3)] blur-3xl"></div>
+        <div class="pointer-events-none absolute -right-24 top-12 h-96 w-96 rounded-full bg-[rgb(var(--landing-accent-2)/0.28)] blur-3xl"></div>
+        <div class="pointer-events-none absolute bottom-[-7rem] left-1/3 h-96 w-96 rounded-full bg-[rgb(var(--landing-accent)/0.24)] blur-3xl"></div>
+
+        <main id="main-content" class="mx-auto max-w-7xl px-6 pb-14 pt-10 sm:px-10 lg:px-12 lg:pb-20 lg:pt-14">
+            <header class="landing-fade-up flex flex-wrap items-center justify-between gap-4" style="animation-delay: 20ms;">
+                <div class="inline-flex items-center gap-3">
+                    <span class="landing-display text-3xl font-semibold tracking-wide">{{ config('app.name') }}</span>
+                    <span class="rounded-full border border-[rgb(var(--landing-line))] bg-[rgb(var(--landing-surface)/0.6)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--landing-muted))]">
+                        {{ __('License Command Theater') }}
                     </span>
-                </h1>
-                <p class="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                    {{ __('A modern platform for managing licenses, devices, and software packages with ease.') }}
-                </p>
-            </div>
+                </div>
+            </header>
 
-            <!-- Navigation Section -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                @if (Route::has('login'))
-                    @auth
-                        <a href="{{ url('/dashboard') }}"
-                            class="group inline-flex items-center px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                            <span class="mr-2">{{ __('Go to Dashboard') }}</span>
-                            <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                            </svg>
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}"
-                            class="group inline-flex items-center px-8 py-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-medium rounded-xl shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                            <span class="mr-2">{{ __('Sign In') }}</span>
-                            <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1">
-                                </path>
-                            </svg>
-                        </a>
+            <section class="mt-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+                <div class="landing-fade-up" style="animation-delay: 90ms;">
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(var(--landing-glow))]">
+                        {{ __('Licenses · Devices · Package Releases · Event Logs') }}
+                    </p>
+                    <h1 class="landing-display mt-4 max-w-4xl text-[3.1rem] font-semibold leading-[0.92] sm:text-[4.4rem] lg:text-[5.6rem]">
+                        {{ __('Operational control for licenses, devices, packages, and logs.') }}
+                    </h1>
+                    <p class="mt-6 max-w-2xl text-base leading-8 text-[rgb(var(--landing-muted))] sm:text-lg">
+                        {{ __('Monitor active licenses, bound devices, package releases, and event logs before small issues turn into operational failures. The landing page stays cinematic, but the hierarchy now points directly at the work this platform actually handles.') }}
+                    </p>
 
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}"
-                                class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                                <span class="mr-2">{{ __('Get Started') }}</span>
-                                <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
+                    <div class="mt-8 flex flex-wrap items-center gap-3">
+                        @auth
+                            <a href="{{ route('dashboard') }}"
+                                class="landing-focus-ring landing-sweep inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-brand))] bg-[rgb(var(--landing-brand))] px-8 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgb(var(--landing-brand)/0.45)]">
+                                {{ __('Open Dashboard') }}
+                                <span aria-hidden="true">→</span>
                             </a>
-                        @endif
-                    @endauth
-                @endif
-            </div>
+                        @else
+                            @if (Route::has('login'))
+                                <a href="{{ route('login') }}"
+                                    class="landing-focus-ring landing-sweep inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-brand))] bg-[rgb(var(--landing-brand))] px-8 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgb(var(--landing-brand)/0.45)]">
+                                    {{ __('Sign In') }}
+                                    <span aria-hidden="true">→</span>
+                                </a>
+                            @endif
 
-            <!-- Features Section -->
-            <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="text-center group">
-                    <div
-                        class="inline-flex items-center justify-center w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl mb-4">
-                        <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}"
+                                    class="landing-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-line))] bg-[rgb(var(--landing-surface)/0.7)] px-8 py-3 text-sm font-semibold transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--landing-accent))] hover:text-[rgb(var(--landing-accent))]">
+                                    {{ __('Create Account') }}
+                                </a>
+                            @endif
+                        @endauth
                     </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('License Management') }}</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        {{ __('Easily create, manage, and track software licenses with detailed analytics and expiration monitoring.') }}
-                    </p>
+
+                    <dl class="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        @foreach ($heroHighlights as $highlight)
+                            <div class="rounded-2xl border border-[rgb(var(--landing-line)/0.75)] bg-[rgb(var(--landing-surface)/0.56)] p-4 backdrop-blur">
+                                <dt class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ $highlight['title'] }}</dt>
+                                <dd class="mt-2 text-sm leading-6 text-[rgb(var(--landing-ink))]">{{ $highlight['description'] }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
                 </div>
 
-                <div class="text-center group">
-                    <div
-                        class="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl mb-4">
-                        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                        </svg>
+                <aside class="landing-fade-up landing-section-anchor" style="animation-delay: 170ms;" id="signal"
+                    x-data="landingSignalBoard()"
+                    aria-labelledby="signal-heading">
+                    <div class="rounded-[1.9rem] border border-[rgb(var(--landing-line)/0.9)] bg-[rgb(var(--landing-surface)/0.84)] p-6 shadow-[0_26px_60px_rgb(8_6_18/0.42)] backdrop-blur sm:p-7">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p id="signal-heading" class="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-muted))]">{{ __('Signal Board') }}</p>
+                                <p class="mt-2 text-sm leading-6 text-[rgb(var(--landing-muted))]">{{ __('An illustrative operations snapshot showing the kinds of signals teams watch first: entitlement volume, device pressure, release readiness, and event noise.') }}</p>
+                            </div>
+                            <span class="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-accent)/0.5)] bg-[rgb(var(--landing-accent)/0.17)] px-3 py-1 text-xs font-semibold text-[rgb(var(--landing-accent))]">
+                                <span class="landing-status-dot h-2 w-2 rounded-full bg-[rgb(var(--landing-accent))]" aria-hidden="true"></span>
+                                {{ __('Illustrative') }}
+                            </span>
+                        </div>
+                        <div class="mt-5 grid gap-4">
+                            <article class="rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.85)] p-4">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ __('Active Licenses') }}</p>
+                                    <span class="rounded-full border border-[rgb(var(--landing-line)/0.75)] px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-glow))]">{{ __('Protected') }}</span>
+                                </div>
+                                <p class="landing-display mt-1 text-4xl font-semibold text-[rgb(var(--landing-ink))]"
+                                    x-text="formatNumber(animated.activeLicenses)">2,314</p>
+                                <p class="mt-2 text-xs leading-5 text-[rgb(var(--landing-muted))]">
+                                    <span x-text="formatPercent(animated.coverageRate)">84.0%</span>
+                                    {{ __('of issued seats are currently active across customer accounts.') }}
+                                </p>
+                                <div class="mt-3 h-2 rounded-full bg-[rgb(var(--landing-line)/0.4)]">
+                                    <div class="h-2 rounded-full bg-[rgb(var(--landing-brand))] transition-[width] duration-1000 ease-out"
+                                        :style="`width: ${animated.coverageRate}%`"
+                                        style="width: 84%"></div>
+                                </div>
+                                <div class="mt-3 flex flex-wrap items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-muted))]">
+                                    <span class="rounded-full border border-[rgb(var(--landing-line)/0.7)] bg-[rgb(var(--landing-surface)/0.66)] px-2.5 py-1">
+                                        +<span x-text="stats.activeLicenses.todayChange">0</span>
+                                        {{ __('today') }}
+                                    </span>
+                                    <span class="rounded-full border border-[rgb(var(--landing-line)/0.5)] px-2.5 py-1 text-[rgb(var(--landing-glow))]">
+                                        {{ __('Since') }} <span x-text="launchLabel()">Mar 29, 2026</span>
+                                    </span>
+                                </div>
+                            </article>
+                            <div class="grid grid-cols-2 gap-3">
+                                <article class="rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.8)] p-4">
+                                    <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ __('Bound Devices') }}</p>
+                                    <p class="landing-display mt-1 text-3xl font-semibold text-[rgb(var(--landing-brand))]"
+                                        x-text="formatNumber(animated.boundDevices)">9,847</p>
+                                    <p class="mt-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-muted))]">
+                                        {{ __('today') }} +<span x-text="stats.boundDevices.todayChange">0</span>
+                                        · {{ __('midnight') }} +<span x-text="stats.boundDevices.projectedChange">0</span>
+                                    </p>
+                                </article>
+                                <article class="rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.8)] p-4">
+                                    <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ __('Deploy Success') }}</p>
+                                    <p class="landing-display mt-1 text-3xl font-semibold text-[rgb(var(--landing-accent))]"
+                                        x-text="formatPercent(animated.deploySuccess)">99.2%</p>
+                                    <div class="mt-2 flex flex-wrap items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-muted))]">
+                                        <span class="rounded-full border border-[rgb(var(--landing-accent)/0.35)] bg-[rgb(var(--landing-accent)/0.12)] px-2.5 py-1 transition-colors duration-300"
+                                            :class="{
+                                                'text-[rgb(var(--landing-accent))]': stats.deploySuccess.direction === 'up',
+                                                'text-[rgb(var(--landing-brand))]': stats.deploySuccess.direction === 'down',
+                                                'text-[rgb(var(--landing-muted))]': stats.deploySuccess.direction === 'steady',
+                                            }"
+                                            x-text="driftLabel()">+0.0% drift</span>
+                                    </div>
+                                </article>
+                            </div>
+                            <article class="rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.78)] p-4">
+                                <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ __('Current Command Feed') }}</p>
+                                <ul class="mt-3 grid gap-3 text-sm leading-6 text-[rgb(var(--landing-ink))]">
+                                    @foreach ($signalFeedEntries as $entry)
+                                        <li
+                                            @class([
+                                                'flex items-start justify-between gap-4',
+                                                'border-b border-[rgb(var(--landing-line)/0.4)] pb-3' => ! $loop->last,
+                                            ])>
+                                            <span>{{ $entry['message'] }}</span>
+                                            <span class="shrink-0 text-[rgb(var(--landing-muted))]">{{ $entry['elapsed'] }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </article>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('Device Tracking') }}</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        {{ __('Monitor and manage device registrations with real-time status updates and usage statistics.') }}
-                    </p>
+                </aside>
+            </section>
+
+            <section id="systems" class="landing-section-anchor landing-fade-up mt-10 lg:mt-12" style="animation-delay: 250ms;"
+                aria-labelledby="systems-heading">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div class="max-w-2xl">
+                        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--landing-glow))]">{{ __('System Surfaces') }}</p>
+                        <h2 id="systems-heading" class="landing-display mt-3 text-4xl font-semibold leading-tight sm:text-5xl">{{ __('Four surfaces. One command floor.') }}</h2>
+                    </div>
+                    <p class="max-w-xl text-sm leading-7 text-[rgb(var(--landing-muted))] sm:text-right">{{ __('Every core area is tuned for operational control: entitlement state, device identity, release movement, and the log trail that explains what happened.') }}</p>
                 </div>
 
-                <div class="text-center group">
-                    <div
-                        class="inline-flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4">
-                        <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ __('Package Distribution') }}</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        {{ __('Distribute software packages securely with version control and download analytics.') }}
-                    </p>
+                <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    @foreach ($systemSurfaces as $surface)
+                        <article class="rounded-3xl border border-[rgb(var(--landing-line)/0.75)] bg-[rgb(var(--landing-surface)/0.72)] p-5 backdrop-blur">
+                            <p class="text-xs uppercase tracking-[0.14em] text-[rgb(var(--landing-muted))]">{{ $surface['axis'] }}</p>
+                            <p class="landing-display mt-2 text-3xl font-semibold">{{ $surface['title'] }}</p>
+                            <p class="mt-2 text-sm leading-6 text-[rgb(var(--landing-muted))]">{{ $surface['description'] }}</p>
+                            <p class="mt-4 text-xs uppercase tracking-[0.14em] text-[rgb(var(--landing-glow))]">{{ $surface['meta'] }}</p>
+                        </article>
+                    @endforeach
                 </div>
-            </div>
-        </div>
+            </section>
+
+            <section id="control"
+                class="landing-section-anchor landing-fade-up mt-10 rounded-[2.2rem] border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.65)] p-6 shadow-[0_18px_44px_rgb(10_8_22/0.35)] lg:mt-12 lg:p-8"
+                style="animation-delay: 310ms;" aria-labelledby="control-heading">
+                <div class="grid gap-8 lg:grid-cols-[1fr_1.15fr]">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--landing-glow))]">{{ __('Control Sequence') }}</p>
+                        <h2 id="control-heading" class="landing-display mt-3 text-4xl font-semibold leading-tight sm:text-5xl">{{ __('From entitlement request to release trace, one coherent operational scene.') }}</h2>
+                        <p class="mt-4 text-sm leading-7 text-[rgb(var(--landing-muted))] sm:text-base">{{ __('Keep entitlement changes, device recovery, release rollout, and event tracing aligned in one flow so operators can move quickly without losing context.') }}</p>
+                        <dl class="mt-6 grid gap-3 sm:grid-cols-2">
+                            @foreach ($controlHighlights as $highlight)
+                                <div class="rounded-2xl border border-[rgb(var(--landing-line)/0.7)] bg-[rgb(var(--landing-surface)/0.68)] p-4">
+                                    <dt class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ $highlight['title'] }}</dt>
+                                    <dd class="mt-2 text-sm leading-6 text-[rgb(var(--landing-ink))]">{{ $highlight['description'] }}</dd>
+                                </div>
+                            @endforeach
+                        </dl>
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        @foreach ($controlSequenceSteps as $step)
+                            <div
+                                @class([
+                                    'rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface)/0.72)] p-4',
+                                    $step['span'] ?? null,
+                                ])>
+                                <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ $step['label'] }}</p>
+                                <p @class([
+                                    'mt-2 text-sm leading-6',
+                                    'text-[rgb(var(--landing-ink))]' => $step['showProgress'] ?? false,
+                                ])>{{ $step['description'] }}</p>
+
+                                @if ($step['showProgress'] ?? false)
+                                    <div class="mt-3 h-2 rounded-full bg-[rgb(var(--landing-line)/0.4)]">
+                                        <div class="h-2 w-11/12 rounded-full bg-[linear-gradient(90deg,rgb(var(--landing-brand)),rgb(var(--landing-accent)),rgb(var(--landing-accent-2)))]"></div>
+                                    </div>
+                                    <p class="mt-2 text-xs text-[rgb(var(--landing-muted))]">{{ $step['meta'] }}</p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+
+            <footer class="landing-fade-up mt-10 flex flex-col gap-4 border-t border-[rgb(var(--landing-line)/0.75)] pt-6 text-sm text-[rgb(var(--landing-muted))] sm:flex-row sm:items-center sm:justify-between lg:mt-12" style="animation-delay: 360ms;">
+                <p>&copy; {{ date('Y') }} {{ config('app.name') }}</p>
+                <p>{{ __('Public homepage · cinematic operational landing page') }}</p>
+            </footer>
+        </main>
     </div>
-
-    <!-- Footer -->
-    <footer class="border-t border-gray-200 dark:border-gray-800 py-6">
-        <div class="container mx-auto px-6 text-center text-sm text-gray-500 dark:text-gray-400">
-            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. {{ __('Built with Laravel & Tailwind CSS.') }}</p>
-        </div>
-    </footer>
 </body>
 
 </html>
