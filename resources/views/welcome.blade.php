@@ -117,12 +117,6 @@
         {{ __('Skip to homepage content') }}
     </a>
 
-    @auth
-        <div class="fixed right-4 top-4 z-50">
-            <x-dark-mode-toggle />
-        </div>
-    @endauth
-
     <div class="landing-grain landing-hero-mesh relative isolate overflow-hidden">
         <div class="landing-grid-overlay pointer-events-none absolute inset-0"></div>
         <div class="pointer-events-none absolute -left-20 top-[-8rem] h-80 w-80 rounded-full bg-[rgb(var(--landing-brand)/0.3)] blur-3xl"></div>
@@ -136,6 +130,10 @@
                     <span class="rounded-full border border-[rgb(var(--landing-line))] bg-[rgb(var(--landing-surface)/0.6)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--landing-muted))]">
                         {{ __('License Command Theater') }}
                     </span>
+                </div>
+
+                <div class="landing-toggle-shell inline-flex items-center rounded-full border border-[rgb(var(--landing-line)/0.72)] bg-[rgb(var(--landing-surface)/0.66)] p-1.5 shadow-[0_10px_24px_rgb(var(--landing-ink)/0.06)] backdrop-blur">
+                    <x-dark-mode-toggle />
                 </div>
             </header>
 
@@ -154,14 +152,14 @@
                     <div class="mt-8 flex flex-wrap items-center gap-3">
                         @auth
                             <a href="{{ route('dashboard') }}"
-                                class="landing-focus-ring landing-sweep inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-brand))] bg-[rgb(var(--landing-brand))] px-8 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgb(var(--landing-brand)/0.45)]">
+                                class="landing-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-brand)/0.38)] bg-[rgb(var(--landing-brand)/0.14)] px-8 py-3 text-sm font-semibold text-[rgb(var(--landing-ink))] shadow-[0_12px_30px_rgb(var(--landing-brand)/0.12)] backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--landing-brand)/0.55)] hover:bg-[rgb(var(--landing-brand)/0.2)]">
                                 {{ __('Open Dashboard') }}
                                 <span aria-hidden="true">→</span>
                             </a>
                         @else
                             @if (Route::has('login'))
                                 <a href="{{ route('login') }}"
-                                    class="landing-focus-ring landing-sweep inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-brand))] bg-[rgb(var(--landing-brand))] px-8 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgb(var(--landing-brand)/0.45)]">
+                                    class="landing-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-brand)/0.38)] bg-[rgb(var(--landing-brand)/0.14)] px-8 py-3 text-sm font-semibold text-[rgb(var(--landing-ink))] shadow-[0_12px_30px_rgb(var(--landing-brand)/0.12)] backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--landing-brand)/0.55)] hover:bg-[rgb(var(--landing-brand)/0.2)]">
                                     {{ __('Sign In') }}
                                     <span aria-hidden="true">→</span>
                                 </a>
@@ -169,7 +167,7 @@
 
                             @if (Route::has('register'))
                                 <a href="{{ route('register') }}"
-                                    class="landing-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-line))] bg-[rgb(var(--landing-surface)/0.7)] px-8 py-3 text-sm font-semibold transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--landing-accent))] hover:text-[rgb(var(--landing-accent))]">
+                                    class="landing-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-line)/0.78)] bg-[rgb(var(--landing-surface)/0.46)] px-8 py-3 text-sm font-medium text-[rgb(var(--landing-muted))] transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--landing-line))] hover:text-[rgb(var(--landing-ink))]">
                                     {{ __('Create Account') }}
                                 </a>
                             @endif
@@ -326,7 +324,7 @@
 
                                 @if ($step['showProgress'] ?? false)
                                     <div class="mt-3 h-2 rounded-full bg-[rgb(var(--landing-line)/0.4)]">
-                                        <div class="h-2 w-11/12 rounded-full bg-[linear-gradient(90deg,rgb(var(--landing-brand)),rgb(var(--landing-accent)),rgb(var(--landing-accent-2)))]"></div>
+                                        <div class="landing-rainbow-bar h-2 w-11/12 rounded-full"></div>
                                     </div>
                                     <p class="mt-2 text-xs text-[rgb(var(--landing-muted))]">{{ $step['meta'] }}</p>
                                 @endif

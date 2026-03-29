@@ -1,20 +1,23 @@
 html.landing-page {
     scroll-behavior: smooth;
+    color-scheme: light;
 
-    --landing-bg: 14 11 21;
-    --landing-bg-alt: 24 17 36;
-    --landing-surface: 28 22 44;
-    --landing-surface-soft: 37 30 57;
-    --landing-ink: 247 243 235;
-    --landing-muted: 178 170 196;
-    --landing-brand: 255 96 56;
-    --landing-accent: 65 213 255;
-    --landing-accent-2: 215 132 255;
-    --landing-line: 104 86 145;
-    --landing-glow: 255 212 90;
+    --landing-bg: 250 245 236;
+    --landing-bg-alt: 236 227 214;
+    --landing-surface: 255 250 244;
+    --landing-surface-soft: 243 234 224;
+    --landing-ink: 45 33 47;
+    --landing-muted: 106 93 113;
+    --landing-brand: 211 92 62;
+    --landing-accent: 24 144 171;
+    --landing-accent-2: 155 102 196;
+    --landing-line: 198 180 203;
+    --landing-glow: 137 88 22;
 }
 
 html.landing-page.dark {
+    color-scheme: dark;
+
     --landing-bg: 8 7 16;
     --landing-bg-alt: 16 13 29;
     --landing-surface: 21 18 37;
@@ -57,10 +60,16 @@ html.landing-page.dark {
     position: absolute;
     inset: 0;
     pointer-events: none;
+    opacity: 0.08;
+    mix-blend-mode: multiply;
+    background-image: radial-gradient(circle at 20% 20%, rgb(var(--landing-ink) / 0.16) 0 1px, transparent 1.3px);
+    background-size: 6px 6px;
+}
+
+html.landing-page.dark .landing-grain::before {
     opacity: 0.2;
     mix-blend-mode: screen;
     background-image: radial-gradient(circle at 20% 20%, rgb(255 255 255 / 0.32) 0 1px, transparent 1.3px);
-    background-size: 6px 6px;
 }
 
 .landing-fade-up {
@@ -90,6 +99,21 @@ html.landing-page.dark {
 .landing-focus-ring:focus-visible {
     outline: 2px solid rgb(var(--landing-accent));
     outline-offset: 3px;
+}
+
+.landing-toggle-shell > button:focus-visible {
+    --tw-ring-color: rgb(var(--landing-accent) / 0.4);
+    --tw-ring-offset-color: rgb(var(--landing-surface));
+}
+
+.landing-rainbow-bar {
+    background-image: linear-gradient(
+        90deg,
+        rgb(var(--landing-brand)) 0%,
+        rgb(var(--landing-glow)) 28%,
+        rgb(var(--landing-accent)) 68%,
+        rgb(var(--landing-accent-2)) 100%
+    );
 }
 
 .landing-status-dot {

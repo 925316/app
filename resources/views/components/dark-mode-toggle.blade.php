@@ -2,7 +2,7 @@
     dark: document.documentElement.classList.contains('dark'),
     toggle() {
         this.dark = !this.dark;
-        document.documentElement.classList.toggle('dark');
+        document.documentElement.classList.toggle('dark', this.dark);
 
         if (this.dark) {
             localStorage.setItem('theme', 'dark');
@@ -10,9 +10,10 @@
             localStorage.setItem('theme', 'light');
         }
     }
-}" x-cloak @click="toggle"
-    class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
-    aria-label="{{ __('Toggle dark mode') }}">
+}" x-cloak type="button" @click="toggle()"
+    class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-500 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+    x-bind:aria-label="dark ? @js(__('Switch to light mode')) : @js(__('Switch to dark mode'))"
+    x-bind:aria-pressed="dark ? 'true' : 'false'">
     <!-- Single icon that works in both themes -->
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

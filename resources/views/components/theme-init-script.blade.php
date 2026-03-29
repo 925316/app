@@ -1,12 +1,11 @@
 <script>
     (function() {
-        const savedTheme = localStorage.getItem('theme') ?? 'dark';
-        const isDark = savedTheme === 'dark';
+        const savedTheme = localStorage.getItem('theme');
+        const hasSavedTheme = savedTheme === 'dark' || savedTheme === 'light';
+        const isDark = hasSavedTheme
+            ? savedTheme === 'dark'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches;
 
         document.documentElement.classList.toggle('dark', isDark);
-
-        if (localStorage.getItem('theme') === null) {
-            localStorage.setItem('theme', 'dark');
-        }
     })();
 </script>
