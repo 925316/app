@@ -20,7 +20,7 @@ test('guest homepage renders the marketing experience with theme toggle support'
         ->assertSee("const savedTheme = localStorage.getItem('theme');", false)
         ->assertDontSee("const savedTheme = localStorage.getItem('theme') ?? 'dark';", false)
         ->assertDontSee("if (localStorage.getItem('theme') === null)", false)
-        ->assertSee('x-data="landingSignalBoard()"', false)
+        ->assertSee('x-data="landingSignalBoard({', false)
         ->assertSee('landing-toggle-shell', false)
         ->assertSee('landing-rainbow-bar', false)
         ->assertDontSee('document.addEventListener(\'alpine:init\'', false);

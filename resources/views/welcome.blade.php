@@ -130,12 +130,12 @@
             <header class="landing-fade-up flex flex-wrap items-center justify-between gap-4" style="animation-delay: 20ms;">
                 <div class="inline-flex items-center gap-3">
                     <span class="landing-display text-3xl font-semibold tracking-wide">{{ config('app.name') }}</span>
-                    <span class="rounded-full border border-[rgb(var(--landing-line))] bg-[rgb(var(--landing-surface)/0.6)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--landing-muted))]">
+                    <span class="landing-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--landing-muted))]">
                         {{ __('License Command Theater') }}
                     </span>
                 </div>
 
-                <div class="landing-toggle-shell inline-flex items-center rounded-full border border-[rgb(var(--landing-line)/0.72)] bg-[rgb(var(--landing-surface)/0.66)] p-1.5 shadow-[0_10px_24px_rgb(var(--landing-ink)/0.06)] backdrop-blur">
+                <div class="landing-toggle-shell inline-flex items-center rounded-full p-1.5">
                     <x-dark-mode-toggle />
                 </div>
             </header>
@@ -155,14 +155,14 @@
                     <div class="mt-8 flex flex-wrap items-center gap-3">
                         @auth
                             <a href="{{ route('dashboard') }}"
-                                class="landing-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-brand)/0.38)] bg-[rgb(var(--landing-brand)/0.14)] px-8 py-3 text-sm font-semibold text-[rgb(var(--landing-ink))] shadow-[0_12px_30px_rgb(var(--landing-brand)/0.12)] backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--landing-brand)/0.55)] hover:bg-[rgb(var(--landing-brand)/0.2)]">
+                                class="landing-focus-ring landing-action-primary inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold text-[rgb(var(--landing-ink))] transition duration-300 hover:-translate-y-0.5">
                                 {{ __('Open Dashboard') }}
                                 <span aria-hidden="true">→</span>
                             </a>
                         @else
                             @if (Route::has('login'))
                                 <a href="{{ route('login') }}"
-                                    class="landing-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-brand)/0.38)] bg-[rgb(var(--landing-brand)/0.14)] px-8 py-3 text-sm font-semibold text-[rgb(var(--landing-ink))] shadow-[0_12px_30px_rgb(var(--landing-brand)/0.12)] backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--landing-brand)/0.55)] hover:bg-[rgb(var(--landing-brand)/0.2)]">
+                                    class="landing-focus-ring landing-action-primary inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold text-[rgb(var(--landing-ink))] transition duration-300 hover:-translate-y-0.5">
                                     {{ __('Sign In') }}
                                     <span aria-hidden="true">→</span>
                                 </a>
@@ -170,7 +170,7 @@
 
                             @if (Route::has('register'))
                                 <a href="{{ route('register') }}"
-                                    class="landing-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-line)/0.78)] bg-[rgb(var(--landing-surface)/0.46)] px-8 py-3 text-sm font-medium text-[rgb(var(--landing-muted))] transition duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--landing-line))] hover:text-[rgb(var(--landing-ink))]">
+                                    class="landing-focus-ring landing-action-secondary inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-medium text-[rgb(var(--landing-muted))] transition duration-300 hover:-translate-y-0.5 hover:text-[rgb(var(--landing-ink))]">
                                     {{ __('Create Account') }}
                                 </a>
                             @endif
@@ -179,7 +179,7 @@
 
                     <dl class="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                         @foreach ($heroHighlights as $highlight)
-                            <div class="rounded-2xl border border-[rgb(var(--landing-line)/0.75)] bg-[rgb(var(--landing-surface)/0.56)] p-4 backdrop-blur">
+                            <div class="landing-panel-soft rounded-2xl p-4">
                                 <dt class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ $highlight['title'] }}</dt>
                                 <dd class="mt-2 text-sm leading-6 text-[rgb(var(--landing-ink))]">{{ $highlight['description'] }}</dd>
                             </div>
@@ -193,22 +193,22 @@
                         launchLabel: @js($launchDateLabel),
                     })"
                     aria-labelledby="signal-heading">
-                    <div class="rounded-[1.9rem] border border-[rgb(var(--landing-line)/0.9)] bg-[rgb(var(--landing-surface)/0.84)] p-6 shadow-[0_26px_60px_rgb(8_6_18/0.42)] backdrop-blur sm:p-7">
+                    <div class="landing-panel-strong rounded-[1.9rem] p-6 sm:p-7">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p id="signal-heading" class="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-muted))]">{{ __('Signal Board') }}</p>
                                 <p class="mt-2 text-sm leading-6 text-[rgb(var(--landing-muted))]">{{ __('An illustrative operations snapshot showing the kinds of signals teams watch first: entitlement volume, device pressure, release readiness, and event noise.') }}</p>
                             </div>
-                            <span class="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--landing-accent)/0.5)] bg-[rgb(var(--landing-accent)/0.17)] px-3 py-1 text-xs font-semibold text-[rgb(var(--landing-accent))]">
+                            <span class="landing-pill-accent inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold text-[rgb(var(--landing-accent))]">
                                 <span class="landing-status-dot h-2 w-2 rounded-full bg-[rgb(var(--landing-accent))]" aria-hidden="true"></span>
                                 {{ __('Illustrative') }}
                             </span>
                         </div>
                         <div class="mt-5 grid gap-4">
-                            <article class="rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.85)] p-4">
+                            <article class="landing-panel-metric rounded-2xl p-4">
                                 <div class="flex items-center justify-between gap-3">
                                     <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ __('Active Licenses') }}</p>
-                                    <span class="rounded-full border border-[rgb(var(--landing-line)/0.75)] px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-glow))]">{{ __('Protected') }}</span>
+                                    <span class="landing-pill rounded-full px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-glow))]">{{ __('Protected') }}</span>
                                 </div>
                                 <p class="landing-display mt-1 text-4xl font-semibold text-[rgb(var(--landing-ink))]"
                                     x-text="formatNumber(animated.activeLicenses)">2,314</p>
@@ -216,23 +216,23 @@
                                     <span x-text="formatPercent(animated.coverageRate)">84.0%</span>
                                     {{ __('of issued seats are currently active across customer accounts.') }}
                                 </p>
-                                <div class="mt-3 h-2 rounded-full bg-[rgb(var(--landing-line)/0.4)]">
+                                <div class="landing-progress-track mt-3 h-2 rounded-full">
                                     <div class="h-2 rounded-full bg-[rgb(var(--landing-brand))] transition-[width] duration-1000 ease-out"
                                         :style="`width: ${animated.coverageRate}%`"
                                         style="width: 84%"></div>
                                 </div>
                                 <div class="mt-3 flex flex-wrap items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-muted))]">
-                                    <span class="rounded-full border border-[rgb(var(--landing-line)/0.7)] bg-[rgb(var(--landing-surface)/0.66)] px-2.5 py-1">
+                                    <span class="landing-pill rounded-full px-2.5 py-1">
                                         +<span x-text="stats.activeLicenses.todayChange">0</span>
                                         {{ __('today') }}
                                     </span>
-                                    <span class="rounded-full border border-[rgb(var(--landing-line)/0.5)] px-2.5 py-1 text-[rgb(var(--landing-glow))]">
+                                    <span class="landing-pill rounded-full px-2.5 py-1 text-[rgb(var(--landing-glow))]">
                                         {{ __('Since') }} <span x-text="launchLabel()">{{ $launchDateLabel }}</span>
                                     </span>
                                 </div>
                             </article>
                             <div class="grid grid-cols-2 gap-3">
-                                <article class="rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.8)] p-4">
+                                <article class="landing-panel-metric rounded-2xl p-4">
                                     <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ __('Bound Devices') }}</p>
                                     <p class="landing-display mt-1 text-3xl font-semibold text-[rgb(var(--landing-brand))]"
                                         x-text="formatNumber(animated.boundDevices)">9,847</p>
@@ -241,12 +241,12 @@
                                         · {{ __('midnight') }} +<span x-text="stats.boundDevices.projectedChange">0</span>
                                     </p>
                                 </article>
-                                <article class="rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.8)] p-4">
+                                <article class="landing-panel-metric rounded-2xl p-4">
                                     <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ __('Deploy Success') }}</p>
                                     <p class="landing-display mt-1 text-3xl font-semibold text-[rgb(var(--landing-accent))]"
                                         x-text="formatPercent(animated.deploySuccess)">99.2%</p>
                                     <div class="mt-2 flex flex-wrap items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-muted))]">
-                                        <span class="rounded-full border border-[rgb(var(--landing-accent)/0.35)] bg-[rgb(var(--landing-accent)/0.12)] px-2.5 py-1 transition-colors duration-300"
+                                        <span class="landing-pill-accent rounded-full px-2.5 py-1 transition-colors duration-300"
                                             :class="{
                                                 'text-[rgb(var(--landing-accent))]': stats.deploySuccess.direction === 'up',
                                                 'text-[rgb(var(--landing-brand))]': stats.deploySuccess.direction === 'down',
@@ -256,7 +256,7 @@
                                     </div>
                                 </article>
                             </div>
-                            <article class="rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.78)] p-4">
+                            <article class="landing-panel rounded-2xl p-4">
                                 <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ __('Current Command Feed') }}</p>
                                 <ul class="mt-3 grid gap-3 text-sm leading-6 text-[rgb(var(--landing-ink))]">
                                     @foreach ($signalFeedEntries as $entry)
@@ -288,7 +288,7 @@
 
                 <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     @foreach ($systemSurfaces as $surface)
-                        <article class="rounded-3xl border border-[rgb(var(--landing-line)/0.75)] bg-[rgb(var(--landing-surface)/0.72)] p-5 backdrop-blur">
+                        <article class="landing-panel rounded-3xl p-5">
                             <p class="text-xs uppercase tracking-[0.14em] text-[rgb(var(--landing-muted))]">{{ $surface['axis'] }}</p>
                             <p class="landing-display mt-2 text-3xl font-semibold">{{ $surface['title'] }}</p>
                             <p class="mt-2 text-sm leading-6 text-[rgb(var(--landing-muted))]">{{ $surface['description'] }}</p>
@@ -299,7 +299,7 @@
             </section>
 
             <section id="control"
-                class="landing-section-anchor landing-fade-up mt-10 rounded-[2.2rem] border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface-soft)/0.65)] p-6 shadow-[0_18px_44px_rgb(10_8_22/0.35)] lg:mt-12 lg:p-8"
+                class="landing-section-anchor landing-fade-up landing-panel mt-10 rounded-[2.2rem] p-6 lg:mt-12 lg:p-8"
                 style="animation-delay: 310ms;" aria-labelledby="control-heading">
                 <div class="grid gap-8 lg:grid-cols-[1fr_1.15fr]">
                     <div>
@@ -308,7 +308,7 @@
                         <p class="mt-4 text-sm leading-7 text-[rgb(var(--landing-muted))] sm:text-base">{{ __('Keep entitlement changes, device recovery, release rollout, and event tracing aligned in one flow so operators can move quickly without losing context.') }}</p>
                         <dl class="mt-6 grid gap-3 sm:grid-cols-2">
                             @foreach ($controlHighlights as $highlight)
-                                <div class="rounded-2xl border border-[rgb(var(--landing-line)/0.7)] bg-[rgb(var(--landing-surface)/0.68)] p-4">
+                                <div class="landing-panel-soft rounded-2xl p-4">
                                     <dt class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ $highlight['title'] }}</dt>
                                     <dd class="mt-2 text-sm leading-6 text-[rgb(var(--landing-ink))]">{{ $highlight['description'] }}</dd>
                                 </div>
@@ -319,7 +319,7 @@
                         @foreach ($controlSequenceSteps as $step)
                             <div
                                 @class([
-                                    'rounded-2xl border border-[rgb(var(--landing-line)/0.8)] bg-[rgb(var(--landing-surface)/0.72)] p-4',
+                                    'landing-panel-soft rounded-2xl p-4',
                                     $step['span'] ?? null,
                                 ])>
                                 <p class="text-xs uppercase tracking-[0.12em] text-[rgb(var(--landing-muted))]">{{ $step['label'] }}</p>
@@ -329,7 +329,7 @@
                                 ])>{{ $step['description'] }}</p>
 
                                 @if ($step['showProgress'] ?? false)
-                                    <div class="mt-3 h-2 rounded-full bg-[rgb(var(--landing-line)/0.4)]">
+                                    <div class="landing-progress-track mt-3 h-2 rounded-full">
                                         <div class="landing-rainbow-bar h-2 w-11/12 rounded-full"></div>
                                     </div>
                                     <p class="mt-2 text-xs text-[rgb(var(--landing-muted))]">{{ $step['meta'] }}</p>
