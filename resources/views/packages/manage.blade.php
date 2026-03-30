@@ -77,16 +77,16 @@
                         </select>
                     </div>
 
-                    <div class="space-y-2 md:col-span-7">
+                    <div class="space-y-2 md:col-span-7 filter-box-actions">
                         <span class="form-label text-transparent">{{ __('Actions') }}</span>
-                        <div class="form-actions-cluster justify-start md:justify-end">
-                            <button type="submit" class="btn btn-primary btn-sm gap-2">
+                        <div class="form-actions-cluster">
+                            <button type="submit" class="btn btn-primary btn-sm flex-1 justify-center gap-2 md:flex-none">
                                 <x-icon name="search" class="h-4 w-4" />
                                 {{ __('Apply Filter') }}
                             </button>
 
                             @if ($hasChannelFilter)
-                                <a href="{{ route('packages.manage') }}" class="btn btn-secondary btn-sm gap-2">
+                                <a href="{{ route('packages.manage') }}" class="btn btn-secondary btn-sm justify-center gap-2">
                                     <x-icon name="reset" class="h-4 w-4" />
                                     {{ __('Reset Filter') }}
                                 </a>
@@ -123,7 +123,7 @@
                             </td>
                         @endif
 
-                        <td class="table-cell-primary whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <td class="table-cell-primary whitespace-nowrap">
                             {{ $release->version }}
                         </td>
 
@@ -151,7 +151,7 @@
 
                         @if ($isAdmin ?? false)
                             <td class="table-cell whitespace-nowrap text-right">
-                                <div class="table-actions table-actions--nowrap">
+                                <div class="table-actions">
                                     <a href="{{ route('packages.show', $release) }}" class="table-action table-action--primary">
                                         {{ __('Details') }}
                                     </a>

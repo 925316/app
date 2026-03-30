@@ -123,7 +123,7 @@
                     </aside>
                 </div>
             @else
-                <div class="table-empty-state rounded-2xl border border-dashed border-cool-200/80 bg-cool-50/60 px-6 py-12 text-center dark:border-cool-700/80 dark:bg-cool-900/40">
+                <div class="table-empty-state px-6 py-12 text-center">
                     <x-icon name="cube" class="table-empty-icon" />
                     <p class="table-empty-title">{{ __('No stable releases available yet.') }}</p>
                     <p class="table-empty-copy">{{ __('Publish a stable build to populate this spotlight surface.') }}</p>
@@ -187,16 +187,16 @@
                             </select>
                         </div>
 
-                        <div class="space-y-2 md:col-span-7">
+                        <div class="space-y-2 md:col-span-7 filter-box-actions">
                             <span class="form-label text-transparent">{{ __('Actions') }}</span>
-                            <div class="form-actions-cluster justify-start md:justify-end">
-                                <button type="submit" class="btn btn-primary btn-sm gap-2">
+                            <div class="form-actions-cluster">
+                                <button type="submit" class="btn btn-primary btn-sm flex-1 justify-center gap-2 md:flex-none">
                                     <x-icon name="search" class="h-4 w-4" />
                                     {{ __('Apply Filter') }}
                                 </button>
 
                                 @if ($hasChannelFilter)
-                                    <a href="{{ route('packages.index') }}" class="btn btn-secondary btn-sm gap-2">
+                                    <a href="{{ route('packages.index') }}" class="btn btn-secondary btn-sm justify-center gap-2">
                                         <x-icon name="reset" class="h-4 w-4" />
                                         {{ __('Reset Filter') }}
                                     </a>
@@ -267,7 +267,7 @@
                             </td>
 
                             <td class="table-cell whitespace-nowrap text-right">
-                                <div class="table-actions table-actions--nowrap">
+                                <div class="table-actions">
                                     <a href="{{ route('packages.show', $release) }}" class="table-action table-action--primary">
                                         {{ __('Details') }}
                                     </a>
