@@ -233,11 +233,19 @@ it('logs pagination preserves applied filters', function () {
 it('admin can view log details', function () {
     $admin = createAdmin();
 
-    $log = EventLog::factory()->create(['event_type' => EventType::LICENSE_ACTIVATED->value]);
+    $log = EventLog::factory()->create([
+        'event_type' => EventType::LICENSE_ACTIVATED->value,
+        'details' => ['status' => 'ok', 'source' => 'test-suite'],
+    ]);
 
     actingAs($admin)
         ->get(route('logs.show', $log))
         ->assertSuccessful()
+        ->assertSee('data-page="logs-show"', false)
+        ->assertSee('Back to Logs')
+        ->assertSee('Raw data')
+        ->assertSee('Event details')
+        ->assertSee('test-suite')
         ->assertViewIs('logs.show')
         ->assertViewHas('log');
 });

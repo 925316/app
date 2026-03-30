@@ -1,139 +1,167 @@
 <x-app-sidebar-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Log Details') }}
-        </h2>
+        {{ __('Log Details') }}
     </x-slot>
 
-    <div class="py-7">
-            <div class="card-shell overflow-hidden">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <!-- Log Header -->
-                    <div class="mb-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('Log Entry:') }} {{ $log->event_type }}</h3>
-                                <div class="mt-2 flex items-center gap-4">
-                                    <span
-                                        class="px-3 py-1 rounded-full text-sm font-medium
-                                        @if ($log->event_level == 0) bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
-                                        @elseif($log->event_level == 1) bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
-                                        @else bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 @endif">
-                                        {{ $log->event_level == 0 ? __('Info') : ($log->event_level == 1 ? __('Warning') : __('Error')) }}
-                                    </span>
-                                    <span class="text-sm text-gray-500 dark:text-gray-300">
-                                        {{ $log->created_at->format('Y-m-d H:i:s') }}
-                                    </span>
-                                </div>
-                            </div>
+    <x-slot name="subheader">
+        {{ __('Inspect a single system event with the same surface hierarchy used across the management shell while preserving payload readability and navigation behavior.') }}
+    </x-slot>
 
-                            <div class="flex gap-2">
-                                <a href="{{ route('logs.index') }}" class="btn btn-secondary">
-                                    {{ __('Back to Logs') }}
-                                </a>
-                            </div>
-                        </div>
+    @php
+        $eventBadge = match ($log->event_level) {
+            0 => 'info',
+            1 => 'warning',
+            default => 'danger',
+        };
+
+        $eventLevelLabel = match ($log->event_level) {
+            0 => __('Info'),
+            1 => __('Warning'),
+            default => __('Error'),
+        };
+
+        $logDetailsJson = $log->details ? json_encode($log->details, JSON_PRETTY_PRINT) : null;
+        $logRawJson = json_encode($log->toArray(), JSON_PRETTY_PRINT);
+    @endphp
+
+    <div class="space-y-8" data-page="logs-show">
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Event log') }}</p>
+                    <h2 class="app-toolbar-title">{{ $log->event_type }}</h2>
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                        <x-status-badge :status="$eventBadge" :text="$eventLevelLabel" />
+                        <span class="badge badge-default">{{ __('ID:') }} {{ $log->id }}</span>
+                        <span class="app-shell-body-copy text-sm">{{ $log->created_at->diffForHumans() }}</span>
+                    </div>
+                </div>
+
+                <div class="app-toolbar-actions">
+                    <a href="{{ route('logs.index') }}" class="btn btn-secondary btn-sm gap-2">
+                        <x-icon name="reset" class="h-4 w-4" />
+                        {{ __('Back to Logs') }}
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div class="card-shell-muted space-y-5 p-6">
+                    <div>
+                        <p class="section-kicker">{{ __('Overview') }}</p>
+                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Event basics') }}</h3>
                     </div>
 
-                    <!-- Log Details -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Basic Information') }}</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Event Type:') }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ $log->event_type }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Event Level:') }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">
-                                        @if ($log->event_level == 0)
-                                            {{ __('Info') }}
-                                        @elseif($log->event_level == 1)
-                                            {{ __('Warning') }}
-                                        @else
-                                            {{ __('Error') }}
-                                        @endif
-                                    </span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Timestamp:') }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ $log->created_at->format('Y-m-d H:i:s') }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('IP Address:') }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ $log->ip_address }}</span>
-                                </div>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="card-shell-muted space-y-2 p-4 sm:col-span-2">
+                            <p class="section-kicker">{{ __('Event type') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $log->event_type }}</p>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Event level') }}</p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <x-status-badge :status="$eventBadge" :text="$eventLevelLabel" />
                             </div>
                         </div>
 
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Related Entities') }}</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Account:') }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">
-                                        @if ($log->account)
-                                            <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline">
-                                                {{ $log->account->username }}
-                                            </a>
-                                        @else
-                                            {{ __('System') }}
-                                        @endif
-                                    </span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Actor:') }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">
-                                        @if ($log->actor)
-                                            <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline">
-                                                {{ $log->actor->username }}
-                                            </a>
-                                        @else
-                                            {{ __('System') }}
-                                        @endif
-                                    </span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('License:') }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">
-                                        @if ($log->license)
-                                            <a href="{{ route('licenses.show', $log->license) }}"
-                                                class="text-blue-600 dark:text-blue-400 hover:underline">
-                                                {{ $log->license->key }}
-                                            </a>
-                                        @else
-                                            {{ __('N/A') }}
-                                        @endif
-                                    </span>
-                                </div>
-                            </div>
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('IP address') }}</p>
+                            <p class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $log->ip_address }}</p>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Logged at') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $log->created_at->format('Y-m-d H:i:s') }}</p>
+                            <p class="app-shell-body-copy text-sm">{{ $log->created_at->diffForHumans() }}</p>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Last updated') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $log->updated_at->format('Y-m-d H:i:s') }}</p>
+                            <p class="app-shell-body-copy text-sm">{{ $log->updated_at->diffForHumans() }}</p>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Event Details -->
-                    @if ($log->details)
-                        <div class="mb-6">
-                            <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200">{{ __('Event Details') }}</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <div class="text-sm">
-                                    <pre class="bg-white dark:bg-gray-800 p-4 rounded overflow-x-auto">{{ json_encode($log->details, JSON_PRETTY_PRINT) }}</pre>
-                                </div>
+                <div class="card-shell-muted space-y-5 p-6">
+                    <div>
+                        <p class="section-kicker">{{ __('Relationships') }}</p>
+                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Related entities') }}</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Account') }}</p>
+                            <div class="min-w-0">
+                                @if ($log->account)
+                                    <a href="#" class="table-title table-truncate text-sm hover:underline" title="{{ $log->account->username }}">
+                                        {{ $log->account->username }}
+                                    </a>
+                                @else
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('System') }}</p>
+                                @endif
                             </div>
                         </div>
-                    @endif
 
-                    <!-- Raw Data -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200">{{ __('Raw Data') }}</h4>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <div class="text-sm">
-                                <pre class="bg-white dark:bg-gray-800 p-4 rounded overflow-x-auto">{{ json_encode($log->toArray(), JSON_PRETTY_PRINT) }}</pre>
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Actor') }}</p>
+                            <div class="min-w-0">
+                                @if ($log->actor)
+                                    <a href="#" class="table-title table-truncate text-sm hover:underline" title="{{ $log->actor->username }}">
+                                        {{ $log->actor->username }}
+                                    </a>
+                                @else
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('System') }}</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('License') }}</p>
+                            <div class="min-w-0">
+                                @if ($log->license)
+                                    <a href="{{ route('licenses.show', $log->license) }}" class="table-title table-truncate text-sm hover:underline" title="{{ $log->license->key }}">
+                                        {{ $log->license->key }}
+                                    </a>
+                                @else
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('N/A') }}</p>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-    </div>
+        </section>
 
+        @if ($logDetailsJson)
+            <section class="card-shell space-y-6">
+                <div class="app-toolbar">
+                    <div>
+                        <p class="section-kicker">{{ __('Payload') }}</p>
+                        <h2 class="app-toolbar-title">{{ __('Event details') }}</h2>
+                        <p class="app-toolbar-subtitle">{{ __('Keep the structured event payload legible in both themes without changing the underlying data.') }}</p>
+                    </div>
+                </div>
+
+                <div class="card-shell-muted p-5">
+                    <pre class="table-code overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs text-gray-700 dark:text-gray-300">{{ $logDetailsJson }}</pre>
+                </div>
+            </section>
+        @endif
+
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Payload') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Raw data') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('Render the full event record inside the shared shell surfaces so raw inspection still feels part of the same interface.') }}</p>
+                </div>
+            </div>
+
+            <div class="card-shell-muted p-5">
+                <pre class="table-code overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs text-gray-700 dark:text-gray-300">{{ $logRawJson }}</pre>
+            </div>
+        </section>
+    </div>
 </x-app-sidebar-layout>
