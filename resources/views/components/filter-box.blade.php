@@ -10,9 +10,10 @@
 
 @php
     $headingId = 'filter-box-title-'.md5((string) $title.(string) $action);
+    $shouldShowTotal = filter_var($showTotal, FILTER_VALIDATE_BOOLEAN) && $totalCount !== null;
 @endphp
 
-<section class="filter-box-shell mb-6 rounded-xl border p-6 shadow-sm" aria-labelledby="{{ $headingId }}" data-filter-box>
+<section class="filter-box-shell mb-6" aria-labelledby="{{ $headingId }}" data-filter-box>
     <form method="{{ $method }}" action="{{ $action }}"
         class="filter-box-form"
         role="search" aria-labelledby="{{ $headingId }}"
@@ -27,8 +28,8 @@
                     <span>{{ $title }}</span>
                 </h2>
             </div>
-            @if ($showTotal && $totalCount !== null)
-                <div class="filter-box-summary">
+            @if ($shouldShowTotal)
+                <div class="filter-box-summary" aria-live="polite">
                     <span class="filter-box-total-label">{{ __('Showing') }}</span>
                     <span class="filter-box-total">{{ $totalCount }} {{ __('total') }}</span>
                 </div>

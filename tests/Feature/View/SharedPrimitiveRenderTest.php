@@ -75,3 +75,21 @@ it('modal confirm defaults blue actions to the shared primary button style', fun
         ->toContain('class="btn btn-primary"')
         ->not->toContain('class="btn btn-blue"');
 });
+
+it('filter box hides total summary by default even when a count is provided', function () {
+    $html = Blade::render('<x-filter-box action="/accounts" title="Filter accounts" :total-count="42"><div>Content</div></x-filter-box>');
+
+    expect($html)
+        ->toContain('data-filter-box')
+        ->not->toContain('filter-box-summary')
+        ->not->toContain('Showing');
+});
+
+it('filter box can opt in to total summary when the page needs emphasis', function () {
+    $html = Blade::render('<x-filter-box action="/logs" title="Filter logs" :total-count="42" :show-total="true"><div>Content</div></x-filter-box>');
+
+    expect($html)
+        ->toContain('filter-box-summary')
+        ->toContain('Showing')
+        ->toContain('42 total');
+});

@@ -3,6 +3,10 @@
         {{ __('Licenses') }}
     </x-slot>
 
+    @php
+        $hasAdminFilters = request()->filled('status') || request()->filled('privilege') || request()->filled('search');
+    @endphp
+
     <div class="space-y-6">
 
             @if (Auth::user()->hasPrivilege(7))
@@ -105,7 +109,7 @@
 
                     @if ($isAdmin ?? false)
                         <!-- Admin filters -->
-                        <x-filter-box :action="route('licenses.index')" :showTotal="true" :totalCount="$licenses->total()">
+                        <x-filter-box :action="route('licenses.index')" :totalCount="$licenses->total()" :title="__('Filter licenses')">
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <!-- Status filter -->
                                 <div class="space-y-2">
@@ -138,51 +142,45 @@
                                 <!-- Search -->
                                 <div class="space-y-2 md:col-span-2">
                                     <label for="search" class="form-label">{{ __('Search') }}</label>
-                                    <div class="flex gap-2">
-                                        <div class="relative flex-1">
-                                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                                <svg class="input-icon h-4 w-4" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                                </svg>
-                                            </div>
-                                            <input type="text" name="search" id="search"
-                                                value="{{ request('search', '') }}"
-                                                class="form-input w-full pl-10 pr-4"
-                                                placeholder="{{ __('Search by key or username...') }}">
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                            </svg>
-                                            Filter
+                                    <x-input-with-icon id="search" name="search" type="text" :value="request('search', '')"
+                                        :placeholder="__('Search by key or username...')" icon="search" />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
+                                <div class="space-y-2 md:col-span-8">
+                                    <span class="form-label text-transparent">{{ __('Search field alignment') }}</span>
+                                </div>
+
+                                <div class="space-y-2 md:col-span-4 filter-box-actions">
+                                    <span class="form-label text-transparent">{{ __('Actions') }}</span>
+                                    <div class="form-actions-cluster">
+                                        <button type="submit" class="btn btn-primary btn-sm flex-1 justify-center gap-2">
+                                            <x-icon name="search" class="h-4 w-4" />
+                                            {{ __('Filter') }}
                                         </button>
-                                        <a href="{{ route('licenses.index') }}" class="btn btn-secondary">
-                                            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                                </path>
-                                            </svg>
-                                            Reset
+                                        <a href="{{ route('licenses.index') }}" class="btn btn-secondary btn-sm justify-center gap-2">
+                                            <x-icon name="reset" class="h-4 w-4" />
+                                            {{ __('Reset') }}
                                         </a>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Active filters badge -->
-                            @if (request()->filled(['status', 'privilege', 'search']) ||
-                                    request()->filled('status') ||
-                                    request()->filled('privilege') ||
-                                    request()->filled('search'))
-                                <div class="mt-4 flex items-center space-x-3">
-                                    <span class="app-shell-body-copy text-sm font-medium">{{ __('Active filters:') }}</span>
-                                    <div class="flex flex-wrap gap-2">
+                            @if ($hasAdminFilters)
+                                <div class="active-filters" data-active-filters>
+                                    <div class="active-filters__header">
+                                        <div class="active-filters__copy">
+                                            <p class="active-filters__title">{{ __('Active Filters') }}</p>
+                                            <p class="active-filters__subtitle">{{ __('Remove a single filter or clear the license query without changing admin access or pagination behavior.') }}</p>
+                                        </div>
+                                        <a href="{{ route('licenses.index') }}" class="active-filters__clear">
+                                            {{ __('Clear All') }}
+                                        </a>
+                                    </div>
+
+                                    <div class="active-filters__list">
                                         @if (request()->filled('status'))
                                             @php
                                                 $statusValue = request('status');
@@ -204,7 +202,10 @@
                                             @endif
                                         @endif
                                         @if (request()->filled('search'))
-                                            <x-filter-badge :label="__('Search:').' &quot;'.request('search').'&quot;'" color="purple"
+                                            @php
+                                                $searchFilterLabel = __('Search:').' "'.request('search').'"';
+                                            @endphp
+                                            <x-filter-badge :label="$searchFilterLabel" color="purple"
                                                 :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
                                         @endif
                                     </div>

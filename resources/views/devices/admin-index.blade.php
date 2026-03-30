@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <x-filter-box :action="route('devices.index')" :showTotal="true" :totalCount="$devices->total()" :title="__('Filter devices')">
+            <x-filter-box :action="route('devices.index')" :totalCount="$devices->total()" :title="__('Filter devices')">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div class="space-y-2 xl:col-span-2">
                         <label for="search" class="form-label">{{ __('Search') }}</label>
@@ -110,9 +110,9 @@
                         </select>
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 filter-box-actions">
                         <span class="form-label text-transparent">{{ __('Actions') }}</span>
-                        <div class="form-actions-cluster justify-start xl:justify-end">
+                        <div class="form-actions-cluster">
                             <button type="submit" class="btn btn-primary btn-sm gap-2">
                                 <x-icon name="search" class="h-4 w-4" />
                                 {{ __('Apply Filters') }}
@@ -140,7 +140,10 @@
 
                         <div class="active-filters__list">
                             @if (filled(request('search')))
-                                <x-filter-badge :label="__('Search:').' \"'.request('search').'\"'" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
+                                @php
+                                    $searchFilterLabel = __('Search:').' "'.request('search').'"';
+                                @endphp
+                                <x-filter-badge :label="$searchFilterLabel" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
                             @endif
 
                             @if ($statusLabel)

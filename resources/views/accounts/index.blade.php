@@ -35,7 +35,7 @@
                 </div>
             </div>
 
-            <x-filter-box :action="route('accounts.index')" :showTotal="true" :totalCount="$statistics['total']" :title="__('Filter accounts')">
+            <x-filter-box :action="route('accounts.index')" :totalCount="$statistics['total']" :title="__('Filter accounts')">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div class="space-y-2">
                         <label for="status" class="form-label">{{ __('Account Status') }}</label>
@@ -94,7 +94,7 @@
                             :placeholder="__('Search by username, email, or license key...')" icon="search" />
                     </div>
 
-                    <div class="space-y-2 md:col-span-4">
+                    <div class="space-y-2 md:col-span-4 filter-box-actions">
                         <span class="form-label text-transparent">{{ __('Actions') }}</span>
                         <div class="form-actions-cluster">
                             <button type="submit" class="btn btn-primary btn-sm flex-1 gap-2 justify-center">
@@ -161,7 +161,10 @@
                             @endif
 
                             @if ($currentFilters['search'])
-                                <x-filter-badge :label="__('Search:').' \"'.$currentFilters['search'].'\"'" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
+                                @php
+                                    $searchFilterLabel = __('Search:').' "'.$currentFilters['search'].'"';
+                                @endphp
+                                <x-filter-badge :label="$searchFilterLabel" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
                             @endif
 
                             @if ($currentFilters['sort'] !== 'created_at_desc')

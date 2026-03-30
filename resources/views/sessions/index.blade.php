@@ -42,7 +42,6 @@
 
             <x-filter-box
                 :action="route('sessions.index')"
-                :showTotal="true"
                 :totalCount="$sessions->total()"
                 :title="__('Filter sessions')"
                 defaultValues="sort:last_heartbeat_at,direction:desc"
@@ -96,7 +95,7 @@
                         />
                     </div>
 
-                    <div class="space-y-2 md:col-span-4">
+                    <div class="space-y-2 md:col-span-4 filter-box-actions">
                         <span class="form-label text-transparent">{{ __('Actions') }}</span>
                         <div class="form-actions-cluster">
                             <button type="submit" class="btn btn-primary btn-sm flex-1 justify-center gap-2">
@@ -136,7 +135,10 @@
                             @endif
 
                             @if (request()->filled('search'))
-                                <x-filter-badge :label="__('Search:').' \"'.request('search').'\"'" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
+                                @php
+                                    $searchFilterLabel = __('Search:').' "'.request('search').'"';
+                                @endphp
+                                <x-filter-badge :label="$searchFilterLabel" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
                             @endif
 
                             @if ($currentFilters['sort'] !== 'last_heartbeat_at' || $currentFilters['direction'] !== 'desc')
