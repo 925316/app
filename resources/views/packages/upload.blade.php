@@ -86,12 +86,8 @@
 
                 <!-- Form Actions -->
                 <div class="flex justify-end gap-3 border-t border-cool-200/70 pt-6 dark:border-cool-700/70">
-                    <a href="{{ route('packages.index') }}" class="btn btn-secondary">
-                        {{ __('Cancel') }}
-                    </a>
-                    <button type="submit" class="btn btn-green">
-                        {{ __('Add Package') }}
-                    </button>
+                    <x-secondary-button tag="a" href="{{ route('packages.index') }}">{{ __('Cancel') }}</x-secondary-button>
+                    <x-primary-button type="submit">{{ __('Add Package') }}</x-primary-button>
                 </div>
             </form>
         </div>

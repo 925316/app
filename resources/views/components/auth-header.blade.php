@@ -1,11 +1,15 @@
-@props(['title' => 'Welcome', 'subtitle' => null, 'logoClass' => null])
-<div class="text-center">
-    <div
-        class="{{ $logoClass ?? 'mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg' }}">
-        <x-application-logo class="h-10 w-10 text-white" />
+@props(['title' => 'Welcome', 'subtitle' => null, 'logoClass' => null, 'iconName' => null, 'iconClass' => null])
+
+<div class="auth-header-shell text-center" data-auth-header>
+    <div class="{{ $logoClass ?? 'auth-header-mark mx-auto flex h-16 w-16 items-center justify-center' }}">
+        @if ($iconName)
+            <x-icon :name="$iconName" :class="$iconClass ?? 'h-10 w-10 text-white'" />
+        @else
+            <x-application-logo class="h-10 w-10" />
+        @endif
     </div>
-    <h2 class="mt-6 text-3xl font-bold text-gray-900 dark:text-white"> {{ $title }} </h2>
+    <h1 id="auth-panel-title" class="auth-header-title mt-6 text-3xl font-bold">{{ $title }}</h1>
     @if ($subtitle)
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300"> {{ $subtitle }} </p>
+        <p class="auth-header-subtitle mt-2 text-sm">{{ $subtitle }}</p>
     @endif
 </div>

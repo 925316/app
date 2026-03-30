@@ -10,7 +10,9 @@ test('email verification screen can be rendered', function () {
 
     $response = $this->actingAs($user)->get('/verify-email');
 
-    $response->assertStatus(200);
+    $response->assertOk()
+        ->assertSee('data-page="auth-verify-email"', false)
+        ->assertSee('data-auth-form="verify-email"', false);
 });
 
 test('guests are redirected to login from verification notice', function () {

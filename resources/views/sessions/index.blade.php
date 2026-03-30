@@ -23,7 +23,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <!-- Header -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        <h3 class="card-heading text-lg font-medium text-gray-900 dark:text-white">
                             @if ($isAdmin)
                                 {{ __('Session Management') }}
                             @else
@@ -123,23 +123,8 @@
                                 <div class="space-y-2 md:col-span-4">
                                     <label class="block text-sm font-medium text-transparent">{{ __('Actions') }}</label>
                                     <div class="flex gap-2">
-                                        <button type="submit" class="btn btn-blue flex-1 py-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                            </svg>
-                                            {{ __('Filter') }}
-                                        </button>
-                                        <a href="{{ route('sessions.index') }}" class="btn btn-secondary py-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                                </path>
-                                            </svg>
-                                            {{ __('Reset') }}
-                                        </a>
+                                        <x-primary-button type="submit" class="flex-1">{{ __('Filter') }}</x-primary-button>
+                                        <x-secondary-button tag="a" href="{{ route('sessions.index') }}">{{ __('Reset') }}</x-secondary-button>
                                     </div>
                                 </div>
                             </div>

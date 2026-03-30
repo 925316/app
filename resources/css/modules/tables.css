@@ -97,6 +97,81 @@
     color: rgb(var(--color-text-muted));
 }
 
+.data-table th[data-column] .sort-icon.is-active-sort {
+    @apply opacity-100;
+    color: rgb(var(--color-brand));
+}
+
 .data-table th[data-column]:hover .sort-icon {
     @apply opacity-100;
+}
+
+[data-shell-theme='cinematic'] .table-wrapper,
+[data-shell-theme='cinematic'] .table-responsive {
+    border-color: rgb(var(--shell-line) / 0.5);
+    background: rgb(var(--shell-surface) / 0.9);
+    box-shadow: var(--shell-shadow-sm);
+}
+
+[data-shell-theme='cinematic'] .table-toolbar,
+[data-shell-theme='cinematic'] .table-pagination {
+    border-color: rgb(var(--shell-line) / 0.34);
+    background: rgb(var(--shell-surface) / 0.52);
+}
+
+[data-shell-theme='cinematic'] .table-search-input {
+    background: rgb(var(--shell-surface) / 0.92);
+}
+
+[data-shell-theme='cinematic'] .table-header {
+    background: rgb(var(--shell-surface-soft) / 0.92);
+}
+
+[data-shell-theme='cinematic'] .table-header-cell {
+    color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] .table-body {
+    border-color: rgb(var(--shell-line) / 0.28);
+    background: transparent;
+}
+
+[data-shell-theme='cinematic'] .table-row {
+    border-color: rgb(var(--shell-line) / 0.24);
+}
+
+[data-shell-theme='cinematic'] .table-row:hover,
+[data-shell-theme='cinematic'] .data-table.with-hover tbody tr:hover,
+[data-shell-theme='cinematic'] .data-table.striped tbody tr:nth-child(even) {
+    background: rgb(var(--shell-surface-soft) / 0.56);
+}
+
+[data-shell-theme='cinematic'] .table-cell,
+[data-shell-theme='cinematic'] .table-cell-secondary,
+[data-shell-theme='cinematic'] .table-empty {
+    color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] .table-cell-primary {
+    color: rgb(var(--shell-ink));
+}
+
+[data-shell-theme='cinematic'] .data-table th[data-column] .sort-icon {
+    color: rgb(var(--shell-line-strong));
+}
+
+[data-shell-theme='cinematic'] .data-table th[data-column] .sort-icon.is-active-sort {
+    color: rgb(var(--shell-brand));
+}
+
+[data-shell-theme='cinematic'] .table-link {
+    color: rgb(var(--shell-brand));
+}
+
+[data-shell-theme='cinematic'] .table-link:hover {
+    color: rgb(var(--shell-accent));
+}
+
+[data-shell-theme='cinematic'] .table-link-muted {
+    color: rgb(var(--shell-muted));
 }

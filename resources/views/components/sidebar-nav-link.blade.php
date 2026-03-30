@@ -23,17 +23,19 @@
     ];
 
     $iconSvg = $icons[$icon] ?? $icons['document-text'];
+    $accessibleLabel = trim((string) preg_replace('/\s+/', ' ', strip_tags((string) $slot)));
 
     $classes = $active ?? false
-        ? 'sidebar-link bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-l-2 border-gray-900 dark:border-gray-100'
-        : 'sidebar-link text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 border-l-2 border-transparent';
+        ? 'sidebar-link sidebar-link-active'
+        : 'sidebar-link sidebar-link-inactive';
 @endphp
 
-<a {{ $attributes->merge(['class' => $classes]) }}>
-    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<a @if ($active ?? false) aria-current="page" @endif
+    {{ $attributes->merge(['class' => $classes, 'aria-label' => $accessibleLabel]) }}>
+    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         {!! $iconSvg !!}
     </svg>
-    <span class="ml-3 truncate" x-show="mobileSidebarOpen || $store.sidebar.open">
+    <span class="sidebar-link-label ml-3 truncate" x-show="mobileSidebarOpen || $store.sidebar.open">
         {{ $slot }}
     </span>
 </a>

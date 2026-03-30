@@ -4,27 +4,27 @@
         {{ __('Account Details') }}
     </x-slot>
 
-    <div class="max-w-6xl mx-auto">
-        <div
-            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $account->username }}</h1>
-                <p class="text-gray-500 dark:text-gray-400">{{ __('Account ID:') }} {{ $account->id }}</p>
+    <div class="mx-auto max-w-6xl space-y-6" data-page="accounts-show">
+        <div class="card-shell">
+            <div class="app-toolbar mb-0">
+                <div>
+                    <p class="section-kicker">{{ __('Account') }}</p>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $account->username }}</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('ID:') }} #{{ $account->id }}</p>
+                </div>
+                <div class="flex gap-2">
+                    <x-primary-button tag="a" href="{{ route('accounts.edit', $account) }}">
+                        {{ __('Edit Account') }}
+                    </x-primary-button>
+                    <x-secondary-button tag="a" href="{{ route('accounts.index') }}">
+                        {{ __('Back to Accounts') }}
+                    </x-secondary-button>
+                </div>
             </div>
-            <div class="flex space-x-3">
-                <a href="{{ route('accounts.edit', $account) }}" class="btn btn-indigo btn-sm">
-                    {{ __('Edit Account') }}
-                </a>
-                <a href="{{ route('accounts.index') }}" class="btn btn-secondary btn-sm">
-                    {{ __('Back to Accounts') }}
-                </a>
-            </div>
-        </div>
 
-        <!-- Account Overview -->
+        {{-- Account Overview --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+            <div class="card-shell-muted">
                 <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Account Information') }}</h3>
                 <div class="space-y-3">
                     <div>
@@ -57,7 +57,7 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+            <div class="card-shell-muted">
                 <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Login Information') }}</h3>
                 <div class="space-y-3">
                     <div>
@@ -84,7 +84,7 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+            <div class="card-shell-muted">
                 <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Device Information') }}</h3>
                 <div class="space-y-3">
                     <div>
@@ -107,50 +107,40 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg mb-8">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Account Actions') }}</h3>
+        {{-- Action Buttons --}}
+        <div class="card-shell-muted mb-8">
+            <p class="section-kicker mb-3">{{ __('Account Actions') }}</p>
             <div class="flex flex-wrap gap-3">
                 @if ($account->isCurrentlySuspended)
-                    <form action="{{ route('accounts.unsuspend', $account) }}" method="POST" class="inline">
+                    <form action="{{ route('accounts.unsuspend', $account) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-green btn-sm">
-                            {{ __('Unsuspend Account') }}
-                        </button>
+                        <x-primary-button type="submit">{{ __('Unsuspend Account') }}</x-primary-button>
                     </form>
                 @else
-                    <button onclick="openSuspendModal('{{ $account->id }}')" class="btn btn-danger btn-sm">
-                        {{ __('Suspend Account') }}
-                    </button>
+                    <x-danger-button onclick="openSuspendModal('{{ $account->id }}')">{{ __('Suspend Account') }}</x-danger-button>
                 @endif
 
                 @if (!$account->email_verified_at)
-                    <form action="{{ route('accounts.verify-email', $account) }}" method="POST" class="inline">
+                    <form action="{{ route('accounts.verify-email', $account) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-blue btn-sm">
-                            {{ __('Verify Email') }}
-                        </button>
+                        <x-primary-button type="submit">{{ __('Verify Email') }}</x-primary-button>
                     </form>
                 @endif
 
-                <button onclick="openResetHwidModal('{{ $account->id }}')" class="btn btn-yellow btn-sm">
-                    {{ __('Reset HWID') }}
-                </button>
+                <x-secondary-button onclick="openResetHwidModal('{{ $account->id }}')">{{ __('Reset HWID') }}</x-secondary-button>
 
-                <form action="{{ route('accounts.destroy', $account) }}" method="POST" class="inline">
+                <form action="{{ route('accounts.destroy', $account) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm">
-                        {{ __('Delete Account') }}
-                    </button>
+                    <x-danger-button type="submit">{{ __('Delete Account') }}</x-danger-button>
                 </form>
             </div>
         </div>
 
-        <!-- Licenses -->
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Licenses') }}</h3>
+        {{-- Licenses --}}
+        <div class="card-shell mb-8">
+            <div class="mb-4">
+                <p class="section-kicker">{{ __('Licenses') }}</p>
                 @if ($account->licenses->isEmpty())
                     <p class="text-gray-500 dark:text-gray-400">{{ __('No licenses found for this account.') }}</p>
                 @else
@@ -211,10 +201,10 @@
             </div>
         </div>
 
-        <!-- Devices -->
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Devices') }}</h3>
+        {{-- Devices --}}
+        <div class="card-shell mb-8">
+            <div class="mb-4">
+                <p class="section-kicker">{{ __('Devices') }}</p>
                 @if ($account->devices->isEmpty())
                     <p class="text-gray-500 dark:text-gray-400">{{ __('No devices found for this account.') }}</p>
                 @else
@@ -285,22 +275,19 @@
             </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Recent Activity') }}</h3>
+        {{-- Recent Activity --}}
+        <div class="card-shell">
+            <div class="mb-4">
+                <p class="section-kicker">{{ __('Recent Activity') }}</p>
                 @if ($account->eventLogs->isEmpty())
                     <p class="text-gray-500 dark:text-gray-400">{{ __('No activity found for this account.') }}</p>
                 @else
                     <div class="space-y-4">
                         @foreach ($account->eventLogs as $log)
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="card-shell-muted">
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                            {{ $log->event_type }}
-                                        </span>
+                                        <x-status-badge status="info" :text="$log->event_type" />
                                         <span
                                             class="ml-2 text-sm text-gray-500 dark:text-gray-400">{{ $log->created_at->diffForHumans() }}</span>
                                     </div>
@@ -347,14 +334,9 @@
                             max="365"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
                     </div>
-                    <div class="flex justify-end space-x-2">
-                        <button type="button" @click="show = false"
-                            class="btn btn-secondary">
-                            {{ __('Cancel') }}
-                        </button>
-                        <button type="submit" class="btn btn-danger">
-                            {{ __('Suspend') }}
-                        </button>
+                    <div class="flex justify-end gap-2">
+                        <x-secondary-button type="button" x-on:click="show = false">{{ __('Cancel') }}</x-secondary-button>
+                        <x-danger-button type="submit">{{ __('Suspend') }}</x-danger-button>
                     </div>
                 </form>
             </div>
@@ -378,14 +360,9 @@
                 <p class="text-sm text-red-600 dark:text-red-400 text-center mb-4">{{ __('Warning: This action cannot be undone.') }}</p>
                 <form id="resetHwidForm" method="POST" class="mt-5">
                     @csrf
-                    <div class="flex justify-end space-x-2">
-                        <button type="button" @click="show = false"
-                            class="btn btn-secondary">
-                            {{ __('Cancel') }}
-                        </button>
-                        <button type="submit" class="btn btn-yellow">
-                            Reset HWID
-                        </button>
+                    <div class="flex justify-end gap-2">
+                        <x-secondary-button type="button" x-on:click="show = false">{{ __('Cancel') }}</x-secondary-button>
+                        <x-primary-button type="submit">{{ __('Reset HWID') }}</x-primary-button>
                     </div>
                 </form>
             </div>

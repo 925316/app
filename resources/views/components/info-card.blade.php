@@ -9,11 +9,11 @@
         default => 'icon-blue',
     };
     $titleColorClass = match ($color) {
-        'blue' => 'text-blue-800 dark:text-blue-200',
-        'green' => 'text-green-800 dark:text-green-200',
-        'yellow' => 'text-yellow-800 dark:text-yellow-200',
-        'red' => 'text-red-800 dark:text-red-200',
-        default => 'text-gray-800 dark:text-gray-200',
+        'blue' => 'card-info-title',
+        'green' => 'card-info-title',
+        'yellow' => 'card-info-title',
+        'red' => 'card-info-title',
+        default => 'card-info-title',
     };
 @endphp
 

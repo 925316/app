@@ -1,0 +1,69 @@
+/* Dashboard cinematic theme overrides */
+
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell,
+[data-shell-theme='cinematic'] [data-dashboard-panels] .card-shell,
+[data-shell-theme='cinematic'] [data-dashboard-database] .card-shell,
+[data-shell-theme='cinematic'] [data-dashboard-summary] {
+    background: rgb(var(--shell-surface) / 0.96);
+    border-color: rgb(var(--shell-line));
+    box-shadow: var(--shell-shadow-sm);
+}
+
+[data-shell-theme='cinematic'] .dashboard-section-title {
+    color: rgb(var(--shell-ink));
+    letter-spacing: 0.01em;
+}
+
+[data-shell-theme='cinematic'] .dashboard-metric-label {
+    color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] .dashboard-stat-number {
+    color: rgb(var(--shell-ink));
+}
+
+[data-shell-theme='cinematic'] .dashboard-meta-text {
+    color: rgb(var(--shell-muted));
+}
+
+/* Usage stat big numbers — override purple/indigo Tailwind colors in cinematic mode */
+[data-shell-theme='cinematic'] [data-dashboard-card='usage-statistics'] .text-3xl {
+    color: rgb(var(--shell-brand));
+}
+
+/* sessions/logs pages — card inner text */
+[data-shell-theme='cinematic'] .card-shell .text-gray-900,
+[data-shell-theme='cinematic'] .card-shell .dark\:text-gray-100 {
+    color: rgb(var(--shell-ink));
+}
+
+[data-shell-theme='cinematic'] .card-shell .text-gray-600,
+[data-shell-theme='cinematic'] .card-shell .dark\:text-gray-300 {
+    color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] .card-shell .text-gray-700,
+[data-shell-theme='cinematic'] .card-shell .dark\:text-gray-200 {
+    color: rgb(var(--shell-ink) / 0.85);
+}
+
+[data-shell-theme='cinematic'] .card-shell-muted .text-gray-600,
+[data-shell-theme='cinematic'] .card-shell-muted .dark\:text-gray-300 {
+    color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-card] .text-blue-600,
+[data-shell-theme='cinematic'] [data-dashboard-card] .dark\:text-blue-300,
+[data-shell-theme='cinematic'] [data-dashboard-card] .text-indigo-700,
+[data-shell-theme='cinematic'] [data-dashboard-card] .dark\:text-indigo-300,
+[data-shell-theme='cinematic'] [data-dashboard-card] .text-purple-700,
+[data-shell-theme='cinematic'] [data-dashboard-card] .dark\:text-purple-300,
+[data-shell-theme='cinematic'] [data-dashboard-card] .text-green-600,
+[data-shell-theme='cinematic'] [data-dashboard-card] .dark\:text-green-300 {
+    color: rgb(var(--shell-brand));
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-card] .text-yellow-500 {
+    background: linear-gradient(90deg, rgb(var(--shell-brand)), rgb(var(--shell-glow)), rgb(var(--shell-accent)));
+}

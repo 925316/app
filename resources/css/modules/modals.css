@@ -50,3 +50,32 @@
 .modal-high-z {
     z-index: 9999;
 }
+
+[data-shell-theme='cinematic'] .modal-backdrop {
+    background: rgb(18 12 28 / 0.54);
+    backdrop-filter: blur(8px);
+}
+
+[data-shell-theme='cinematic'] .modal-panel,
+[data-shell-theme='cinematic'] .dropdown-content {
+    border: 1px solid rgb(var(--shell-line) / 0.52);
+    background:
+        linear-gradient(145deg, rgb(var(--shell-surface) / 0.96), rgb(var(--shell-surface-soft) / 0.92));
+    box-shadow: var(--shell-shadow-lg);
+}
+
+[data-shell-theme='cinematic'] .modal-content {
+    border-radius: 1.5rem;
+}
+
+[data-shell-theme='cinematic'] .dropdown-menu {
+    border-radius: 1rem;
+}
+
+[data-shell-theme='cinematic'] .dropdown-link {
+    color: rgb(var(--shell-ink));
+}
+
+[data-shell-theme='cinematic'] .dropdown-link:hover {
+    background: rgb(var(--shell-surface-soft) / 0.84);
+}

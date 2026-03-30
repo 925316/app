@@ -16,7 +16,7 @@
             @endif
 
             <div class="card-shell overflow-hidden">
-                <div class="p-6 text-gray-900 dark:text-gray-100 space-y-6">
+                <div class="space-y-6 p-6">
                     <!-- Header with actions -->
                     <div class="app-toolbar">
                         <div>
@@ -34,7 +34,7 @@
 
                         @if ($isAdmin ?? false)
                             <div class="app-toolbar-actions">
-                                <a href="{{ route('licenses.create') }}" class="btn btn-blue btn-sm">
+                                <a href="{{ route('licenses.create') }}" class="btn btn-primary btn-sm">
                                     {{ __('Create License') }}
                                 </a>
                             </div>
@@ -43,10 +43,10 @@
 
                     <!-- License Activation Form for Regular Users -->
                     @if (!$isAdmin ?? false)
-                        <div class="card-shell-muted border border-sky-200/50 dark:border-sky-700/40 bg-sky-50/70 dark:bg-sky-900/20">
+                        <div class="card-shell-muted form-panel">
                             <div class="flex items-start space-x-4">
-                                <div class="p-3 bg-blue-500/20 rounded-full">
-                                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none"
+                                <div class="card-icon-container icon-blue h-12 w-12 shrink-0 rounded-full">
+                                    <svg class="h-6 w-6" fill="none"
                                         stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
@@ -55,8 +55,8 @@
                                 </div>
                                 <div class="flex-1">
                                     <p class="section-kicker mb-1">{{ __('License Redeem') }}</p>
-                                    <h4 class="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">{{ __('Activate License') }}</h4>
-                                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                                    <h4 class="card-form-title mb-2 text-lg font-semibold">{{ __('Activate License') }}</h4>
+                                    <p class="card-form-copy mb-4">
                                         Enter your license key below to activate premium features. License keys follow
                                         the format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
                                     </p>
@@ -65,29 +65,28 @@
                                         @csrf
 
                                         <div>
-                                            <label for="license_key"
-                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <label for="license_key" class="form-label mb-2">
                                                 License Key
                                             </label>
                                             <input type="text" id="license_key" name="license_key"
                                                 value="{{ old('license_key') }}"
                                                 placeholder="{{ __('XXXXX-XXXXX-XXXXX-XXXXX-XXXXX') }}"
-                                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200 text-center font-mono text-lg tracking-wider uppercase @error('license_key') border-red-500 @enderror"
+                                                class="form-input w-full py-3 text-center font-mono text-lg uppercase tracking-wider @error('license_key') border-red-500 @enderror"
                                                 maxlength="29" required {{-- pattern="^[A-Z0-9]{5}-[0-9A-F]{5}-[A-Z2-7]{5}-[A-Z3-8]{5}-[A-Z0-9]{5}$" --}}
                                                 title="{{ __('License key must be in the format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX') }}">
                                             @error('license_key')
-                                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}
+                                                <p class="form-error mt-2">{{ $message }}
                                                 </p>
                                             @enderror
                                         </div>
 
-                                        <div class="rounded-lg border border-cool-200/70 bg-white/70 px-4 py-3 text-sm text-gray-600 dark:border-cool-700/60 dark:bg-cool-800/60 dark:text-gray-300">
-                                            <p class="font-medium text-gray-800 dark:text-gray-200">{{ __('Terms Reminder') }}</p>
+                                        <div class="form-panel rounded-lg px-4 py-3 text-sm">
+                                            <p class="card-label-strong font-medium">{{ __('Terms Reminder') }}</p>
                                             <p class="mt-1">{{ __('By activating a key, you agree that license usage is device-bound and subject to account suspension rules on abuse.') }}</p>
                                         </div>
 
                                         <div class="flex justify-end">
-                                            <button type="submit" class="btn btn-blue">
+                                            <button type="submit" class="btn btn-primary">
                                                 <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -110,10 +109,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <!-- Status filter -->
                                 <div class="space-y-2">
-                                    <label for="status"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Status') }}</label>
-                                    <select name="status" id="status"
-                                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                                    <label for="status" class="form-label">{{ __('Status') }}</label>
+                                    <select name="status" id="status" class="form-select">
                                         <option value="">{{ __('All Statuses') }}</option>
                                         @foreach ($statusOptions as $value => $label)
                                             <option value="{{ $value }}"
@@ -126,10 +123,8 @@
 
                                 <!-- Privilege filter -->
                                 <div class="space-y-2">
-                                    <label for="privilege"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Privilege') }}</label>
-                                    <select name="privilege" id="privilege"
-                                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200">
+                                    <label for="privilege" class="form-label">{{ __('Privilege') }}</label>
+                                    <select name="privilege" id="privilege" class="form-select">
                                         <option value="">{{ __('All Privileges') }}</option>
                                         @foreach ($privilegeOptions as $value => $label)
                                             <option value="{{ $value }}"
@@ -142,13 +137,11 @@
 
                                 <!-- Search -->
                                 <div class="space-y-2 md:col-span-2">
-                                    <label for="search"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Search') }}</label>
+                                    <label for="search" class="form-label">{{ __('Search') }}</label>
                                     <div class="flex gap-2">
                                         <div class="relative flex-1">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <svg class="h-4 w-4 text-gray-400" fill="none"
+                                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                <svg class="input-icon h-4 w-4" fill="none"
                                                     stroke="currentColor" viewBox="0 0 24 24"
                                                     xmlns="http://www.w3.org/2000/svg">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -158,10 +151,10 @@
                                             </div>
                                             <input type="text" name="search" id="search"
                                                 value="{{ request('search', '') }}"
-                                                class="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-200 transition-all duration-200"
+                                                class="form-input w-full pl-10 pr-4"
                                                 placeholder="{{ __('Search by key or username...') }}">
                                         </div>
-                                        <button type="submit" class="btn btn-blue btn-sm">
+                                        <button type="submit" class="btn btn-primary btn-sm">
                                             <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -169,7 +162,7 @@
                                             </svg>
                                             Filter
                                         </button>
-                                        <a href="{{ route('licenses.index') }}" class="btn btn-secondary btn-sm">
+                                        <a href="{{ route('licenses.index') }}" class="btn btn-secondary">
                                             <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -188,7 +181,7 @@
                                     request()->filled('privilege') ||
                                     request()->filled('search'))
                                 <div class="mt-4 flex items-center space-x-3">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Active filters:') }}</span>
+                                    <span class="app-shell-body-copy text-sm font-medium">{{ __('Active filters:') }}</span>
                                     <div class="flex flex-wrap gap-2">
                                         @if (request()->filled('status'))
                                             @php
@@ -223,42 +216,40 @@
                     <!-- Licenses table -->
                     <x-table :headers="$isAdmin ?? false ? ['Key', 'Account', 'Privilege', 'Status', 'Expires', 'Actions'] : ['Key', 'Privilege', 'Status', 'Expires', 'Actions']" :emptyColspan="$isAdmin ?? false ? 6 : 5">
                         @forelse($licenses as $license)
-                            <tr>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <tr class="table-row">
+                                <td class="table-cell-primary whitespace-nowrap">
                                     {{ $license->key }}
                                 </td>
                                 @if ($isAdmin ?? false)
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                <td class="table-cell whitespace-nowrap">
                                     {{ $license->account?->username ?? __('Unassigned') }}
                                 </td>
                                 @endif
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                <td class="table-cell whitespace-nowrap">
                                     {{ $license->getPrivilegeTextAttribute() }}
                                 </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                    <span class="px-2 py-0.5 rounded text-xs font-medium {{ $license->getStatusColorAttribute() }}">
-                                        {{ $license->getStatusTextAttribute() }}
-                                    </span>
+                                <td class="table-cell whitespace-nowrap">
+                                    <x-status-badge :status="$license->status->value" :text="$license->getStatusTextAttribute()" />
                                 </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                <td class="table-cell whitespace-nowrap">
                                     <span title="{{ $license->expires_at->format('Y-m-d H:i:s') }}">
                                         {{ $license->expires_at->format('Y-m-d') }}
                                     </span>
                                     @if ($license->isActive() && !$license->isExpired())
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                        <span class="table-link-muted text-xs">
                                             ({{ $license->daysUntilExpiry() }}d)
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                <td class="table-cell whitespace-nowrap text-right font-medium">
                                     <a href="{{ route('licenses.show', $license) }}"
-                                        class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                        class="table-link">
                                         View
                                     </a>
                                     @if ($isAdmin ?? false)
-                                        <span class="mx-1 text-gray-400">{{ '|' }}</span>
+                                        <span class="table-link-muted mx-1">{{ '|' }}</span>
                                         <a href="{{ route('licenses.edit', $license) }}"
-                                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                                            class="table-link">
                                             Edit
                                         </a>
                                     @endif
@@ -266,7 +257,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="{{ $isAdmin ?? false ? 6 : 5 }}" class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
+                                <td colspan="{{ $isAdmin ?? false ? 6 : 5 }}" class="table-empty">
                                     {{ __('No licenses found.') }}
                                 </td>
                             </tr>

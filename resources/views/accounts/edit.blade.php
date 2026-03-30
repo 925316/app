@@ -13,9 +13,7 @@
                         {{ __('Update identity and credentials while preserving access history and related records.') }}
                     </p>
                 </div>
-                <a href="{{ route('accounts.show', $account) }}" class="btn btn-secondary btn-sm">
-                    {{ __('Back to Account') }}
-                </a>
+                <x-secondary-button tag="a" href="{{ route('accounts.show', $account) }}">{{ __('Back to Account') }}</x-secondary-button>
             </div>
 
             <form method="POST" action="{{ route('accounts.update', $account) }}" class="space-y-6">
@@ -57,12 +55,8 @@
             </div>
 
                 <div class="flex justify-end gap-3 border-t border-cool-200/70 pt-6 dark:border-cool-700/70">
-                    <a href="{{ route('accounts.show', $account) }}" class="btn btn-secondary btn-sm">
-                        {{ __('Cancel') }}
-                    </a>
-                    <button type="submit" class="btn btn-blue btn-sm">
-                        {{ __('Update Account') }}
-                    </button>
+                    <x-secondary-button tag="a" href="{{ route('accounts.show', $account) }}">{{ __('Cancel') }}</x-secondary-button>
+                    <x-primary-button type="submit">{{ __('Update Account') }}</x-primary-button>
                 </div>
             </form>
         </div>

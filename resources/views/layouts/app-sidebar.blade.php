@@ -10,7 +10,7 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:500,600,700|ibm-plex-sans:400,500,600,700&display=swap" rel="stylesheet" />
 
     <!-- Early theme detection to prevent FOUC -->
     @include('components.theme-init-script')
@@ -39,7 +39,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-    <body class="app-shell-page app-shell-grid font-sans antialiased min-h-screen overflow-x-hidden transition-colors duration-300">
+<body class="app-shell-page app-shell-grid shell-cinematic shell-cinematic--sidebar font-sans antialiased min-h-screen overflow-x-hidden transition-colors duration-300"
+    data-shell-theme="cinematic" data-shell-variant="sidebar">
+    <a href="#app-main-content" class="shell-cinematic__skip-link">
+        {{ __('Skip to main content') }}
+    </a>
+
     <div class="flex min-h-screen w-full overflow-x-hidden" x-data="{
         mobileSidebarOpen: false,
         isDesktop: false,
@@ -92,15 +97,16 @@
             aria-hidden="true"></div>
 
         <!-- Main Content Area -->
-        <div class="relative z-0 flex flex-col w-full min-w-0 transition-all duration-300 ml-0"
+        <div class="app-shell-body relative z-0 flex flex-col w-full min-w-0 transition-all duration-300 ml-0"
             :class="{ 'lg:ml-64 lg:w-[calc(100%-16rem)]': $store.sidebar.open, 'lg:ml-16 lg:w-[calc(100%-4rem)]': !$store.sidebar.open }"
             :inert="mobileSidebarOpen && !isDesktop" :aria-hidden="(mobileSidebarOpen && !isDesktop).toString()" x-cloak>
             <!-- Top Header -->
             <header class="app-shell-header">
-                <div class="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-3.5 lg:px-8">
                     <!-- Page Title -->
-                    <div class="flex items-center gap-3">
-                        <button type="button" class="inline-flex items-center justify-center rounded-md p-2 text-gray-500 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200 lg:hidden"
+                    <div class="flex min-w-0 items-center gap-3">
+                        <button type="button"
+                            class="app-shell-mobile-toggle inline-flex items-center justify-center rounded-md p-2 transition-colors duration-150 focus:outline-none focus:ring-2 lg:hidden"
                             @click="openMobileSidebar($el)" :aria-expanded="mobileSidebarOpen.toString()"
                             aria-controls="app-sidebar" aria-label="{{ __('Open navigation menu') }}">
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,19 +114,23 @@
                             </svg>
                         </button>
 
-                        <div>
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        <div class="min-w-0" data-app-shell-header-copy>
+                            <div class="app-shell-page-meta flex min-w-0 items-center gap-2.5">
+                                <p class="app-shell-page-kicker shrink-0 text-xs font-semibold uppercase tracking-[0.2em]">{{ __('Command surface') }}</p>
+                                @isset($subheader)
+                                    <span class="app-shell-page-meta-separator" aria-hidden="true">•</span>
+                                    <p class="app-shell-page-subtitle min-w-0 truncate text-sm">
+                                        {{ $subheader }}
+                                    </p>
+                                @endisset
+                            </div>
+                            <h1 class="app-shell-page-title truncate text-2xl font-bold">
                                 @isset($header)
                                     {{ $header }}
                                 @else
                                     {{ __('Dashboard') }}
                                 @endisset
                             </h1>
-                            @isset($subheader)
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $subheader }}
-                                </p>
-                            @endisset
                         </div>
                     </div>
 
@@ -130,7 +140,7 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
+            <main id="app-main-content" class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden" aria-label="{{ __('Application content') }}">
                 <div class="app-shell-content-wrap">
                     <div class="app-shell-content mx-auto w-full sm:px-6 lg:px-8">
                         {{ $slot }}
@@ -139,8 +149,8 @@
             </main>
 
             <!-- Footer -->
-            <footer class="app-shell-footer py-4 px-4 sm:px-6 lg:px-8">
-                <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+            <footer class="app-shell-footer px-4 py-4 sm:px-6 lg:px-8">
+                <div class="app-shell-footer-copy text-center text-sm">
                     &copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. {{ __('All rights reserved.') }}
                 </div>
             </footer>

@@ -1,4 +1,4 @@
-<aside id="app-sidebar" x-data x-cloak
+<aside id="app-sidebar" x-data x-cloak data-sidebar-shell
     class="sidebar h-screen fixed inset-y-0 left-0 z-50 transform transition-all duration-300 lg:z-40"
     :class="isDesktop
         ? 'translate-x-0 ' + ($store.sidebar.open ? 'w-64' : 'w-16')
@@ -11,10 +11,10 @@
     <div class="sidebar-header">
         <!-- Logo Container -->
         <div class="sidebar-logo" :class="mobileSidebarOpen || $store.sidebar.open ? 'sidebar-content-visible' : 'sidebar-content-hidden'">
-            <a href="{{ route('dashboard') }}" class="shrink-0">
-                <x-application-logo class="block h-8 w-auto fill-current text-gray-800 dark:text-gray-200" />
+            <a href="{{ route('dashboard') }}" class="sidebar-brand-mark shrink-0" aria-label="{{ __('Go to dashboard') }}">
+                <x-application-logo class="block h-8 w-auto fill-current" />
             </a>
-            <span class="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
+            <span class="sidebar-brand-text truncate text-lg font-semibold">
                 {{ config('app.name', 'Laravel') }}
             </span>
         </div>
@@ -41,8 +41,8 @@
     </div>
 
     <!-- Navigation Menu -->
-    <nav class="flex-1 overflow-y-auto py-4">
-        <div class="space-y-1 px-2">
+    <nav class="sidebar-nav" aria-label="{{ __('Primary navigation') }}">
+        <div class="space-y-1.5 px-3">
             <!-- Dashboard -->
             <x-sidebar-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" :icon="'home'" @click="closeMobileSidebar()">
                 {{ __('Dashboard') }}
@@ -91,55 +91,68 @@
     </nav>
 
     <!-- User Profile Section -->
-    <div class="border-t border-cool-200/50 dark:border-cool-700/50 p-4">
-        <!-- Profile Header - Only avatar visible when collapsed -->
-        <div class="mb-4 flex items-center justify-between" :class="mobileSidebarOpen || $store.sidebar.open ? 'justify-between' : 'justify-center'">
-            <!-- User Avatar -->
-            <div class="shrink-0">
-                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm font-semibold text-white"
-                    :class="{ 'h-6 w-6 text-xs': !$store.sidebar.open && !mobileSidebarOpen }">
-                    {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
-                </div>
+    <div class="sidebar-user" data-sidebar-account>
+        <div class="sidebar-account-panel" x-show="mobileSidebarOpen || $store.sidebar.open" x-transition>
+            <div class="sidebar-account-row" data-sidebar-profile-row>
+                <a href="{{ route('profile.edit') }}"
+                    class="sidebar-account-entry flex min-w-0 flex-1 items-center gap-3 px-1 py-1 text-sm font-medium transition-colors duration-150">
+                    <div class="user-avatar flex h-8 w-8 shrink-0 items-center justify-center text-sm font-semibold text-white">
+                        {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                        <p class="sidebar-user-name truncate text-sm font-medium">
+                            {{ Auth::user()->username }}
+                        </p>
+                        <p class="sidebar-user-meta truncate text-xs">
+                            {{ Auth::user()->email }}
+                        </p>
+                    </div>
+                </a>
+
+                <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+                    @csrf
+                    <button type="submit" class="sidebar-account-icon" aria-label="{{ __('Log out') }}">
+                        <x-icon name="logout" class="h-4 w-4" />
+                    </button>
+                </form>
             </div>
 
-            <!-- User Info - Hidden when collapsed -->
-            <div class="ml-3 min-w-0 flex-1" x-show="mobileSidebarOpen || $store.sidebar.open" x-transition>
-                <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {{ Auth::user()->username }}
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {{ Auth::user()->email }}
-                </p>
-            </div>
+            <x-dark-mode-toggle variant="sidebar-row" data-sidebar-theme-row />
 
-            <!-- Dark Mode Toggle - Hidden when collapsed -->
-            <div class="ml-3 shrink-0" x-show="mobileSidebarOpen || $store.sidebar.open" x-transition>
-                <x-dark-mode-toggle />
-            </div>
-        </div>
+            @php
+                $supportedLocales = (array) config('app.supported_locales', []);
+                $currentLocale = app()->getLocale();
+            @endphp
 
-        <!-- User Actions - Hidden when collapsed -->
-        <div x-show="mobileSidebarOpen || $store.sidebar.open" x-transition class="space-y-2">
-            <a href="{{ route('profile.edit') }}"
-                class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors duration-150">
-                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                {{ __('Profile') }}
-            </a>
-
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('profile.update-locale') }}" class="sidebar-account-language-form"
+                data-sidebar-language-row>
                 @csrf
-                <button type="submit"
-                    class="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors duration-150">
-                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    {{ __('Log Out') }}
-                </button>
+                @method('patch')
+
+                <label class="sidebar-account-language-label" for="sidebar-locale-select">{{ __('Language') }}</label>
+                <select id="sidebar-locale-select" name="locale" class="sidebar-account-language-select"
+                    onchange="this.form.submit()">
+                    @if (count($supportedLocales) === 0)
+                        <option value="{{ $currentLocale }}" selected>
+                            {{ strtoupper($currentLocale) }}
+                        </option>
+                    @endif
+                    @foreach ($supportedLocales as $value => $label)
+                        <option value="{{ $value }}" {{ $currentLocale === $value ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
             </form>
         </div>
+
+        <a href="{{ route('profile.edit') }}" class="sidebar-account-collapsed mx-auto"
+            x-show="!mobileSidebarOpen && !$store.sidebar.open" x-transition aria-label="{{ __('Profile') }}">
+            <div class="user-avatar flex h-8 w-8 items-center justify-center text-sm font-semibold text-white"
+                :class="{ 'h-6 w-6 text-xs': !$store.sidebar.open && !mobileSidebarOpen }">
+                {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+            </div>
+        </a>
     </div>
 </aside>

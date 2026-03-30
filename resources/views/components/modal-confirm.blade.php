@@ -10,6 +10,7 @@
     'confirmColor' => 'blue',
     'cancelText' => 'Cancel',
 ]) @php
+    $titleId = $id ? $id.'-title' : 'modal-confirm-title';
     $iconBgColor = match ($iconColor) {
         'red' => 'bg-red-100 dark:bg-red-900',
         'yellow' => 'bg-yellow-100 dark:bg-yellow-900',
@@ -25,16 +26,17 @@
         default => 'text-gray-600 dark:text-gray-400',
     };
     $confirmButtonColor = match ($confirmColor) {
-        'red' => 'bg-red-600 hover:bg-red-700 focus:ring-red-300',
-        'green' => 'bg-green-600 hover:bg-green-700 focus:ring-green-300',
-        'blue' => 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-300',
-        'yellow' => 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-300',
-        'gray' => 'bg-gray-600 hover:bg-gray-700 focus:ring-gray-300',
-        default => 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-300',
+        'red' => 'btn btn-danger',
+        'green' => 'btn btn-green',
+        'blue' => 'btn btn-primary',
+        'yellow' => 'btn btn-yellow',
+        'gray' => 'btn btn-secondary',
+        default => 'btn btn-primary',
     };
 @endphp
 <div id="{{ $id }}" class="modal-backdrop hidden">
-    <div class="relative top-20 mx-auto w-full max-w-md p-5 border shadow-lg rounded-md bg-white dark:bg-gray-800 modal-content">
+    <div class="modal-content modal-md modal-panel relative top-20 mx-auto w-full border p-5 shadow-lg"
+        role="dialog" aria-modal="true" aria-labelledby="{{ $titleId }}">
         <div class="mt-3">
             @if ($icon || $iconName)
                 <div class="flex items-center justify-center mx-auto h-12 w-12 rounded-full {{ $iconBgColor }}">
@@ -49,7 +51,7 @@
             @endif
             @if ($title)
                 <div class="mt-2 text-center">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    <h3 id="{{ $titleId }}" class="card-modal-title text-lg font-medium leading-6">
                         {{ $title }}
                     </h3>
                 </div>
@@ -60,13 +62,11 @@
                     @method($method)
                 @endif
                 {{ $slot }}
-                <div class="flex justify-end space-x-2 mt-4">
-                    <button type="button" onclick="closeModal('{{ $id }}')"
-                        class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <div class="mt-4 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('{{ $id }}')" class="btn btn-secondary">
                         {{ $cancelText }}
                     </button>
-                    <button type="submit"
-                        class="px-4 py-2 {{ $confirmButtonColor }} text-white text-base font-medium rounded-md shadow-sm transition focus:outline-none focus:ring-2">
+                    <button type="submit" class="{{ $confirmButtonColor }}">
                         {{ $confirmText }}
                     </button>
                 </div>

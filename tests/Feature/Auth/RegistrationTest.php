@@ -5,7 +5,9 @@ use App\Models\Account;
 test('registration screen can be rendered', function () {
     $response = $this->get('/register');
 
-    $response->assertStatus(200);
+    $response->assertOk()
+        ->assertSee('data-page="auth-register"', false)
+        ->assertSee('data-auth-form="register"', false);
 });
 
 test('authenticated users are redirected away from registration screen', function () {

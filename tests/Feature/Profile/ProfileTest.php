@@ -9,7 +9,9 @@ test('profile page is displayed', function () {
         ->actingAs($user)
         ->get('/profile');
 
-    $response->assertOk();
+    $response->assertOk()
+        ->assertSee('role="dialog"', false)
+        ->assertSee('aria-modal="true"', false);
 });
 
 test('non-admin cannot update username and email', function () {
@@ -67,7 +69,7 @@ test('admin can update locale without requiring username and email', function ()
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile')
+        ->assertRedirect('/')
         ->assertSessionHas('status', 'locale-updated');
 
     $response->assertCookie((string) config('app.locale_cookie_name', 'locale'), 'ko');
@@ -84,7 +86,7 @@ test('selected locale is applied on subsequent profile request', function () {
             'locale' => 'ko',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile')
+        ->assertRedirect('/')
         ->assertSessionHas('status', 'locale-updated')
         ->assertSessionHas($sessionKey, 'ko')
         ->assertCookie($cookieName, 'ko');
@@ -118,7 +120,7 @@ test('selected english locale remains selected even when browser prefers chinese
             'locale' => 'en',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile')
+        ->assertRedirect('/')
         ->assertSessionHas('status', 'locale-updated');
 
     $this->actingAs($user)
@@ -126,6 +128,25 @@ test('selected english locale remains selected even when browser prefers chinese
         ->get('/profile')
         ->assertOk()
         ->assertSee('option value="en" selected', false);
+});
+
+test('locale update redirects back to the originating page', function () {
+    $user = createAdmin();
+    $sessionKey = (string) config('app.locale_session_key', 'locale');
+    $cookieName = (string) config('app.locale_cookie_name', 'locale');
+
+    $response = $this->actingAs($user)
+        ->from(route('dashboard'))
+        ->patch('/profile/locale', [
+            'locale' => 'ja',
+        ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('dashboard'))
+        ->assertSessionHas('status', 'locale-updated')
+        ->assertSessionHas($sessionKey, 'ja')
+        ->assertCookie($cookieName, 'ja');
 });
 
 test('email verification status is unchanged when the email address is unchanged for non-admin', function () {

@@ -59,3 +59,56 @@
 .badge-default {
     @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300;
 }
+
+[data-shell-theme='cinematic'] .badge {
+    border: 1px solid rgb(var(--shell-line) / 0.4);
+    border-radius: 9999px;
+    padding-inline: 0.625rem;
+    padding-block: 0.25rem;
+    box-shadow: var(--shell-shadow-sm);
+}
+
+[data-shell-theme='cinematic'] .badge-success,
+[data-shell-theme='cinematic'] .badge-active,
+[data-shell-theme='cinematic'] .badge-verified,
+[data-shell-theme='cinematic'] .badge-bound,
+[data-shell-theme='cinematic'] .badge-stable {
+    background: rgb(var(--shell-accent) / 0.16);
+    color: rgb(var(--shell-accent));
+}
+
+[data-shell-theme='cinematic'] .badge-danger,
+[data-shell-theme='cinematic'] .badge-error,
+[data-shell-theme='cinematic'] .badge-inactive,
+[data-shell-theme='cinematic'] .badge-suspended,
+[data-shell-theme='cinematic'] .badge-expired,
+[data-shell-theme='cinematic'] .badge-tester,
+[data-shell-theme='cinematic'] .badge-staff {
+    background: rgb(var(--shell-brand) / 0.16);
+    color: rgb(var(--shell-brand));
+}
+
+[data-shell-theme='cinematic'] .badge-warning,
+[data-shell-theme='cinematic'] .badge-pending,
+[data-shell-theme='cinematic'] .badge-unverified,
+[data-shell-theme='cinematic'] .badge-ultimate {
+    background: rgb(var(--shell-glow) / 0.16);
+    color: rgb(var(--shell-glow));
+}
+
+[data-shell-theme='cinematic'] .badge-info,
+[data-shell-theme='cinematic'] .badge-standard,
+[data-shell-theme='cinematic'] .badge-latest,
+[data-shell-theme='cinematic'] .badge-premium,
+[data-shell-theme='cinematic'] .badge-upgrade,
+[data-shell-theme='cinematic'] .badge-dev,
+[data-shell-theme='cinematic'] .badge-development {
+    background: rgb(var(--shell-line-strong) / 0.18);
+    color: rgb(var(--shell-ink));
+}
+
+[data-shell-theme='cinematic'] .badge-historical,
+[data-shell-theme='cinematic'] .badge-default {
+    background: rgb(var(--shell-surface-soft) / 0.86);
+    color: rgb(var(--shell-muted));
+}

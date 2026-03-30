@@ -1,274 +1,223 @@
 @php use App\Models\License; @endphp
+
 <x-app-sidebar-layout>
     <x-slot name="header">
         {{ __('Dashboard') }}
     </x-slot>
 
-    <div>
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-6">
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ __('Last updated:') }} {{ now()->format('M d, Y H:i') }}
-                </div>
+    <x-slot name="subheader">
+        {{ __('Monitor accounts, activity, and infrastructure health from one place.') }}
+    </x-slot>
+
+    @php
+        $totalLicenses = $stats['total_licenses'] ?? 0;
+        $activeRatio = $totalLicenses > 0 ? round((($stats['active_licenses'] ?? 0) / $totalLicenses) * 100) : 0;
+        $cacheConnected = $databaseStatus['cache']['connected'] ?? false;
+        $connectionUsage = min($databaseStatus['connections']['usage_percent'] ?? 0, 100);
+    @endphp
+
+    <div class="space-y-8" data-page="dashboard-admin">
+        <section class="card-shell flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between" data-dashboard-summary>
+            <div class="space-y-2">
+                <p class="section-kicker">{{ __('Operations snapshot') }}</p>
+                <h2 class="dashboard-section-title text-2xl font-semibold">{{ __('Administrative overview') }}</h2>
+                <p class="dashboard-meta-text max-w-2xl text-sm">
+                    {{ __('Track account health, recent platform activity, and core service status without changing any existing data contracts.') }}
+                </p>
             </div>
 
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <x-stat-card :title="__('Total Accounts')" :value="$stats['total_accounts'] ?? 0" icon="users" iconColor="icon-blue" />
-                <x-stat-card :title="__('Active Licenses')" :value="$stats['active_licenses'] ?? 0" icon="success" iconColor="icon-green" />
-                <x-stat-card :title="__('Suspended Accounts')" :value="$stats['suspended_accounts'] ?? 0" icon="warning" iconColor="icon-red" />
-                <x-stat-card :title="__('Expired Licenses')" :value="$stats['expired_licenses'] ?? 0" icon="error" iconColor="icon-yellow" />
-            </div>
+            <div class="card-shell-muted flex items-center gap-3 self-start lg:self-auto">
+                <span class="card-icon-container icon-indigo h-11 w-11 shrink-0">
+                    <x-icon name="server" class="h-6 w-6" />
+                </span>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <!-- Recent Activity -->
-                <div class="card-shell overflow-hidden">
-                    <div class="p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                            {{ __('Recent Activity (Last 7 Days)') }}
-                        </h4>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('New Accounts:') }}</span>
-                                <span
-                                    class="font-semibold text-gray-900 dark:text-white">{{ $recentActivity['new_accounts'] ?? 0 }}</span>
-                            </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('Active Sessions:') }}</span>
-                                <span
-                                    class="font-semibold text-gray-900 dark:text-white">{{ $recentActivity['active_sessions'] ?? 0 }}</span>
-                            </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('Login Events:') }}</span>
-                                <span
-                                    class="font-semibold text-gray-900 dark:text-white">{{ $recentActivity['login_events'] ?? 0 }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- System Health -->
-                <div class="card-shell overflow-hidden">
-                    <div class="p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                </path>
-                            </svg>
-                            {{ __('System Health') }}
-                        </h4>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('Unverified Accounts:') }}</span>
-                                <span
-                                    class="font-semibold text-gray-900 dark:text-white">{{ $stats['unverified_accounts'] ?? 0 }}</span>
-                            </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('Total System Users:') }}</span>
-                                <span
-                                    class="font-semibold text-gray-900 dark:text-white">{{ $stats['total_accounts'] ?? 0 }}</span>
-                            </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('Active License Ratio:') }}</span>
-                                <span class="font-semibold text-gray-900 dark:text-white">
-                                    @php
-                                        $totalLicenses = $stats['total_licenses'] ?? 0;
-                                        $activeRatio =
-                                            $totalLicenses > 0
-                                                ? round((($stats['active_licenses'] ?? 0) / $totalLicenses) * 100)
-                                                : 0;
-                                    @endphp
-                                    {{ $activeRatio }}%
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                <div>
+                    <p class="section-kicker">{{ __('Last updated') }}</p>
+                    <p class="dashboard-meta-text text-sm font-medium">{{ now()->format('M d, Y H:i') }}</p>
                 </div>
             </div>
+        </section>
 
-            <!-- Database Status -->
-            <div>
-                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-300" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4">
-                        </path>
-                    </svg>
-                    {{ __('Database System Status') }}
-                </h4>
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Dashboard statistics') }}">
+            <x-stat-card :title="__('Total Accounts')" :value="$stats['total_accounts'] ?? 0" icon="users" iconColor="icon-blue" />
+            <x-stat-card :title="__('Active Licenses')" :value="$stats['active_licenses'] ?? 0" icon="success" iconColor="icon-green" />
+            <x-stat-card :title="__('Suspended Accounts')" :value="$stats['suspended_accounts'] ?? 0" icon="warning" iconColor="icon-red" />
+            <x-stat-card :title="__('Expired Licenses')" :value="$stats['expired_licenses'] ?? 0" icon="error" iconColor="icon-yellow" />
+        </section>
 
-                @if (isset($databaseStatus['error']))
-                    <div
-                        class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span class="text-red-600 dark:text-red-300">{{ $databaseStatus['error'] }}</span>
-                        </div>
+        <section class="grid grid-cols-1 gap-6 xl:grid-cols-2" data-dashboard-panels>
+            <article class="card-shell space-y-6" data-dashboard-card="recent-activity">
+                <header class="flex items-start gap-4">
+                    <span class="card-icon-container icon-blue shrink-0">
+                        <x-icon name="lightning" class="h-6 w-6" />
+                    </span>
+
+                    <div class="space-y-1">
+                        <p class="section-kicker">{{ __('Last 7 days') }}</p>
+                        <h3 class="dashboard-section-title text-lg font-semibold">{{ __('Recent Activity') }}</h3>
                     </div>
-                @endif
+                </header>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Database Info -->
-                    <div class="card-shell overflow-hidden">
-                        <div class="p-6">
-                            <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-300" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4">
-                                    </path>
-                                </svg>
-                                {{ __('Database Info') }}
-                            </h5>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Name:') }}</span>
-                                    <span
-                                        class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['database']['name'] ?? __('Unknown') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Version:') }}</span>
-                                    <span
-                                        class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['database']['version'] ?? __('Unknown') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Size:') }}</span>
-                                    <span
-                                        class="font-semibold text-gray-900 dark:text-white">{{ number_format($databaseStatus['database']['size_mb'] ?? 0, 2) }}
-                                        {{ __('MB') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Connection:') }}</span>
-                                    <span
-                                        class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['database']['connection'] ?? __('Unknown') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Driver:') }}</span>
-                                    <span
-                                        class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['database']['driver'] ?? __('Unknown') }}</span>
-                                </div>
-                            </div>
-                        </div>
+                <dl class="space-y-3">
+                    <div class="card-shell-muted flex items-center justify-between gap-4">
+                        <dt class="dashboard-metric-label text-sm">{{ __('New Accounts') }}</dt>
+                        <dd class="dashboard-stat-number text-lg font-semibold">{{ $recentActivity['new_accounts'] ?? 0 }}</dd>
                     </div>
-
-                    <!-- Connection Pool -->
-                    <div class="card-shell overflow-hidden">
-                        <div class="p-6">
-                            <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-300" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                                {{ __('Connection Pool') }}
-                            </h5>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Max Connections:') }}</span>
-                                    <span
-                                        class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['connections']['max_connections'] ?? 0 }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Threads Connected:') }}</span>
-                                    <span
-                                        class="font-semibold text-blue-600 dark:text-blue-300">{{ $databaseStatus['connections']['threads_connected'] ?? 0 }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Threads Running:') }}</span>
-                                    <span
-                                        class="font-semibold text-green-600 dark:text-green-300">{{ $databaseStatus['connections']['threads_running'] ?? 0 }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Usage:') }}</span>
-                                    <span
-                                        class="font-semibold text-yellow-600 dark:text-yellow-300">{{ $databaseStatus['connections']['usage_percent'] ?? 0 }}%</span>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                        <div class="bg-yellow-500 h-2 rounded-full transition-all duration-300 w-[calc(var(--usage-percent)*1%)]"
-                                            style="--usage-percent: {{ min($databaseStatus['connections']['usage_percent'] ?? 0, 100) }};">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="card-shell-muted flex items-center justify-between gap-4">
+                        <dt class="dashboard-metric-label text-sm">{{ __('Active Sessions') }}</dt>
+                        <dd class="dashboard-stat-number text-lg font-semibold">{{ $recentActivity['active_sessions'] ?? 0 }}</dd>
                     </div>
-
-                    <!-- Queue Jobs -->
-                    <div class="card-shell overflow-hidden">
-                        <div class="p-6">
-                            <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-orange-600 dark:text-orange-300" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                {{ __('Queue Jobs') }}
-                            </h5>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Pending Jobs:') }}</span>
-                                    <span
-                                        class="font-semibold text-blue-600 dark:text-blue-300">{{ $databaseStatus['queues']['pending_jobs'] ?? 0 }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Failed Jobs:') }}</span>
-                                    <span
-                                        class="font-semibold text-red-600 dark:text-red-300">{{ $databaseStatus['queues']['failed_jobs'] ?? 0 }}</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="card-shell-muted flex items-center justify-between gap-4">
+                        <dt class="dashboard-metric-label text-sm">{{ __('Login Events') }}</dt>
+                        <dd class="dashboard-stat-number text-lg font-semibold">{{ $recentActivity['login_events'] ?? 0 }}</dd>
                     </div>
+                </dl>
+            </article>
 
-                    <!-- Uptime & Cache -->
-                    <div class="card-shell overflow-hidden">
-                        <div class="p-6">
-                            <h5 class="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-green-600 dark:text-green-300" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                {{ __('System Status') }}
-                            </h5>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Database Uptime:') }}</span>
-                                    <span
-                                        class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['uptime']['formatted'] ?? __('Unknown') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Cache') }}
-                                        ({{ $databaseStatus['cache']['type'] ?? __('Unknown') }}):</span>
-                                    <span
-                                        class="font-semibold {{ $databaseStatus['cache']['connected'] ? 'text-green-600 dark:text-green-300' : 'text-red-600 dark:text-red-300' }}">
-                                        {{ $databaseStatus['cache']['connected'] ? __('Connected') : __('Disconnected') }}
-                                    </span>
-                                </div>
-                                @if (isset($databaseStatus['cache']['db_size']))
-                                    <div class="flex justify-between items-center py-2">
-                                        <span class="text-gray-600 dark:text-gray-300">{{ __('Cache Keys:') }}</span>
-                                        <span
-                                            class="font-semibold text-gray-900 dark:text-white">{{ $databaseStatus['cache']['db_size'] ?? 0 }}</span>
-                                    </div>
-                                @endif
-                            </div>
+            <article class="card-shell space-y-6" data-dashboard-card="system-health">
+                <header class="flex items-start gap-4">
+                    <span class="card-icon-container icon-purple shrink-0">
+                        <x-icon name="shield" class="h-6 w-6" />
+                    </span>
+
+                    <div class="space-y-1">
+                        <p class="section-kicker">{{ __('System health') }}</p>
+                        <h3 class="dashboard-section-title text-lg font-semibold">{{ __('Operational posture') }}</h3>
+                    </div>
+                </header>
+
+                <dl class="space-y-3">
+                    <div class="card-shell-muted flex items-center justify-between gap-4">
+                        <dt class="dashboard-metric-label text-sm">{{ __('Unverified Accounts') }}</dt>
+                        <dd class="dashboard-stat-number text-lg font-semibold">{{ $stats['unverified_accounts'] ?? 0 }}</dd>
+                    </div>
+                    <div class="card-shell-muted flex items-center justify-between gap-4">
+                        <dt class="dashboard-metric-label text-sm">{{ __('Total System Users') }}</dt>
+                        <dd class="dashboard-stat-number text-lg font-semibold">{{ $stats['total_accounts'] ?? 0 }}</dd>
+                    </div>
+                    <div class="card-shell-muted flex items-center justify-between gap-4">
+                        <dt class="dashboard-metric-label text-sm">{{ __('Active License Ratio') }}</dt>
+                        <dd class="dashboard-stat-number flex items-center gap-2 text-lg font-semibold">
+                            <x-status-badge :status="$activeRatio >= 70 ? 'stable' : ($activeRatio >= 40 ? 'warning' : 'inactive')" :text="$activeRatio.'%'" />
+                        </dd>
+                    </div>
+                </dl>
+            </article>
+        </section>
+
+        <section class="space-y-6" data-dashboard-database>
+            <div class="space-y-2">
+                <p class="section-kicker">{{ __('Infrastructure') }}</p>
+                <h2 class="dashboard-section-title text-xl font-semibold">{{ __('Database system status') }}</h2>
+            </div>
+
+            @if (isset($databaseStatus['error']))
+                <div class="card-shell border-red-200/70 text-red-700 dark:border-red-800 dark:text-red-300" data-dashboard-error>
+                    <div class="flex items-start gap-3">
+                        <span class="card-icon-container icon-red h-11 w-11 shrink-0">
+                            <x-icon name="error" class="h-6 w-6" />
+                        </span>
+
+                        <div class="space-y-1">
+                            <p class="section-kicker">{{ __('Attention') }}</p>
+                            <p class="font-medium">{{ $databaseStatus['error'] }}</p>
                         </div>
                     </div>
                 </div>
+            @endif
+
+            <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                <article class="card-shell space-y-6" data-dashboard-card="database-info">
+                    <header class="flex items-start gap-4">
+                        <span class="card-icon-container icon-blue shrink-0">
+                            <x-icon name="server" class="h-6 w-6" />
+                        </span>
+
+                        <div class="space-y-1">
+                            <p class="section-kicker">{{ __('Database info') }}</p>
+                            <h3 class="dashboard-section-title text-lg font-semibold">{{ __('Connection details') }}</h3>
+                        </div>
+                    </header>
+
+                    <dl class="space-y-3">
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Name') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['database']['name'] ?? __('Unknown') }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Version') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['database']['version'] ?? __('Unknown') }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Size') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ number_format($databaseStatus['database']['size_mb'] ?? 0, 2) }} {{ __('MB') }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Connection') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['database']['connection'] ?? __('Unknown') }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Driver') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['database']['driver'] ?? __('Unknown') }}</dd></div>
+                    </dl>
+                </article>
+
+                <article class="card-shell space-y-6" data-dashboard-card="connection-pool">
+                    <header class="flex items-start gap-4">
+                        <span class="card-icon-container icon-purple shrink-0">
+                            <x-icon name="lightning" class="h-6 w-6" />
+                        </span>
+
+                        <div class="space-y-1">
+                            <p class="section-kicker">{{ __('Connections') }}</p>
+                            <h3 class="dashboard-section-title text-lg font-semibold">{{ __('Connection pool') }}</h3>
+                        </div>
+                    </header>
+
+                    <dl class="space-y-3">
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Max Connections') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['connections']['max_connections'] ?? 0 }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Threads Connected') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['connections']['threads_connected'] ?? 0 }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Threads Running') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['connections']['threads_running'] ?? 0 }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Usage') }}</dt><dd><x-status-badge :status="$connectionUsage > 80 ? 'warning' : 'info'" :text="$connectionUsage.'%'" /></dd></div>
+                    </dl>
+
+                    <div class="space-y-2">
+                        <div class="dashboard-metric-label flex items-center justify-between text-xs uppercase tracking-wide">
+                            <span>{{ __('Utilization') }}</span>
+                            <span>{{ $connectionUsage }}%</span>
+                        </div>
+                        <div class="app-shell-chip h-2 overflow-hidden rounded-full p-0">
+                            <div class="h-full w-[var(--usage-width)] rounded-full bg-yellow-500 transition-all duration-300"
+                                style="--usage-width: {{ $connectionUsage }}%"></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card-shell space-y-6" data-dashboard-card="queue-jobs">
+                    <header class="flex items-start gap-4">
+                        <span class="card-icon-container icon-orange shrink-0">
+                            <x-icon name="document" class="h-6 w-6" />
+                        </span>
+
+                        <div class="space-y-1">
+                            <p class="section-kicker">{{ __('Queues') }}</p>
+                            <h3 class="dashboard-section-title text-lg font-semibold">{{ __('Queue jobs') }}</h3>
+                        </div>
+                    </header>
+
+                    <dl class="space-y-3">
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Pending Jobs') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['queues']['pending_jobs'] ?? 0 }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Failed Jobs') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['queues']['failed_jobs'] ?? 0 }}</dd></div>
+                    </dl>
+                </article>
+
+                <article class="card-shell space-y-6" data-dashboard-card="system-status">
+                    <header class="flex items-start gap-4">
+                        <span class="card-icon-container icon-green shrink-0">
+                            <x-icon name="success" class="h-6 w-6" />
+                        </span>
+
+                        <div class="space-y-1">
+                            <p class="section-kicker">{{ __('Availability') }}</p>
+                            <h3 class="dashboard-section-title text-lg font-semibold">{{ __('System status') }}</h3>
+                        </div>
+                    </header>
+
+                    <dl class="space-y-3">
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Database Uptime') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['uptime']['formatted'] ?? __('Unknown') }}</dd></div>
+                        <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Cache').' ('.($databaseStatus['cache']['type'] ?? __('Unknown')).')' }}</dt><dd><x-status-badge :status="$cacheConnected ? 'active' : 'inactive'" :text="$cacheConnected ? __('Connected') : __('Disconnected')" /></dd></div>
+                        @if (isset($databaseStatus['cache']['db_size']))
+                            <div class="card-shell-muted flex items-center justify-between gap-4"><dt class="dashboard-metric-label text-sm">{{ __('Cache Keys') }}</dt><dd class="dashboard-stat-number text-sm font-semibold">{{ $databaseStatus['cache']['db_size'] ?? 0 }}</dd></div>
+                        @endif
+                    </dl>
+                </article>
             </div>
-        </div>
+        </section>
     </div>
 </x-app-sidebar-layout>

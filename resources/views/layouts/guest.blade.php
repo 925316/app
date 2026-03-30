@@ -10,7 +10,7 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:500,600,700|ibm-plex-sans:400,500,600,700&display=swap" rel="stylesheet" />
 
     <!-- Early theme detection to prevent FOUC -->
     @include('components.theme-init-script')
@@ -19,8 +19,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="app-shell-page font-sans antialiased min-h-screen transition-colors duration-300">
-    {{ $slot }}
+<body class="app-shell-page shell-cinematic shell-cinematic--guest font-sans antialiased min-h-screen transition-colors duration-300"
+    data-shell-theme="cinematic" data-shell-variant="guest">
+    <a href="#guest-content" class="shell-cinematic__skip-link">
+        {{ __('Skip to guest content') }}
+    </a>
+
+    <main id="guest-content" class="guest-shell" aria-label="{{ __('Guest content') }}">
+        <div class="guest-shell__frame">
+            {{ $slot }}
+        </div>
+    </main>
 </body>
 
 </html>

@@ -2,9 +2,9 @@
     <div class="max-w-xl">
         @if ($title)
             <header>
-                <h2 class="text-lg font-medium text-gray-900 dark:text-white"> {{ $title }} </h2>
+                <h2 class="card-form-title text-lg font-medium"> {{ $title }} </h2>
                 @if ($description)
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300"> {{ $description }} </p>
+                    <p class="card-form-copy mt-1 text-sm"> {{ $description }} </p>
                 @endif
             </header>
         @endif {{ $slot }}

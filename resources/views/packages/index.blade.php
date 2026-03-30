@@ -3,8 +3,7 @@
         {{ __('Software Packages') }}
     </x-slot>
 
-    <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="space-y-6" data-page="packages-index">
             <!-- Statistics Cards -->
             @php
                 $showDevStats = Auth::user()->hasPrivilege(6) || Auth::user()->hasPrivilege(7);
@@ -22,7 +21,7 @@
             <!-- Latest Stable Release - For All Users -->
             <div class="card-shell overflow-hidden mb-6">
                 <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">{{ __('Latest Stable Release') }}</h3>
+                    <h3 class="card-heading text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">{{ __('Latest Stable Release') }}</h3>
 
                     @if ($stats['latest_stable'] ?? null)
                         <div class="space-y-4">
@@ -115,7 +114,7 @@
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <!-- Header with actions -->
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('All Package Releases') }}</h3>
+                            <h3 class="card-heading text-lg font-medium text-gray-900 dark:text-white">{{ __('All Package Releases') }}</h3>
 
                             @if ($isAdmin ?? false)
                                 <div class="flex flex-wrap gap-2">
@@ -244,6 +243,5 @@
                     </div>
                 </div>
             @endif
-        </div>
     </div>
 </x-app-sidebar-layout>

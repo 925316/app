@@ -3,32 +3,76 @@
 use App\Models\Account;
 use App\Models\AccountDevice;
 use App\Models\UsageStatistic;
+use Illuminate\Support\Facades\Blade;
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\get;
 
 it('unauthenticated user is redirected to login from dashboard', function () {
-    $this->get(route('dashboard'))
+    get(route('dashboard'))
         ->assertRedirect(route('login'));
 });
 
 it('admin can access dashboard', function () {
     $admin = createAdmin();
 
-    $this->actingAs($admin)
+    actingAs($admin)
         ->get(route('dashboard'))
-        ->assertSuccessful();
+        ->assertSuccessful()
+        ->assertSee('data-app-shell-header-copy', false)
+        ->assertSee('aria-label="Primary navigation"', false)
+        ->assertSee('aria-label="Dashboard"', false)
+        ->assertSee('data-page="dashboard-admin"', false)
+        ->assertSee('data-dashboard-summary', false)
+        ->assertSee('id="app-main-content"', false);
+});
+
+it('sidebar nav link keeps an accessible name when the visible label is toggled', function () {
+    $html = Blade::render('<x-sidebar-nav-link href="/dashboard" :active="true" icon="home">Dashboard</x-sidebar-nav-link>');
+
+    expect($html)
+        ->toContain('aria-current="page"')
+        ->toContain('aria-label="Dashboard"')
+        ->toContain('aria-hidden="true"')
+        ->toContain('x-show="mobileSidebarOpen || $store.sidebar.open"');
+});
+
+it('sidebar account section renders a bottom footer with profile row, logout icon, and theme row', function () {
+    $account = createAdmin();
+
+    actingAs($account);
+
+    $html = view('layouts.sidebar')->render();
+
+    expect($html)
+        ->toContain('data-sidebar-account')
+        ->toContain('data-sidebar-profile-row')
+        ->toContain('data-sidebar-theme-row')
+        ->toContain('data-sidebar-language-row')
+        ->toContain('sidebar-account-icon')
+        ->toContain('sidebar-locale-select')
+        ->toContain('name="locale"')
+        ->toContain('aria-label="Log out"')
+        ->toContain('sidebar-account-collapsed')
+        ->toContain('sidebar-account-toggle')
+        ->toContain('aria-pressed=')
+        ->not->toContain('sidebar-utility-link sidebar-account-entry')
+        ->not->toContain('>Log Out<');
 });
 
 it('user with license can access dashboard', function () {
     $user = createUserWithLicense(1);
 
-    $this->actingAs($user)
+    actingAs($user)
         ->get(route('dashboard'))
         ->assertSuccessful();
 });
 
 it('user without license can access dashboard', function () {
+    /** @var Account $user */
     $user = Account::factory()->create();
 
-    $this->actingAs($user)
+    actingAs($user)
         ->get(route('dashboard'))
         ->assertSuccessful();
 });
@@ -36,20 +80,23 @@ it('user without license can access dashboard', function () {
 it('admin sees the admin panel view', function () {
     $admin = createAdmin();
 
-    $this->actingAs($admin)
+    actingAs($admin)
         ->get(route('dashboard'))
         ->assertSuccessful()
         ->assertViewIs('dashboard.admin-panel')
+        ->assertSee('data-dashboard-database', false)
         ->assertViewHasAll(['stats', 'recentActivity', 'databaseStatus']);
 });
 
 it('regular user sees the user panel view', function () {
     $user = createUserWithLicense(1);
 
-    $this->actingAs($user)
+    actingAs($user)
         ->get(route('dashboard'))
         ->assertSuccessful()
         ->assertViewIs('dashboard.user-panel')
+        ->assertSee('data-page="dashboard-user"', false)
+        ->assertSee('data-license-state="active"', false)
         ->assertViewHasAll(['userStats', 'activeLicense', 'boundDevices', 'usageTimeFormatted']);
 });
 
@@ -61,7 +108,7 @@ it('expired admin level license user sees user panel', function () {
     expect($staffLicense)->not->toBeNull();
     $staffLicense?->update(['expires_at' => now()->subDay()]);
 
-    $this->actingAs($user)
+    actingAs($user)
         ->get(route('dashboard'))
         ->assertSuccessful()
         ->assertViewIs('dashboard.user-panel');
@@ -83,7 +130,7 @@ it('user dashboard counts only currently bound devices', function () {
         'unbound_at' => now()->subDay(),
     ]);
 
-    $response = $this->actingAs($user)
+    $response = actingAs($user)
         ->get(route('dashboard'));
 
     $response->assertSuccessful()->assertViewIs('dashboard.user-panel');
@@ -96,7 +143,7 @@ it('user dashboard falls back to 0h when usage statistics are empty', function (
 
     UsageStatistic::query()->delete();
 
-    $response = $this->actingAs($user)
+    $response = actingAs($user)
         ->get(route('dashboard'));
 
     $response->assertSuccessful()->assertViewIs('dashboard.user-panel');

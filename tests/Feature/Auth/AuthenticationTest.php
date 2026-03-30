@@ -1,29 +1,78 @@
 <?php
 
 use App\Models\Account;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
 
 test('login screen can be rendered', function () {
-    $response = $this->get('/login');
+    $response = get('/login');
 
-    $response->assertStatus(200);
+    $response->assertOk()
+        ->assertSee('id="guest-content"', false)
+        ->assertSee('data-page="auth-login"', false)
+        ->assertSee('data-auth-form="login"', false)
+        ->assertSee('aria-labelledby="auth-panel-title"', false);
+});
+
+test('input with icon forwards caller attributes to the input while preserving base classes', function () {
+    $html = Blade::render(<<<'BLADE'
+        <x-input-with-icon
+            id="email"
+            name="email"
+            type="email"
+            value="0"
+            placeholder=""
+            required
+            autofocus
+            autocomplete="username"
+            icon="user"
+            class="ring-2"
+            disabled
+            readonly
+            maxlength="32"
+            aria-describedby="email-help"
+            data-track="email"
+        />
+    BLADE);
+
+    expect($html)
+        ->toContain('id="email"')
+        ->toContain('name="email"')
+        ->toContain('type="email"')
+        ->toContain('value="0"')
+        ->toContain('placeholder=""')
+        ->toContain('autocomplete="username"')
+        ->toContain('maxlength="32"')
+        ->toContain('aria-describedby="email-help"')
+        ->toContain('data-track="email"')
+        ->toContain('class="form-input input-with-icon block w-full py-3 pl-10 pr-3 ring-2"')
+        ->toContain('disabled')
+        ->toContain('readonly')
+        ->toContain('required')
+        ->toContain('autofocus');
 });
 
 test('users can authenticate using the login screen', function () {
     $user = Account::factory()->create();
 
-    $response = $this->post('/login', [
+    $response = post('/login', [
         'email' => $user->email,
         'password' => 'password',
     ]);
 
-    $this->assertAuthenticated();
+    expect(Auth::check())->toBeTrue();
     $response->assertRedirect(route('dashboard', absolute: false));
 });
 
 test('authenticated users are redirected away from login screen', function () {
+    /** @var Account $user */
     $user = Account::factory()->create();
 
-    $this->actingAs($user)
+    actingAs($user)
         ->get('/login')
         ->assertRedirect(route('dashboard', absolute: false));
 });
@@ -31,51 +80,51 @@ test('authenticated users are redirected away from login screen', function () {
 test('users can not authenticate with invalid password', function () {
     $user = Account::factory()->create();
 
-    $this->post('/login', [
+    post('/login', [
         'email' => $user->email,
         'password' => 'wrong-password',
     ]);
 
-    $this->assertGuest();
+    expect(Auth::check())->toBeFalse();
 });
 
 test('login is rate limited after too many failed attempts', function () {
     $user = Account::factory()->create();
 
     for ($i = 0; $i < 5; $i++) {
-        $this->post('/login', [
+        post('/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ])->assertSessionHasErrors('email');
     }
 
-    $this->post('/login', [
+    post('/login', [
         'email' => $user->email,
         'password' => 'wrong-password',
     ])->assertSessionHasErrors('email');
 
-    $this->assertGuest();
+    expect(Auth::check())->toBeFalse();
 });
 
 test('successful login clears previous rate limiting attempts', function () {
     $user = Account::factory()->create();
 
     for ($i = 0; $i < 3; $i++) {
-        $this->post('/login', [
+        post('/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ])->assertSessionHasErrors('email');
     }
 
-    $this->post('/login', [
+    post('/login', [
         'email' => $user->email,
         'password' => 'password',
     ])->assertRedirect(route('dashboard', absolute: false));
 
-    $this->post('/logout')->assertRedirect('/');
+    post('/logout')->assertRedirect('/');
 
     for ($i = 0; $i < 3; $i++) {
-        $response = $this->post('/login', [
+        $response = post('/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
@@ -87,10 +136,11 @@ test('successful login clears previous rate limiting attempts', function () {
 });
 
 test('users can logout', function () {
+    /** @var Account $user */
     $user = Account::factory()->create();
 
-    $response = $this->actingAs($user)->post('/logout');
+    $response = actingAs($user)->post('/logout');
 
-    $this->assertGuest();
+    expect(Auth::check())->toBeFalse();
     $response->assertRedirect('/');
 });

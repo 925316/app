@@ -13,9 +13,7 @@
                         {{ __('Set up user credentials and optionally pre-verify email status for onboarding.') }}
                     </p>
                 </div>
-                <a href="{{ route('accounts.index') }}" class="btn btn-secondary btn-sm">
-                    {{ __('Back to Accounts') }}
-                </a>
+                <x-secondary-button tag="a" href="{{ route('accounts.index') }}">{{ __('Back to Accounts') }}</x-secondary-button>
             </div>
 
             <form method="POST" action="{{ route('accounts.store') }}" class="space-y-6">
@@ -67,12 +65,8 @@
             </div>
 
                 <div class="flex justify-end gap-3 border-t border-cool-200/70 pt-6 dark:border-cool-700/70">
-                    <a href="{{ route('accounts.index') }}" class="btn btn-secondary btn-sm">
-                        {{ __('Cancel') }}
-                    </a>
-                    <button type="submit" class="btn btn-blue btn-sm">
-                        {{ __('Create Account') }}
-                    </button>
+                    <x-secondary-button tag="a" href="{{ route('accounts.index') }}">{{ __('Cancel') }}</x-secondary-button>
+                    <x-primary-button type="submit">{{ __('Create Account') }}</x-primary-button>
                 </div>
             </form>
         </div>

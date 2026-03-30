@@ -11,32 +11,26 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
         <!-- Profile Header Card -->
         <div class="card-shell">
             <div class="flex items-center gap-6">
-                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
+                <div class="user-avatar h-20 w-20 flex-shrink-0 text-2xl shadow-lg">
                     <span class="text-2xl font-bold text-white">{{ $initials }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white truncate">{{ $user->username }}</h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 truncate">{{ $user->email }}</p>
+                    <h2 class="app-shell-heading truncate text-xl font-semibold">{{ $user->username }}</h2>
+                    <p class="app-shell-body-copy truncate text-sm">{{ $user->email }}</p>
                     <div class="mt-2 flex items-center gap-3">
                         @if($user->hasVerifiedEmail())
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                {{ __('Verified') }}
-                            </span>
+                            <x-status-badge status="active" :text="__('Verified')" />
                         @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                                {{ __('Unverified') }}
-                            </span>
+                            <x-status-badge status="warning" :text="__('Unverified')" />
                         @endif
-                        <span class="text-xs text-gray-400 dark:text-gray-500">
+                        <span class="app-shell-body-copy text-xs">
                             {{ __('User ID') }}: #{{ $user->id }}
                         </span>
                     </div>
                 </div>
-                <div class="text-right text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
+                <div class="app-shell-body-copy flex-shrink-0 text-right text-sm">
                     <div>{{ __('Joined') }}</div>
-                    <div class="font-medium text-gray-700 dark:text-gray-300">{{ $user->created_at->format('M d, Y') }}</div>
+                    <div class="app-shell-heading font-medium">{{ $user->created_at->format('M d, Y') }}</div>
                 </div>
             </div>
         </div>
@@ -44,7 +38,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
         @if($isAdmin)
         <!-- Profile Information (Admin Only) -->
         <div class="card-shell">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ __('Profile Information') }}</h3>
+            <h3 class="card-form-title mb-4 text-lg font-semibold">{{ __('Profile Information') }}</h3>
             <form method="post" action="{{ route('profile.update') }}" class="space-y-6">
                 @csrf
                 @method('patch')
@@ -64,7 +58,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
                         <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
                         @if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail())
-                            <p class="text-sm mt-2 text-gray-800 dark:text-gray-200">
+                            <p class="card-inline-copy mt-2 text-sm">
                                 {{ __('Your email address is unverified.') }}
                             </p>
                         @endif
@@ -80,7 +74,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
                             $updatedLocaleLabel = is_string($updatedLocale) ? ($supportedLocales[$updatedLocale] ?? strtoupper($updatedLocale)) : null;
                         @endphp
                         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                            class="text-sm text-gray-600 dark:text-gray-300">
+                            class="form-note text-sm">
                             {{ __('Saved.') }}
                             @if ($updatedLocaleLabel)
                                 {{ __('Current language:') }} {{ $updatedLocaleLabel }}
@@ -93,8 +87,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
             @if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail())
                 <form id="send-verification" method="post" action="{{ route('verification.send') }}" class="mt-3 inline">
                     @csrf
-                    <button type="submit"
-                        class="underline text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                    <button type="submit" class="form-link text-sm underline">
                         {{ __('Resend verification email') }}
                     </button>
                 </form>
@@ -104,8 +97,8 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
 
         <!-- Language Preferences -->
         <div class="card-shell">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ __('Language Preferences') }}</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            <h3 class="card-form-title mb-2 text-lg font-semibold">{{ __('Language Preferences') }}</h3>
+            <p class="card-form-copy mb-6 text-sm">
                 {{ __('Choose your preferred language. If you have not selected one, we will use your browser language.') }}
             </p>
 
@@ -139,7 +132,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
                             $updatedLocaleLabel = is_string($updatedLocale) ? ($supportedLocales[$updatedLocale] ?? strtoupper($updatedLocale)) : null;
                         @endphp
                         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                            class="text-sm text-gray-600 dark:text-gray-300">
+                            class="form-note text-sm">
                             {{ __('Saved.') }}
                             @if ($updatedLocaleLabel)
                                 {{ __('Current language:') }} {{ $updatedLocaleLabel }}
@@ -152,8 +145,8 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
 
         <!-- Update Password -->
         <div class="card-shell">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ __('Update Password') }}</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ __('Ensure your account is using a long, random password to stay secure.') }}</p>
+            <h3 class="card-form-title mb-2 text-lg font-semibold">{{ __('Update Password') }}</h3>
+            <p class="card-form-copy mb-6 text-sm">{{ __('Ensure your account is using a long, random password to stay secure.') }}</p>
             
             <form method="post" action="{{ route('password.update') }}" class="space-y-6">
                 @csrf
@@ -189,7 +182,7 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
 
                     @if (session('status') === 'password-updated')
                         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                            class="text-sm text-gray-600 dark:text-gray-300">{{ __('Saved.') }}</p>
+                            class="form-note text-sm">{{ __('Saved.') }}</p>
                     @endif
                 </div>
             </form>
@@ -197,8 +190,8 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
 
         <!-- Delete Account -->
         <div class="card-shell">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ __('Delete Account') }}</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            <h3 class="card-form-title mb-2 text-lg font-semibold">{{ __('Delete Account') }}</h3>
+            <p class="card-form-copy mb-6 text-sm">
                 {{ __('Once your account is deleted, all of its resources and data will be permanently deleted.') }}
             </p>
             
@@ -210,11 +203,11 @@ $initials = collect(explode(' ', $user->username ?? 'U'))->take(2)->map(fn($word
                     @csrf
                     @method('delete')
 
-                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <h2 class="card-modal-title text-lg font-medium">
                         {{ __('Are you sure you want to delete your account?') }}
                     </h2>
 
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                    <p class="card-modal-copy mt-1 text-sm">
                         {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm.') }}
                     </p>
 

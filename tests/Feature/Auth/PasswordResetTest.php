@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Notification;
 test('reset password link screen can be rendered', function () {
     $response = $this->get('/forgot-password');
 
-    $response->assertStatus(200);
+    $response->assertOk()
+        ->assertSee('data-page="auth-forgot-password"', false)
+        ->assertSee('data-auth-form="forgot-password"', false);
 });
 
 test('authenticated users are redirected away from forgot password screen', function () {
@@ -39,7 +41,9 @@ test('reset password screen can be rendered', function () {
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
         $response = $this->get('/reset-password/'.$notification->token);
 
-        $response->assertStatus(200);
+        $response->assertOk()
+            ->assertSee('data-page="auth-reset-password"', false)
+            ->assertSee('data-auth-form="reset-password"', false);
 
         return true;
     });

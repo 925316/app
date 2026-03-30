@@ -1,12 +1,10 @@
 <x-app-sidebar-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Device Management') }}
-        </h2>
+        {{ __('Device Management') }}
     </x-slot>
 
-    <div class="py-7">
-            <!-- Statistics Cards -->
+    <div class="space-y-6" data-page="devices-admin-index">
+        <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <x-stat-card :title="__('Total Devices')" :value="$totalDevices" icon="desktop" iconColor="icon-blue" />
                 <x-stat-card :title="__('Bound Devices')" :value="$boundDevices" icon="success" iconColor="icon-green" />
@@ -14,11 +12,10 @@
                 <x-stat-card :title="__('Never Bound')" :value="$neverBoundDevices" icon="question" iconColor="icon-yellow" />
             </div>
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <!-- Filters Section -->
-                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <h4 class="text-sm font-medium mb-3">{{ __('Filters') }}</h4>
+        <div class="card-shell">
+                    {{-- Filters Section --}}
+                    <div class="card-shell-muted mb-6">
+                        <p class="section-kicker mb-3">{{ __('Filters') }}</p>
                         <form method="GET" action="{{ route('devices.index') }}" data-clean-form="true"
                             class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                             <!-- Search -->
@@ -238,7 +235,6 @@
                     <div class="mt-4">
                         <x-pagination :paginator="$devices" />
                     </div>
-                </div>
         </div>
     </div>
 

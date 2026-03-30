@@ -4,22 +4,27 @@ use App\Enums\EventType;
 use App\Models\Account;
 use App\Models\EventLog;
 
-beforeEach(function () {
-    $this->admin = createAdmin();
-});
+use function Pest\Laravel\actingAs;
 
 // --- Index ---
 
 it('admin can view logs index', function () {
-    $this->actingAs($this->admin)
+    $admin = createAdmin();
+
+    actingAs($admin)
         ->get(route('logs.index'))
         ->assertSuccessful()
+        ->assertSee('data-page="logs-index"', false)
+        ->assertSee('data-filter-box', false)
+        ->assertSee('data-clear-logs-form', false)
         ->assertViewIs('logs.index')
         ->assertViewHasAll(['logs', 'statistics', 'eventTypes', 'eventLevels', 'filters']);
 });
 
 it('logs index shows statistics with correct keys', function () {
-    $this->actingAs($this->admin)
+    $admin = createAdmin();
+
+    actingAs($admin)
         ->get(route('logs.index'))
         ->assertViewHas('statistics', fn ($s) => array_key_exists('total', $s)
             && array_key_exists('info', $s)
@@ -29,23 +34,28 @@ it('logs index shows statistics with correct keys', function () {
 });
 
 it('admin can filter logs by event type', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['event_type' => EventType::LICENSE_ACTIVATED->value]);
     EventLog::factory()->create(['event_type' => EventType::LICENSE_REVOKED->value]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', ['event_type' => EventType::LICENSE_ACTIVATED->value]));
 
-    $response->assertSuccessful();
+    $response->assertSuccessful()
+        ->assertSee('data-active-filters', false);
     $logs = $response->viewData('logs');
     expect($logs->total())->toBe(1);
     expect($logs->first()->event_type)->toBe(EventType::LICENSE_ACTIVATED->value);
 });
 
 it('admin can filter logs by event level', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['event_level' => EventLog::LEVEL_INFO]);
     EventLog::factory()->create(['event_level' => EventLog::LEVEL_ERROR]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', ['event_level' => EventLog::LEVEL_ERROR]));
 
     $response->assertSuccessful();
@@ -54,11 +64,13 @@ it('admin can filter logs by event level', function () {
 });
 
 it('admin can filter logs by account', function () {
+    $admin = createAdmin();
+
     $account = Account::factory()->create();
     EventLog::factory()->create(['account_id' => $account->id]);
     EventLog::factory()->create(['account_id' => null]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', ['account_id' => $account->id]));
 
     $response->assertSuccessful();
@@ -67,10 +79,12 @@ it('admin can filter logs by account', function () {
 });
 
 it('admin can filter logs by date range', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(5)]);
     EventLog::factory()->create(['created_at' => now()->subDays(60)]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', [
             'start_date' => now()->subDays(10)->format('Y-m-d'),
             'end_date' => now()->format('Y-m-d'),
@@ -82,10 +96,12 @@ it('admin can filter logs by date range', function () {
 });
 
 it('end date filter includes logs created on that date', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(2)->setTime(23, 0, 0)]);
     EventLog::factory()->create(['created_at' => now()->subDays(3)->setTime(23, 59, 59)]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', [
             'start_date' => now()->subDays(3)->format('Y-m-d'),
             'end_date' => now()->subDays(2)->format('Y-m-d'),
@@ -97,10 +113,12 @@ it('end date filter includes logs created on that date', function () {
 });
 
 it('inverted date range returns safely with no matches', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(2)]);
     EventLog::factory()->create(['created_at' => now()->subDays(6)]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', [
             'start_date' => now()->format('Y-m-d'),
             'end_date' => now()->subDays(10)->format('Y-m-d'),
@@ -112,10 +130,12 @@ it('inverted date range returns safely with no matches', function () {
 });
 
 it('malformed event level filter does not crash index', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['event_level' => EventLog::LEVEL_INFO]);
     EventLog::factory()->create(['event_level' => EventLog::LEVEL_WARN]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', ['event_level' => 'not-an-int']));
 
     $response->assertSuccessful()
@@ -123,9 +143,11 @@ it('malformed event level filter does not crash index', function () {
 });
 
 it('non numeric account id filter is handled safely', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['account_id' => null]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', ['account_id' => 'abc']));
 
     $response->assertSuccessful()
@@ -133,10 +155,12 @@ it('non numeric account id filter is handled safely', function () {
 });
 
 it('admin can search logs by ip address', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['ip_address' => '10.0.0.1']);
     EventLog::factory()->create(['ip_address' => '192.168.1.1']);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', ['search' => '10.0.0.1']));
 
     $response->assertSuccessful();
@@ -144,10 +168,12 @@ it('admin can search logs by ip address', function () {
 });
 
 it('admin can search logs by account username', function () {
+    $admin = createAdmin();
+
     $user = Account::factory()->create(['username' => 'findableuser']);
     EventLog::factory()->create(['account_id' => $user->id]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', ['search' => 'findableuser']));
 
     $response->assertSuccessful();
@@ -156,6 +182,8 @@ it('admin can search logs by account username', function () {
 });
 
 it('admin can search logs by event type and account email', function () {
+    $admin = createAdmin();
+
     $account = Account::factory()->create(['email' => 'log-search@example.com']);
 
     EventLog::factory()->create([
@@ -167,18 +195,20 @@ it('admin can search logs by event type and account email', function () {
         'event_type' => EventType::LICENSE_REVOKED->value,
     ]);
 
-    $byType = $this->actingAs($this->admin)
+    $byType = actingAs($admin)
         ->get(route('logs.index', ['search' => EventType::ACCOUNT_LOGIN->value]));
     $byType->assertSuccessful();
     expect($byType->viewData('logs')->total())->toBeGreaterThanOrEqual(1);
 
-    $byEmail = $this->actingAs($this->admin)
+    $byEmail = actingAs($admin)
         ->get(route('logs.index', ['search' => 'log-search@example.com']));
     $byEmail->assertSuccessful();
     expect($byEmail->viewData('logs')->total())->toBeGreaterThanOrEqual(1);
 });
 
 it('logs pagination preserves applied filters', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->count(30)->create([
         'event_type' => EventType::ACCOUNT_LOGIN->value,
     ]);
@@ -187,7 +217,7 @@ it('logs pagination preserves applied filters', function () {
         'event_type' => EventType::LICENSE_REVOKED->value,
     ]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('logs.index', [
             'event_type' => EventType::ACCOUNT_LOGIN->value,
         ]));
@@ -201,9 +231,11 @@ it('logs pagination preserves applied filters', function () {
 // --- Show ---
 
 it('admin can view log details', function () {
+    $admin = createAdmin();
+
     $log = EventLog::factory()->create(['event_type' => EventType::LICENSE_ACTIVATED->value]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->get(route('logs.show', $log))
         ->assertSuccessful()
         ->assertViewIs('logs.show')
@@ -213,10 +245,12 @@ it('admin can view log details', function () {
 // --- Clear ---
 
 it('admin can clear old logs', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(40)]);
     EventLog::factory()->create(['created_at' => now()->subDays(10)]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->post(route('logs.clear'), ['days' => 30])
         ->assertRedirect()
         ->assertSessionHas('success');
@@ -226,10 +260,12 @@ it('admin can clear old logs', function () {
 });
 
 it('clear logs validates days field is required', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(40)]);
     EventLog::factory()->create(['created_at' => now()->subDays(10)]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->post(route('logs.clear'), [])
         ->assertSessionHasErrors('days');
 
@@ -237,9 +273,11 @@ it('clear logs validates days field is required', function () {
 });
 
 it('clear logs validates days minimum of 1', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(40)]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->post(route('logs.clear'), ['days' => 0])
         ->assertSessionHasErrors('days');
 
@@ -247,9 +285,11 @@ it('clear logs validates days minimum of 1', function () {
 });
 
 it('clear logs validates days maximum of 365', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(40)]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->post(route('logs.clear'), ['days' => 400])
         ->assertSessionHasErrors('days');
 
@@ -257,10 +297,12 @@ it('clear logs validates days maximum of 365', function () {
 });
 
 it('clear logs validates days must be integer and keeps data intact', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(40)]);
     EventLog::factory()->create(['created_at' => now()->subDays(5)]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->post(route('logs.clear'), ['days' => 'thirty'])
         ->assertSessionHasErrors('days');
 
@@ -268,13 +310,15 @@ it('clear logs validates days must be integer and keeps data intact', function (
 });
 
 it('clear logs deletes entries exactly on the cutoff boundary', function () {
+    $admin = createAdmin();
+
     $fixedNow = now()->startOfSecond();
     \Illuminate\Support\Carbon::setTestNow($fixedNow);
 
     EventLog::factory()->create(['created_at' => $fixedNow->copy()->subDays(30)]);
     EventLog::factory()->create(['created_at' => $fixedNow->copy()->subDays(29)]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->post(route('logs.clear'), ['days' => 30])
         ->assertRedirect()
         ->assertSessionHas('success');
@@ -285,17 +329,19 @@ it('clear logs deletes entries exactly on the cutoff boundary', function () {
 });
 
 it('clear logs accepts boundary values one and three hundred sixty five', function () {
+    $admin = createAdmin();
+
     EventLog::factory()->create(['created_at' => now()->subDays(2)]);
     EventLog::factory()->create(['created_at' => now()->subDays(370)]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->post(route('logs.clear'), ['days' => 1])
         ->assertRedirect()
         ->assertSessionHas('success');
 
     EventLog::factory()->create(['created_at' => now()->subDays(370)]);
 
-    $this->actingAs($this->admin)
+    actingAs($admin)
         ->post(route('logs.clear'), ['days' => 365])
         ->assertRedirect()
         ->assertSessionHas('success');

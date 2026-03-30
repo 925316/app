@@ -68,7 +68,7 @@ class ProfileController extends Controller
 
         $request->session()->put($sessionKey, $locale);
 
-        return Redirect::route('profile.edit')
+        return Redirect::back()
             ->with('status', 'locale-updated')
             ->with('locale-updated-value', $locale)
             ->withCookie(

@@ -7,7 +7,9 @@ test('confirm password screen can be rendered', function () {
 
     $response = $this->actingAs($user)->get('/confirm-password');
 
-    $response->assertStatus(200);
+    $response->assertOk()
+        ->assertSee('data-page="auth-confirm-password"', false)
+        ->assertSee('data-auth-form="confirm-password"', false);
 });
 
 test('guests are redirected from password confirmation routes', function () {

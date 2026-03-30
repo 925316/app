@@ -1,35 +1,28 @@
 <x-app-sidebar-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Package Details') }}
-        </h2>
+        {{ __('Package Details') }}
     </x-slot>
 
     @php
         $deletePackageReleaseConfirmation = __('Are you sure you want to delete this package release? This action cannot be undone.');
     @endphp
 
-    <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="card-shell overflow-hidden">
+    <div class="space-y-6" data-page="packages-show">
+        <div class="card-shell overflow-hidden">
                 <div class="p-6 text-gray-900 dark:text-gray-100 space-y-6">
                     <!-- Package Header -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <p class="section-kicker">{{ __('Release Snapshot') }}</p>
                                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('Package:') }} {{ $release->version }}</h3>
-                                <div class="mt-2 flex items-center gap-4">
-                                    <span
-                                        class="px-3 py-1 rounded-full text-sm font-medium
-                                        {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' }}">
-                                        {{ ucfirst($release->release_channel) }} {{ __('Release') }}
-                                    </span>
+                                <div class="mt-2 flex items-center gap-2">
+                                    <x-status-badge :status="$release->release_channel === 'stable' ? 'active' : 'info'" :text="ucfirst($release->release_channel) . ' ' . __('Release')" />
                                 </div>
                             </div>
 
                             <div class="flex gap-2">
                                 @if ($isAdmin ?? false)
-                                    <a href="{{ route('packages.manage') }}" class="btn btn-purple">
+                                    <a href="{{ route('packages.manage') }}" class="btn btn-primary">
                                         {{ __('Manage Packages') }}
                                     </a>
                                 @endif
@@ -135,7 +128,7 @@
                         <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Download') }}</h4>
                         <div class="flex flex-col sm:flex-row gap-3">
                             @if ($canDownload ?? false && $release->id)
-                                <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="btn btn-green text-center">
+                                <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="btn btn-primary text-center">
                                     {{ __('Download Package') }}
                                 </a>
                             @else
@@ -145,7 +138,7 @@
                             @endif
 
                             @if ($isAdmin ?? false)
-                                <button onclick="showChangelogModal()" class="btn btn-indigo">
+                                <button onclick="showChangelogModal()" class="btn btn-primary">
                                     {{ __('Edit Changelog') }}
                                 </button>
                             @endif
@@ -189,7 +182,7 @@
                         <button type="button" onclick="hideChangelogModal()" class="btn btn-secondary">
                             {{ __('Cancel') }}
                         </button>
-                        <button type="submit" class="btn btn-indigo">
+                        <button type="submit" class="btn btn-primary">
                             {{ __('Update Changelog') }}
                         </button>
                     </div>

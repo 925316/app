@@ -5,22 +5,37 @@ use App\Enums\LicenseStatus;
 use App\Models\Account;
 use App\Models\License;
 
-beforeEach(function () {
-    $this->admin = createAdmin();
-});
+use function Pest\Laravel\actingAs;
 
 // --- Basic Access ---
 
 it('admin can view accounts index', function () {
-    $this->actingAs($this->admin)
+    $admin = createAdmin();
+
+    actingAs($admin)
         ->get(route('accounts.index'))
         ->assertSuccessful()
+        ->assertSee('role="search"', false)
+        ->assertSee('aria-label="Accounts table"', false)
+        ->assertSee('data-page="accounts-index"', false)
+        ->assertSee('data-accounts-panel', false)
         ->assertViewIs('accounts.index')
         ->assertViewHasAll(['accounts', 'statistics', 'statusOptions', 'privilegeOptions', 'currentFilters']);
 });
 
+it('accounts index surfaces active filter chips with stable markers', function () {
+    $admin = createAdmin();
+
+    actingAs($admin)
+        ->get(route('accounts.index', ['status' => 'active', 'search' => 'demo']))
+        ->assertSuccessful()
+        ->assertSee('data-active-filters', false);
+});
+
 it('accounts index shows statistics', function () {
-    $this->actingAs($this->admin)
+    $admin = createAdmin();
+
+    actingAs($admin)
         ->get(route('accounts.index'))
         ->assertViewHas('statistics', fn ($s) => array_key_exists('total', $s)
             && array_key_exists('active', $s)
@@ -32,10 +47,12 @@ it('accounts index shows statistics', function () {
 // --- Status Filters ---
 
 it('can filter accounts by active status', function () {
+    $admin = createAdmin();
+
     Account::factory()->active()->create();
     Account::factory()->suspended()->create();
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['status' => 'active']));
 
     $response->assertSuccessful();
@@ -51,10 +68,12 @@ it('can filter accounts by active status', function () {
 });
 
 it('can filter accounts by suspended status', function () {
+    $admin = createAdmin();
+
     Account::factory()->create(['is_suspended' => true, 'suspended_until' => null]);
     Account::factory()->create(['is_suspended' => false]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['status' => 'suspended']));
 
     $response->assertSuccessful();
@@ -65,10 +84,12 @@ it('can filter accounts by suspended status', function () {
 });
 
 it('can filter accounts by verified status', function () {
+    $admin = createAdmin();
+
     Account::factory()->verified()->create();
     Account::factory()->create(['email_verified_at' => null]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['status' => 'verified']));
 
     $response->assertSuccessful();
@@ -79,10 +100,12 @@ it('can filter accounts by verified status', function () {
 });
 
 it('can filter accounts by unverified status', function () {
+    $admin = createAdmin();
+
     Account::factory()->create(['email_verified_at' => null]);
     Account::factory()->verified()->create();
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['status' => 'unverified']));
 
     $response->assertSuccessful();
@@ -93,13 +116,15 @@ it('can filter accounts by unverified status', function () {
 });
 
 it('can filter accounts by two factor enabled status', function () {
+    $admin = createAdmin();
+
     $withTwoFactor = Account::factory()->withTwoFactor()->create();
     $withoutTwoFactor = Account::factory()->create([
         'two_factor_secret' => null,
         'two_factor_confirmed_at' => null,
     ]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['status' => '2fa-enabled']));
 
     $response->assertSuccessful();
@@ -113,11 +138,13 @@ it('can filter accounts by two factor enabled status', function () {
 // --- License Count Filters ---
 
 it('can filter accounts with no licenses', function () {
+    $admin = createAdmin();
+
     $accountWithNoLicense = Account::factory()->create();
     $accountWithLicense = Account::factory()->create();
     License::factory()->create(['used_by' => $accountWithLicense->id]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['license_count' => 'none']));
 
     $response->assertSuccessful();
@@ -128,11 +155,13 @@ it('can filter accounts with no licenses', function () {
 });
 
 it('can filter accounts that have licenses', function () {
+    $admin = createAdmin();
+
     $accountWithNoLicense = Account::factory()->create();
     $accountWithLicense = Account::factory()->create();
     License::factory()->create(['used_by' => $accountWithLicense->id]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['license_count' => 'has']));
 
     $response->assertSuccessful();
@@ -145,6 +174,8 @@ it('can filter accounts that have licenses', function () {
 // --- Privilege Filter ---
 
 it('can filter accounts by privilege level', function () {
+    $admin = createAdmin();
+
     $standardUser = Account::factory()->create();
     License::factory()->create([
         'used_by' => $standardUser->id,
@@ -161,7 +192,7 @@ it('can filter accounts by privilege level', function () {
         'expires_at' => now()->addYear(),
     ]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['privilege' => LicensePrivilege::STANDARD->value]));
 
     $response->assertSuccessful();
@@ -172,6 +203,8 @@ it('can filter accounts by privilege level', function () {
 });
 
 it('privilege filter excludes expired and inactive licenses', function () {
+    $admin = createAdmin();
+
     $expiredUser = Account::factory()->create();
     License::factory()->create([
         'used_by' => $expiredUser->id,
@@ -196,7 +229,7 @@ it('privilege filter excludes expired and inactive licenses', function () {
         'expires_at' => now()->addYear(),
     ]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['privilege' => LicensePrivilege::STANDARD->value]));
 
     $response->assertSuccessful();
@@ -210,10 +243,12 @@ it('privilege filter excludes expired and inactive licenses', function () {
 // --- Search ---
 
 it('can search accounts by username', function () {
+    $admin = createAdmin();
+
     Account::factory()->create(['username' => 'uniqueusername123']);
     Account::factory()->create(['username' => 'otheraccount456']);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['search' => 'uniqueusername123']));
 
     $response->assertSuccessful();
@@ -223,10 +258,12 @@ it('can search accounts by username', function () {
 });
 
 it('can search accounts by email', function () {
+    $admin = createAdmin();
+
     Account::factory()->create(['email' => 'findme@example.com']);
     Account::factory()->create(['email' => 'other@example.com']);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['search' => 'findme@example.com']));
 
     $response->assertSuccessful();
@@ -235,13 +272,15 @@ it('can search accounts by email', function () {
 });
 
 it('can search accounts by license key', function () {
+    $admin = createAdmin();
+
     $account = Account::factory()->create();
     License::factory()->create([
         'key' => 'SRCH1-12345-ABCDE-FGHIJ-KLMNO',
         'used_by' => $account->id,
     ]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', ['search' => 'SRCH1']));
 
     $response->assertSuccessful();
@@ -253,10 +292,12 @@ it('can search accounts by license key', function () {
 // --- Sort ---
 
 it('defaults to created_at descending sort', function () {
+    $admin = createAdmin();
+
     Account::factory()->create(['created_at' => now()->subDays(5)]);
     Account::factory()->create(['created_at' => now()->subDay()]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index'));
 
     $response->assertSuccessful();
@@ -276,10 +317,12 @@ it('defaults to created_at descending sort', function () {
 });
 
 it('invalid filter and sort inputs are handled safely with default sort fallback', function () {
+    $admin = createAdmin();
+
     Account::factory()->create(['created_at' => now()->subDays(2)]);
     Account::factory()->create(['created_at' => now()->subDay()]);
 
-    $response = $this->actingAs($this->admin)
+    $response = actingAs($admin)
         ->get(route('accounts.index', [
             'status' => 'unknown-status',
             'license_count' => 'weird',

@@ -14,8 +14,8 @@
             @endif
         </div>
         <div class="ml-4">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ $title }}</p>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <p class="stat-card-label text-sm font-medium">{{ $title }}</p>
+            <p class="stat-card-value text-2xl font-semibold">
                 {{ $value }}
             </p>
         </div>

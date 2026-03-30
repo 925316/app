@@ -153,3 +153,106 @@
 .btn-indigo:hover {
     background-color: rgb(67 56 202);
 }
+
+[data-shell-theme='cinematic'] .btn {
+    border-radius: 0.95rem;
+    border-color: rgb(var(--shell-line) / 0.46);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    box-shadow: var(--shell-shadow-sm);
+    backdrop-filter: blur(16px);
+}
+
+[data-shell-theme='cinematic'] .btn:focus-visible {
+    --tw-ring-color: rgb(var(--shell-accent) / 0.28);
+    --tw-ring-offset-color: rgb(var(--shell-surface));
+}
+
+[data-shell-theme='cinematic'] .btn-primary,
+[data-shell-theme='cinematic'] .btn-blue {
+    color: rgb(var(--shell-ink));
+    border-color: rgb(var(--shell-brand) / 0.34);
+    background: rgb(var(--shell-brand) / 0.14);
+}
+
+[data-shell-theme='cinematic'] .btn-primary:hover,
+[data-shell-theme='cinematic'] .btn-blue:hover {
+    border-color: rgb(var(--shell-brand) / 0.52);
+    background: rgb(var(--shell-brand) / 0.2);
+}
+
+[data-shell-theme='cinematic'] .btn-secondary {
+    color: rgb(var(--shell-ink));
+    border-color: rgb(var(--shell-line) / 0.48);
+    background: rgb(var(--shell-surface) / 0.7);
+}
+
+[data-shell-theme='cinematic'] .btn-secondary:hover {
+    background: rgb(var(--shell-surface-soft) / 0.84);
+    border-color: rgb(var(--shell-line-strong) / 0.52);
+}
+
+[data-shell-theme='cinematic'] .btn-secondary:focus-visible {
+    --tw-ring-color: rgb(var(--shell-accent) / 0.24);
+}
+
+[data-shell-theme='cinematic'] .btn-danger {
+    color: rgb(var(--shell-ink));
+    border-color: rgb(var(--color-danger) / 0.34);
+    background: rgb(var(--color-danger) / 0.12);
+}
+
+[data-shell-theme='cinematic'] .btn-green,
+[data-shell-theme='cinematic'] .btn-yellow,
+[data-shell-theme='cinematic'] .btn-purple,
+[data-shell-theme='cinematic'] .btn-indigo {
+    color: rgb(var(--shell-ink));
+    border-color: rgb(var(--shell-line) / 0.42);
+    box-shadow: var(--shell-shadow-sm);
+}
+
+[data-shell-theme='cinematic'] .btn-green {
+    border-color: rgb(var(--shell-accent) / 0.34);
+    background: rgb(var(--shell-accent) / 0.12);
+}
+
+[data-shell-theme='cinematic'] .btn-yellow {
+    color: rgb(var(--shell-ink));
+    border-color: rgb(var(--shell-glow) / 0.34);
+    background: rgb(var(--shell-glow) / 0.12);
+}
+
+[data-shell-theme='cinematic'] .btn-purple {
+    border-color: rgb(var(--shell-line-strong) / 0.42);
+    background: rgb(var(--shell-line-strong) / 0.14);
+}
+
+[data-shell-theme='cinematic'] .btn-indigo {
+    border-color: rgb(var(--shell-brand) / 0.3);
+    background: rgb(var(--shell-brand) / 0.1);
+}
+
+[data-shell-theme='cinematic'] .btn-danger:hover {
+    border-color: rgb(var(--color-danger) / 0.48);
+    background: rgb(var(--color-danger) / 0.18);
+}
+
+[data-shell-theme='cinematic'] .btn-green:hover {
+    border-color: rgb(var(--shell-accent) / 0.48);
+    background: rgb(var(--shell-accent) / 0.18);
+}
+
+[data-shell-theme='cinematic'] .btn-yellow:hover {
+    border-color: rgb(var(--shell-glow) / 0.48);
+    background: rgb(var(--shell-glow) / 0.18);
+}
+
+[data-shell-theme='cinematic'] .btn-purple:hover {
+    border-color: rgb(var(--shell-line-strong) / 0.56);
+    background: rgb(var(--shell-line-strong) / 0.2);
+}
+
+[data-shell-theme='cinematic'] .btn-indigo:hover {
+    border-color: rgb(var(--shell-brand) / 0.46);
+    background: rgb(var(--shell-brand) / 0.16);
+}

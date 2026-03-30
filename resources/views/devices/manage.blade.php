@@ -8,21 +8,24 @@
         $resetHwidConfirmation = __('Are you sure you want to reset your HWID? This will allow you to bind a new device.');
     @endphp
 
-    <div class="max-w-4xl mx-auto">
-        <div
-            class="bg-white/80 dark:bg-cool-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-cool-200/50 dark:border-cool-700/50 p-6">
-        <!-- Header -->
-        <div class="mb-6">
-            <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">{{ __('Device Binding Management') }}</h3>
-            <p class="text-gray-600 dark:text-gray-300 text-sm">
-                Manage the devices bound to your account. You can only bind one device at a time.
+    <div class="mx-auto max-w-4xl space-y-6" data-page="devices-manage">
+        <div class="card-shell-muted">
+            <p class="section-kicker">{{ __('Device Management') }}</p>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                {{ __('Manage the devices bound to your account. You can only bind one device at a time.') }}
             </p>
         </div>
 
-        <!-- Current Device Status -->
+        {{-- Current Device Status --}}
         @if ($currentDevice)
-            <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/50 rounded-lg">
-                <h4 class="font-medium mb-2 text-green-800 dark:text-green-200 text-sm">{{ __('Currently Bound Device') }}</h4>
+            <div class="card-shell">
+                <div class="app-toolbar mb-4">
+                    <div>
+                        <p class="section-kicker">{{ __('Active Binding') }}</p>
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('Currently Bound Device') }}</h3>
+                    </div>
+                    <x-status-badge status="active" :text="__('Bound')" />
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm mb-3">
                     <div>
                         <div class="text-gray-600 dark:text-gray-300 text-xs">{{ __('HWID Hash:') }}</div>
@@ -44,27 +47,26 @@
                     </div>
                 </div>
 
-                <!-- Unbind Action -->
+                {{-- Unbind Action --}}
                 <form action="{{ route('devices.unbind') }}" method="POST"
                     onsubmit="return confirm('{{ $unbindDeviceConfirmation }}')">
                     @csrf
-                    <button type="submit"
-                        class="px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition text-sm">
-                        {{ __('Unbind This Device') }}
-                    </button>
+                    <x-danger-button type="submit">{{ __('Unbind This Device') }}</x-danger-button>
                 </form>
             </div>
         @else
-            <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/50 rounded-lg">
-                <h4 class="font-medium mb-1 text-yellow-800 dark:text-yellow-200 text-sm">{{ __('No Device Bound') }}</h4>
-                <p class="text-yellow-600 dark:text-yellow-300 text-xs">{{ __('You have not bound any device to your account yet.') }}</p>
+            <div class="card-shell-muted">
+                <div class="flex items-center gap-3">
+                    <x-status-badge status="warning" :text="__('No Binding')" />
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ __('You have not bound any device to your account yet.') }}</p>
+                </div>
             </div>
         @endif
 
-        <!-- Bind New Device Form -->
+        {{-- Bind New Device Form --}}
         @if (!$currentDevice)
-            <div class="mb-4">
-                <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200 text-sm">{{ __('Bind New Device') }}</h4>
+            <div class="card-shell">
+                <p class="section-kicker mb-3">{{ __('Bind New Device') }}</p>
                 <form method="POST" action="{{ route('devices.bind') }}">
                     @csrf
 
@@ -114,10 +116,10 @@
             </div>
         @endif
 
-        <!-- HWID Reset Information -->
-        <div class="mb-4">
-            <h4 class="font-medium mb-2 text-gray-800 dark:text-gray-200 text-sm">{{ __('HWID Reset Information') }}</h4>
-            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+        {{-- HWID Reset Information --}}
+        <div class="card-shell-muted mb-4">
+            <p class="section-kicker mb-2">{{ __('HWID Reset Information') }}</p>
+            <div>
                 <div class="space-y-2 text-xs">
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">{{ __('HWID Reset Count:') }}</span>
@@ -167,12 +169,11 @@
             </div>
         </div>
 
-        <!-- Back to Devices List -->
+        {{-- Back to Devices List --}}
         <div class="flex justify-end">
-            <a href="{{ route('devices.index') }}"
-                class="px-3 py-1.5 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition text-sm">
+            <x-secondary-button tag="a" href="{{ route('devices.index') }}">
                 {{ __('Back to Device History') }}
-            </a>
+            </x-secondary-button>
         </div>
         </div>
     </div>

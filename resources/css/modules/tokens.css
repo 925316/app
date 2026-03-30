@@ -54,3 +54,39 @@
     --color-warning: 251 191 36;
     --color-danger: 248 113 113;
 }
+
+[data-shell-theme='cinematic'] {
+    --shell-canvas: 249 244 236;
+    --shell-canvas-alt: 236 228 216;
+    --shell-surface: 255 250 244;
+    --shell-surface-soft: 244 235 224;
+    --shell-surface-strong: 235 225 214;
+    --shell-ink: 53 42 57;
+    --shell-muted: 112 98 121;
+    --shell-line: 194 176 191;
+    --shell-line-strong: 166 148 170;
+    --shell-brand: 198 93 66;
+    --shell-accent: 31 136 162;
+    --shell-glow: 150 108 47;
+    --shell-shadow-sm: 0 12px 30px rgb(74 46 45 / 0.08);
+    --shell-shadow-md: 0 24px 64px rgb(74 46 45 / 0.14);
+    --shell-shadow-lg: 0 36px 96px rgb(49 31 43 / 0.18);
+}
+
+:root.dark [data-shell-theme='cinematic'] {
+    --shell-canvas: 8 7 16;
+    --shell-canvas-alt: 17 14 29;
+    --shell-surface: 22 18 37;
+    --shell-surface-soft: 31 27 49;
+    --shell-surface-strong: 38 33 58;
+    --shell-ink: 245 243 239;
+    --shell-muted: 173 164 190;
+    --shell-line: 97 82 138;
+    --shell-line-strong: 125 110 167;
+    --shell-brand: 255 112 73;
+    --shell-accent: 92 223 255;
+    --shell-glow: 255 221 133;
+    --shell-shadow-sm: 0 16px 36px rgb(0 0 0 / 0.24);
+    --shell-shadow-md: 0 28px 72px rgb(0 0 0 / 0.32);
+    --shell-shadow-lg: 0 40px 112px rgb(0 0 0 / 0.42);
+}

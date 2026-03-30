@@ -12,6 +12,7 @@
     'compact' => false,
     'hover' => true,
     'name' => 'table-'.uniqid(),
+    'ariaLabel' => 'Data table',
 ])
 
 @php
@@ -32,21 +33,16 @@
     $emptyColspan = $emptyColspan ?? count($headers);
 @endphp
 
-<div class="table-wrapper">
+<div class="table-wrapper" data-table-shell>
     {{-- Search Bar --}}
     @if($searchable)
-    <div class="p-3 border-b border-gray-100 dark:border-gray-700">
+    <div class="table-toolbar border-b p-3">
         <div class="relative">
-            <x-icon name="magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <x-icon name="magnifying-glass" class="input-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
             <input type="text" 
                    id="search-{{ $name }}"
                    placeholder="{{ __($searchPlaceholder) }}"
-                   class="w-full pl-10 pr-4 py-2 text-sm 
-                          bg-gray-50 dark:bg-gray-700 
-                          border border-gray-200 dark:border-gray-600 
-                          rounded-lg text-gray-900 dark:text-gray-100
-                          placeholder-gray-400 dark:placeholder-gray-500
-                          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                   class="form-input table-search-input w-full pl-10 pr-4 text-sm"
                    oninput="filterTable_{{ str_replace('-', '_', $name) }}(this.value)">
         </div>
     </div>
@@ -55,7 +51,7 @@
     {{-- Table --}}
     <div class="overflow-x-auto">
         <table class="data-table {{ $striped ? 'striped' : '' }} {{ $compact ? 'compact' : '' }} {{ $hover ? 'with-hover' : '' }}"
-               id="{{ $name }}">
+               id="{{ $name }}" aria-label="{{ __($ariaLabel) }}">
             <thead class="table-header">
                 <tr>
                     @if($headers instanceof \Illuminate\View\ComponentSlot)
@@ -69,7 +65,7 @@
                                 $isSortable = $sortable && (empty($sortableColumns) || in_array($columnKey, $sortableColumns));
                             @endphp
                             <th scope="col" 
-                                class="table-header-cell {{ $isSortable ? 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-gray-700' : '' }}"
+                                class="table-header-cell {{ $isSortable ? 'cursor-pointer select-none' : '' }}"
                                 @if($isSortable)
                                 data-column="{{ $columnKey }}"
                                 data-sort-dir=""
@@ -78,9 +74,9 @@
                                 <div class="flex items-center gap-2">
                                     <span>{{ $columnLabel }}</span>
                                     @if($isSortable)
-                                    <span class="sort-icon text-gray-400 dark:text-gray-500">
-                                        <x-icon name="funnel" class="w-3 h-3" />
-                                    </span>
+                                     <span class="sort-icon">
+                                         <x-icon name="funnel" class="w-3 h-3" />
+                                     </span>
                                     @endif
                                 </div>
                             </th>
@@ -97,8 +93,8 @@
                 <tr>
                     <td colspan="{{ $emptyColspan }}" class="table-empty">
                         <div class="flex flex-col items-center py-8">
-                            <x-icon name="document" class="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
-                            <p class="text-gray-500 dark:text-gray-400">{{ __($emptyMessage) }}</p>
+                            <x-icon name="document" class="mb-3 h-12 w-12 text-[rgb(var(--color-text-muted)/0.4)] dark:text-[rgb(var(--color-text-muted)/0.4)]" />
+                            <p class="table-empty">{{ __($emptyMessage) }}</p>
                         </div>
                     </td>
                 </tr>
@@ -109,7 +105,7 @@
     
     {{-- Pagination slot --}}
     @isset($pagination)
-    <div class="border-t border-gray-100 dark:border-gray-700">
+    <div class="table-pagination border-t">
         {{ $pagination }}
     </div>
     @endisset
@@ -147,11 +143,9 @@
         
         // Update sort icons
         table.querySelectorAll('th').forEach(header => {
-            header.querySelector('.sort-icon')?.classList.remove('text-primary-600', 'dark:text-primary-400');
-            header.querySelector('.sort-icon')?.classList.add('text-gray-400', 'dark:text-gray-500');
+            header.querySelector('.sort-icon')?.classList.remove('is-active-sort');
         });
-        th.querySelector('.sort-icon')?.classList.remove('text-gray-400', 'dark:text-gray-500');
-        th.querySelector('.sort-icon')?.classList.add('text-primary-600', 'dark:text-primary-400');
+        th.querySelector('.sort-icon')?.classList.add('is-active-sort');
         
         // Sort rows
         rows.sort((a, b) => {

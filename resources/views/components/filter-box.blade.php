@@ -7,20 +7,27 @@
     'showTotal' => false,
     'title' => 'Filter',
 ])
-<div
-    class="mb-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+
+@php
+    $headingId = 'filter-box-title-'.md5((string) $title.(string) $action);
+@endphp
+
+<section class="filter-box-shell mb-6 rounded-xl border p-6 shadow-sm" aria-labelledby="{{ $headingId }}" data-filter-box>
     <form method="{{ $method }}" action="{{ $action }}"
+        role="search" aria-labelledby="{{ $headingId }}"
         @if ($cleanForm) data-clean-form="true" @endif
         @if ($defaultValues) data-default-values="{{ $defaultValues }}" @endif>
-        <div class="flex items-center justify-between mb-4">
-            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                <x-icon name="filter" class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" /> {{ $title }}
-            </h4>
+        <div class="mb-4 flex items-center justify-between gap-3">
+            <h2 id="{{ $headingId }}" class="filter-box-title flex items-center text-lg font-semibold">
+                <x-icon name="filter" class="mr-2 h-5 w-5 text-current" /> {{ $title }}
+            </h2>
             @if ($showTotal && $totalCount !== null)
-                <div class="flex items-center space-x-2"><span class="text-sm text-gray-600 dark:text-gray-400">
+                <div class="flex items-center gap-2"><span class="filter-box-total text-sm">
                         {{ $totalCount }} total </span>
                 </div>
             @endif
-        </div> {{ $slot }}
+        </div>
+
+        {{ $slot }}
     </form>
-</div>
+</section>

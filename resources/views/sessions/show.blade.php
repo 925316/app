@@ -7,21 +7,17 @@
         $terminateSessionConfirmation = __('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.');
     @endphp
 
-    <div class="mx-auto max-w-7xl py-7">
-            <!-- Breadcrumb and Actions -->
-            <div class="mb-6 flex justify-between items-center gap-3 lg:max-xl:flex-wrap">
-                <div class="flex items-center space-x-2">
-                    <a href="{{ route('sessions.index') }}" class="text-cool-700 dark:text-cool-300 hover:underline text-sm">
-                        {{ __('Back to Sessions') }}
-                    </a>
-                </div>
+    <div class="space-y-6" data-page="sessions-show">
+            {{-- Breadcrumb and Actions --}}
+            <div class="card-shell-muted flex items-center justify-between gap-3">
+                <a href="{{ route('sessions.index') }}" class="text-sm text-cool-700 hover:underline dark:text-cool-300">
+                    {{ __('Back to Sessions') }}
+                </a>
                 <form action="{{ route('sessions.destroy', $session) }}" method="POST"
                     onsubmit="return confirm('{{ $terminateSessionConfirmation }}')">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger text-sm">
-                        {{ __('Terminate Session') }}
-                    </button>
+                    <x-danger-button type="submit">{{ __('Terminate Session') }}</x-danger-button>
                 </form>
             </div>
 
@@ -32,24 +28,13 @@
                         <div>
                             <p class="section-kicker">{{ __('Heartbeat Session') }}</p>
                             <h3 class="text-2xl font-bold mb-2">{{ __('Session') }} #{{ $session->id }}</h3>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 @if ($session->isActive())
-                                    <span
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                                        {{ __('Active') }}
-                                    </span>
+                                    <x-status-badge status="active" :text="__('Active')" />
                                 @else
-                                    <span
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                                        <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                                        {{ __('Expired') }}
-                                    </span>
+                                    <x-status-badge status="error" :text="__('Expired')" />
                                 @endif
-                                <span
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                    {{ __('Client:') }} {{ $session->client_version ?? __('Unknown') }}
-                                </span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Client:') }} {{ $session->client_version ?? __('Unknown') }}</span>
                             </div>
                         </div>
                     </div>
@@ -188,7 +173,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ route('accounts.show', $session->account) }}" class="btn btn-blue text-sm">
+                                <a href="{{ route('accounts.show', $session->account) }}" class="btn btn-primary text-sm">
                                     {{ __('View Account') }}
                                 </a>
                             </div>
@@ -243,7 +228,6 @@
                 </div>
             </div>
     </div>
-
 </x-app-sidebar-layout>
 
 <script>
