@@ -41,8 +41,52 @@ it('accounts index prefers a single view action in each row', function () {
         ->assertSuccessful()
         ->assertSee('table-action table-action--primary', false)
         ->assertSee('aria-label="Account row actions"', false)
+        ->assertSee('class="flex justify-end" aria-label="Account row actions"', false)
+        ->assertDontSee('class="table-actions" aria-label="Account row actions"', false)
         ->assertDontSee('table-action table-action--danger', false)
         ->assertDontSee('onsubmit="return confirm', false);
+});
+
+it('accounts index uses the tightened scan hierarchy columns and account cell markers', function () {
+    $admin = createAdmin();
+    Account::factory()->create();
+
+    actingAs($admin)
+        ->get(route('accounts.index'))
+        ->assertSuccessful()
+        ->assertSeeInOrder([
+            'Account',
+            'Access',
+            'Usage',
+            'Last Login',
+        ])
+        ->assertDontSee('>Email<', false)
+        ->assertDontSee('>Status<', false)
+        ->assertDontSee('>Privilege<', false)
+        ->assertDontSee('>Licenses<', false)
+        ->assertDontSee('>Devices<', false)
+        ->assertSee('data-account-cell="identity"', false)
+        ->assertSee('data-account-cell="access"', false)
+        ->assertSee('data-account-cell="usage"', false)
+        ->assertSee('aria-label="Actions"', false);
+});
+
+it('accounts index preserves long username and email access through truncation titles', function () {
+    $admin = createAdmin();
+
+    $account = Account::factory()->create([
+        'username' => 'very-long-account-name-for-density-audit-operator',
+        'email' => 'very.long.account.name@example.test',
+    ]);
+
+    actingAs($admin)
+        ->get(route('accounts.index', ['search' => 'very.long.account.name@example.test']))
+        ->assertSuccessful()
+        ->assertSee('title="'.$account->username.'"', false)
+        ->assertSee('title="'.$account->email.'"', false)
+        ->assertSee('table-truncate table-truncate-md text-sm', false)
+        ->assertSee('table-meta table-truncate table-truncate-lg', false)
+        ->assertSee('Search: &quot;very.long.account.name@example.test&quot;', false);
 });
 
 it('accounts index shows statistics', function () {
