@@ -131,7 +131,7 @@ it('single filter only includes non-empty parameters', function () {
     $response->assertSee('TEST3-ABCDE-12345-VWXYZ-ABCDE');
     $response->assertDontSee('TEST2-67890-VWXYZ-12345-67890');
 
-    $response->assertSee('Active filters:');
+    $response->assertSee('Active Filters');
     $response->assertSee('Privilege:');
     $response->assertDontSee('Status:');
     $response->assertDontSee('Search:');

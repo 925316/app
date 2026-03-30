@@ -181,7 +181,8 @@ it('sessions index renders copy-friendly truncated cells for long device and ver
         ->assertSuccessful()
         ->assertSee('data-copy-value="26.3.30-build-with-a-very-long-suffix-for-ui-check"', false)
         ->assertSee('onclick="copyTextValue(this)"', false)
-        ->assertSee('max-w-[220px] truncate', false);
+        ->assertSee('table-inline-copy table-truncate table-truncate-sm', false)
+        ->assertSee('table-title table-code table-truncate table-truncate-md text-sm', false);
 });
 
 it('session detail page renders truncated copy button for full session token', function () {

@@ -6,8 +6,6 @@
     </x-slot>
 
     @php
-        $suspendAccountConfirmation = __('Are you sure you want to suspend this account?');
-        $deleteAccountConfirmation = __('Are you sure you want to delete this account? This action cannot be undone.');
         $hasFilters = $currentFilters['status'] || $currentFilters['privilege'] || $currentFilters['license_count'] || $currentFilters['search'] || $currentFilters['sort'] !== 'created_at_desc';
     @endphp
 
@@ -189,36 +187,40 @@
                 @endif
             </x-filter-box>
 
-            <x-data-table :headers="[__('User'), __('Email'), __('Status'), __('Privilege'), __('Licenses'), __('Devices'), __('Last Login'), __('Actions')]" :emptyColspan="8" ariaLabel="{{ __('Accounts table') }}">
+            <x-table
+                :headers="[__('User'), __('Email'), __('Status'), __('Privilege'), __('Licenses'), __('Devices'), __('Last Login'), __('Actions')]"
+                :emptyColspan="8"
+                compact="true"
+                ariaLabel="{{ __('Accounts table') }}"
+            >
                 @foreach ($accounts as $account)
                     <tr class="table-row">
-                        <td class="table-cell-primary whitespace-nowrap">
+                        <td class="table-cell-primary">
                             <div class="flex items-center gap-3">
                                 <div class="table-avatar">
                                     {{ $account->initials() }}
                                 </div>
 
                                 <div class="table-stack table-stack-tight">
-                                    <div class="table-title text-sm">{{ $account->username }}</div>
+                                    <div class="table-title table-truncate table-truncate-md text-sm" title="{{ $account->username }}">{{ $account->username }}</div>
                                     <div class="table-meta">{{ __('ID:') }} {{ $account->id }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="table-cell whitespace-nowrap">
-                            <div class="max-w-[220px] truncate" title="{{ $account->email }}">
-                                <span class="badge {{ $account->email_verified_at ? 'badge-verified' : 'badge-unverified' }}">
-                                    {{ $account->email }}
-                                </span>
+                        <td class="table-cell">
+                            <div class="table-stack table-stack-tight">
+                                <span class="table-truncate table-truncate-lg" title="{{ $account->email }}">{{ $account->email }}</span>
+                                <span class="table-meta">{{ $account->email_verified_at ? __('Verified email') : __('Unverified email') }}</span>
                             </div>
                         </td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             @if ($account->isCurrentlySuspended)
                                 <x-status-badge status="suspended" />
                             @else
                                 <x-status-badge status="active" />
                             @endif
                         </td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             @php
                                 $privilege = $account->getPrivilegeLevel();
                                 $privilegeLabel = match ($privilege) {
@@ -233,9 +235,9 @@
 
                             <x-status-badge :status="$privilegeLabel" />
                         </td>
-                        <td class="table-cell whitespace-nowrap">{{ $account->licenses_count }}</td>
-                        <td class="table-cell whitespace-nowrap">{{ $account->devices_count }}</td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">{{ $account->licenses_count }}</td>
+                        <td class="table-cell table-cell-fit">{{ $account->devices_count }}</td>
+                        <td class="table-cell">
                             @if ($account->last_login_at)
                                 <div class="table-stack table-stack-tight">
                                     <div>{{ $account->last_login_at->diffForHumans() }}</div>
@@ -245,35 +247,11 @@
                                 <span class="table-meta">{{ __('Never') }}</span>
                             @endif
                         </td>
-                        <td class="table-cell whitespace-nowrap text-right">
-                            <div class="table-actions table-actions--nowrap">
+                        <td class="table-cell table-cell-fit text-right">
+                            <div class="table-actions" aria-label="{{ __('Account row actions') }}">
                                 <a href="{{ route('accounts.show', $account) }}" class="table-action table-action--primary">
                                     {{ __('View') }}
                                 </a>
-
-                                @if ($account->isCurrentlySuspended)
-                                    <form action="{{ route('accounts.unsuspend', $account) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="table-action table-action--success">
-                                            {{ __('Unsuspend') }}
-                                        </button>
-                                    </form>
-                                @else
-                                    <form action="{{ route('accounts.suspend', $account) }}" method="POST" class="inline" onsubmit="return confirm('{{ $suspendAccountConfirmation }}')">
-                                        @csrf
-                                        <button type="submit" class="table-action table-action--danger">
-                                            {{ __('Suspend') }}
-                                        </button>
-                                    </form>
-                                @endif
-
-                                <form action="{{ route('accounts.destroy', $account) }}" method="POST" class="inline" onsubmit="return confirm('{{ $deleteAccountConfirmation }}')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="table-action table-action--danger">
-                                        {{ __('Delete') }}
-                                    </button>
-                                </form>
                             </div>
                         </td>
                     </tr>
@@ -290,7 +268,7 @@
                         </td>
                     </tr>
                 @endif
-            </x-data-table>
+            </x-table>
 
             <div>
                 <x-pagination :paginator="$accounts" />

@@ -139,16 +139,16 @@
                 @endif
             </x-filter-box>
 
-            <x-table :headers="[__('Time'), __('Type'), __('Level'), __('Account'), __('IP'), __('Actions')]" :emptyColspan="6" ariaLabel="{{ __('Logs table') }}">
+            <x-table :headers="[__('Time'), __('Type'), __('Level'), __('Account'), __('IP'), __('Actions')]" :emptyColspan="6" compact="true" ariaLabel="{{ __('Logs table') }}">
                 @forelse ($logs as $log)
                     <tr class="table-row">
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             <div class="table-stack table-stack-tight">
                                 <div>{{ $log->created_at->format('Y-m-d H:i') }}</div>
                                 <div class="table-meta">{{ $log->created_at->diffForHumans() }}</div>
                             </div>
                         </td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             @php
                                 $eventBadge = match ($log->event_level) {
                                     0 => 'info',
@@ -158,19 +158,21 @@
                             @endphp
                             <x-status-badge :status="$eventBadge" :text="$log->event_type" />
                         </td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             <span class="table-meta">{{ $eventLevels[$log->event_level] ?? __('Unknown') }}</span>
                         </td>
-                        <td class="table-cell whitespace-nowrap">
-                            <span class="table-title text-sm">{{ $log->account?->username ?? __('System') }}</span>
+                        <td class="table-cell">
+                            <span class="table-title table-truncate table-truncate-md text-sm" title="{{ $log->account?->username ?? __('System') }}">{{ $log->account?->username ?? __('System') }}</span>
                         </td>
-                        <td class="table-cell whitespace-nowrap">
-                            <span class="table-meta">{{ $log->ip_address }}</span>
+                        <td class="table-cell">
+                            <span class="table-meta table-truncate table-truncate-sm" title="{{ $log->ip_address }}">{{ $log->ip_address }}</span>
                         </td>
-                        <td class="table-cell whitespace-nowrap text-right">
-                            <a href="{{ route('logs.show', $log) }}" class="table-action table-action--primary">
-                                {{ __('View') }}
-                            </a>
+                        <td class="table-cell table-cell-fit text-right">
+                            <div class="table-actions" aria-label="{{ __('Log row actions') }}">
+                                <a href="{{ route('logs.show', $log) }}" class="table-action table-action--primary">
+                                    {{ __('View') }}
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 @empty

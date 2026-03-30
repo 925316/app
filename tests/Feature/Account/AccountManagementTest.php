@@ -16,6 +16,26 @@ it('admin can view account details', function () {
         ->assertSuccessful();
 });
 
+it('account detail preserves device admin controls after devices index handoff', function () {
+    $account = Account::factory()->create([
+        'hwid_last_reset_at' => null,
+    ]);
+
+    $device = AccountDevice::factory()->create([
+        'account_id' => $account->id,
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $this->actingAs($this->admin)
+        ->get(route('accounts.show', $account))
+        ->assertSuccessful()
+        ->assertSee('id="account-device-'.$device->id.'"', false)
+        ->assertSee('aria-label="Account device row actions"', false)
+        ->assertSee(route('devices.unbind-admin', $device), false)
+        ->assertSee('Reset HWID', false);
+});
+
 it('admin can view account create form', function () {
     $this->actingAs($this->admin)
         ->get(route('accounts.create'))

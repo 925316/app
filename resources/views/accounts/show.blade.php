@@ -13,6 +13,7 @@
         $accountPrivilegeLabel = $accountPrivilege?->getLabel() ?? 'default';
         $accountStatusText = $account->isCurrentlySuspended ? __('Suspended') : __('Active');
         $boundDevicesCount = $boundDevices->count();
+        $adminUnbindDeviceConfirmation = __('Are you sure you want to unbind this device from the account?');
     @endphp
 
     <div class="space-y-8" data-page="accounts-show">
@@ -250,21 +251,21 @@
                 </div>
             </div>
 
-            <x-table :headers="[__('Device'), __('HWID Hash'), __('Status'), __('First Seen'), __('Last Seen'), __('Bound At')]" :emptyColspan="6" ariaLabel="{{ __('Account devices table') }}">
+            <x-table :headers="[__('Device'), __('HWID Hash'), __('Status'), __('First Seen'), __('Last Seen'), __('Bound At'), __('Actions')]" :emptyColspan="7" compact="true" ariaLabel="{{ __('Account devices table') }}">
                 @forelse ($account->devices as $device)
-                    <tr class="table-row">
-                        <td class="table-cell-primary whitespace-nowrap">
+                    <tr class="table-row" id="account-device-{{ $device->id }}">
+                        <td class="table-cell-primary">
                             <div class="table-stack table-stack-tight">
                                 <div class="table-title text-sm">{{ __('Device') }} #{{ $device->id }}</div>
                                 <div class="table-meta">{{ $device->device_name ?? __('Unknown device') }}</div>
                             </div>
                         </td>
-                        <td class="table-cell whitespace-nowrap">
-                            <span class="table-meta inline-block max-w-[220px] truncate align-middle" title="{{ $device->hwid_hash ?? __('N/A') }}">
+                        <td class="table-cell">
+                            <span class="table-meta table-code table-truncate table-truncate-md" title="{{ $device->hwid_hash ?? __('N/A') }}">
                                 {{ $device->hwid_hash ? substr($device->hwid_hash, 0, 16).'...' : __('N/A') }}
                             </span>
                         </td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             @if ($device->bound_at && !$device->unbound_at)
                                 <x-status-badge status="active" :text="__('Bound')" />
                             @elseif ($device->unbound_at)
@@ -273,7 +274,7 @@
                                 <x-status-badge status="default" :text="__('Not Bound')" />
                             @endif
                         </td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @if ($device->first_seen_at)
                                 <div class="table-stack table-stack-tight">
                                     <div>{{ $device->first_seen_at->format('Y-m-d H:i:s') }}</div>
@@ -283,7 +284,7 @@
                                 <span class="table-meta">{{ __('N/A') }}</span>
                             @endif
                         </td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @if ($device->last_seen_at)
                                 <div class="table-stack table-stack-tight">
                                     <div>{{ $device->last_seen_at->format('Y-m-d H:i:s') }}</div>
@@ -293,7 +294,7 @@
                                 <span class="table-meta">{{ __('N/A') }}</span>
                             @endif
                         </td>
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @if ($device->bound_at)
                                 <div class="table-stack table-stack-tight">
                                     <div>{{ $device->bound_at->format('Y-m-d H:i:s') }}</div>
@@ -303,10 +304,24 @@
                                 <span class="table-meta">{{ __('N/A') }}</span>
                             @endif
                         </td>
+                        <td class="table-cell table-cell-fit text-right">
+                            @if ($device->bound_at && ! $device->unbound_at)
+                                <div class="table-actions" aria-label="{{ __('Account device row actions') }}">
+                                    <form action="{{ route('devices.unbind-admin', $device) }}" method="POST" class="inline" onsubmit="return confirm('{{ $adminUnbindDeviceConfirmation }}')">
+                                        @csrf
+                                        <button type="submit" class="table-action table-action--danger">
+                                            {{ __('Unbind') }}
+                                        </button>
+                                    </form>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('No actions') }}</span>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr class="table-row">
-                        <td colspan="6" class="table-empty">
+                        <td colspan="7" class="table-empty">
                             <div class="table-empty-state">
                                 <x-icon name="desktop" class="table-empty-icon" />
                                 <p class="table-empty-title">{{ __('No devices found for this account.') }}</p>

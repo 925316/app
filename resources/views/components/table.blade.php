@@ -49,7 +49,7 @@
     @endif
     
     {{-- Table --}}
-    <div class="overflow-x-auto">
+    <div class="table-scroll">
         <table class="data-table {{ $striped ? 'striped' : '' }} {{ $compact ? 'compact' : '' }} {{ $hover ? 'with-hover' : '' }}"
                id="{{ $name }}" aria-label="{{ __($ariaLabel) }}">
             <thead class="table-header">

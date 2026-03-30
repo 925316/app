@@ -6,8 +6,9 @@
     'ariaLabel' => __('Data table'),
 ])
 
-<div class="table-responsive" data-table-shell>
-    <table class="data-table" aria-label="{{ $ariaLabel }}">
+<div class="table-wrapper" data-table-shell>
+    <div class="table-scroll">
+        <table class="data-table compact with-hover" aria-label="{{ $ariaLabel }}">
         <thead class="table-header">
             <tr>
                 @foreach ($headers as $header)
@@ -29,5 +30,6 @@
                 </tr>
             @endif
         </tbody>
-    </table>
+        </table>
+    </div>
 </div>

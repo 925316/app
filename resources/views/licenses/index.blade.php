@@ -215,24 +215,39 @@
                     @endif
 
                     <!-- Licenses table -->
-                    <x-table :headers="$isAdmin ?? false ? ['Key', 'Account', 'Privilege', 'Status', 'Expires', 'Actions'] : ['Key', 'Privilege', 'Status', 'Expires', 'Actions']" :emptyColspan="$isAdmin ?? false ? 6 : 5">
+                    <x-table
+                        :headers="$isAdmin ?? false ? ['Key', 'Account', 'Privilege', 'Status', 'Expires', 'Actions'] : ['Key', 'Privilege', 'Status', 'Expires', 'Actions']"
+                        :emptyColspan="$isAdmin ?? false ? 6 : 5"
+                        compact="true"
+                        ariaLabel="{{ __('Licenses table') }}"
+                    >
                         @forelse($licenses as $license)
                             <tr class="table-row">
-                                <td class="table-cell-primary whitespace-nowrap">
-                                    {{ $license->key }}
+                                <td class="table-cell-primary">
+                                    <div class="table-stack table-stack-tight">
+                                        <span class="table-title table-code table-truncate table-truncate-lg" title="{{ $license->key }}">{{ $license->key }}</span>
+                                        <span class="table-meta">{{ __('ID:') }} {{ $license->id }}</span>
+                                    </div>
                                 </td>
                                 @if ($isAdmin ?? false)
-                                <td class="table-cell whitespace-nowrap">
-                                    {{ $license->account?->username ?? __('Unassigned') }}
+                                <td class="table-cell">
+                                    @if ($license->account)
+                                        <div class="table-stack table-stack-tight">
+                                            <span class="table-title table-truncate table-truncate-md text-sm" title="{{ $license->account->username }}">{{ $license->account->username }}</span>
+                                            <span class="table-meta table-truncate table-truncate-md" title="{{ $license->account->email }}">{{ $license->account->email }}</span>
+                                        </div>
+                                    @else
+                                        <span class="table-meta">{{ __('Unassigned') }}</span>
+                                    @endif
                                 </td>
                                 @endif
-                                <td class="table-cell whitespace-nowrap">
+                                <td class="table-cell table-cell-fit">
                                     {{ $license->getPrivilegeTextAttribute() }}
                                 </td>
-                                <td class="table-cell whitespace-nowrap">
+                                <td class="table-cell table-cell-fit">
                                     <x-status-badge :status="$license->status->value" :text="$license->getStatusTextAttribute()" />
                                 </td>
-                                <td class="table-cell whitespace-nowrap">
+                                <td class="table-cell table-cell-fit">
                                     <span title="{{ $license->expires_at->format('Y-m-d H:i:s') }}">
                                         {{ $license->expires_at->format('Y-m-d') }}
                                     </span>
@@ -242,18 +257,12 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="table-cell whitespace-nowrap text-right font-medium">
-                                    <a href="{{ route('licenses.show', $license) }}"
-                                        class="table-link">
-                                        View
-                                    </a>
-                                    @if ($isAdmin ?? false)
-                                        <span class="table-link-muted mx-1">{{ '|' }}</span>
-                                        <a href="{{ route('licenses.edit', $license) }}"
-                                            class="table-link">
-                                            Edit
+                                <td class="table-cell table-cell-fit text-right font-medium">
+                                    <div class="table-actions" aria-label="{{ __('License row actions') }}">
+                                        <a href="{{ route('licenses.show', $license) }}" class="table-action table-action--primary">
+                                            {{ __('View') }}
                                         </a>
-                                    @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty

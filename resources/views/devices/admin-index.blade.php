@@ -182,11 +182,12 @@
                     __('Actions'),
                 ]"
                 :emptyColspan="8"
+                compact="true"
                 ariaLabel="{{ __('Devices admin table') }}"
             >
                 @forelse ($devices as $device)
                     <tr class="table-row">
-                        <td class="table-cell-primary whitespace-nowrap">
+                        <td class="table-cell-primary">
                             @if ($device->account)
                                 <div class="flex items-center gap-3">
                                     <div class="table-avatar">
@@ -194,8 +195,8 @@
                                     </div>
 
                                     <div class="table-stack table-stack-tight">
-                                        <div class="table-title text-sm">{{ $device->account->username }}</div>
-                                        <div class="table-meta max-w-[220px] truncate" title="{{ $device->account->email }}">{{ $device->account->email }}</div>
+                                        <div class="table-title table-truncate table-truncate-md text-sm" title="{{ $device->account->username }}">{{ $device->account->username }}</div>
+                                        <div class="table-meta table-truncate table-truncate-md" title="{{ $device->account->email }}">{{ $device->account->email }}</div>
                                     </div>
                                 </div>
                             @else
@@ -203,12 +204,12 @@
                             @endif
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @if ($device->hwid_hash)
                                 <div class="table-stack table-stack-tight">
-                                    <div class="table-title text-sm font-mono">
-                                        <span title="{{ $device->hwid_hash }}" class="cursor-help">
-                                            {{ \Illuminate\Support\Str::limit($device->hwid_hash, 18, '...') }}
+                                    <div class="table-title table-code text-sm">
+                                        <span title="{{ $device->hwid_hash }}" class="table-truncate table-truncate-md cursor-help">
+                                            {{ \Illuminate\Support\Str::limit($device->hwid_hash, 20, '...') }}
                                         </span>
                                     </div>
                                     <div class="table-meta">{{ __('Device ID:') }} {{ $device->id }}</div>
@@ -218,21 +219,21 @@
                             @endif
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             <div class="table-stack table-stack-tight">
-                                <div>{{ $device->ip_address ?? __('Unknown') }}</div>
+                                <div class="table-truncate table-truncate-sm" title="{{ $device->ip_address ?? __('Unknown') }}">{{ $device->ip_address ?? __('Unknown') }}</div>
                                 <div class="table-meta">{{ $device->country_code ?? __('Unknown') }}</div>
                             </div>
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             <div class="table-stack table-stack-tight">
                                 <div>{{ __('Last:') }} {{ $device->last_seen_at ? $device->last_seen_at->format('Y-m-d H:i') : __('Unknown') }}</div>
                                 <div class="table-meta">{{ __('First:') }} {{ $device->first_seen_at ? $device->first_seen_at->format('Y-m-d H:i') : __('Unknown') }}</div>
                             </div>
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             @if ($device->isBound())
                                 <x-status-badge status="active" :text="__('Currently Bound')" />
                             @elseif ($device->bound_at)
@@ -242,7 +243,7 @@
                             @endif
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             @if ($device->account && $device->account->isSuspended())
                                 <x-status-badge status="suspended" :text="__('Suspended')" />
                             @else
@@ -250,7 +251,7 @@
                             @endif
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             <div class="table-stack table-stack-tight">
                                 <div>{{ $device->account?->hwid_reset_count ?? 0 }}</div>
                                 <div class="table-meta">
@@ -259,32 +260,16 @@
                             </div>
                         </td>
 
-                        <td class="table-cell whitespace-nowrap text-right">
-                            <div class="table-actions table-actions--nowrap">
-                                @if ($device->isBound())
-                                    <form method="POST" action="{{ route('devices.unbind-admin', $device) }}" class="inline" onsubmit="return confirm('Unbind device from {{ $device->account->username }}?');">
-                                        @csrf
-
-                                        <button type="submit" class="table-action table-action--danger">
-                                            {{ __('Unbind') }}
-                                        </button>
-                                    </form>
-                                @endif
-
-                                @if ($device->account && $device->account->canResetHwid())
-                                    <form method="POST" action="{{ route('devices.reset-hwid-admin', $device->account) }}" class="inline" onsubmit="return confirm('Reset HWID for {{ $device->account->username }}? This will unbind all devices.');">
-                                        @csrf
-
-                                        <button type="submit" class="table-action table-action--danger">
-                                            {{ __('Reset HWID') }}
-                                        </button>
-                                    </form>
-                                @endif
-
-                                @if (! $device->isBound() && ! ($device->account && $device->account->canResetHwid()))
-                                    <span class="table-meta">{{ __('No actions') }}</span>
-                                @endif
-                            </div>
+                        <td class="table-cell table-cell-fit text-right">
+                            @if ($device->account)
+                                <div class="table-actions" aria-label="{{ __('Device row actions') }}">
+                                    <a href="{{ route('accounts.show', $device->account) }}#account-device-{{ $device->id }}" class="table-action table-action--primary">
+                                        {{ __('View') }}
+                                    </a>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('No actions') }}</span>
+                            @endif
                         </td>
                     </tr>
                 @empty

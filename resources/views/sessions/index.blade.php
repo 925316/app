@@ -8,7 +8,6 @@
     </x-slot>
 
     @php
-        $terminateSessionConfirmation = __('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.');
         $sessionTitle = $isAdmin ? __('Session management') : __('My sessions');
         $sessionSubtitle = $isAdmin
             ? __('Monitor account activity, filter the heartbeat stream, and keep the same query behavior.')
@@ -168,12 +167,13 @@
                     ? [__('Account'), __('Device'), __('IP Address'), __('Client Version'), __('Status'), __('Last Heartbeat'), __('Created'), __('Actions')]
                     : [__('Device'), __('IP Address'), __('Client Version'), __('Status'), __('Last Heartbeat'), __('Created'), __('Actions')]"
                 :emptyColspan="$isAdmin ? 8 : 7"
+                compact="true"
                 ariaLabel="{{ __('Sessions table') }}"
             >
                 @forelse ($sessions as $session)
                     <tr class="table-row">
                         @if ($isAdmin)
-                            <td class="table-cell-primary whitespace-nowrap">
+                            <td class="table-cell-primary">
                                 @if ($session->account)
                                     <div class="flex items-center gap-3">
                                         <div class="table-avatar">
@@ -181,8 +181,8 @@
                                         </div>
 
                                         <div class="table-stack table-stack-tight">
-                                            <div class="table-title text-sm">{{ $session->account->username }}</div>
-                                            <div class="table-meta max-w-[240px] truncate" title="{{ $session->account->email }}">
+                                            <div class="table-title table-truncate table-truncate-md text-sm" title="{{ $session->account->username }}">{{ $session->account->username }}</div>
+                                            <div class="table-meta table-truncate table-truncate-md" title="{{ $session->account->email }}">
                                                 {{ $session->account->email }}
                                             </div>
                                         </div>
@@ -193,10 +193,10 @@
                             </td>
                         @endif
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @if ($session->device)
                                 <div class="table-stack table-stack-tight">
-                                    <div class="table-title max-w-[220px] truncate text-sm" title="{{ $session->device->hwid_hash ?? __('Unknown Device') }}">
+                                    <div class="table-title table-code table-truncate table-truncate-md text-sm" title="{{ $session->device->hwid_hash ?? __('Unknown Device') }}">
                                         {{ $session->device->hwid_hash ?? __('Unknown Device') }}
                                     </div>
                                     <div class="table-meta">{{ __('ID:') }} {{ $session->device->id }}</div>
@@ -206,13 +206,13 @@
                             @endif
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
-                            <span class="table-meta inline-block max-w-[180px] truncate align-middle" title="{{ $session->ip_address ?? __('N/A') }}">
+                        <td class="table-cell">
+                            <span class="table-meta table-truncate table-truncate-sm" title="{{ $session->ip_address ?? __('N/A') }}">
                                 {{ $session->ip_address ?? __('N/A') }}
                             </span>
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @php
                                 $clientVersion = (string) ($session->client_version ?? __('Unknown'));
                                 $clientVersionPreview = \Illuminate\Support\Str::limit($clientVersion, 24, '...');
@@ -220,7 +220,7 @@
 
                             <button
                                 type="button"
-                                class="badge badge-default inline-flex max-w-[190px] items-center truncate text-left transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                class="badge badge-default table-inline-copy table-truncate table-truncate-sm transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
                                 title="{{ $clientVersion }}"
                                 data-copy-value="{{ $clientVersion }}"
                                 onclick="copyTextValue(this)"
@@ -229,11 +229,11 @@
                             </button>
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             <x-status-badge :status="$session->isActive() ? 'active' : 'error'" :text="$session->isActive() ? __('Active') : __('Expired')" />
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @if ($session->last_heartbeat_at)
                                 <div class="table-stack table-stack-tight">
                                     <div>{{ $session->last_heartbeat_at->diffForHumans() }}</div>
@@ -244,7 +244,7 @@
                             @endif
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @if ($session->created_at)
                                 <div class="table-stack table-stack-tight">
                                     <div>{{ $session->created_at->diffForHumans() }}</div>
@@ -255,19 +255,11 @@
                             @endif
                         </td>
 
-                        <td class="table-cell whitespace-nowrap text-right">
-                            <div class="table-actions table-actions--nowrap">
+                        <td class="table-cell table-cell-fit text-right">
+                            <div class="table-actions" aria-label="{{ __('Session row actions') }}">
                                 <a href="{{ route('sessions.show', $session) }}" class="table-action table-action--primary">
                                     {{ __('View') }}
                                 </a>
-
-                                <form action="{{ route('sessions.destroy', $session) }}" method="POST" class="inline" onsubmit="return confirm('{{ $terminateSessionConfirmation }}')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="table-action table-action--danger">
-                                        {{ __('Terminate') }}
-                                    </button>
-                                </form>
                             </div>
                         </td>
                     </tr>

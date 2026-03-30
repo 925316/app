@@ -115,6 +115,25 @@ it('admin can search devices', function () {
     $response->assertViewHas('devices');
 });
 
+it('admin device index uses a single view action per row', function () {
+    $deviceOwner = Account::factory()->create();
+    $device = AccountDevice::factory()->create([
+        'account_id' => $deviceOwner->id,
+        'bound_at' => now(),
+        'unbound_at' => null,
+    ]);
+
+    $this->actingAs($this->admin)
+        ->get(route('devices.index'))
+        ->assertSuccessful()
+        ->assertSee('aria-label="Device row actions"', false)
+        ->assertSee(route('accounts.show', $deviceOwner).'#account-device-'.$device->id, false)
+        ->assertDontSee('devices.unbind-admin', false)
+        ->assertDontSee('devices.reset-hwid-admin', false)
+        ->assertDontSee('>Unbind<', false)
+        ->assertDontSee('>Reset HWID<', false);
+});
+
 it('admin can unbind a device', function () {
     $device = AccountDevice::factory()->create([
         'account_id' => $this->regularUser->id,

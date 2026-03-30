@@ -32,14 +32,17 @@ it('accounts index surfaces active filter chips with stable markers', function (
         ->assertSee('data-active-filters', false);
 });
 
-it('accounts index keeps row actions on a single horizontal line', function () {
+it('accounts index prefers a single view action in each row', function () {
     $admin = createAdmin();
     Account::factory()->create();
 
     actingAs($admin)
         ->get(route('accounts.index'))
         ->assertSuccessful()
-        ->assertSee('table-actions table-actions--nowrap', false);
+        ->assertSee('table-action table-action--primary', false)
+        ->assertSee('aria-label="Account row actions"', false)
+        ->assertDontSee('table-action table-action--danger', false)
+        ->assertDontSee('onsubmit="return confirm', false);
 });
 
 it('accounts index shows statistics', function () {
