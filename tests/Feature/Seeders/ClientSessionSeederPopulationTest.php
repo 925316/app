@@ -112,16 +112,18 @@ it('seeds mixed client versions and keeps older versions among long-inactive ses
         ->filter(fn (mixed $version): bool => is_string($version) && $version !== '')
         ->values();
 
-    expect($distinctVersions->count())->toBeGreaterThanOrEqual(2);
+    $latestStableVersion = PackageService::getLatestRelease('stable')?->version;
 
-    $latestVersion = $distinctVersions->first();
+    expect($distinctVersions->count())->toBeGreaterThanOrEqual(2)
+        ->and($latestStableVersion)->not->toBeNull()
+        ->and($distinctVersions->contains($latestStableVersion))->toBeTrue();
 
     $dormantOldVersionCount = ClientSession::query()
         ->where(function ($query): void {
             $query->whereNull('last_heartbeat_at')
                 ->orWhere('last_heartbeat_at', '<', now()->subDays(30));
         })
-        ->where('client_version', '!=', $latestVersion)
+        ->where('client_version', '!=', $latestStableVersion)
         ->count();
 
     expect($dormantOldVersionCount)->toBeGreaterThanOrEqual(1);

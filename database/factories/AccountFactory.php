@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -52,6 +54,45 @@ class AccountFactory extends Factory
         'qq.com',
     ];
 
+    private function toCarbon(mixed $value): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value->copy();
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::instance($value);
+        }
+
+        if (is_string($value) && $value !== '') {
+            return Carbon::parse($value);
+        }
+
+        return null;
+    }
+
+    private function randomDateBetween(Carbon $start, Carbon $end): Carbon
+    {
+        if ($start->greaterThan($end)) {
+            return $end->copy();
+        }
+
+        return Carbon::instance(fake()->dateTimeBetween($start, $end));
+    }
+
+    private function randomOptionalDateBetween(Carbon $start, Carbon $end, float $weight): ?Carbon
+    {
+        if ($start->greaterThan($end)) {
+            return null;
+        }
+
+        if (! fake()->boolean((int) round($weight * 100))) {
+            return null;
+        }
+
+        return $this->randomDateBetween($start, $end);
+    }
+
     /**
      * Define the model's default state.
      *
@@ -59,13 +100,22 @@ class AccountFactory extends Factory
      */
     public function definition(): array
     {
-        $createdAt = fake()->dateTimeBetween('-365 days', 'now');
+        $now = now();
+        $createdAt = Carbon::instance(fake()->dateTimeBetween($now->copy()->subDays(365), $now));
         $suspended = fake()->boolean(5); // 5% chance of being suspended
-        $suspendedUntil = $suspended ? fake()->optional(0.5)->dateTimeBetween('now', '+30 days') : null;
-        $verificationUpperBound = $suspendedUntil && $suspendedUntil < now() ? $suspendedUntil : now();
+        $suspendedUntil = $suspended
+            ? $this->randomOptionalDateBetween($now, $now->copy()->addDays(30), 0.5)
+            : null;
+        $verificationUpperBound = $now->copy();
+        if ($suspendedUntil instanceof Carbon && $suspendedUntil->lessThan($verificationUpperBound)) {
+            $verificationUpperBound = $suspendedUntil->copy();
+        }
+        if ($verificationUpperBound->lessThan($createdAt)) {
+            $verificationUpperBound = $createdAt->copy();
+        }
         $username = $this->generateUsername();
         $email = $this->generateEmail($username);
-        $emailVerifiedAt = fake()->dateTimeBetween($createdAt, $verificationUpperBound);
+        $emailVerifiedAt = $this->randomDateBetween($createdAt, $verificationUpperBound);
         $hasTwoFactor = fake()->boolean(20);
 
         $twoFactorSecret = null;
@@ -77,19 +127,28 @@ class AccountFactory extends Factory
             $twoFactorRecoveryCodes = encrypt(json_encode([Str::random(10), Str::random(10)]));
 
             if ($emailVerifiedAt && fake()->boolean(80)) {
-                $twoFactorConfirmedAt = fake()->dateTimeBetween($emailVerifiedAt, $verificationUpperBound);
+                $twoFactorFloor = $emailVerifiedAt->copy();
+                if ($twoFactorFloor->greaterThan($verificationUpperBound)) {
+                    $twoFactorFloor = $verificationUpperBound->copy();
+                }
+
+                $twoFactorConfirmedAt = $this->randomDateBetween($twoFactorFloor, $verificationUpperBound);
             }
         }
+
+        $lastLoginAt = $this->randomOptionalDateBetween($createdAt, $now, 0.7);
+        $hwidLastResetAt = $this->randomOptionalDateBetween($createdAt, $now, 0.3);
+        $updatedAt = $this->randomDateBetween($createdAt, $now);
 
         return [
             'username' => $username,
             'email' => $email,
             'password' => Hash::make('password'), // Default test password
-            'last_login_at' => fake()->optional(0.7)->dateTimeBetween($createdAt, 'now'),
+            'last_login_at' => $lastLoginAt,
             'last_ip_address' => fake()->boolean(70) ? $this->generateValidIpv4() : null,
             'last_user_agent' => fake()->optional()->userAgent(),
             'hwid_reset_count' => fake()->numberBetween(0, 5),
-            'hwid_last_reset_at' => fake()->optional(0.3)->dateTimeBetween($createdAt, 'now'),
+            'hwid_last_reset_at' => $hwidLastResetAt,
             'is_suspended' => $suspended,
             'suspension_reason' => $suspended ? fake()->randomElement([
                 'Violation of terms of service',
@@ -105,7 +164,7 @@ class AccountFactory extends Factory
             'two_factor_confirmed_at' => $twoFactorConfirmedAt,
             'remember_token' => Str::random(10),
             'created_at' => $createdAt,
-            'updated_at' => fake()->dateTimeBetween($createdAt, 'now'),
+            'updated_at' => $updatedAt,
         ];
     }
 
@@ -171,12 +230,18 @@ class AccountFactory extends Factory
      */
     public function verified(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => fake()->dateTimeBetween(
-                $attributes['created_at'] ?? '-1 year',
-                'now'
-            ),
-        ]);
+        return $this->state(function (array $attributes): array {
+            $createdAt = $this->toCarbon($attributes['created_at'] ?? null) ?? now()->subYear();
+            $now = now();
+
+            if ($createdAt->greaterThan($now)) {
+                $createdAt = $now->copy();
+            }
+
+            return [
+                'email_verified_at' => $this->randomDateBetween($createdAt, $now),
+            ];
+        });
     }
 
     /**
@@ -185,14 +250,42 @@ class AccountFactory extends Factory
     public function withTwoFactor(): static
     {
         return $this->state(function (array $attributes) {
-            $createdAt = $attributes['created_at'] ?? now()->subDays(30);
-            $verificationFloor = $attributes['email_verified_at'] ?? $createdAt;
+            $createdAt = $this->toCarbon($attributes['created_at'] ?? null) ?? now()->subDays(30);
+            $now = now();
+
+            if ($createdAt->greaterThan($now)) {
+                $createdAt = $now->copy();
+            }
+
+            $verificationFloor = $this->toCarbon($attributes['email_verified_at'] ?? null) ?? $createdAt->copy();
+            if ($verificationFloor->lessThan($createdAt)) {
+                $verificationFloor = $createdAt->copy();
+            }
+            if ($verificationFloor->greaterThan($now)) {
+                $verificationFloor = $now->copy();
+            }
+
+            $emailVerifiedAt = $this->toCarbon($attributes['email_verified_at'] ?? null)
+                ?? $this->randomDateBetween($createdAt, $now);
+            if ($emailVerifiedAt->lessThan($createdAt)) {
+                $emailVerifiedAt = $createdAt->copy();
+            }
+            if ($emailVerifiedAt->greaterThan($now)) {
+                $emailVerifiedAt = $now->copy();
+            }
+
+            $twoFactorFloor = $verificationFloor->greaterThan($emailVerifiedAt)
+                ? $verificationFloor->copy()
+                : $emailVerifiedAt->copy();
+            if ($twoFactorFloor->greaterThan($now)) {
+                $twoFactorFloor = $now->copy();
+            }
 
             return [
-                'email_verified_at' => $attributes['email_verified_at'] ?? fake()->dateTimeBetween($createdAt, 'now'),
+                'email_verified_at' => $emailVerifiedAt,
                 'two_factor_secret' => encrypt('secret'),
                 'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
-                'two_factor_confirmed_at' => fake()->dateTimeBetween($verificationFloor, 'now'),
+                'two_factor_confirmed_at' => $this->randomDateBetween($twoFactorFloor, $now),
             ];
         });
     }
@@ -202,14 +295,18 @@ class AccountFactory extends Factory
      */
     public function suspended(?string $reason = null): static
     {
-        return $this->state(fn (array $attributes) => [
-            'is_suspended' => true,
-            'suspension_reason' => $reason ?? fake()->randomElement([
-                'Violation of terms of service',
-                'Suspicious activity detected',
-            ]),
-            'suspended_until' => fake()->optional(0.7)->dateTimeBetween('now', '+30 days'),
-        ]);
+        return $this->state(function (array $attributes) use ($reason): array {
+            $now = now();
+
+            return [
+                'is_suspended' => true,
+                'suspension_reason' => $reason ?? fake()->randomElement([
+                    'Violation of terms of service',
+                    'Suspicious activity detected',
+                ]),
+                'suspended_until' => $this->randomOptionalDateBetween($now, $now->copy()->addDays(30), 0.7),
+            ];
+        });
     }
 
     /**

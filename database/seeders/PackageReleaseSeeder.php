@@ -10,6 +10,8 @@ class PackageReleaseSeeder extends Seeder
 {
     private const BETA_INSERTION_INTERVAL = 5;
 
+    private const MINIMUM_COMMIT_DATES_FOR_GIT_TIMELINE = 15;
+
     private const OLDER_BUCKET_YEAR = 25;
 
     private const OLDER_BUCKET_MONTH = 3;
@@ -37,7 +39,7 @@ class PackageReleaseSeeder extends Seeder
     private function buildReleaseTimelineFromGit(): array
     {
         $commitDates = $this->readCommitDates();
-        if ($commitDates === []) {
+        if (count($commitDates) < self::MINIMUM_COMMIT_DATES_FOR_GIT_TIMELINE) {
             return $this->buildFallbackReleaseTimeline();
         }
 
@@ -91,7 +93,25 @@ class PackageReleaseSeeder extends Seeder
             ];
         }
 
+        if (! $this->containsDevelopmentRelease($releases)) {
+            return $this->buildFallbackReleaseTimeline();
+        }
+
         return $releases;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $releases
+     */
+    private function containsDevelopmentRelease(array $releases): bool
+    {
+        foreach ($releases as $release) {
+            if (is_array($release) && ($release['release_channel'] ?? null) === 'dev') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -205,7 +225,9 @@ class PackageReleaseSeeder extends Seeder
 
     private function buildDownloadUrl(string $version, string $channel): string
     {
-        $platform = fake()->randomElement(['win-x64', 'linux-x64', 'macos-universal']);
+        $platforms = ['win-x64', 'linux-x64', 'macos-universal'];
+        $index = abs(crc32($version.'|'.$channel)) % count($platforms);
+        $platform = $platforms[$index];
 
         return "https://downloads.demo-license.local/releases/{$channel}/{$version}/acme-client-{$version}-{$platform}.zip";
     }

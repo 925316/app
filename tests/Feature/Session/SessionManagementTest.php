@@ -173,13 +173,13 @@ it('sessions index renders copy-friendly truncated cells for long device and ver
     ClientSession::factory()->create([
         'account_id' => $account->id,
         'device_id' => $device->id,
-        'client_version' => '26.3.30-build-with-a-very-long-suffix-for-ui-checks',
+        'client_version' => '26.3.30-build-with-a-very-long-suffix-for-ui-check',
     ]);
 
     $this->actingAs($this->admin)
         ->get(route('sessions.index'))
         ->assertSuccessful()
-        ->assertSee('data-copy-value="26.3.30-build-with-a-very-long-suffix-for-ui-checks"', false)
+        ->assertSee('data-copy-value="26.3.30-build-with-a-very-long-suffix-for-ui-check"', false)
         ->assertSee('onclick="copyTextValue(this)"', false)
         ->assertSee('max-w-[220px] truncate', false);
 });

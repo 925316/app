@@ -103,8 +103,14 @@ it('does not create upgrade-chain timeline artifacts for @test.com personas', fu
 
 it('seeds usernames as lowercase alphanumeric only and valid lowercase emails', function () {
     $invalidUsernames = Account::query()
-        ->whereRaw("username NOT GLOB '[a-z0-9]*'")
-        ->orWhereRaw('length(username) = 0')
+        ->get('username')
+        ->filter(function (Account $account): bool {
+            if (! is_string($account->username) || $account->username === '') {
+                return true;
+            }
+
+            return preg_match('/^[a-z0-9]+$/', $account->username) !== 1;
+        })
         ->count();
 
     $invalidEmails = Account::query()
