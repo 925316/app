@@ -20,6 +20,9 @@
 </head>
 
 @php
+    $launchDate = \Carbon\CarbonImmutable::parse('2026-03-28');
+    $launchDateLabel = $launchDate->locale(app()->getLocale())->isoFormat('ll');
+
     $heroHighlights = [
         [
             'title' => __('License Policy'),
@@ -185,7 +188,10 @@
                 </div>
 
                 <aside class="landing-fade-up landing-section-anchor" style="animation-delay: 170ms;" id="signal"
-                    x-data="landingSignalBoard()"
+                    x-data="landingSignalBoard({
+                        locale: @js(app()->getLocale()),
+                        launchLabel: @js($launchDateLabel),
+                    })"
                     aria-labelledby="signal-heading">
                     <div class="rounded-[1.9rem] border border-[rgb(var(--landing-line)/0.9)] bg-[rgb(var(--landing-surface)/0.84)] p-6 shadow-[0_26px_60px_rgb(8_6_18/0.42)] backdrop-blur sm:p-7">
                         <div class="flex items-center justify-between">
@@ -221,7 +227,7 @@
                                         {{ __('today') }}
                                     </span>
                                     <span class="rounded-full border border-[rgb(var(--landing-line)/0.5)] px-2.5 py-1 text-[rgb(var(--landing-glow))]">
-                                        {{ __('Since') }} <span x-text="launchLabel()">Mar 29, 2026</span>
+                                        {{ __('Since') }} <span x-text="launchLabel()">{{ $launchDateLabel }}</span>
                                     </span>
                                 </div>
                             </article>

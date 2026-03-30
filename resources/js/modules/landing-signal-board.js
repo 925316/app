@@ -1,7 +1,9 @@
 export default function registerLandingSignalBoard(Alpine) {
-    Alpine.data('landingSignalBoard', () => ({
+    Alpine.data('landingSignalBoard', (options = {}) => ({
         config: {
             startDate: '2026-03-28',
+            locale: options.locale ?? document.documentElement.lang ?? 'en',
+            launchLabel: options.launchLabel ?? '',
             activeLicenses: {
                 base: 2314,
                 maxDailyGrowth: 9,
@@ -246,11 +248,7 @@ export default function registerLandingSignalBoard(Alpine) {
             return `${Number(value).toFixed(precision)}%`;
         },
         launchLabel() {
-            return new Intl.DateTimeFormat(undefined, {
-                month: 'short',
-                day: '2-digit',
-                year: 'numeric',
-            }).format(new Date(`${this.config.startDate}T00:00:00`));
+            return this.config.launchLabel;
         },
         driftLabel() {
             const variation = Number(this.stats.deploySuccess.variation).toFixed(1);

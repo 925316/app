@@ -130,6 +130,51 @@ test('selected english locale remains selected even when browser prefers chinese
         ->assertSee('option value="en" selected', false);
 });
 
+test('homepage launch date follows selected locale instead of browser locale', function () {
+    $user = createAdmin();
+    $cookieName = (string) config('app.locale_cookie_name', 'locale');
+
+    $this->actingAs($user)
+        ->withHeader('Accept-Language', 'zh-CN,zh;q=0.9,en;q=0.8')
+        ->patch('/profile/locale', [
+            'locale' => 'en',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/');
+
+    $this->actingAs($user)
+        ->withHeader('Accept-Language', 'zh-CN,zh;q=0.9,en;q=0.8')
+        ->withCookie($cookieName, 'en')
+        ->get('/')
+        ->assertOk()
+        ->assertSee('x-data="landingSignalBoard({', false)
+        ->assertSee("locale: 'en'", false)
+        ->assertSee("launchLabel: 'Mar 28, 2026'", false)
+        ->assertSee('>Mar 28, 2026<', false)
+        ->assertDontSee('2026年3月28日', false);
+});
+
+test('homepage launch date fallback matches active chinese locale', function () {
+    $user = createAdmin();
+    $cookieName = (string) config('app.locale_cookie_name', 'locale');
+
+    $this->actingAs($user)
+        ->patch('/profile/locale', [
+            'locale' => 'zh_CN',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/');
+
+    $this->actingAs($user)
+        ->withCookie($cookieName, 'zh_CN')
+        ->get('/')
+        ->assertOk()
+        ->assertSee("locale: 'zh_CN'", false)
+        ->assertSee("launchLabel: '2026\u5e743\u670828\u65e5'", false)
+        ->assertSee('>2026年3月28日<', false)
+        ->assertDontSee('>Mar 28, 2026<', false);
+});
+
 test('locale update redirects back to the originating page', function () {
     $user = createAdmin();
     $sessionKey = (string) config('app.locale_session_key', 'locale');
