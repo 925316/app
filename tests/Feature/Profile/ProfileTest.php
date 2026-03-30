@@ -11,7 +11,9 @@ test('profile page is displayed', function () {
 
     $response->assertOk()
         ->assertSee('role="dialog"', false)
-        ->assertSee('aria-modal="true"', false);
+        ->assertSee('aria-modal="true"', false)
+        ->assertSee('Sidebar control only')
+        ->assertDontSee('Language Preferences');
 });
 
 test('non-admin cannot update username and email', function () {
@@ -95,7 +97,10 @@ test('selected locale is applied on subsequent profile request', function () {
         ->withCookie($cookieName, 'ko')
         ->get('/profile')
         ->assertOk()
-        ->assertSee('option value="ko" selected', false);
+        ->assertSee('sidebar-locale-label', false)
+        ->assertSee('id="sidebar-locale-select"', false)
+        ->assertSee('value="ko"', false)
+        ->assertDontSee('Language Preferences');
 });
 
 test('session locale takes precedence over browser preferred language', function () {
@@ -108,7 +113,10 @@ test('session locale takes precedence over browser preferred language', function
         ->withSession([$sessionKey => 'ja'])
         ->get('/profile')
         ->assertOk()
-        ->assertSee('option value="ja" selected', false);
+        ->assertSee('sidebar-locale-label', false)
+        ->assertSee('id="sidebar-locale-select"', false)
+        ->assertSee('value="ja"', false)
+        ->assertDontSee('Language Preferences');
 });
 
 test('selected english locale remains selected even when browser prefers chinese', function () {
@@ -127,7 +135,10 @@ test('selected english locale remains selected even when browser prefers chinese
         ->withHeader('Accept-Language', 'zh-CN,zh;q=0.9,en;q=0.8')
         ->get('/profile')
         ->assertOk()
-        ->assertSee('option value="en" selected', false);
+        ->assertSee('sidebar-locale-label', false)
+        ->assertSee('id="sidebar-locale-select"', false)
+        ->assertSee('value="en"', false)
+        ->assertDontSee('Language Preferences');
 });
 
 test('homepage launch date follows selected locale instead of browser locale', function () {
