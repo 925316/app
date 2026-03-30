@@ -1,0 +1,73 @@
+name: Setup Laravel project
+description: Shared PHP, Composer, Node, and asset build setup for repository workflows
+
+inputs:
+  php-version:
+    description: PHP version to install
+    required: false
+    default: '8.3'
+  php-extensions:
+    description: Comma-separated PHP extensions to install
+    required: false
+    default: 'mbstring, dom, fileinfo, pdo_mysql'
+  composer-flags:
+    description: Flags passed to composer install
+    required: false
+    default: '--no-progress --prefer-dist --optimize-autoloader'
+  composer-cache-key:
+    description: Additional suffix used to isolate Composer vendor cache variants
+    required: false
+    default: 'dev'
+  setup-node:
+    description: Whether to install Node.js
+    required: false
+    default: 'false'
+  node-version:
+    description: Node.js version to install when enabled
+    required: false
+    default: '18'
+  install-npm:
+    description: Whether to run npm ci
+    required: false
+    default: 'false'
+  build-assets:
+    description: Whether to run the frontend asset build
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: ${{ inputs.php-extensions }}
+        coverage: none
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v5
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ inputs.php-version }}-${{ inputs.composer-cache-key }}-${{ hashFiles('**/composer.lock') }}
+
+    - name: Install Composer dependencies
+      shell: bash
+      run: composer install ${{ inputs.composer-flags }}
+
+    - name: Setup Node.js
+      if: inputs.setup-node == 'true'
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+
+    - name: Install npm dependencies
+      if: inputs.install-npm == 'true'
+      shell: bash
+      run: npm ci
+
+    - name: Build assets
+      if: inputs.build-assets == 'true'
+      shell: bash
+      run: npm run build
