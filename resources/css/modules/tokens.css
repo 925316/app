@@ -58,9 +58,16 @@
 [data-shell-theme='cinematic'] {
     --shell-canvas: 249 244 236;
     --shell-canvas-alt: 236 228 216;
+    --shell-canvas-grid: 194 176 191;
+    --shell-canvas-grid-strong: 166 148 170;
     --shell-surface: 255 250 244;
     --shell-surface-soft: 244 235 224;
     --shell-surface-strong: 235 225 214;
+    --shell-surface-rgb: 255 250 244;
+    --shell-surface-soft-rgb: 244 235 224;
+    --shell-surface-panel: 251 246 239;
+    --shell-surface-panel-soft: 242 233 222;
+    --shell-surface-panel-muted: 239 230 218;
     --shell-ink: 53 42 57;
     --shell-muted: 112 98 121;
     --shell-line: 194 176 191;
@@ -76,9 +83,16 @@
 :root.dark [data-shell-theme='cinematic'] {
     --shell-canvas: 8 7 16;
     --shell-canvas-alt: 17 14 29;
+    --shell-canvas-grid: 91 77 132;
+    --shell-canvas-grid-strong: 121 106 163;
     --shell-surface: 22 18 37;
     --shell-surface-soft: 31 27 49;
     --shell-surface-strong: 38 33 58;
+    --shell-surface-rgb: 22 18 37;
+    --shell-surface-soft-rgb: 31 27 49;
+    --shell-surface-panel: 20 17 35;
+    --shell-surface-panel-soft: 29 25 47;
+    --shell-surface-panel-muted: 35 30 56;
     --shell-ink: 245 243 239;
     --shell-muted: 173 164 190;
     --shell-line: 97 82 138;

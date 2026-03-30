@@ -1,61 +1,75 @@
 /* Card Styles */
 .card {
-    @apply rounded-xl border;
-    @apply transition-all duration-200 hover:shadow-md;
     border-radius: var(--radius-xl);
+    border-width: 1px;
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     box-shadow: var(--shadow-sm);
+    transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
 }
 
 .card-shell {
-    @apply rounded-2xl border p-6;
+    border-radius: 1rem;
+    border-width: 1px;
+    padding: 1.5rem;
     border-color: rgb(var(--color-border-subtle) / 0.85);
     background: linear-gradient(145deg, rgb(var(--color-surface-card) / 0.95), rgb(var(--color-surface-card-muted) / 0.82));
     box-shadow: var(--shadow-md);
 }
 
 .card-shell-muted {
-    @apply rounded-xl border p-4;
+    border-radius: var(--radius-xl);
+    border-width: 1px;
+    padding: 1rem;
     border-color: rgb(var(--color-border-subtle) / 0.75);
     background-color: rgb(var(--color-surface-card-muted) / 0.7);
 }
 
 .section-kicker {
-    @apply text-xs font-semibold uppercase tracking-wide;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
     color: rgb(var(--color-text-muted));
 }
 
 .card-glass {
-    @apply backdrop-blur-sm rounded-2xl border;
+    border-radius: 1rem;
+    border-width: 1px;
+    backdrop-filter: blur(4px);
     border-color: rgb(var(--color-border-subtle) / 0.65);
     background-color: rgb(var(--color-surface-card) / 0.8);
     box-shadow: var(--shadow-lg);
 }
 
 .card-stat {
-    @apply rounded-xl border p-5 transition-all duration-200 hover:shadow-md;
     border-radius: var(--radius-xl);
+    border-width: 1px;
+    padding: 1.25rem;
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     box-shadow: var(--shadow-sm);
+    transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
 }
 
 .card-stat:hover {
     border-color: rgb(var(--color-border-strong));
+    box-shadow: var(--shadow-md);
 }
 
 .card-form {
-    @apply overflow-hidden rounded-xl border;
+    overflow: hidden;
     border-radius: var(--radius-xl);
+    border-width: 1px;
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     box-shadow: var(--shadow-sm);
 }
 
 .card-info {
-    @apply rounded-xl border p-6;
     border-radius: var(--radius-xl);
+    border-width: 1px;
+    padding: 1.5rem;
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     box-shadow: var(--shadow-sm);
@@ -305,39 +319,84 @@
 }
 
 .card-icon-container {
-    @apply flex items-center justify-center w-12 h-12 rounded-lg;
+    display: flex;
+    height: 3rem;
+    width: 3rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
 }
 
 .icon-blue {
-    @apply bg-blue-500/20 text-blue-600 dark:text-blue-300;
+    background-color: rgb(59 130 246 / 0.2);
+    color: rgb(37 99 235);
 }
 
 .icon-green {
-    @apply bg-green-500/20 text-green-600 dark:text-green-300;
+    background-color: rgb(34 197 94 / 0.2);
+    color: rgb(22 163 74);
 }
 
 .icon-red {
-    @apply bg-red-500/20 text-red-600 dark:text-red-300;
+    background-color: rgb(239 68 68 / 0.2);
+    color: rgb(220 38 38);
 }
 
 .icon-yellow {
-    @apply bg-yellow-500/20 text-yellow-600 dark:text-yellow-300;
+    background-color: rgb(234 179 8 / 0.2);
+    color: rgb(217 119 6);
 }
 
 .icon-purple {
-    @apply bg-purple-500/20 text-purple-600 dark:text-purple-300;
+    background-color: rgb(168 85 247 / 0.2);
+    color: rgb(147 51 234);
 }
 
 .icon-orange {
-    @apply bg-orange-500/20 text-orange-600 dark:text-orange-300;
+    background-color: rgb(249 115 22 / 0.2);
+    color: rgb(234 88 12);
 }
 
 .icon-indigo {
-    @apply bg-indigo-500/20 text-indigo-600 dark:text-indigo-300;
+    background-color: rgb(99 102 241 / 0.2);
+    color: rgb(79 70 229);
 }
 
 .icon-gray {
-    @apply bg-gray-500/20 text-gray-600 dark:text-gray-300;
+    background-color: rgb(107 114 128 / 0.2);
+    color: rgb(75 85 99);
+}
+
+:root.dark .icon-blue {
+    color: rgb(147 197 253);
+}
+
+:root.dark .icon-green {
+    color: rgb(134 239 172);
+}
+
+:root.dark .icon-red {
+    color: rgb(252 165 165);
+}
+
+:root.dark .icon-yellow {
+    color: rgb(253 224 71);
+}
+
+:root.dark .icon-purple {
+    color: rgb(216 180 254);
+}
+
+:root.dark .icon-orange {
+    color: rgb(253 186 116);
+}
+
+:root.dark .icon-indigo {
+    color: rgb(165 180 252);
+}
+
+:root.dark .icon-gray {
+    color: rgb(209 213 219);
 }
 
 [data-shell-theme='cinematic'] .card,
@@ -347,6 +406,8 @@
 [data-shell-theme='cinematic'] .card-shell,
 [data-shell-theme='cinematic'] .card-glass,
 [data-shell-theme='cinematic'] .card-shell-muted {
+    position: relative;
+    isolation: isolate;
     border-color: rgb(var(--shell-line) / 0.5);
     box-shadow: var(--shell-shadow-md);
 }
@@ -358,11 +419,44 @@
 [data-shell-theme='cinematic'] .card-shell,
 [data-shell-theme='cinematic'] .card-glass {
     background:
-        linear-gradient(145deg, rgb(var(--shell-surface) / 0.96), rgb(var(--shell-surface-soft) / 0.9));
+        linear-gradient(160deg, rgb(var(--shell-surface-panel) / 0.95), rgb(var(--shell-surface-panel-soft) / 0.92));
+    backdrop-filter: blur(18px) saturate(120%);
 }
 
 [data-shell-theme='cinematic'] .card-shell-muted {
-    background: rgb(var(--shell-surface-soft) / 0.82);
+    background:
+        linear-gradient(155deg, rgb(var(--shell-surface-panel-muted) / 0.9), rgb(var(--shell-surface-panel-soft) / 0.78));
+    backdrop-filter: blur(14px) saturate(115%);
+}
+
+[data-shell-theme='cinematic'] .card::before,
+[data-shell-theme='cinematic'] .card-form::before,
+[data-shell-theme='cinematic'] .card-info::before,
+[data-shell-theme='cinematic'] .card-stat::before,
+[data-shell-theme='cinematic'] .card-shell::before,
+[data-shell-theme='cinematic'] .card-glass::before,
+[data-shell-theme='cinematic'] .card-shell-muted::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 24%, transparent 76%, rgb(255 255 255 / 0.04));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+    z-index: -1;
+}
+
+:root.dark [data-shell-theme='cinematic'] .card::before,
+:root.dark [data-shell-theme='cinematic'] .card-form::before,
+:root.dark [data-shell-theme='cinematic'] .card-info::before,
+:root.dark [data-shell-theme='cinematic'] .card-stat::before,
+:root.dark [data-shell-theme='cinematic'] .card-shell::before,
+:root.dark [data-shell-theme='cinematic'] .card-glass::before,
+:root.dark [data-shell-theme='cinematic'] .card-shell-muted::before {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 24%, transparent 78%, rgb(255 255 255 / 0.02));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
 }
 
 [data-shell-theme='cinematic'] .section-kicker {

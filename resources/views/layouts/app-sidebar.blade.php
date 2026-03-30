@@ -100,6 +100,8 @@
         <div class="app-shell-body relative z-0 flex flex-col w-full min-w-0 transition-all duration-300 ml-0"
             :class="{ 'lg:ml-64 lg:w-[calc(100%-16rem)]': $store.sidebar.open, 'lg:ml-16 lg:w-[calc(100%-4rem)]': !$store.sidebar.open }"
             :inert="mobileSidebarOpen && !isDesktop" :aria-hidden="(mobileSidebarOpen && !isDesktop).toString()" x-cloak>
+            <div class="app-shell-canvas" aria-hidden="true"></div>
+
             <!-- Top Header -->
             <header class="app-shell-header">
                 <div class="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-3.5 lg:px-8">
