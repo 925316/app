@@ -35,14 +35,14 @@
 @endphp
 
 <div class="input-icon-wrapper">
-    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+    <div class="input-icon-slot">
         @if ($icon)
             <x-icon :name="$icon" :class="$iconClass" />
         @else
             {{ $slot }}
         @endif
     </div>
-    <input {{ $attributes->class(['form-input', 'input-with-icon', 'block', 'w-full', 'py-3', 'pl-10', 'pr-3'])->merge($inputAttributes) }}
+    <input {{ $attributes->class(['form-input', 'input-with-icon', 'block', 'w-full'])->merge($inputAttributes) }}
         @if ($required) required @endif
         @if ($autofocus) autofocus @endif />
 </div>

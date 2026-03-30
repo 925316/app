@@ -1,10 +1,21 @@
 /* Form Styles */
+.form-input,
+input.form-input,
+select.form-select,
+.form-select {
+    height: 2.5rem;
+    min-height: 2.5rem;
+    padding-block: 0.375rem;
+    padding-inline: 0.9375rem;
+    border-radius: 0.95rem;
+    line-height: 1rem;
+}
+
 .form-input {
     @apply block w-full rounded-lg border;
-    @apply px-4 py-2.5 focus:outline-none focus:ring-2;
+    @apply focus:outline-none focus:ring-2;
     @apply focus:border-transparent transition-all duration-200;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    border-radius: var(--radius-lg);
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     color: rgb(var(--color-text-primary));
@@ -26,19 +37,26 @@
 
 .form-input:focus {
     --tw-ring-color: rgb(var(--color-brand) / 0.35);
+    box-shadow: 0 0 0 1px rgb(var(--color-brand) / 0.2);
 }
 
 .input-icon-wrapper {
     @apply relative;
 }
 
+.input-icon-slot {
+    @apply pointer-events-none absolute inset-y-0 left-0 flex items-center;
+    padding-inline-start: 0.9375rem;
+}
+
 .input-icon {
-    @apply absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none;
+    @apply h-4 w-4;
     color: rgb(var(--color-text-muted));
 }
 
 .input-with-icon {
-    @apply pl-11;
+    padding-inline-start: 2.875rem;
+    padding-inline-end: 0.9375rem;
 }
 
 .form-label {
@@ -65,13 +83,18 @@
 
 .form-select {
     @apply block w-full rounded-lg border;
-    @apply px-4 py-2.5 focus:outline-none focus:ring-2;
+    @apply focus:outline-none focus:ring-2;
     @apply focus:border-transparent transition-all duration-200;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    border-radius: var(--radius-lg);
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     color: rgb(var(--color-text-primary));
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+    background-position: right 0.875rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+    padding-inline-end: 2.75rem;
 }
 
 .dark .form-select {
@@ -82,6 +105,7 @@
 
 .form-select:focus {
     --tw-ring-color: rgb(var(--color-brand) / 0.35);
+    box-shadow: 0 0 0 1px rgb(var(--color-brand) / 0.2);
 }
 
 .form-textarea {
@@ -174,6 +198,7 @@
 [data-shell-theme='cinematic'] .form-checkbox:focus {
     --tw-ring-color: rgb(var(--shell-accent) / 0.26);
     border-color: rgb(var(--shell-accent) / 0.55);
+    box-shadow: 0 0 0 1px rgb(var(--shell-accent) / 0.22);
 }
 
 [data-shell-theme='cinematic'] .form-label {
@@ -186,6 +211,10 @@
 
 [data-shell-theme='cinematic'] .input-icon {
     color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='rgb(132 149 177)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
 }
 
 [data-shell-theme='cinematic'] .form-note {

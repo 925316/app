@@ -17,9 +17,13 @@ it('input with icon forwards arbitrary input attributes while preserving shared 
         ->toContain('data-probe="foundation"')
         ->toContain('maxlength="120"')
         ->toContain('aria-describedby="email-help"')
+        ->toContain('input-icon-slot')
         ->toContain('form-input')
         ->toContain('input-with-icon')
-        ->toContain('custom-probe');
+        ->toContain('custom-probe')
+        ->not->toContain('py-3')
+        ->not->toContain('pl-10')
+        ->not->toContain('pr-3');
 });
 
 it('auth session status uses the shared status shell', function () {

@@ -126,24 +126,45 @@
             @endphp
 
             <form method="POST" action="{{ route('profile.update-locale') }}" class="sidebar-account-language-form"
+                x-data="{ localeMenuOpen: false }" @click.outside="localeMenuOpen = false" @keydown.escape.window="localeMenuOpen = false"
                 data-sidebar-language-row>
                 @csrf
                 @method('patch')
 
-                <label class="sidebar-account-language-label" for="sidebar-locale-select">{{ __('Language') }}</label>
-                <select id="sidebar-locale-select" name="locale" class="sidebar-account-language-select"
-                    onchange="this.form.submit()">
-                    @if (count($supportedLocales) === 0)
-                        <option value="{{ $currentLocale }}" selected>
-                            {{ strtoupper($currentLocale) }}
-                        </option>
-                    @endif
-                    @foreach ($supportedLocales as $value => $label)
-                        <option value="{{ $value }}" {{ $currentLocale === $value ? 'selected' : '' }}>
-                            {{ $label }}
-                        </option>
-                    @endforeach
-                </select>
+                <span id="sidebar-locale-label" class="sidebar-account-language-label">{{ __('Language') }}</span>
+
+                <div class="sidebar-account-language-control">
+                    <button type="button" class="sidebar-account-language-trigger" data-sidebar-language-trigger aria-haspopup="listbox"
+                        :aria-expanded="localeMenuOpen.toString()" aria-labelledby="sidebar-locale-label"
+                        @click="localeMenuOpen = !localeMenuOpen">
+                        <span class="sidebar-account-language-current">
+                            {{ $supportedLocales[$currentLocale] ?? strtoupper($currentLocale) }}
+                        </span>
+                        <x-icon name="chevron-down" class="sidebar-account-language-trigger-icon" />
+                    </button>
+
+                    <input x-ref="localeInput" id="sidebar-locale-select" type="hidden" name="locale"
+                        value="{{ $currentLocale }}">
+                    <div class="sidebar-account-language-menu" data-sidebar-language-menu x-cloak x-show="localeMenuOpen"
+                        x-transition.opacity.origin.top.right>
+                        @if (count($supportedLocales) === 0)
+                            <button type="button" class="sidebar-account-language-option is-active" disabled>
+                                <span>{{ strtoupper($currentLocale) }}</span>
+                                <x-icon name="check" class="sidebar-account-language-option-icon" />
+                            </button>
+                        @endif
+                        @foreach ($supportedLocales as $value => $label)
+                            <button type="button"
+                                class="sidebar-account-language-option {{ $currentLocale === $value ? 'is-active' : '' }}"
+                                @click="$refs.localeInput.value = '{{ $value }}'; localeMenuOpen = false; $el.form.submit()">
+                                <span>{{ $label }}</span>
+                                @if ($currentLocale === $value)
+                                    <x-icon name="check" class="sidebar-account-language-option-icon" />
+                                @endif
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
             </form>
         </div>
 
