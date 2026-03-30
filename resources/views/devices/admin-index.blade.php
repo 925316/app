@@ -15,6 +15,10 @@
             || filled(request('min_reset_count'))
             || filled(request('account_status'));
 
+        $searchFilterLabel = filled(request('search'))
+            ? __('Search:').' "'.request('search').'"'
+            : null;
+
         $statusLabel = match (request('status')) {
             'bound' => __('Currently Bound'),
             'unbound' => __('Unbound'),
@@ -62,13 +66,13 @@
             </div>
 
             <x-filter-box :action="route('devices.index')" :totalCount="$devices->total()" :title="__('Filter devices')">
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <div class="space-y-2 xl:col-span-2">
+                <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
+                    <div class="space-y-2 md:col-span-6 xl:col-span-5">
                         <label for="search" class="form-label">{{ __('Search') }}</label>
                         <x-input-with-icon id="search" name="search" type="text" :value="request('search')" :placeholder="__('HWID, IP, Username, Email')" icon="search" />
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 md:col-span-3 xl:col-span-2">
                         <label for="status" class="form-label">{{ __('Status') }}</label>
                         <select name="status" id="status" class="form-select">
                             <option value="">{{ __('All') }}</option>
@@ -78,7 +82,7 @@
                         </select>
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 md:col-span-3 xl:col-span-2">
                         <label for="date_range" class="form-label">{{ __('Date Range') }}</label>
                         <select name="date_range" id="date_range" class="form-select">
                             <option value="">{{ __('All Time') }}</option>
@@ -88,20 +92,35 @@
                             <option value="90d" {{ request('date_range') === '90d' ? 'selected' : '' }}>{{ __('Last 90 Days') }}</option>
                         </select>
                     </div>
+
+                    <div class="space-y-2 md:col-span-12 xl:col-span-3 filter-box-actions">
+                        <span class="form-label text-transparent">{{ __('Actions') }}</span>
+                        <div class="form-actions-cluster">
+                            <button type="submit" class="btn btn-primary btn-sm flex-1 justify-center gap-2 xl:flex-none">
+                                <x-icon name="search" class="h-4 w-4" />
+                                {{ __('Apply Filters') }}
+                            </button>
+
+                            <a href="{{ route('devices.index') }}" class="btn btn-secondary btn-sm justify-center gap-2">
+                                <x-icon name="reset" class="h-4 w-4" />
+                                {{ __('Reset') }}
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-divider grid grid-cols-1 items-end gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <div class="space-y-2">
+                <div class="form-divider grid grid-cols-1 gap-4 md:grid-cols-12">
+                    <div class="space-y-2 md:col-span-4 xl:col-span-3">
                         <label for="country_code" class="form-label">{{ __('Country Code') }}</label>
                         <input type="text" name="country_code" id="country_code" value="{{ request('country_code') }}" placeholder="{{ __('e.g., US, CN') }}" class="form-input w-full uppercase">
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 md:col-span-4 xl:col-span-3">
                         <label for="min_reset_count" class="form-label">{{ __('Min HWID Reset') }}</label>
                         <input type="number" name="min_reset_count" id="min_reset_count" value="{{ request('min_reset_count') }}" min="0" class="form-input w-full">
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 md:col-span-4 xl:col-span-3">
                         <label for="account_status" class="form-label">{{ __('Account Status') }}</label>
                         <select name="account_status" id="account_status" class="form-select">
                             <option value="">{{ __('All') }}</option>
@@ -110,20 +129,7 @@
                         </select>
                     </div>
 
-                    <div class="space-y-2 filter-box-actions">
-                        <span class="form-label text-transparent">{{ __('Actions') }}</span>
-                        <div class="form-actions-cluster">
-                            <button type="submit" class="btn btn-primary btn-sm gap-2">
-                                <x-icon name="search" class="h-4 w-4" />
-                                {{ __('Apply Filters') }}
-                            </button>
-
-                            <a href="{{ route('devices.index') }}" class="btn btn-secondary btn-sm gap-2">
-                                <x-icon name="reset" class="h-4 w-4" />
-                                {{ __('Reset') }}
-                            </a>
-                        </div>
-                    </div>
+                    <div class="hidden xl:block xl:col-span-3"></div>
                 </div>
 
                 @if ($hasFilters)
@@ -139,10 +145,7 @@
                         </div>
 
                         <div class="active-filters__list">
-                            @if (filled(request('search')))
-                                @php
-                                    $searchFilterLabel = __('Search:').' "'.request('search').'"';
-                                @endphp
+                            @if ($searchFilterLabel)
                                 <x-filter-badge :label="$searchFilterLabel" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
                             @endif
 
@@ -173,15 +176,13 @@
             <x-table
                 :headers="[
                     __('Account'),
-                    __('HWID Hash'),
-                    __('IP / Country'),
-                    __('First / Last Seen'),
-                    __('Status'),
-                    __('Account Status'),
+                    __('Device'),
+                    __('Activity'),
+                    __('State'),
                     __('HWID Resets'),
                     __('Actions'),
                 ]"
-                :emptyColspan="8"
+                :emptyColspan="6"
                 compact="true"
                 ariaLabel="{{ __('Devices admin table') }}"
             >
@@ -194,9 +195,9 @@
                                         {{ $device->account->initials() }}
                                     </div>
 
-                                    <div class="table-stack table-stack-tight">
+                                    <div class="table-stack table-stack-tight min-w-0">
                                         <div class="table-title table-truncate table-truncate-md text-sm" title="{{ $device->account->username }}">{{ $device->account->username }}</div>
-                                        <div class="table-meta table-truncate table-truncate-md" title="{{ $device->account->email }}">{{ $device->account->email }}</div>
+                                         <div class="table-meta table-truncate table-truncate-md" title="{{ $device->account->email }}">{{ $device->account->email }}</div>
                                     </div>
                                 </div>
                             @else
@@ -206,24 +207,28 @@
 
                         <td class="table-cell">
                             @if ($device->hwid_hash)
-                                <div class="table-stack table-stack-tight">
-                                    <div class="table-title table-code text-sm">
-                                        <span title="{{ $device->hwid_hash }}" class="table-truncate table-truncate-md cursor-help">
+                                <div class="table-stack table-stack-tight min-w-0">
+                                    <button
+                                        type="button"
+                                        class="badge badge-default table-inline-copy max-w-full transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                        title="{{ $device->hwid_hash }}"
+                                        aria-label="{{ __('Copy full HWID') }}"
+                                        data-copy-value="{{ $device->hwid_hash }}"
+                                        data-device-hwid-copy="true"
+                                        onclick="copyDeviceValue(this)"
+                                    >
+                                        <span class="table-truncate table-truncate-md font-mono text-xs sm:text-sm">
                                             {{ \Illuminate\Support\Str::limit($device->hwid_hash, 20, '...') }}
                                         </span>
-                                    </div>
+                                    </button>
                                     <div class="table-meta">{{ __('Device ID:') }} {{ $device->id }}</div>
+                                    <div class="table-meta table-truncate table-truncate-sm" title="{{ $device->ip_address ?? __('Unknown') }}">
+                                        {{ $device->ip_address ?? __('Unknown') }} · {{ $device->country_code ?? __('Unknown') }}
+                                    </div>
                                 </div>
                             @else
                                 <span class="table-meta">{{ __('N/A') }}</span>
                             @endif
-                        </td>
-
-                        <td class="table-cell">
-                            <div class="table-stack table-stack-tight">
-                                <div class="table-truncate table-truncate-sm" title="{{ $device->ip_address ?? __('Unknown') }}">{{ $device->ip_address ?? __('Unknown') }}</div>
-                                <div class="table-meta">{{ $device->country_code ?? __('Unknown') }}</div>
-                            </div>
                         </td>
 
                         <td class="table-cell">
@@ -234,21 +239,21 @@
                         </td>
 
                         <td class="table-cell table-cell-fit">
-                            @if ($device->isBound())
-                                <x-status-badge status="active" :text="__('Currently Bound')" />
-                            @elseif ($device->bound_at)
-                                <x-status-badge status="default" :text="__('Historical')" />
-                            @else
-                                <x-status-badge status="warning" :text="__('Never Bound')" />
-                            @endif
-                        </td>
+                            <div class="table-stack table-stack-tight">
+                                @if ($device->isBound())
+                                    <x-status-badge status="active" :text="__('Currently Bound')" />
+                                @elseif ($device->bound_at)
+                                    <x-status-badge status="default" :text="__('Historical')" />
+                                @else
+                                    <x-status-badge status="warning" :text="__('Never Bound')" />
+                                @endif
 
-                        <td class="table-cell table-cell-fit">
-                            @if ($device->account && $device->account->isSuspended())
-                                <x-status-badge status="suspended" :text="__('Suspended')" />
-                            @else
-                                <x-status-badge status="active" :text="__('Active')" />
-                            @endif
+                                @if ($device->account && $device->account->isSuspended())
+                                    <x-status-badge status="suspended" :text="__('Suspended')" />
+                                @else
+                                    <x-status-badge status="active" :text="__('Active')" />
+                                @endif
+                            </div>
                         </td>
 
                         <td class="table-cell table-cell-fit">
@@ -274,7 +279,7 @@
                     </tr>
                 @empty
                     <tr class="table-row">
-                        <td colspan="8" class="table-empty">
+                        <td colspan="6" class="table-empty">
                             <div class="table-empty-state">
                                 <x-icon name="desktop" class="table-empty-icon" />
                                 <p class="table-empty-title">{{ __('No devices found matching your filters.') }}</p>
@@ -291,3 +296,25 @@
         </section>
     </div>
 </x-app-sidebar-layout>
+
+<script>
+    function copyDeviceValue(element) {
+        const value = element?.getAttribute('data-copy-value') ?? '';
+        if (! value) {
+            return;
+        }
+
+        navigator.clipboard?.writeText(value).then(() => {
+            const originalTitle = element.getAttribute('title') ?? value;
+            element.setAttribute('title', "{{ __('Copied') }}");
+            setTimeout(() => element.setAttribute('title', originalTitle), 1200);
+        }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = value;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        });
+    }
+</script>

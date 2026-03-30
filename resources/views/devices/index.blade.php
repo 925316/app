@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,1fr)]">
+            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.9fr)]">
                 <div class="card-shell-muted space-y-5 p-6">
                     @if ($currentDevice)
                         <div class="flex flex-wrap items-start justify-between gap-4">
@@ -51,11 +51,21 @@
 
                                 <div>
                                     <p class="section-kicker">{{ __('Current device') }}</p>
-                                    <h3 class="card-heading text-2xl font-semibold text-gray-900 dark:text-white">
-                                        <span title="{{ $currentDevice->hwid_hash }}" class="cursor-help font-mono">
-                                            {{ $currentDeviceShortHwid }}
-                                        </span>
-                                    </h3>
+                                    <div class="mt-2">
+                                        <button
+                                            type="button"
+                                            class="badge badge-default table-inline-copy max-w-full transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                            title="{{ $currentDevice->hwid_hash }}"
+                                            aria-label="{{ __('Copy full HWID') }}"
+                                            data-copy-value="{{ $currentDevice->hwid_hash }}"
+                                            data-device-hwid-copy="true"
+                                            onclick="copyDeviceValue(this)"
+                                        >
+                                            <span class="table-truncate table-truncate-lg font-mono text-sm">
+                                                {{ $currentDeviceShortHwid }}
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -154,47 +164,57 @@
                 </aside>
             </div>
 
-            <x-table :headers="[__('HWID'), __('IP / Country'), __('First / Last Seen'), __('Status'), __('Actions')]" :emptyColspan="5" ariaLabel="{{ __('Device history table') }}">
+            <x-table :headers="[__('Device'), __('Activity'), __('Status'), __('Actions')]" :emptyColspan="4" compact="true" ariaLabel="{{ __('Device history table') }}">
                 @forelse ($devices as $device)
                     <tr class="table-row">
-                        <td class="table-cell-primary whitespace-nowrap">
+                        <td class="table-cell-primary">
                             @if ($device->hwid_hash)
-                                <div class="table-stack table-stack-tight">
-                                    <div class="table-title text-sm font-mono">
-                                        <span title="{{ $device->hwid_hash }}" class="cursor-help">
+                                <div class="table-stack table-stack-tight min-w-0">
+                                    <button
+                                        type="button"
+                                        class="badge badge-default table-inline-copy max-w-full transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                        title="{{ $device->hwid_hash }}"
+                                        aria-label="{{ __('Copy full HWID') }}"
+                                        data-copy-value="{{ $device->hwid_hash }}"
+                                        data-device-hwid-copy="true"
+                                        onclick="copyDeviceValue(this)"
+                                    >
+                                        <span class="table-truncate table-truncate-md font-mono text-xs sm:text-sm">
                                             {{ \Illuminate\Support\Str::limit($device->hwid_hash, 18, '...') }}
                                         </span>
-                                    </div>
+                                    </button>
                                     <div class="table-meta">{{ __('Device ID:') }} {{ $device->id }}</div>
+                                    <div class="table-meta table-truncate table-truncate-sm" title="{{ $device->ip_address ?? __('Unknown') }}">
+                                        {{ $device->ip_address ?? __('Unknown') }} · {{ $device->country_code ?? __('Unknown') }}
+                                    </div>
                                 </div>
                             @else
                                 <span class="table-meta">{{ __('N/A') }}</span>
                             @endif
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             <div class="table-stack table-stack-tight">
-                                <div>{{ $device->ip_address ?? __('Unknown') }}</div>
-                                <div class="table-meta">{{ $device->country_code ?? __('Unknown') }}</div>
+                                <div>{{ __('Last:') }} {{ $device->last_seen_at ? $device->last_seen_at->format('Y-m-d H:i') : __('Unknown') }}</div>
+                                <div class="table-meta">{{ __('First:') }} {{ $device->first_seen_at ? $device->first_seen_at->format('Y-m-d H:i') : __('Unknown') }}</div>
                             </div>
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell table-cell-fit">
                             <div class="table-stack table-stack-tight">
-                                <div>{{ __('First:') }} {{ $device->first_seen_at ? $device->first_seen_at->format('Y-m-d H:i') : __('Unknown') }}</div>
-                                <div class="table-meta">{{ __('Last:') }} {{ $device->last_seen_at ? $device->last_seen_at->format('Y-m-d H:i') : __('Unknown') }}</div>
+                                @if ($device->bound_at && ! $device->unbound_at)
+                                    <x-status-badge status="active" :text="__('Currently Bound')" />
+                                    <span class="table-meta">{{ __('Current binding') }}</span>
+                                @else
+                                    <x-status-badge status="default" :text="__('Historical')" />
+                                    <span class="table-meta">
+                                        {{ $device->unbound_at ? __('Unbound') : __('History entry') }}
+                                    </span>
+                                @endif
                             </div>
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
-                            @if ($device->bound_at && ! $device->unbound_at)
-                                <x-status-badge status="active" :text="__('Currently Bound')" />
-                            @else
-                                <x-status-badge status="default" :text="__('Historical')" />
-                            @endif
-                        </td>
-
-                        <td class="table-cell whitespace-nowrap text-right">
+                        <td class="table-cell table-cell-fit whitespace-nowrap text-right">
                             @if ($device->isBound())
                                 <div class="table-actions table-actions--nowrap">
                                     <form method="POST" action="{{ route('devices.unbind') }}" class="inline" onsubmit="return confirm('{{ $unbindDeviceConfirmation }}');">
@@ -212,7 +232,7 @@
                     </tr>
                 @empty
                     <tr class="table-row">
-                        <td colspan="5" class="table-empty">
+                        <td colspan="4" class="table-empty">
                             <div class="table-empty-state">
                                 <x-icon name="desktop" class="table-empty-icon" />
                                 <p class="table-empty-title">{{ __('No device history found.') }}</p>
@@ -229,3 +249,25 @@
         </section>
     </div>
 </x-app-sidebar-layout>
+
+<script>
+    function copyDeviceValue(element) {
+        const value = element?.getAttribute('data-copy-value') ?? '';
+        if (! value) {
+            return;
+        }
+
+        navigator.clipboard?.writeText(value).then(() => {
+            const originalTitle = element.getAttribute('title') ?? value;
+            element.setAttribute('title', "{{ __('Copied') }}");
+            setTimeout(() => element.setAttribute('title', originalTitle), 1200);
+        }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = value;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        });
+    }
+</script>
