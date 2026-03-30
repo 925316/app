@@ -14,20 +14,29 @@
 
 <section class="filter-box-shell mb-6 rounded-xl border p-6 shadow-sm" aria-labelledby="{{ $headingId }}" data-filter-box>
     <form method="{{ $method }}" action="{{ $action }}"
+        class="filter-box-form"
         role="search" aria-labelledby="{{ $headingId }}"
         @if ($cleanForm) data-clean-form="true" @endif
         @if ($defaultValues) data-default-values="{{ $defaultValues }}" @endif>
-        <div class="mb-4 flex items-center justify-between gap-3">
-            <h2 id="{{ $headingId }}" class="filter-box-title flex items-center text-lg font-semibold">
-                <x-icon name="filter" class="mr-2 h-5 w-5 text-current" /> {{ $title }}
-            </h2>
+        <div class="filter-box-header">
+            <div class="filter-box-heading">
+                <h2 id="{{ $headingId }}" class="filter-box-title text-lg font-semibold">
+                    <span class="filter-box-icon" aria-hidden="true">
+                        <x-icon name="filter" class="h-5 w-5 text-current" />
+                    </span>
+                    <span>{{ $title }}</span>
+                </h2>
+            </div>
             @if ($showTotal && $totalCount !== null)
-                <div class="flex items-center gap-2"><span class="filter-box-total text-sm">
-                        {{ $totalCount }} total </span>
+                <div class="filter-box-summary">
+                    <span class="filter-box-total-label">{{ __('Showing') }}</span>
+                    <span class="filter-box-total">{{ $totalCount }} {{ __('total') }}</span>
                 </div>
             @endif
         </div>
 
-        {{ $slot }}
+        <div class="filter-box-body">
+            {{ $slot }}
+        </div>
     </form>
 </section>

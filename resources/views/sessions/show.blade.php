@@ -3,230 +3,206 @@
         {{ __('Session Details') }}
     </x-slot>
 
+    <x-slot name="subheader">
+        {{ __('Inspect a single heartbeat session with the same cinematic framing used on the management index while preserving copy and termination behavior.') }}
+    </x-slot>
+
     @php
         $terminateSessionConfirmation = __('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.');
+        $sessionToken = (string) $session->session_token;
+        $sessionTokenPreview = \Illuminate\Support\Str::limit($sessionToken, 28, '...');
+        $sessionClientVersion = (string) ($session->client_version ?? __('Unknown'));
+        $sessionClientVersionPreview = \Illuminate\Support\Str::limit($sessionClientVersion, 22, '...');
     @endphp
 
-    <div class="space-y-6" data-page="sessions-show">
-            {{-- Breadcrumb and Actions --}}
-            <div class="card-shell-muted flex items-center justify-between gap-3">
-                <a href="{{ route('sessions.index') }}" class="text-sm text-cool-700 hover:underline dark:text-cool-300">
-                    {{ __('Back to Sessions') }}
-                </a>
-                <form action="{{ route('sessions.destroy', $session) }}" method="POST"
-                    onsubmit="return confirm('{{ $terminateSessionConfirmation }}')">
-                    @csrf
-                    @method('DELETE')
-                    <x-danger-button type="submit">{{ __('Terminate Session') }}</x-danger-button>
-                </form>
-            </div>
+    <div class="space-y-8" data-page="sessions-show">
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Session statistics') }}">
+            <x-stat-card :title="__('Status')" :value="$session->isActive() ? __('Active') : __('Expired')" icon="server" :iconColor="$session->isActive() ? 'icon-green' : 'icon-red'" />
+            <x-stat-card :title="__('Last Heartbeat')" :value="$session->last_heartbeat_at ? $session->last_heartbeat_at->diffForHumans() : __('Never')" icon="success" iconColor="icon-blue" />
+            <x-stat-card :title="__('Session Age')" :value="$session->age_in_minutes !== null ? number_format($session->age_in_minutes, 2).' '.__('min') : __('Unknown')" icon="document" iconColor="icon-purple" />
+            <x-stat-card :title="__('Client')" :value="$session->client_version ?? __('Unknown')" icon="desktop" iconColor="icon-orange" />
+        </section>
 
-            <div class="card-shell overflow-hidden">
-                <div class="p-6 text-gray-900 dark:text-gray-100 space-y-6">
-                    <!-- Session Header -->
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="section-kicker">{{ __('Heartbeat Session') }}</p>
-                            <h3 class="text-2xl font-bold mb-2">{{ __('Session') }} #{{ $session->id }}</h3>
-                            <div class="flex flex-wrap items-center gap-2">
-                                @if ($session->isActive())
-                                    <x-status-badge status="active" :text="__('Active')" />
-                                @else
-                                    <x-status-badge status="error" :text="__('Expired')" />
-                                @endif
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Client:') }} {{ $session->client_version ?? __('Unknown') }}</span>
-                            </div>
-                        </div>
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Heartbeat Session') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Session') }} #{{ $session->id }}</h2>
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                        <x-status-badge :status="$session->isActive() ? 'active' : 'error'" :text="$session->isActive() ? __('Active') : __('Expired')" />
+                        <span class="app-shell-body-copy text-sm">{{ __('Review token, heartbeat, and relationship details without changing session semantics.') }}</span>
                     </div>
+                </div>
 
-                    <!-- Session Details Grid -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Basic Information -->
-                        <div class="card-shell-muted">
-                            <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Basic Information') }}</h4>
-                            <dl class="space-y-3">
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Session Token') }}</dt>
-                                    @php
-                                        $sessionToken = (string) $session->session_token;
-                                        $sessionTokenPreview = \Illuminate\Support\Str::limit($sessionToken, 24, '...');
-                                    @endphp
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono">
-                                        <button
-                                            type="button"
-                                            class="max-w-[280px] truncate text-left hover:text-blue-600 dark:hover:text-blue-300"
-                                            title="{{ $sessionToken }}"
-                                            data-copy-value="{{ $sessionToken }}"
-                                            onclick="copySessionField(this)">
-                                            {{ $sessionTokenPreview }}
-                                        </button>
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('IP Address') }}</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono">
-                                        {{ $session->ip_address ?? __('N/A') }}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Client Version') }}</dt>
-                                    @php
-                                        $sessionClientVersion = (string) ($session->client_version ?? __('Unknown'));
-                                        $sessionClientVersionPreview = \Illuminate\Support\Str::limit($sessionClientVersion, 18, '...');
-                                    @endphp
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                        <button
-                                            type="button"
-                                            class="max-w-[180px] truncate text-left hover:text-blue-600 dark:hover:text-blue-300"
-                                            title="{{ $sessionClientVersion }}"
-                                            data-copy-value="{{ $sessionClientVersion }}"
-                                            onclick="copySessionField(this)">
-                                            {{ $sessionClientVersionPreview }}
-                                        </button>
-                                    </dd>
-                                </div>
-                            </dl>
-                        </div>
+                <div class="app-toolbar-actions">
+                    <a href="{{ route('sessions.index') }}" class="btn btn-secondary btn-sm gap-2">
+                        <x-icon name="reset" class="h-4 w-4" />
+                        {{ __('Back to Sessions') }}
+                    </a>
 
-                        <!-- Timing Information -->
-                        <div class="card-shell-muted">
-                            <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Timing Information') }}</h4>
-                            <dl class="space-y-3">
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Created At') }}</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                        {{ $session->created_at ? $session->created_at->format('Y-m-d H:i:s') : __('Unknown') }}
-                                        @if ($session->created_at)
-                                            <span class="text-xs text-gray-500 dark:text-gray-400 block mt-1">
-                                                ({{ $session->created_at->diffForHumans() }})
-                                            </span>
-                                        @endif
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Last Updated') }}</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                        {{ $session->updated_at ? $session->updated_at->format('Y-m-d H:i:s') : __('Unknown') }}
-                                        @if ($session->updated_at)
-                                            <span class="text-xs text-gray-500 dark:text-gray-400 block mt-1">
-                                                ({{ $session->updated_at->diffForHumans() }})
-                                            </span>
-                                        @endif
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Last Heartbeat') }}</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                        @if ($session->last_heartbeat_at)
-                                            {{ $session->last_heartbeat_at->format('Y-m-d H:i:s') }}
-                                            <span class="text-xs text-gray-500 dark:text-gray-400 block mt-1">
-                                                ({{ $session->last_heartbeat_at->diffForHumans() }})
-                                            </span>
-                                        @else
-                                            <span class="text-gray-500">{{ __('Never') }}</span>
-                                        @endif
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Session Age') }}</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                        @if ($session->age_in_minutes !== null)
-                                            {{ number_format($session->age_in_minutes, 2) }} {{ __('minutes') }}
-                                        @else
-                                            {{ __('Unknown') }}
-                                        @endif
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Time Since Last Heartbeat') }}
-                                    </dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                        @if ($session->time_since_last_heartbeat !== null)
-                                            {{ number_format($session->time_since_last_heartbeat, 2) }} {{ __('minutes') }}
-                                        @else
-                                            {{ __('Never') }}
-                                        @endif
-                                    </dd>
-                                </div>
-                            </dl>
-                        </div>
-                    </div>
+                    <form action="{{ route('sessions.destroy', $session) }}" method="POST" onsubmit="return confirm('{{ $terminateSessionConfirmation }}')">
+                        @csrf
+                        @method('DELETE')
 
-                    <!-- Related Accounts -->
-                    @if ($session->account)
-                        <div class="card-shell-muted p-6">
-                            <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Related Account') }}</h4>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-12 w-12">
-                                        <div
-                                            class="h-12 w-12 rounded-full bg-cool-600 dark:bg-cool-500 flex items-center justify-center text-white font-bold text-lg">
-                                            {{ $session->account->initials() }}
-                                        </div>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-lg font-medium text-gray-900 dark:text-white">
-                                            {{ $session->account->username }}
-                                        </div>
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $session->account->email }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <a href="{{ route('accounts.show', $session->account) }}" class="btn btn-primary text-sm">
-                                    {{ __('View Account') }}
-                                </a>
-                            </div>
-                        </div>
-                    @else
-                        <div class="card-shell-muted p-6">
-                            <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Related Account') }}</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No account associated with this session. This may indicate a deleted account.') }}</p>
-                        </div>
-                    @endif
-
-                    <!-- Related Device -->
-                    @if ($session->device)
-                        <div class="card-shell-muted p-6">
-                            <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Related Device') }}</h4>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-12 w-12">
-                                        <div
-                                            class="h-12 w-12 rounded-full bg-purple-500 flex items-center justify-center text-white">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                                </path>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-lg font-medium text-gray-900 dark:text-white">
-                                            {{ $session->device->device_name }}
-                                        </div>
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            {{ __('Device ID:') }} {{ $session->device->id }}
-                                        </div>
-                                        @if ($session->device->bound_at)
-                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                {{ __('Bound since:') }} {{ $session->device->bound_at->format('Y-m-d H:i:s') }}
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="card-shell-muted p-6">
-                            <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Related Device') }}</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No device associated with this session. This may indicate a deleted device or an unbound session.') }}</p>
-                        </div>
-                    @endif
-
+                        <button type="submit" class="btn btn-danger btn-sm gap-2">
+                            <x-icon name="trash" class="h-4 w-4" />
+                            {{ __('Terminate Session') }}
+                        </button>
+                    </form>
                 </div>
             </div>
+
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div class="card-shell-muted space-y-5 p-6">
+                    <div>
+                        <p class="section-kicker">{{ __('Identifiers') }}</p>
+                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Session basics') }}</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="card-shell-muted space-y-2 p-4 sm:col-span-2">
+                            <p class="section-kicker">{{ __('Session token') }}</p>
+                            <button
+                                type="button"
+                                class="badge badge-default inline-flex max-w-full items-center truncate text-left transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                title="{{ $sessionToken }}"
+                                data-copy-value="{{ $sessionToken }}"
+                                onclick="copySessionField(this)">
+                                {{ $sessionTokenPreview }}
+                            </button>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('IP address') }}</p>
+                            <p class="font-mono text-sm text-gray-900 dark:text-white">{{ $session->ip_address ?? __('N/A') }}</p>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Client version') }}</p>
+                            <button
+                                type="button"
+                                class="badge badge-default inline-flex max-w-full items-center truncate text-left transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                title="{{ $sessionClientVersion }}"
+                                data-copy-value="{{ $sessionClientVersion }}"
+                                onclick="copySessionField(this)">
+                                {{ $sessionClientVersionPreview }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-shell-muted space-y-5 p-6">
+                    <div>
+                        <p class="section-kicker">{{ __('Timing') }}</p>
+                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Heartbeat timeline') }}</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Created at') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $session->created_at ? $session->created_at->format('Y-m-d H:i:s') : __('Unknown') }}</p>
+                            @if ($session->created_at)
+                                <p class="app-shell-body-copy text-sm">{{ $session->created_at->diffForHumans() }}</p>
+                            @endif
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Last updated') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $session->updated_at ? $session->updated_at->format('Y-m-d H:i:s') : __('Unknown') }}</p>
+                            @if ($session->updated_at)
+                                <p class="app-shell-body-copy text-sm">{{ $session->updated_at->diffForHumans() }}</p>
+                            @endif
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Last heartbeat') }}</p>
+                            @if ($session->last_heartbeat_at)
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $session->last_heartbeat_at->format('Y-m-d H:i:s') }}</p>
+                                <p class="app-shell-body-copy text-sm">{{ $session->last_heartbeat_at->diffForHumans() }}</p>
+                            @else
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Never') }}</p>
+                            @endif
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Since last heartbeat') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                {{ $session->time_since_last_heartbeat !== null ? number_format($session->time_since_last_heartbeat, 2).' '.__('minutes') : __('Never') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <div class="card-shell-muted space-y-5 p-6">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <p class="section-kicker">{{ __('Relationship') }}</p>
+                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Related account') }}</h3>
+                    </div>
+
+                    @if ($session->account)
+                        <a href="{{ route('accounts.show', $session->account) }}" class="btn btn-primary btn-sm gap-2">
+                            <x-icon name="users" class="h-4 w-4" />
+                            {{ __('View Account') }}
+                        </a>
+                    @endif
+                </div>
+
+                @if ($session->account)
+                    <div class="card-shell-muted p-5">
+                        <div class="flex items-center gap-4">
+                            <div class="table-avatar">
+                                {{ $session->account->initials() }}
+                            </div>
+
+                            <div class="table-stack">
+                                <div class="table-title text-base">{{ $session->account->username }}</div>
+                                <div class="table-meta break-all">{{ $session->account->email }}</div>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="card-shell-muted p-5">
+                        <p class="app-shell-body-copy text-sm">{{ __('No account is associated with this session. This can happen when the related account has been removed.') }}</p>
+                    </div>
+                @endif
+            </div>
+
+            <div class="card-shell-muted space-y-5 p-6">
+                <div>
+                    <p class="section-kicker">{{ __('Relationship') }}</p>
+                    <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Related device') }}</h3>
+                </div>
+
+                @if ($session->device)
+                    <div class="card-shell-muted p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="card-icon-container icon-purple shrink-0">
+                                <x-icon name="desktop" class="h-6 w-6" />
+                            </span>
+
+                            <div class="table-stack gap-2">
+                                <div class="table-title text-base">{{ $session->device->device_name ?? $session->device->hwid_hash ?? __('Unknown Device') }}</div>
+                                <div class="table-meta">{{ __('Device ID:') }} {{ $session->device->id }}</div>
+                                @if ($session->device->hwid_hash)
+                                    <div class="table-meta break-all">{{ $session->device->hwid_hash }}</div>
+                                @endif
+                                @if ($session->device->bound_at)
+                                    <div class="table-meta">{{ __('Bound since:') }} {{ $session->device->bound_at->format('Y-m-d H:i:s') }}</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="card-shell-muted p-5">
+                        <p class="app-shell-body-copy text-sm">{{ __('No device is associated with this session. This may indicate a deleted device or an unbound session.') }}</p>
+                    </div>
+                @endif
+            </div>
+        </section>
     </div>
 </x-app-sidebar-layout>
 

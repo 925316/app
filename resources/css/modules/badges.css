@@ -66,6 +66,7 @@
     padding-inline: 0.625rem;
     padding-block: 0.25rem;
     box-shadow: var(--shell-shadow-sm);
+    letter-spacing: 0.02em;
 }
 
 [data-shell-theme='cinematic'] .badge-success,

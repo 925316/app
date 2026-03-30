@@ -137,6 +137,17 @@
     box-shadow: var(--shadow-sm);
 }
 
+.form-divider {
+    border-top: 1px solid rgb(var(--color-border-subtle) / 0.9);
+    padding-top: 1rem;
+}
+
+.form-actions-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 [data-shell-theme='cinematic'] .form-input,
 [data-shell-theme='cinematic'] .form-select,
 [data-shell-theme='cinematic'] .form-textarea {
@@ -193,4 +204,8 @@
     border-color: rgb(var(--shell-line) / 0.42);
     background: rgb(var(--shell-surface-soft) / 0.72);
     box-shadow: var(--shell-shadow-sm);
+}
+
+[data-shell-theme='cinematic'] .form-divider {
+    border-color: rgb(var(--shell-line) / 0.34);
 }

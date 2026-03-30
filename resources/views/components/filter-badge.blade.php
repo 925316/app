@@ -16,9 +16,9 @@
 @endphp
 
 <span class="{{ $colorClasses }}">
-    {{ $label }}
+    <span class="filter-badge__label">{{ $label }}</span>
     @if ($removeUrl)
-        <a href="{{ $removeUrl }}" class="ml-1.5">
+        <a href="{{ $removeUrl }}" class="filter-badge__remove" aria-label="{{ __('Remove filter: :label', ['label' => strip_tags((string) $label)]) }}">
             <x-icon name="close" class="w-3 h-3" />
         </a>
     @endif

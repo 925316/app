@@ -31,7 +31,7 @@
 @endphp
 
 @if($paginator->hasPages())
-<nav class="flex flex-col sm:flex-row px-4 py-3 justify-between items-center text-sm gap-3" 
+<nav class="flex flex-col justify-between gap-3 px-4 py-4 text-sm sm:flex-row sm:items-center" 
      role="navigation" 
      aria-label="{{ __('Pagination Navigation') }}">
     
@@ -45,22 +45,22 @@
     @endif
     
     {{-- Pagination Controls --}}
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-1.5">
         {{-- Previous Page --}}
         @if($paginator->onFirstPage())
-        <span class="app-shell-body-copy inline-flex cursor-not-allowed items-center rounded-md {{ $btnSize }}">
+        <span class="app-shell-body-copy inline-flex cursor-not-allowed items-center rounded-full {{ $btnSize }}">
             <x-icon name="arrow-left" class="w-4 h-4" />
         </span>
         @else
         <a href="{{ $paginator->previousPageUrl() }}" 
            rel="prev"
-           class="btn btn-secondary inline-flex items-center {{ $btnSize }} rounded-md !px-3 !py-2">
+           class="btn btn-secondary inline-flex items-center rounded-full {{ $btnSize }} !px-3 !py-2">
             <x-icon name="arrow-left" class="w-4 h-4" />
         </a>
         @endif
         
         {{-- Page Numbers --}}
-        <div class="hidden sm:flex items-center gap-1">
+        <div class="hidden items-center gap-1.5 sm:flex">
             @php
                 $start = max(1, $currentPage - 2);
                 $end = min($lastPage, $currentPage + 2);
@@ -77,7 +77,7 @@
             {{-- First Page --}}
             @if($start > 1)
             <a href="{{ $paginator->url(1) }}" 
-               class="btn btn-secondary inline-flex items-center {{ $btnSize }} rounded-md !px-3 !py-2">
+               class="btn btn-secondary inline-flex items-center rounded-full {{ $btnSize }} !px-3 !py-2">
                 1
             </a>
             @if($start > 2)
@@ -88,12 +88,12 @@
             {{-- Page Links --}}
             @for($page = $start; $page <= $end; $page++)
                 @if($page == $currentPage)
-                <span class="btn btn-primary inline-flex items-center {{ $btnSize }} rounded-md !px-3 !py-2 font-semibold">
+                <span class="btn btn-primary inline-flex items-center rounded-full {{ $btnSize }} !px-3 !py-2 font-semibold">
                     {{ $page }}
                 </span>
                 @else
                 <a href="{{ $paginator->url($page) }}" 
-                   class="btn btn-secondary inline-flex items-center {{ $btnSize }} rounded-md !px-3 !py-2">
+                   class="btn btn-secondary inline-flex items-center rounded-full {{ $btnSize }} !px-3 !py-2">
                     {{ $page }}
                 </a>
                 @endif
@@ -105,7 +105,7 @@
             <span class="app-shell-body-copy px-2">...</span>
             @endif
             <a href="{{ $paginator->url($lastPage) }}" 
-               class="btn btn-secondary inline-flex items-center {{ $btnSize }} rounded-md !px-3 !py-2">
+               class="btn btn-secondary inline-flex items-center rounded-full {{ $btnSize }} !px-3 !py-2">
                 {{ $lastPage }}
             </a>
             @endif
@@ -121,11 +121,11 @@
         @if($paginator->hasMorePages())
         <a href="{{ $paginator->nextPageUrl() }}" 
            rel="next"
-           class="btn btn-secondary inline-flex items-center {{ $btnSize }} rounded-md !px-3 !py-2">
+           class="btn btn-secondary inline-flex items-center rounded-full {{ $btnSize }} !px-3 !py-2">
             <x-icon name="arrow-right" class="w-4 h-4" />
         </a>
         @else
-        <span class="app-shell-body-copy inline-flex cursor-not-allowed items-center rounded-md {{ $btnSize }}">
+        <span class="app-shell-body-copy inline-flex cursor-not-allowed items-center rounded-full {{ $btnSize }}">
             <x-icon name="arrow-right" class="w-4 h-4" />
         </span>
         @endif

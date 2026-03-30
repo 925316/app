@@ -3,239 +3,303 @@
         {{ __('Device Management') }}
     </x-slot>
 
-    <div class="space-y-6" data-page="devices-admin-index">
-        <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <x-stat-card :title="__('Total Devices')" :value="$totalDevices" icon="desktop" iconColor="icon-blue" />
-                <x-stat-card :title="__('Bound Devices')" :value="$boundDevices" icon="success" iconColor="icon-green" />
-                <x-stat-card :title="__('Unbound')" :value="$unboundDevices" icon="ban" iconColor="icon-gray" />
-                <x-stat-card :title="__('Never Bound')" :value="$neverBoundDevices" icon="question" iconColor="icon-yellow" />
+    <x-slot name="subheader">
+        {{ __('Filter the device inventory, preserve export and admin actions, and align the remaining device admin surface with the shared cinematic system.') }}
+    </x-slot>
+
+    @php
+        $hasFilters = filled(request('search'))
+            || filled(request('status'))
+            || filled(request('date_range'))
+            || filled(request('country_code'))
+            || filled(request('min_reset_count'))
+            || filled(request('account_status'));
+
+        $statusLabel = match (request('status')) {
+            'bound' => __('Currently Bound'),
+            'unbound' => __('Unbound'),
+            'never_bound' => __('Never Bound'),
+            default => null,
+        };
+
+        $dateRangeLabel = match (request('date_range')) {
+            '24h' => __('Last 24 Hours'),
+            '7d' => __('Last 7 Days'),
+            '30d' => __('Last 30 Days'),
+            '90d' => __('Last 90 Days'),
+            default => null,
+        };
+
+        $accountStatusLabel = match (request('account_status')) {
+            'active' => __('Active'),
+            'suspended' => __('Suspended'),
+            default => null,
+        };
+    @endphp
+
+    <div class="space-y-8" data-page="devices-admin-index">
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Device statistics') }}">
+            <x-stat-card :title="__('Total Devices')" :value="$totalDevices" icon="desktop" iconColor="icon-blue" />
+            <x-stat-card :title="__('Bound Devices')" :value="$boundDevices" icon="success" iconColor="icon-green" />
+            <x-stat-card :title="__('Unbound')" :value="$unboundDevices" icon="ban" iconColor="icon-gray" />
+            <x-stat-card :title="__('Never Bound')" :value="$neverBoundDevices" icon="warning" iconColor="icon-yellow" />
+        </section>
+
+        <section class="card-shell space-y-6" data-devices-admin-panel>
+            <div class="app-toolbar" data-devices-admin-toolbar>
+                <div>
+                    <p class="section-kicker">{{ __('Inventory') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Device directory') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('Keep the same admin filters, export endpoint, pagination, and reset or unbind actions while matching the accounts and sessions admin surfaces.') }}</p>
+                </div>
+
+                <div class="app-toolbar-actions">
+                    <a href="{{ route('devices.export', request()->query()) }}" class="btn btn-secondary btn-sm gap-2">
+                        <x-icon name="cloud" class="h-4 w-4" />
+                        {{ __('Export CSV') }}
+                    </a>
+                </div>
             </div>
 
-        <div class="card-shell">
-                    {{-- Filters Section --}}
-                    <div class="card-shell-muted mb-6">
-                        <p class="section-kicker mb-3">{{ __('Filters') }}</p>
-                        <form method="GET" action="{{ route('devices.index') }}" data-clean-form="true"
-                            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                            <!-- Search -->
-                            <div>
-                                <label for="search"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Search') }}</label>
-                                <input type="text" name="search" id="search" value="{{ request('search') }}"
-                                    placeholder="{{ __('HWID, IP, Username, Email') }}"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
-                            </div>
-
-                            <!-- Status Filter -->
-                            <div>
-                                <label for="status"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Status') }}</label>
-                                <select name="status" id="status"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
-                                    <option value="">{{ __('All') }}</option>
-                                    <option value="bound" {{ request('status') === 'bound' ? 'selected' : '' }}>
-                                        {{ __('Currently Bound') }}
-                                    </option>
-                                    <option value="unbound" {{ request('status') === 'unbound' ? 'selected' : '' }}>
-                                        {{ __('Unbound') }}
-                                    </option>
-                                    <option value="never_bound" {{ request('status') === 'never_bound' ? 'selected' : '' }}>
-                                        {{ __('Never Bound') }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Date Range Filter -->
-                            <div>
-                                <label for="date_range"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Date Range') }}</label>
-                                <select name="date_range" id="date_range"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
-                                    <option value="">{{ __('All Time') }}</option>
-                                    <option value="24h" {{ request('date_range') === '24h' ? 'selected' : '' }}>Last
-                                        {{ __('Last 24 Hours') }}
-                                    </option>
-                                    <option value="7d" {{ request('date_range') === '7d' ? 'selected' : '' }}>Last
-                                        {{ __('Last 7 Days') }}
-                                    </option>
-                                    <option value="30d" {{ request('date_range') === '30d' ? 'selected' : '' }}>Last
-                                        {{ __('Last 30 Days') }}
-                                    </option>
-                                    <option value="90d" {{ request('date_range') === '90d' ? 'selected' : '' }}>Last
-                                        {{ __('Last 90 Days') }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Country Code Filter -->
-                            <div>
-                                <label for="country_code"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Country Code') }}</label>
-                                <input type="text" name="country_code" id="country_code"
-                                    value="{{ request('country_code') }}" placeholder="{{ __('e.g., US, CN') }}"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 uppercase">
-                            </div>
-
-                            <!-- HWID Reset Count Filter -->
-                            <div>
-                                <label for="min_reset_count"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Min HWID Reset') }}</label>
-                                <input type="number" name="min_reset_count" id="min_reset_count"
-                                    value="{{ request('min_reset_count') }}" min="0"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
-                            </div>
-
-                            <!-- Account Status Filter -->
-                            <div>
-                                <label for="account_status"
-                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Account Status') }}</label>
-                                <select name="account_status" id="account_status"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100">
-                                    <option value="">{{ __('All') }}</option>
-                                    <option value="active"
-                                        {{ request('account_status') === 'active' ? 'selected' : '' }}>
-                                        {{ __('Active') }}
-                                    </option>
-                                    <option value="suspended"
-                                        {{ request('account_status') === 'suspended' ? 'selected' : '' }}>
-                                        {{ __('Suspended') }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="col-span-full flex gap-2 mt-2">
-                                <button type="submit"
-                                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
-                                    {{ __('Apply Filters') }}
-                                </button>
-                                <a href="{{ route('devices.index') }}"
-                                    class="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition">
-                                    {{ __('Reset') }}
-                                </a>
-                                <a href="{{ route('devices.export', request()->query()) }}"
-                                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition">
-                                    {{ __('Export CSV') }}
-                                </a>
-                            </div>
-                        </form>
+            <x-filter-box :action="route('devices.index')" :showTotal="true" :totalCount="$devices->total()" :title="__('Filter devices')">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div class="space-y-2 xl:col-span-2">
+                        <label for="search" class="form-label">{{ __('Search') }}</label>
+                        <x-input-with-icon id="search" name="search" type="text" :value="request('search')" :placeholder="__('HWID, IP, Username, Email')" icon="search" />
                     </div>
 
-                    <!-- Device Table -->
+                    <div class="space-y-2">
+                        <label for="status" class="form-label">{{ __('Status') }}</label>
+                        <select name="status" id="status" class="form-select">
+                            <option value="">{{ __('All') }}</option>
+                            <option value="bound" {{ request('status') === 'bound' ? 'selected' : '' }}>{{ __('Currently Bound') }}</option>
+                            <option value="unbound" {{ request('status') === 'unbound' ? 'selected' : '' }}>{{ __('Unbound') }}</option>
+                            <option value="never_bound" {{ request('status') === 'never_bound' ? 'selected' : '' }}>{{ __('Never Bound') }}</option>
+                        </select>
+                    </div>
 
-                    <x-table :headers="[
-                        __('Account'),
-                        __('HWID Hash'),
-                        __('IP / Country'),
-                        __('First / Last Seen'),
-                        __('Status'),
-                        __('Account Status'),
-                        __('HWID Resets'),
-                        __('Actions'),
-                    ]" :emptyColspan="5">
-                        @forelse($devices as $device)
-                            <tr>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                    <div class="font-medium text-gray-900 dark:text-gray-100">
-                                        {{ $device->account->username }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $device->account->email }}</div>
-                                </td>
-                                <td
-                                    class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    @if ($device->hwid_hash)
+                    <div class="space-y-2">
+                        <label for="date_range" class="form-label">{{ __('Date Range') }}</label>
+                        <select name="date_range" id="date_range" class="form-select">
+                            <option value="">{{ __('All Time') }}</option>
+                            <option value="24h" {{ request('date_range') === '24h' ? 'selected' : '' }}>{{ __('Last 24 Hours') }}</option>
+                            <option value="7d" {{ request('date_range') === '7d' ? 'selected' : '' }}>{{ __('Last 7 Days') }}</option>
+                            <option value="30d" {{ request('date_range') === '30d' ? 'selected' : '' }}>{{ __('Last 30 Days') }}</option>
+                            <option value="90d" {{ request('date_range') === '90d' ? 'selected' : '' }}>{{ __('Last 90 Days') }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-divider grid grid-cols-1 items-end gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div class="space-y-2">
+                        <label for="country_code" class="form-label">{{ __('Country Code') }}</label>
+                        <input type="text" name="country_code" id="country_code" value="{{ request('country_code') }}" placeholder="{{ __('e.g., US, CN') }}" class="form-input w-full uppercase">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="min_reset_count" class="form-label">{{ __('Min HWID Reset') }}</label>
+                        <input type="number" name="min_reset_count" id="min_reset_count" value="{{ request('min_reset_count') }}" min="0" class="form-input w-full">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="account_status" class="form-label">{{ __('Account Status') }}</label>
+                        <select name="account_status" id="account_status" class="form-select">
+                            <option value="">{{ __('All') }}</option>
+                            <option value="active" {{ request('account_status') === 'active' ? 'selected' : '' }}>{{ __('Active') }}</option>
+                            <option value="suspended" {{ request('account_status') === 'suspended' ? 'selected' : '' }}>{{ __('Suspended') }}</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <span class="form-label text-transparent">{{ __('Actions') }}</span>
+                        <div class="form-actions-cluster justify-start xl:justify-end">
+                            <button type="submit" class="btn btn-primary btn-sm gap-2">
+                                <x-icon name="search" class="h-4 w-4" />
+                                {{ __('Apply Filters') }}
+                            </button>
+
+                            <a href="{{ route('devices.index') }}" class="btn btn-secondary btn-sm gap-2">
+                                <x-icon name="reset" class="h-4 w-4" />
+                                {{ __('Reset') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @if ($hasFilters)
+                    <div class="active-filters" data-active-filters>
+                        <div class="active-filters__header">
+                            <div class="active-filters__copy">
+                                <p class="active-filters__title">{{ __('Active Filters') }}</p>
+                                <p class="active-filters__subtitle">{{ __('Remove a single filter or clear the full device query without changing admin permissions, exports, or pagination behavior.') }}</p>
+                            </div>
+                            <a href="{{ route('devices.index') }}" class="active-filters__clear">
+                                {{ __('Clear All') }}
+                            </a>
+                        </div>
+
+                        <div class="active-filters__list">
+                            @if (filled(request('search')))
+                                <x-filter-badge :label="__('Search:').' \"'.request('search').'\"'" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
+                            @endif
+
+                            @if ($statusLabel)
+                                <x-filter-badge :label="__('Status:').' '.$statusLabel" color="blue" :removeUrl="request()->fullUrlWithQuery(['status' => null])" />
+                            @endif
+
+                            @if ($dateRangeLabel)
+                                <x-filter-badge :label="__('Date Range:').' '.$dateRangeLabel" color="yellow" :removeUrl="request()->fullUrlWithQuery(['date_range' => null])" />
+                            @endif
+
+                            @if (filled(request('country_code')))
+                                <x-filter-badge :label="__('Country:').' '.strtoupper((string) request('country_code'))" color="green" :removeUrl="request()->fullUrlWithQuery(['country_code' => null])" />
+                            @endif
+
+                            @if (filled(request('min_reset_count')))
+                                <x-filter-badge :label="__('Min Resets:').' '.request('min_reset_count')" color="orange" :removeUrl="request()->fullUrlWithQuery(['min_reset_count' => null])" />
+                            @endif
+
+                            @if ($accountStatusLabel)
+                                <x-filter-badge :label="__('Account Status:').' '.$accountStatusLabel" color="green" :removeUrl="request()->fullUrlWithQuery(['account_status' => null])" />
+                            @endif
+                        </div>
+                    </div>
+                @endif
+            </x-filter-box>
+
+            <x-table
+                :headers="[
+                    __('Account'),
+                    __('HWID Hash'),
+                    __('IP / Country'),
+                    __('First / Last Seen'),
+                    __('Status'),
+                    __('Account Status'),
+                    __('HWID Resets'),
+                    __('Actions'),
+                ]"
+                :emptyColspan="8"
+                ariaLabel="{{ __('Devices admin table') }}"
+            >
+                @forelse ($devices as $device)
+                    <tr class="table-row">
+                        <td class="table-cell-primary whitespace-nowrap">
+                            @if ($device->account)
+                                <div class="flex items-center gap-3">
+                                    <div class="table-avatar">
+                                        {{ $device->account->initials() }}
+                                    </div>
+
+                                    <div class="table-stack table-stack-tight">
+                                        <div class="table-title text-sm">{{ $device->account->username }}</div>
+                                        <div class="table-meta max-w-[220px] truncate" title="{{ $device->account->email }}">{{ $device->account->email }}</div>
+                                    </div>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('Unknown account') }}</span>
+                            @endif
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($device->hwid_hash)
+                                <div class="table-stack table-stack-tight">
+                                    <div class="table-title text-sm font-mono">
                                         <span title="{{ $device->hwid_hash }}" class="cursor-help">
-                                            {{ substr($device->hwid_hash, 0, 8) }}...
+                                            {{ \Illuminate\Support\Str::limit($device->hwid_hash, 18, '...') }}
                                         </span>
-                                    @else
-                                        {{ __('N/A') }}
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                    <div class="text-gray-900 dark:text-gray-100">{{ $device->ip_address }}
                                     </div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $device->country_code ?? __('Unknown') }}</div>
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                    <div class="text-gray-900 dark:text-gray-100">
-                                        {{ __('L:') }} {{ $device->last_seen_at->format('Y-m-d H:i') }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ __('F:') }} {{ $device->first_seen_at->format('Y-m-d H:i') }}</div>
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                    @if ($device->isBound())
-                                        <span
-                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
-                                            {{ __('Currently Bound') }}
-                                        </span>
-                                    @else
-                                        <span
-                                            class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium">
-                                            {{ __('Historical') }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                    @if ($device->account->isSuspended())
-                                        <span
-                                            class="px-2 py-0.5 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded text-xs font-medium">
-                                            {{ __('Suspended') }}
-                                        </span>
-                                    @else
-                                        <span
-                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs font-medium">
-                                            {{ __('Active') }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    {{ $device->account->hwid_reset_count }}
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                    <div class="flex gap-2">
-                                        @if ($device->isBound())
-                                            <form method="POST"
-                                                action="{{ route('devices.unbind-admin', $device) }}" class="inline"
-                                                onsubmit="return confirm('Unbind device from {{ $device->account->username }}?');">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition">
-                                                    {{ __('Unbind') }}
-                                                </button>
-                                            </form>
-                                        @endif
-                                        @if ($device->account->canResetHwid())
-                                            <form method="POST"
-                                                action="{{ route('devices.reset-hwid-admin', $device->account) }}"
-                                                class="inline"
-                                                onsubmit="return confirm('Reset HWID for {{ $device->account->username }}? This will unbind all devices.');">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition">
-                                                    {{ __('Reset HWID') }}
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8"
-                                    class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                    {{ __('No devices found matching your filters.') }}
-                                </td>
-                            </tr>
-                        @endforelse
-                    </x-table>
+                                    <div class="table-meta">{{ __('Device ID:') }} {{ $device->id }}</div>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('N/A') }}</span>
+                            @endif
+                        </td>
 
-                    <!-- Pagination -->
-                    <div class="mt-4">
-                        <x-pagination :paginator="$devices" />
-                    </div>
-        </div>
+                        <td class="table-cell whitespace-nowrap">
+                            <div class="table-stack table-stack-tight">
+                                <div>{{ $device->ip_address ?? __('Unknown') }}</div>
+                                <div class="table-meta">{{ $device->country_code ?? __('Unknown') }}</div>
+                            </div>
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
+                            <div class="table-stack table-stack-tight">
+                                <div>{{ __('Last:') }} {{ $device->last_seen_at ? $device->last_seen_at->format('Y-m-d H:i') : __('Unknown') }}</div>
+                                <div class="table-meta">{{ __('First:') }} {{ $device->first_seen_at ? $device->first_seen_at->format('Y-m-d H:i') : __('Unknown') }}</div>
+                            </div>
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($device->isBound())
+                                <x-status-badge status="active" :text="__('Currently Bound')" />
+                            @elseif ($device->bound_at)
+                                <x-status-badge status="default" :text="__('Historical')" />
+                            @else
+                                <x-status-badge status="warning" :text="__('Never Bound')" />
+                            @endif
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($device->account && $device->account->isSuspended())
+                                <x-status-badge status="suspended" :text="__('Suspended')" />
+                            @else
+                                <x-status-badge status="active" :text="__('Active')" />
+                            @endif
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
+                            <div class="table-stack table-stack-tight">
+                                <div>{{ $device->account?->hwid_reset_count ?? 0 }}</div>
+                                <div class="table-meta">
+                                    {{ $device->account && $device->account->canResetHwid() ? __('Reset available') : __('Cooldown') }}
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap text-right">
+                            <div class="table-actions table-actions--nowrap">
+                                @if ($device->isBound())
+                                    <form method="POST" action="{{ route('devices.unbind-admin', $device) }}" class="inline" onsubmit="return confirm('Unbind device from {{ $device->account->username }}?');">
+                                        @csrf
+
+                                        <button type="submit" class="table-action table-action--danger">
+                                            {{ __('Unbind') }}
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if ($device->account && $device->account->canResetHwid())
+                                    <form method="POST" action="{{ route('devices.reset-hwid-admin', $device->account) }}" class="inline" onsubmit="return confirm('Reset HWID for {{ $device->account->username }}? This will unbind all devices.');">
+                                        @csrf
+
+                                        <button type="submit" class="table-action table-action--danger">
+                                            {{ __('Reset HWID') }}
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (! $device->isBound() && ! ($device->account && $device->account->canResetHwid()))
+                                    <span class="table-meta">{{ __('No actions') }}</span>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr class="table-row">
+                        <td colspan="8" class="table-empty">
+                            <div class="table-empty-state">
+                                <x-icon name="desktop" class="table-empty-icon" />
+                                <p class="table-empty-title">{{ __('No devices found matching your filters.') }}</p>
+                                <p class="table-empty-copy">{{ __('Broaden the current query or clear a filter badge to surface more device records.') }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </x-table>
+
+            <div>
+                <x-pagination :paginator="$devices" />
+            </div>
+        </section>
     </div>
-
 </x-app-sidebar-layout>

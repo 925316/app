@@ -3,351 +3,292 @@
         {{ __('Session Management') }}
     </x-slot>
 
+    <x-slot name="subheader">
+        {{ __('Track live heartbeats, narrow the session stream, and keep termination controls intact.') }}
+    </x-slot>
+
     @php
         $terminateSessionConfirmation = __('Are you sure you want to terminate this session? The client will be disconnected on next heartbeat check. This action cannot be undone.');
+        $sessionTitle = $isAdmin ? __('Session management') : __('My sessions');
+        $sessionSubtitle = $isAdmin
+            ? __('Monitor account activity, filter the heartbeat stream, and keep the same query behavior.')
+            : __('Review your active and expired sessions without changing the existing filters or actions.');
+        $hasFilters =
+            request()->filled('status') ||
+            request()->filled('search') ||
+            $currentFilters['sort'] !== 'last_heartbeat_at' ||
+            $currentFilters['direction'] !== 'desc';
     @endphp
 
-    <div class="py-7">
-            @if ($isAdmin && $statistics)
-                <!-- Statistics Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                    <x-stat-card :title="__('Total Sessions')" :value="$statistics['total']" icon="server" iconColor="icon-blue" />
-                    <x-stat-card :title="__('Active Sessions')" :value="$statistics['active']" icon="success" iconColor="icon-green" />
-                    <x-stat-card :title="__('Expired Sessions')" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
-                    <x-stat-card :title="__('Unique Accounts')" :value="$statistics['unique_accounts']" icon="users" iconColor="icon-purple" />
-                    <x-stat-card :title="__('Unique Devices')" :value="$statistics['unique_devices']" icon="desktop" iconColor="icon-orange" />
-                </div>
-            @endif
+    <div class="space-y-8" data-page="sessions-index">
+        @if ($isAdmin && $statistics)
+            <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5" aria-label="{{ __('Session statistics') }}">
+                <x-stat-card :title="__('Total Sessions')" :value="$statistics['total']" icon="server" iconColor="icon-blue" />
+                <x-stat-card :title="__('Active Sessions')" :value="$statistics['active']" icon="success" iconColor="icon-green" />
+                <x-stat-card :title="__('Expired Sessions')" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
+                <x-stat-card :title="__('Unique Accounts')" :value="$statistics['unique_accounts']" icon="users" iconColor="icon-purple" />
+                <x-stat-card :title="__('Unique Devices')" :value="$statistics['unique_devices']" icon="desktop" iconColor="icon-orange" />
+            </section>
+        @endif
 
-            <div class="card-shell overflow-hidden">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <!-- Header -->
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h3 class="card-heading text-lg font-medium text-gray-900 dark:text-white">
-                            @if ($isAdmin)
-                                {{ __('Session Management') }}
-                            @else
-                                {{ __('My Sessions') }}
-                            @endif
-                        </h3>
+        <section class="card-shell space-y-6" data-sessions-panel>
+            <div class="app-toolbar" data-sessions-toolbar>
+                <div>
+                    <p class="section-kicker">{{ __('Heartbeats') }}</p>
+                    <h2 class="app-toolbar-title">{{ $sessionTitle }}</h2>
+                    <p class="app-toolbar-subtitle">{{ $sessionSubtitle }}</p>
+                </div>
+            </div>
+
+            <x-filter-box
+                :action="route('sessions.index')"
+                :showTotal="true"
+                :totalCount="$sessions->total()"
+                :title="__('Filter sessions')"
+                defaultValues="sort:last_heartbeat_at,direction:desc"
+            >
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div class="space-y-2">
+                        <label for="status" class="form-label">{{ __('Status') }}</label>
+                        <select name="status" id="status" class="form-select">
+                            @foreach ($statusOptions as $value => $label)
+                                <option value="{{ $value }}" {{ $currentFilters['status'] === $value ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
-                    <!-- Filters -->
-                    <div class="mb-6 card-shell-muted">
-                        <div class="flex items-center justify-between mb-4 lg:max-xl:flex-wrap gap-2">
-                            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                                    </path>
-                                </svg>
-                                {{ __('Filter Sessions') }}
-                            </h4>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $sessions->total() }} {{ $isAdmin ? __('total') : __('my') }} {{ __('sessions') }}
-                                </span>
+                    <div class="space-y-2 md:col-span-2">
+                        <label for="sort" class="form-label">{{ __('Sort By') }}</label>
+                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_7rem]">
+                            <select name="sort" id="sort" class="form-select">
+                                <option value="last_heartbeat_at" {{ $currentFilters['sort'] === 'last_heartbeat_at' ? 'selected' : '' }}>
+                                    {{ __('Last Heartbeat') }}
+                                </option>
+                                <option value="created_at" {{ $currentFilters['sort'] === 'created_at' ? 'selected' : '' }}>
+                                    {{ __('Created') }}
+                                </option>
+                            </select>
+
+                            <select name="direction" id="direction" class="form-select">
+                                <option value="desc" {{ $currentFilters['direction'] === 'desc' ? 'selected' : '' }}>
+                                    {{ __('Desc') }}
+                                </option>
+                                <option value="asc" {{ $currentFilters['direction'] === 'asc' ? 'selected' : '' }}>
+                                    {{ __('Asc') }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
+                    <div class="space-y-2 md:col-span-8">
+                        <label for="search" class="form-label">{{ __('Search') }}</label>
+                        <x-input-with-icon
+                            id="search"
+                            name="search"
+                            type="text"
+                            :value="$currentFilters['search']"
+                            :placeholder="$isAdmin ? __('Search by account username, device name, or session token...') : __('Search by device name or session token...')"
+                            icon="search"
+                        />
+                    </div>
+
+                    <div class="space-y-2 md:col-span-4">
+                        <span class="form-label text-transparent">{{ __('Actions') }}</span>
+                        <div class="form-actions-cluster">
+                            <button type="submit" class="btn btn-primary btn-sm flex-1 justify-center gap-2">
+                                <x-icon name="search" class="h-4 w-4" />
+                                {{ __('Filter') }}
+                            </button>
+                            <a href="{{ route('sessions.index') }}" class="btn btn-secondary btn-sm justify-center gap-2">
+                                <x-icon name="reset" class="h-4 w-4" />
+                                {{ __('Reset') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @if ($hasFilters)
+                    <div class="active-filters" data-active-filters>
+                        <div class="active-filters__header">
+                            <div class="active-filters__copy">
+                                <p class="active-filters__title">{{ __('Active Filters') }}</p>
+                                <p class="active-filters__subtitle">{{ __('Remove a single filter or clear the whole session query without changing routes.') }}</p>
                             </div>
+                            <a href="{{ route('sessions.index') }}" class="active-filters__clear">
+                                {{ __('Clear All') }}
+                            </a>
                         </div>
 
-                        <form method="GET" action="{{ route('sessions.index') }}" data-clean-form="true"
-                            data-default-values="sort:last_heartbeat_at,direction:desc">
-                            <!-- Status & Sort Row -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                <!-- Status filter -->
-                                <div class="space-y-2">
-                                    <label for="status"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Status') }}</label>
-                                    <select name="status" id="status" class="form-select">
-                                        @foreach ($statusOptions as $value => $label)
-                                            <option value="{{ $value }}"
-                                                {{ $currentFilters['status'] === $value ? 'selected' : '' }}>
-                                                {{ $label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                        <div class="active-filters__list">
+                            @if (request()->filled('status'))
+                                @php
+                                    $statusValue = request('status');
+                                    $statusLabel = $statusOptions[$statusValue] ?? null;
+                                @endphp
 
-                                <!-- Sort with direction -->
-                                <div class="space-y-2 md:col-span-2">
-                                    <label for="sort"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Sort By') }}</label>
-                                    <div class="flex flex-wrap gap-2">
-                                        <select name="sort" id="sort" class="form-select flex-1">
-                                            <option value="last_heartbeat_at"
-                                                {{ $currentFilters['sort'] === 'last_heartbeat_at' ? 'selected' : '' }}>
-                                                {{ __('Last Heartbeat') }}
-                                            </option>
-                                            <option value="created_at"
-                                                {{ $currentFilters['sort'] === 'created_at' ? 'selected' : '' }}>
-                                                {{ __('Created') }}
-                                            </option>
-                                        </select>
-                                        <select name="direction" class="form-select w-24 px-2">
-                                            <option value="desc"
-                                                {{ $currentFilters['direction'] === 'desc' ? 'selected' : '' }}>
-                                                ↓
-                                            </option>
-                                            <option value="asc"
-                                                {{ $currentFilters['direction'] === 'asc' ? 'selected' : '' }}>
-                                                ↑
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+                                @if ($statusLabel)
+                                    <x-filter-badge :label="__('Status:').' '.$statusLabel" color="blue" :removeUrl="request()->fullUrlWithQuery(['status' => null])" />
+                                @endif
+                            @endif
 
-                            <!-- Search Row -->
-                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                                <!-- Search -->
-                                <div class="space-y-2 md:col-span-8">
-                                    <label for="search"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Search') }}</label>
-                                    <div class="relative">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                            </svg>
+                            @if (request()->filled('search'))
+                                <x-filter-badge :label="__('Search:').' \"'.request('search').'\"'" color="purple" :removeUrl="request()->fullUrlWithQuery(['search' => null])" />
+                            @endif
+
+                            @if ($currentFilters['sort'] !== 'last_heartbeat_at' || $currentFilters['direction'] !== 'desc')
+                                @php
+                                    $sortLabel = match ($currentFilters['sort']) {
+                                        'last_heartbeat_at' => __('Last Heartbeat'),
+                                        'created_at' => __('Created'),
+                                        default => ucfirst((string) $currentFilters['sort']),
+                                    };
+
+                                    $directionLabel = $currentFilters['direction'] === 'asc' ? __('Ascending') : __('Descending');
+                                @endphp
+
+                                <x-filter-badge
+                                    :label="__('Sort:').' '.$sortLabel.' · '.$directionLabel"
+                                    color="yellow"
+                                    :removeUrl="request()->fullUrlWithQuery(['sort' => null, 'direction' => null])"
+                                />
+                            @endif
+                        </div>
+                    </div>
+                @endif
+            </x-filter-box>
+
+            <x-table
+                :headers="$isAdmin
+                    ? [__('Account'), __('Device'), __('IP Address'), __('Client Version'), __('Status'), __('Last Heartbeat'), __('Created'), __('Actions')]
+                    : [__('Device'), __('IP Address'), __('Client Version'), __('Status'), __('Last Heartbeat'), __('Created'), __('Actions')]"
+                :emptyColspan="$isAdmin ? 8 : 7"
+                ariaLabel="{{ __('Sessions table') }}"
+            >
+                @forelse ($sessions as $session)
+                    <tr class="table-row">
+                        @if ($isAdmin)
+                            <td class="table-cell-primary whitespace-nowrap">
+                                @if ($session->account)
+                                    <div class="flex items-center gap-3">
+                                        <div class="table-avatar">
+                                            {{ $session->account->initials() }}
                                         </div>
-                                        <input type="text" name="search" id="search" value="{{ $currentFilters['search'] }}"
-                                            class="form-input pl-10 pr-4 py-2"
-                                            placeholder="{{ $isAdmin ? __('Search by account username, device name, or session token...') : __('Search by device name or session token...') }}">
-                                    </div>
-                                </div>
 
-                                <!-- Action Buttons -->
-                                <div class="space-y-2 md:col-span-4">
-                                    <label class="block text-sm font-medium text-transparent">{{ __('Actions') }}</label>
-                                    <div class="flex gap-2">
-                                        <x-primary-button type="submit" class="flex-1">{{ __('Filter') }}</x-primary-button>
-                                        <x-secondary-button tag="a" href="{{ route('sessions.index') }}">{{ __('Reset') }}</x-secondary-button>
+                                        <div class="table-stack table-stack-tight">
+                                            <div class="table-title text-sm">{{ $session->account->username }}</div>
+                                            <div class="table-meta max-w-[240px] truncate" title="{{ $session->account->email }}">
+                                                {{ $session->account->email }}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                @else
+                                    <span class="table-meta">{{ __('Unknown') }}</span>
+                                @endif
+                            </td>
+                        @endif
 
-                            <!-- Active Filters -->
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($session->device)
+                                <div class="table-stack table-stack-tight">
+                                    <div class="table-title max-w-[220px] truncate text-sm" title="{{ $session->device->hwid_hash ?? __('Unknown Device') }}">
+                                        {{ $session->device->hwid_hash ?? __('Unknown Device') }}
+                                    </div>
+                                    <div class="table-meta">{{ __('ID:') }} {{ $session->device->id }}</div>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('Unknown') }}</span>
+                            @endif
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
+                            <span class="table-meta inline-block max-w-[180px] truncate align-middle" title="{{ $session->ip_address ?? __('N/A') }}">
+                                {{ $session->ip_address ?? __('N/A') }}
+                            </span>
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
                             @php
-                                $hasFilters =
-                                    request()->filled('status') ||
-                                    request()->filled('search') ||
-                                    request()->filled('sort');
+                                $clientVersion = (string) ($session->client_version ?? __('Unknown'));
+                                $clientVersionPreview = \Illuminate\Support\Str::limit($clientVersion, 24, '...');
                             @endphp
 
-                            @if ($hasFilters)
-                                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            {{ __('Active Filters') }}
-                                        </span>
-                                        <a href="{{ route('sessions.index') }}"
-                                            class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                                            {{ __('Clear All') }}
-                                        </a>
-                                    </div>
-                                    <div class="flex flex-wrap gap-2">
-                                        @if (request()->filled('status'))
-                                            @php
-                                                $statusValue = request('status');
-                                                $statusLabel = $statusOptions[$statusValue] ?? null;
-                                            @endphp
-                                            @if ($statusLabel)
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                                    {{ __('Status:') }} {{ $statusLabel }}
-                                                    <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}"
-                                                        class="ml-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                        </svg>
-                                                    </a>
-                                                </span>
-                                            @endif
-                                        @endif
-                                        @if (request()->filled('search'))
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                                {{ __('Search:') }} "{{ request('search') }}"
-                                                <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}"
-                                                    class="ml-1.5 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-200">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                    </svg>
-                                                </a>
-                                            </span>
-                                        @endif
-                                        @if (request()->filled('sort'))
-                                            @php
-                                                $sortValue = request('sort');
-                                                $directionValue = request('direction', 'desc');
-                                                $sortLabel = match ($sortValue) {
-                                                    'last_heartbeat_at' => __('Last Heartbeat'),
-                                                    'created_at' => __('Created'),
-                                                    default => ucfirst($sortValue),
-                                                };
-                                                $directionArrow = $directionValue === 'desc' ? '↓' : '↑';
-                                            @endphp
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                                {{ __('Sort:') }} {{ $sortLabel }} {{ $directionArrow }}
-                                                <a href="{{ request()->fullUrlWithQuery(['sort' => null, 'direction' => null]) }}"
-                                                    class="ml-1.5 text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-200">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                    </svg>
-                                                </a>
-                                            </span>
-                                        @endif
-                                    </div>
+                            <button
+                                type="button"
+                                class="badge badge-default inline-flex max-w-[190px] items-center truncate text-left transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                title="{{ $clientVersion }}"
+                                data-copy-value="{{ $clientVersion }}"
+                                onclick="copyTextValue(this)"
+                            >
+                                {{ $clientVersionPreview }}
+                            </button>
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
+                            <x-status-badge :status="$session->isActive() ? 'active' : 'error'" :text="$session->isActive() ? __('Active') : __('Expired')" />
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($session->last_heartbeat_at)
+                                <div class="table-stack table-stack-tight">
+                                    <div>{{ $session->last_heartbeat_at->diffForHumans() }}</div>
+                                    <div class="table-meta">{{ $session->last_heartbeat_at->format('Y-m-d H:i:s') }}</div>
                                 </div>
+                            @else
+                                <span class="table-meta">{{ __('Never') }}</span>
                             @endif
-                        </form>
-                    </div>
+                        </td>
 
-                    <!-- Sessions table -->
-                    <x-table :emptyColspan="$isAdmin ? 8 : 7">
-                        <x-slot:headers>
-                            @if ($isAdmin)
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Account
-                            </th>
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($session->created_at)
+                                <div class="table-stack table-stack-tight">
+                                    <div>{{ $session->created_at->diffForHumans() }}</div>
+                                    <div class="table-meta">{{ $session->created_at->format('Y-m-d H:i:s') }}</div>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('Unknown') }}</span>
                             @endif
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Device') }}</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('IP Address') }}</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Client Version') }}</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Status') }}</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Last Heartbeat') }}</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Created') }}</th>
-                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Actions') }}</th>
-                        </x-slot:headers>
-                        @forelse($sessions as $session)
-                            <tr>
-                                @if ($isAdmin)
-                                <td class="px-4 py-2 whitespace-nowrap">
-                                    @if ($session->account)
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-8 w-8">
-                                                <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                                                    {{ $session->account->initials() }}
-                                                </div>
-                                            </div>
-                                            <div class="ml-3">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                    {{ $session->account->username }}
-                                                </div>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                    {{ $session->account->email }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Unknown') }}</span>
-                                    @endif
-                                </td>
-                                @endif
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    @if ($session->device)
-                                        <div>
-                                            <div class="text-sm font-medium max-w-[220px] truncate" title="{{ $session->device->hwid_hash ?? __('Unknown Device') }}">
-                                                {{ $session->device->hwid_hash ?? __('Unknown Device') }}
-                                            </div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ __('ID:') }} {{ $session->device->id }}
-                                            </div>
-                                        </div>
-                                    @else
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Unknown') }}</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white max-w-[180px] truncate" title="{{ $session->ip_address ?? __('N/A') }}">
-                                    {{ $session->ip_address ?? __('N/A') }}
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    @php
-                                        $clientVersion = $session->client_version ?? __('Unknown');
-                                    @endphp
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center max-w-[170px] truncate px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                                        title="{{ $clientVersion }}"
-                                        data-copy-value="{{ $clientVersion }}"
-                                        onclick="copyTextValue(this)">
-                                        {{ $clientVersion }}
+                        </td>
+
+                        <td class="table-cell whitespace-nowrap text-right">
+                            <div class="table-actions table-actions--nowrap">
+                                <a href="{{ route('sessions.show', $session) }}" class="table-action table-action--primary">
+                                    {{ __('View') }}
+                                </a>
+
+                                <form action="{{ route('sessions.destroy', $session) }}" method="POST" class="inline" onsubmit="return confirm('{{ $terminateSessionConfirmation }}')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="table-action table-action--danger">
+                                        {{ __('Terminate') }}
                                     </button>
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap">
-                                    @if ($session->isActive())
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                            {{ __('Active') }}
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                                            {{ __('Expired') }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    @if ($session->last_heartbeat_at)
-                                        {{ $session->last_heartbeat_at->diffForHumans() }}
-                                        <br>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ $session->last_heartbeat_at->format('Y-m-d H:i:s') }}</span>
-                                    @else
-                                        <span class="text-gray-500 dark:text-gray-400">{{ __('Never') }}</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    @if ($session->created_at)
-                                        {{ $session->created_at->diffForHumans() }}
-                                        <br>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ $session->created_at->format('Y-m-d H:i:s') }}</span>
-                                    @else
-                                        <span class="text-gray-500 dark:text-gray-400">{{ __('Unknown') }}</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('sessions.show', $session) }}"
-                                        class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        {{ __('View') }}
-                                    </a>
-                                    <span class="mx-1 text-gray-400">{{ '|' }}</span>
-                                    <form action="{{ route('sessions.destroy', $session) }}" method="POST"
-                                        class="inline"
-                                        onsubmit="return confirm('{{ $terminateSessionConfirmation }}')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                            {{ __('Terminate') }}
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="{{ $isAdmin ? 8 : 7 }}" class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                    {{ __('No sessions found.') }}
-                                </td>
-                            </tr>
-                        @endforelse
-                    </x-table>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr class="table-row">
+                        <td colspan="{{ $isAdmin ? 8 : 7 }}" class="table-empty">
+                            <div class="table-empty-state">
+                                <x-icon name="server" class="table-empty-icon" />
+                                <p class="table-empty-title">{{ __('No sessions found.') }}</p>
+                                <p class="table-empty-copy">
+                                    {{ __('Adjust the heartbeat filters or reset the query to surface more sessions.') }}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </x-table>
 
-                    <!-- Pagination -->
-                    <div class="mt-4 pagination-container">
-                        <x-pagination :paginator="$sessions" />
-                    </div>
-                </div>
-        </div>
+            <div>
+                <x-pagination :paginator="$sessions" />
+            </div>
+        </section>
     </div>
-
 </x-app-sidebar-layout>
 
 <script>

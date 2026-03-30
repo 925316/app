@@ -92,9 +92,9 @@
                 @if(trim($slot) === '')
                 <tr>
                     <td colspan="{{ $emptyColspan }}" class="table-empty">
-                        <div class="flex flex-col items-center py-8">
-                            <x-icon name="document" class="mb-3 h-12 w-12 text-[rgb(var(--color-text-muted)/0.4)] dark:text-[rgb(var(--color-text-muted)/0.4)]" />
-                            <p class="table-empty">{{ __($emptyMessage) }}</p>
+                        <div class="table-empty-state">
+                            <x-icon name="document" class="table-empty-icon" />
+                            <p class="table-empty-title">{{ __($emptyMessage) }}</p>
                         </div>
                     </td>
                 </tr>

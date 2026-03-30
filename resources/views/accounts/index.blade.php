@@ -36,7 +36,7 @@
             </div>
 
             <x-filter-box :action="route('accounts.index')" :showTotal="true" :totalCount="$statistics['total']" :title="__('Filter accounts')">
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 mb-4">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div class="space-y-2">
                         <label for="status" class="form-label">{{ __('Account Status') }}</label>
                         <select name="status" id="status" class="form-select">
@@ -87,7 +87,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 items-end md:grid-cols-12">
+                <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
                     <div class="space-y-2 md:col-span-8">
                         <label for="search" class="form-label">{{ __('Search') }}</label>
                         <x-input-with-icon id="search" name="search" type="text" :value="$currentFilters['search']"
@@ -96,7 +96,7 @@
 
                     <div class="space-y-2 md:col-span-4">
                         <span class="form-label text-transparent">{{ __('Actions') }}</span>
-                        <div class="flex gap-2">
+                        <div class="form-actions-cluster">
                             <button type="submit" class="btn btn-primary btn-sm flex-1 gap-2 justify-center">
                                 <x-icon name="search" class="h-4 w-4" />
                                 {{ __('Filter') }}
@@ -110,15 +110,18 @@
                 </div>
 
                 @if ($hasFilters)
-                    <div class="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700" data-active-filters>
-                        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
-                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Active Filters') }}</p>
-                            <a href="{{ route('accounts.index') }}" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+                    <div class="active-filters" data-active-filters>
+                        <div class="active-filters__header">
+                            <div class="active-filters__copy">
+                                <p class="active-filters__title">{{ __('Active Filters') }}</p>
+                                <p class="active-filters__subtitle">{{ __('Remove a single filter or clear the entire query.') }}</p>
+                            </div>
+                            <a href="{{ route('accounts.index') }}" class="active-filters__clear">
                                 {{ __('Clear All') }}
                             </a>
                         </div>
 
-                        <div class="flex flex-wrap gap-2">
+                        <div class="active-filters__list">
                             @if ($currentFilters['status'])
                                 @php
                                     $statusValue = $currentFilters['status'];
@@ -188,19 +191,19 @@
                     <tr class="table-row">
                         <td class="table-cell-primary whitespace-nowrap">
                             <div class="flex items-center gap-3">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">
+                                <div class="table-avatar">
                                     {{ $account->initials() }}
                                 </div>
 
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $account->username }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('ID:') }} {{ $account->id }}</div>
+                                <div class="table-stack table-stack-tight">
+                                    <div class="table-title text-sm">{{ $account->username }}</div>
+                                    <div class="table-meta">{{ __('ID:') }} {{ $account->id }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="table-cell whitespace-nowrap">
                             <div class="max-w-[220px] truncate" title="{{ $account->email }}">
-                                <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-medium {{ $account->email_verified_at ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
+                                <span class="badge {{ $account->email_verified_at ? 'badge-verified' : 'badge-unverified' }}">
                                     {{ $account->email }}
                                 </span>
                             </div>
@@ -231,29 +234,31 @@
                         <td class="table-cell whitespace-nowrap">{{ $account->devices_count }}</td>
                         <td class="table-cell whitespace-nowrap">
                             @if ($account->last_login_at)
-                                <div>{{ $account->last_login_at->diffForHumans() }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $account->last_login_at->format('Y-m-d H:i') }}</div>
+                                <div class="table-stack table-stack-tight">
+                                    <div>{{ $account->last_login_at->diffForHumans() }}</div>
+                                    <div class="table-meta">{{ $account->last_login_at->format('Y-m-d H:i') }}</div>
+                                </div>
                             @else
-                                <span class="text-gray-500 dark:text-gray-400">{{ __('Never') }}</span>
+                                <span class="table-meta">{{ __('Never') }}</span>
                             @endif
                         </td>
                         <td class="table-cell whitespace-nowrap text-right">
-                            <div class="flex flex-wrap justify-end gap-3">
-                                <a href="{{ route('accounts.show', $account) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            <div class="table-actions table-actions--nowrap">
+                                <a href="{{ route('accounts.show', $account) }}" class="table-action table-action--primary">
                                     {{ __('View') }}
                                 </a>
 
                                 @if ($account->isCurrentlySuspended)
                                     <form action="{{ route('accounts.unsuspend', $account) }}" method="POST" class="inline">
                                         @csrf
-                                        <button type="submit" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
+                                        <button type="submit" class="table-action table-action--success">
                                             {{ __('Unsuspend') }}
                                         </button>
                                     </form>
                                 @else
                                     <form action="{{ route('accounts.suspend', $account) }}" method="POST" class="inline" onsubmit="return confirm('{{ $suspendAccountConfirmation }}')">
                                         @csrf
-                                        <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                        <button type="submit" class="table-action table-action--danger">
                                             {{ __('Suspend') }}
                                         </button>
                                     </form>
@@ -262,7 +267,7 @@
                                 <form action="{{ route('accounts.destroy', $account) }}" method="POST" class="inline" onsubmit="return confirm('{{ $deleteAccountConfirmation }}')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                    <button type="submit" class="table-action table-action--danger">
                                         {{ __('Delete') }}
                                     </button>
                                 </form>
@@ -273,7 +278,13 @@
 
                 @if ($accounts->count() === 0)
                     <tr class="table-row">
-                        <td colspan="8" class="table-empty">{{ __('No accounts found.') }}</td>
+                        <td colspan="8" class="table-empty">
+                            <div class="table-empty-state">
+                                <x-icon name="users" class="table-empty-icon" />
+                                <p class="table-empty-title">{{ __('No accounts found.') }}</p>
+                                <p class="table-empty-copy">{{ __('Adjust the current filters or reset the query to widen the account directory.') }}</p>
+                            </div>
+                        </td>
                     </tr>
                 @endif
             </x-data-table>

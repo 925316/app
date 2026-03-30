@@ -163,6 +163,11 @@
     backdrop-filter: blur(16px);
 }
 
+[data-shell-theme='cinematic'] .btn-sm {
+    min-height: 2.5rem;
+    letter-spacing: 0.03em;
+}
+
 [data-shell-theme='cinematic'] .btn:focus-visible {
     --tw-ring-color: rgb(var(--shell-accent) / 0.28);
     --tw-ring-offset-color: rgb(var(--shell-surface));

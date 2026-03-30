@@ -32,6 +32,16 @@ it('accounts index surfaces active filter chips with stable markers', function (
         ->assertSee('data-active-filters', false);
 });
 
+it('accounts index keeps row actions on a single horizontal line', function () {
+    $admin = createAdmin();
+    Account::factory()->create();
+
+    actingAs($admin)
+        ->get(route('accounts.index'))
+        ->assertSuccessful()
+        ->assertSee('table-actions table-actions--nowrap', false);
+});
+
 it('accounts index shows statistics', function () {
     $admin = createAdmin();
 

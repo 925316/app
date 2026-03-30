@@ -41,7 +41,7 @@
             </div>
 
             <x-filter-box :action="route('logs.index')" :title="__('Filter logs')">
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5 items-end">
+                <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-2 xl:grid-cols-5">
                     <div class="space-y-2">
                         <label for="event_type" class="form-label">{{ __('Event Type') }}</label>
                         <select name="event_type" id="event_type" class="form-select">
@@ -79,7 +79,7 @@
                     </div>
                 </div>
 
-                <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 items-end border-t border-gray-200 pt-4 dark:border-gray-700">
+                <div class="form-divider grid grid-cols-1 items-end gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div class="space-y-2">
                         <label for="start_date" class="form-label">{{ __('Start Date') }}</label>
                         <input type="datetime-local" name="start_date" id="start_date" value="{{ request('start_date') }}" class="form-input">
@@ -90,7 +90,7 @@
                         <input type="datetime-local" name="end_date" id="end_date" value="{{ request('end_date') }}" class="form-input">
                     </div>
 
-                    <div class="xl:col-span-2 flex flex-wrap gap-2">
+                    <div class="form-actions-cluster xl:col-span-2">
                         <button type="submit" class="btn btn-primary btn-sm gap-2">
                             <x-icon name="search" class="h-4 w-4" />
                             {{ __('Filter') }}
@@ -103,8 +103,18 @@
                 </div>
 
                 @if ($hasLogFilters)
-                    <div class="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700" data-active-filters>
-                        <div class="flex flex-wrap gap-2">
+                    <div class="active-filters" data-active-filters>
+                        <div class="active-filters__header">
+                            <div class="active-filters__copy">
+                                <p class="active-filters__title">{{ __('Active Filters') }}</p>
+                                <p class="active-filters__subtitle">{{ __('Refine the event stream without losing the current route or pagination state.') }}</p>
+                            </div>
+                            <a href="{{ route('logs.index') }}" class="active-filters__clear">
+                                {{ __('Clear All') }}
+                            </a>
+                        </div>
+
+                        <div class="active-filters__list">
                             @if (filled(request('event_type')))
                                 <x-filter-badge :label="__('Type:').' '.request('event_type')" color="blue" :removeUrl="request()->fullUrlWithQuery(['event_type' => null])" />
                             @endif
@@ -132,7 +142,12 @@
             <x-table :headers="[__('Time'), __('Type'), __('Level'), __('Account'), __('IP'), __('Actions')]" :emptyColspan="6" ariaLabel="{{ __('Logs table') }}">
                 @forelse ($logs as $log)
                     <tr class="table-row">
-                        <td class="table-cell whitespace-nowrap">{{ $log->created_at->format('Y-m-d H:i') }}</td>
+                        <td class="table-cell whitespace-nowrap">
+                            <div class="table-stack table-stack-tight">
+                                <div>{{ $log->created_at->format('Y-m-d H:i') }}</div>
+                                <div class="table-meta">{{ $log->created_at->diffForHumans() }}</div>
+                            </div>
+                        </td>
                         <td class="table-cell whitespace-nowrap">
                             @php
                                 $eventBadge = match ($log->event_level) {
@@ -143,18 +158,30 @@
                             @endphp
                             <x-status-badge :status="$eventBadge" :text="$log->event_type" />
                         </td>
-                        <td class="table-cell whitespace-nowrap">{{ $eventLevels[$log->event_level] ?? __('Unknown') }}</td>
-                        <td class="table-cell whitespace-nowrap">{{ $log->account?->username ?? __('System') }}</td>
-                        <td class="table-cell whitespace-nowrap">{{ $log->ip_address }}</td>
+                        <td class="table-cell whitespace-nowrap">
+                            <span class="table-meta">{{ $eventLevels[$log->event_level] ?? __('Unknown') }}</span>
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            <span class="table-title text-sm">{{ $log->account?->username ?? __('System') }}</span>
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            <span class="table-meta">{{ $log->ip_address }}</span>
+                        </td>
                         <td class="table-cell whitespace-nowrap text-right">
-                            <a href="{{ route('logs.show', $log) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            <a href="{{ route('logs.show', $log) }}" class="table-action table-action--primary">
                                 {{ __('View') }}
                             </a>
                         </td>
                     </tr>
                 @empty
                     <tr class="table-row">
-                        <td colspan="6" class="table-empty">{{ __('No logs found.') }}</td>
+                        <td colspan="6" class="table-empty">
+                            <div class="table-empty-state">
+                                <x-icon name="document" class="table-empty-icon" />
+                                <p class="table-empty-title">{{ __('No logs found.') }}</p>
+                                <p class="table-empty-copy">{{ __('Try broadening the date range or removing a filter to surface more events.') }}</p>
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
             </x-table>
@@ -174,7 +201,7 @@
 
                         <div class="space-y-1">
                             <p class="section-kicker">{{ __('Maintenance') }}</p>
-                            <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Clear Old Logs') }}</h3>
+                            <h3 class="card-heading text-lg font-semibold">{{ __('Clear Old Logs') }}</h3>
                         </div>
                     </div>
                 </div>
@@ -183,7 +210,7 @@
                     @csrf
 
                     <div class="modal-body space-y-4">
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                        <p class="card-modal-copy text-sm">
                             {{ __('This will permanently delete all log entries older than the specified number of days.') }}
                         </p>
 
@@ -191,7 +218,7 @@
                             <label for="days" class="form-label">{{ __('Delete logs older than') }}</label>
                             <div class="flex items-center gap-3">
                                 <input type="number" name="days" id="days" min="1" max="365" value="30" class="form-input">
-                                <span class="text-sm text-gray-600 dark:text-gray-300">{{ __('days') }}</span>
+                                <span class="form-note text-sm">{{ __('days') }}</span>
                             </div>
                         </div>
                     </div>

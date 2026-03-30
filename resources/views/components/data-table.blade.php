@@ -20,7 +20,12 @@
 
             @if ($items === null && trim($slot) === '')
                 <tr>
-                    <td colspan="{{ $emptyColspan ?? count($headers) }}" class="table-empty">{{ $emptyMessage }}</td>
+                    <td colspan="{{ $emptyColspan ?? count($headers) }}" class="table-empty">
+                        <div class="table-empty-state">
+                            <x-icon name="document" class="table-empty-icon" />
+                            <p class="table-empty-title">{{ $emptyMessage }}</p>
+                        </div>
+                    </td>
                 </tr>
             @endif
         </tbody>

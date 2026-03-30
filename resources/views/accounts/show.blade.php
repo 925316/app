@@ -4,368 +4,430 @@
         {{ __('Account Details') }}
     </x-slot>
 
-    <div class="mx-auto max-w-6xl space-y-6" data-page="accounts-show">
-        <div class="card-shell">
-            <div class="app-toolbar mb-0">
+    <x-slot name="subheader">
+        {{ __('Carry the cinematic account directory system into the detail view without changing account actions, modal workflows, or related records.') }}
+    </x-slot>
+
+    @php
+        $accountPrivilege = LicensePrivilege::tryFrom($account->getPrivilegeLevel());
+        $accountPrivilegeLabel = $accountPrivilege?->getLabel() ?? 'default';
+        $accountStatusText = $account->isCurrentlySuspended ? __('Suspended') : __('Active');
+        $boundDevicesCount = $boundDevices->count();
+    @endphp
+
+    <div class="space-y-8" data-page="accounts-show">
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
                 <div>
                     <p class="section-kicker">{{ __('Account') }}</p>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $account->username }}</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('ID:') }} #{{ $account->id }}</p>
+                    <h2 class="app-toolbar-title">{{ $account->username }}</h2>
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                        <x-status-badge :status="$account->isCurrentlySuspended ? 'suspended' : 'active'" :text="$accountStatusText" />
+                        <x-status-badge :status="$account->email_verified_at ? 'verified' : 'unverified'" :text="$account->email_verified_at ? __('Verified') : __('Unverified')" />
+                        <x-status-badge :status="strtolower($accountPrivilegeLabel)" :text="ucfirst($accountPrivilegeLabel)" />
+                    </div>
+                    <p class="mt-3 app-shell-body-copy text-sm">{{ __('ID:') }} #{{ $account->id }}</p>
                 </div>
-                <div class="flex gap-2">
-                    <x-primary-button tag="a" href="{{ route('accounts.edit', $account) }}">
+
+                <div class="app-toolbar-actions">
+                    <x-primary-button tag="a" href="{{ route('accounts.edit', $account) }}" class="btn-sm gap-2">
+                        <x-icon name="document" class="h-4 w-4" />
                         {{ __('Edit Account') }}
                     </x-primary-button>
-                    <x-secondary-button tag="a" href="{{ route('accounts.index') }}">
+
+                    <x-secondary-button tag="a" href="{{ route('accounts.index') }}" class="btn-sm gap-2">
+                        <x-icon name="reset" class="h-4 w-4" />
                         {{ __('Back to Accounts') }}
                     </x-secondary-button>
                 </div>
             </div>
 
-        {{-- Account Overview --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="card-shell-muted">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Account Information') }}</h3>
-                <div class="space-y-3">
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Username') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->username }}</p>
-                    </div>
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Email') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->email }}</p>
-                        @if ($account->email_verified_at)
-                            <x-status-badge status="verified" :text="__('Verified')" />
-                        @else
-                            <x-status-badge status="unverified" :text="__('Unverified')" />
-                        @endif
-                    </div>
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Status') }}</span>
-                        @if ($account->isCurrentlySuspended)
-                            <x-status-badge status="suspended" />
-                        @else
-                            <x-status-badge status="active" />
-                        @endif
-                    </div>
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Privilege Level') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">
-                            {{ $account->getPrivilegeLevel() ? ucfirst(strtolower(LicensePrivilege::tryFrom($account->getPrivilegeLevel())?->getLabel() ?? __('Unknown'))) : __('None') }}
-                        </p>
-                    </div>
+            <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Account statistics') }}">
+                <x-stat-card :title="__('Licenses')" :value="$account->licenses->count()" icon="document" iconColor="icon-blue" />
+                <x-stat-card :title="__('Devices')" :value="$account->devices_count" icon="desktop" iconColor="icon-purple" />
+                <x-stat-card :title="__('Bound Devices')" :value="$boundDevicesCount" icon="success" iconColor="icon-green" />
+                <x-stat-card :title="__('HWID Resets')" :value="$account->hwid_reset_count" icon="warning" iconColor="icon-yellow" />
+            </section>
+        </section>
+
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Overview') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Account overview') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('Keep the same account facts, but present them in the shared cinematic detail language.') }}</p>
                 </div>
             </div>
 
-            <div class="card-shell-muted">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Login Information') }}</h3>
-                <div class="space-y-3">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div class="card-shell-muted space-y-4 p-6">
                     <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Last Login') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">
-                            @if ($account->last_login_at)
-                                {{ $account->last_login_at->diffForHumans() }}
-                                <br>
-                                <span
-                                    class="text-xs text-gray-500 dark:text-gray-400">{{ $account->last_login_at->format('Y-m-d H:i:s') }}</span>
-                            @else
-                                <span class="text-gray-500 dark:text-gray-400">{{ __('Never') }}</span>
-                            @endif
-                        </p>
+                        <p class="section-kicker">{{ __('Identity') }}</p>
+                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Account information') }}</h3>
                     </div>
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Last IP Address') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->last_ip_address ?? __('N/A') }}</p>
-                    </div>
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Registration Date') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="card-shell-muted">
-                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{{ __('Device Information') }}</h3>
-                <div class="space-y-3">
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Total Devices') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->devices_count }}</p>
-                    </div>
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Bound Devices') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $boundDevices->count() }}</p>
-                    </div>
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('HWID Resets') }}</span>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $account->hwid_reset_count }}</p>
-                        @if ($account->hwid_last_reset_at)
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('Last reset:') }}
-                                {{ $account->hwid_last_reset_at->diffForHumans() }}</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <div class="grid gap-4">
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Username') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->username }}</p>
+                        </div>
 
-        {{-- Action Buttons --}}
-        <div class="card-shell-muted mb-8">
-            <p class="section-kicker mb-3">{{ __('Account Actions') }}</p>
-            <div class="flex flex-wrap gap-3">
-                @if ($account->isCurrentlySuspended)
-                    <form action="{{ route('accounts.unsuspend', $account) }}" method="POST">
-                        @csrf
-                        <x-primary-button type="submit">{{ __('Unsuspend Account') }}</x-primary-button>
-                    </form>
-                @else
-                    <x-danger-button onclick="openSuspendModal('{{ $account->id }}')">{{ __('Suspend Account') }}</x-danger-button>
-                @endif
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Email') }}</p>
+                            <p class="break-all text-sm font-semibold text-gray-900 dark:text-white">{{ $account->email }}</p>
+                            <x-status-badge :status="$account->email_verified_at ? 'verified' : 'unverified'" :text="$account->email_verified_at ? __('Verified') : __('Unverified')" />
+                        </div>
 
-                @if (!$account->email_verified_at)
-                    <form action="{{ route('accounts.verify-email', $account) }}" method="POST">
-                        @csrf
-                        <x-primary-button type="submit">{{ __('Verify Email') }}</x-primary-button>
-                    </form>
-                @endif
-
-                <x-secondary-button onclick="openResetHwidModal('{{ $account->id }}')">{{ __('Reset HWID') }}</x-secondary-button>
-
-                <form action="{{ route('accounts.destroy', $account) }}" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <x-danger-button type="submit">{{ __('Delete Account') }}</x-danger-button>
-                </form>
-            </div>
-        </div>
-
-        {{-- Licenses --}}
-        <div class="card-shell mb-8">
-            <div class="mb-4">
-                <p class="section-kicker">{{ __('Licenses') }}</p>
-                @if ($account->licenses->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('No licenses found for this account.') }}</p>
-                @else
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('License Key') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Privilege') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Status') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Expires At') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Actions') }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
-                                @foreach ($account->licenses as $license)
-                                    <tr>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $license->key }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            <x-status-badge :status="strtolower($license->privilege?->getLabel() ?? 'default')" :text="$license->privilege?->getLabel() ?? __('Unknown')" />
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <x-status-badge :status="strtolower($license->status?->getLabel() ?? 'default')" :text="$license->status?->getLabel() ?? __('Unknown')" />
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            {{ $license->expires_at->format('Y-m-d H:i:s') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('licenses.show', $license) }}"
-                                                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                {{ __('View') }}
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        {{-- Devices --}}
-        <div class="card-shell mb-8">
-            <div class="mb-4">
-                <p class="section-kicker">{{ __('Devices') }}</p>
-                @if ($account->devices->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('No devices found for this account.') }}</p>
-                @else
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Device ID') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('HWID Hash') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Status') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('First Seen') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Last Seen') }}
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Bound At') }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
-                                @foreach ($account->devices as $device)
-                                    <tr>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $device->id }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            {{ $device->hwid_hash ? substr($device->hwid_hash, 0, 16) . '...' : __('N/A') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if ($device->bound_at && !$device->unbound_at)
-                                                <x-status-badge status="active" :text="__('Bound')" />
-                                            @elseif($device->unbound_at)
-                                                <x-status-badge status="suspended" :text="__('Unbound')" />
-                                            @else
-                                                <x-status-badge status="default" :text="__('Not Bound')" />
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            {{ $device->first_seen_at->format('Y-m-d H:i:s') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            {{ $device->last_seen_at->format('Y-m-d H:i:s') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                            {{ $device->bound_at ? $device->bound_at->format('Y-m-d H:i:s') : __('N/A') }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        {{-- Recent Activity --}}
-        <div class="card-shell">
-            <div class="mb-4">
-                <p class="section-kicker">{{ __('Recent Activity') }}</p>
-                @if ($account->eventLogs->isEmpty())
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('No activity found for this account.') }}</p>
-                @else
-                    <div class="space-y-4">
-                        @foreach ($account->eventLogs as $log)
-                            <div class="card-shell-muted">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div>
-                                        <x-status-badge status="info" :text="$log->event_type" />
-                                        <span
-                                            class="ml-2 text-sm text-gray-500 dark:text-gray-400">{{ $log->created_at->diffForHumans() }}</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ __('ID:') }}
-                                        {{ $log->id }}</span>
-                                </div>
-                                <div class="text-sm text-gray-900 dark:text-white">
-                                    <pre class="bg-gray-100 dark:bg-gray-900 p-3 rounded text-xs overflow-x-auto">{{ json_encode($log->details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
-                                </div>
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Privilege level') }}</p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <x-status-badge :status="strtolower($accountPrivilegeLabel)" :text="ucfirst($accountPrivilegeLabel)" />
+                                <span class="app-shell-body-copy text-sm">{{ __('Status:') }} {{ $accountStatusText }}</span>
                             </div>
-                        @endforeach
-                    </div>
-            </div>
-            @endif
-        </div>
-
-        <!-- Suspend Modal -->
-        <x-modal name="suspend-modal">
-            <div class="p-6">
-                <div class="flex items-center justify-center mb-4">
-                    <div class="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
-                        <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-                            </path>
-                        </svg>
+                        </div>
                     </div>
                 </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">{{ __('Suspend Account') }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">{{ __('Enter suspension details for this account.') }}</p>
-                <form id="suspendForm" method="POST" class="mt-5">
-                    @csrf
-                    <div class="mb-4">
-                        <label for="suspend_reason"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Reason') }}</label>
-                        <input type="text" name="reason" id="suspend_reason"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+
+                <div class="card-shell-muted space-y-4 p-6">
+                    <div>
+                        <p class="section-kicker">{{ __('Access') }}</p>
+                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Login information') }}</h3>
                     </div>
-                    <div class="mb-4">
-                        <label for="suspend_duration"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Duration (days) - Optional') }}</label>
-                        <input type="number" name="duration" id="suspend_duration" min="1"
-                            max="365"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+
+                    <div class="grid gap-4">
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Last login') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->last_login_at ? $account->last_login_at->diffForHumans() : __('Never') }}</p>
+                            @if ($account->last_login_at)
+                                <p class="app-shell-body-copy text-sm">{{ $account->last_login_at->format('Y-m-d H:i:s') }}</p>
+                            @endif
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Last IP address') }}</p>
+                            <p class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $account->last_ip_address ?? __('N/A') }}</p>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Registered') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
+                            <p class="app-shell-body-copy text-sm">{{ $account->created_at->diffForHumans() }}</p>
+                        </div>
                     </div>
-                    <div class="flex justify-end gap-2">
-                        <x-secondary-button type="button" x-on:click="show = false">{{ __('Cancel') }}</x-secondary-button>
-                        <x-danger-button type="submit">{{ __('Suspend') }}</x-danger-button>
+                </div>
+
+                <div class="card-shell-muted space-y-4 p-6">
+                    <div>
+                        <p class="section-kicker">{{ __('Devices') }}</p>
+                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Device information') }}</h3>
                     </div>
-                </form>
+
+                    <div class="grid gap-4">
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Total devices') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->devices_count }}</p>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('Bound devices') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $boundDevicesCount }}</p>
+                        </div>
+
+                        <div class="card-shell-muted space-y-2 p-4">
+                            <p class="section-kicker">{{ __('HWID resets') }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->hwid_reset_count }}</p>
+                            @if ($account->hwid_last_reset_at)
+                                <p class="app-shell-body-copy text-sm">{{ __('Last reset:') }} {{ $account->hwid_last_reset_at->diffForHumans() }}</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
+        </section>
+
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Operations') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Account actions') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('All existing account actions stay unchanged; this section only brings them into the shared handoff styling.') }}</p>
+                </div>
+            </div>
+
+            <div class="card-shell-muted p-6">
+                <div class="flex flex-wrap gap-3">
+                    @if ($account->isCurrentlySuspended)
+                        <form action="{{ route('accounts.unsuspend', $account) }}" method="POST">
+                            @csrf
+                            <x-primary-button type="submit" class="btn-sm">{{ __('Unsuspend Account') }}</x-primary-button>
+                        </form>
+                    @else
+                        <button type="button" onclick="openSuspendModal('{{ $account->id }}')" class="btn btn-danger btn-sm">
+                            {{ __('Suspend Account') }}
+                        </button>
+                    @endif
+
+                    @if (!$account->email_verified_at)
+                        <form action="{{ route('accounts.verify-email', $account) }}" method="POST">
+                            @csrf
+                            <x-primary-button type="submit" class="btn-sm">{{ __('Verify Email') }}</x-primary-button>
+                        </form>
+                    @endif
+
+                    <button type="button" onclick="openResetHwidModal('{{ $account->id }}')" class="btn btn-secondary btn-sm">
+                        {{ __('Reset HWID') }}
+                    </button>
+
+                    <form action="{{ route('accounts.destroy', $account) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <x-danger-button type="submit" class="btn-sm">{{ __('Delete Account') }}</x-danger-button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Licenses') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Assigned licenses') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('Convert the raw license list into the shared table system without changing destinations or record content.') }}</p>
+                </div>
+            </div>
+
+            <x-table :headers="[__('License Key'), __('Privilege'), __('Status'), __('Expires At'), __('Actions')]" :emptyColspan="5" ariaLabel="{{ __('Account licenses table') }}">
+                @forelse ($account->licenses as $license)
+                    <tr class="table-row">
+                        <td class="table-cell-primary whitespace-nowrap">
+                            <div class="table-stack table-stack-tight">
+                                <div class="table-title text-sm">{{ $license->key }}</div>
+                                <div class="table-meta">{{ __('ID:') }} {{ $license->id }}</div>
+                            </div>
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            <x-status-badge :status="strtolower($license->privilege?->getLabel() ?? 'default')" :text="ucfirst($license->privilege?->getLabel() ?? __('Unknown'))" />
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            <x-status-badge :status="strtolower($license->status?->getLabel() ?? 'default')" :text="$license->status?->getLabel() ?? __('Unknown')" />
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            <div class="table-stack table-stack-tight">
+                                <div>{{ $license->expires_at ? $license->expires_at->format('Y-m-d H:i:s') : __('N/A') }}</div>
+                                @if ($license->expires_at)
+                                    <div class="table-meta">{{ $license->expires_at->diffForHumans() }}</div>
+                                @endif
+                            </div>
+                        </td>
+                        <td class="table-cell whitespace-nowrap text-right">
+                            <div class="table-actions table-actions--nowrap">
+                                <a href="{{ route('licenses.show', $license) }}" class="table-action table-action--primary">
+                                    {{ __('View') }}
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr class="table-row">
+                        <td colspan="5" class="table-empty">
+                            <div class="table-empty-state">
+                                <x-icon name="document" class="table-empty-icon" />
+                                <p class="table-empty-title">{{ __('No licenses found for this account.') }}</p>
+                                <p class="table-empty-copy">{{ __('Assigned licenses will appear here once they exist for this account.') }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </x-table>
+        </section>
+
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Devices') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Registered devices') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('Keep the same device data while normalizing it into the shared table language.') }}</p>
+                </div>
+            </div>
+
+            <x-table :headers="[__('Device'), __('HWID Hash'), __('Status'), __('First Seen'), __('Last Seen'), __('Bound At')]" :emptyColspan="6" ariaLabel="{{ __('Account devices table') }}">
+                @forelse ($account->devices as $device)
+                    <tr class="table-row">
+                        <td class="table-cell-primary whitespace-nowrap">
+                            <div class="table-stack table-stack-tight">
+                                <div class="table-title text-sm">{{ __('Device') }} #{{ $device->id }}</div>
+                                <div class="table-meta">{{ $device->device_name ?? __('Unknown device') }}</div>
+                            </div>
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            <span class="table-meta inline-block max-w-[220px] truncate align-middle" title="{{ $device->hwid_hash ?? __('N/A') }}">
+                                {{ $device->hwid_hash ? substr($device->hwid_hash, 0, 16).'...' : __('N/A') }}
+                            </span>
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($device->bound_at && !$device->unbound_at)
+                                <x-status-badge status="active" :text="__('Bound')" />
+                            @elseif ($device->unbound_at)
+                                <x-status-badge status="suspended" :text="__('Unbound')" />
+                            @else
+                                <x-status-badge status="default" :text="__('Not Bound')" />
+                            @endif
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($device->first_seen_at)
+                                <div class="table-stack table-stack-tight">
+                                    <div>{{ $device->first_seen_at->format('Y-m-d H:i:s') }}</div>
+                                    <div class="table-meta">{{ $device->first_seen_at->diffForHumans() }}</div>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('N/A') }}</span>
+                            @endif
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($device->last_seen_at)
+                                <div class="table-stack table-stack-tight">
+                                    <div>{{ $device->last_seen_at->format('Y-m-d H:i:s') }}</div>
+                                    <div class="table-meta">{{ $device->last_seen_at->diffForHumans() }}</div>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('N/A') }}</span>
+                            @endif
+                        </td>
+                        <td class="table-cell whitespace-nowrap">
+                            @if ($device->bound_at)
+                                <div class="table-stack table-stack-tight">
+                                    <div>{{ $device->bound_at->format('Y-m-d H:i:s') }}</div>
+                                    <div class="table-meta">{{ $device->bound_at->diffForHumans() }}</div>
+                                </div>
+                            @else
+                                <span class="table-meta">{{ __('N/A') }}</span>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr class="table-row">
+                        <td colspan="6" class="table-empty">
+                            <div class="table-empty-state">
+                                <x-icon name="desktop" class="table-empty-icon" />
+                                <p class="table-empty-title">{{ __('No devices found for this account.') }}</p>
+                                <p class="table-empty-copy">{{ __('Bound and unbound devices will appear here as the account uses the service.') }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </x-table>
+        </section>
+
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Recent Activity') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Account event stream') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('Preserve the existing activity payloads while presenting them as cinematic event cards.') }}</p>
+                </div>
+            </div>
+
+            @if ($account->eventLogs->isEmpty())
+                <div class="table-empty-state rounded-2xl border border-dashed border-cool-200/80 bg-cool-50/60 px-6 py-12 text-center dark:border-cool-700/80 dark:bg-cool-900/40">
+                    <x-icon name="document" class="table-empty-icon" />
+                    <p class="table-empty-title">{{ __('No activity found for this account.') }}</p>
+                    <p class="table-empty-copy">{{ __('Recent account events will appear here once they are recorded.') }}</p>
+                </div>
+            @else
+                <div class="space-y-4">
+                    @foreach ($account->eventLogs as $log)
+                        @php
+                            $eventBadge = match ($log->event_level) {
+                                0 => 'info',
+                                1 => 'warning',
+                                default => 'danger',
+                            };
+                        @endphp
+
+                        <div class="card-shell-muted space-y-4 p-5">
+                            <div class="flex flex-wrap items-start justify-between gap-3">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <x-status-badge :status="$eventBadge" :text="$log->event_type" />
+                                    <span class="app-shell-body-copy text-sm">{{ $log->created_at->diffForHumans() }}</span>
+                                </div>
+
+                                <span class="badge badge-default">{{ __('ID:') }} {{ $log->id }}</span>
+                            </div>
+
+                            <div class="card-shell-muted p-4">
+                                <pre class="overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs text-gray-700 dark:text-gray-300">{{ json_encode($log->details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </section>
+
+        <x-modal name="suspend-modal">
+            <div class="modal-header">
+                <div class="flex items-start gap-4">
+                    <span class="card-icon-container icon-red shrink-0">
+                        <x-icon name="warning" class="h-6 w-6" />
+                    </span>
+
+                    <div class="space-y-1">
+                        <p class="section-kicker">{{ __('Account actions') }}</p>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Suspend Account') }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <form id="suspendForm" method="POST">
+                @csrf
+
+                <div class="modal-body space-y-4">
+                    <p class="card-modal-copy text-sm">{{ __('Enter suspension details for this account.') }}</p>
+
+                    <div class="space-y-2">
+                        <label for="suspend_reason" class="form-label">{{ __('Reason') }}</label>
+                        <input type="text" name="reason" id="suspend_reason" class="form-input w-full">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="suspend_duration" class="form-label">{{ __('Duration (days) - Optional') }}</label>
+                        <input type="number" name="duration" id="suspend_duration" min="1" max="365" class="form-input w-full">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <x-secondary-button type="button" x-on:click="$dispatch('close-modal', 'suspend-modal')">{{ __('Cancel') }}</x-secondary-button>
+                    <x-danger-button type="submit">{{ __('Suspend') }}</x-danger-button>
+                </div>
+            </form>
         </x-modal>
 
-        <!-- Reset HWID Modal -->
         <x-modal name="reset-hwid-modal">
-            <div class="p-6">
-                <div class="flex items-center justify-center mb-4">
-                    <div class="h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
-                        <svg class="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                            </path>
-                        </svg>
+            <div class="modal-header">
+                <div class="flex items-start gap-4">
+                    <span class="card-icon-container icon-yellow shrink-0">
+                        <x-icon name="warning" class="h-6 w-6" />
+                    </span>
+
+                    <div class="space-y-1">
+                        <p class="section-kicker">{{ __('Device actions') }}</p>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Reset HWID') }}</h3>
                     </div>
                 </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white text-center mb-2">{{ __('Reset HWID') }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">{{ __('This will unbind all devices and reset the HWID for this account.') }}</p>
-                <p class="text-sm text-red-600 dark:text-red-400 text-center mb-4">{{ __('Warning: This action cannot be undone.') }}</p>
-                <form id="resetHwidForm" method="POST" class="mt-5">
-                    @csrf
-                    <div class="flex justify-end gap-2">
-                        <x-secondary-button type="button" x-on:click="show = false">{{ __('Cancel') }}</x-secondary-button>
-                        <x-primary-button type="submit">{{ __('Reset HWID') }}</x-primary-button>
-                    </div>
-                </form>
             </div>
+
+            <form id="resetHwidForm" method="POST">
+                @csrf
+
+                <div class="modal-body space-y-4">
+                    <p class="card-modal-copy text-sm">{{ __('This will unbind all devices and reset the HWID for this account.') }}</p>
+                    <p class="text-sm font-medium text-red-600 dark:text-red-400">{{ __('Warning: This action cannot be undone.') }}</p>
+                </div>
+
+                <div class="modal-footer">
+                    <x-secondary-button type="button" x-on:click="$dispatch('close-modal', 'reset-hwid-modal')">{{ __('Cancel') }}</x-secondary-button>
+                    <x-primary-button type="submit">{{ __('Reset HWID') }}</x-primary-button>
+                </div>
+            </form>
         </x-modal>
 
         <script>
@@ -384,7 +446,5 @@
                 document.getElementById('resetHwidForm').action = `/accounts/${accountId}/reset-hwid`;
             }
         </script>
-        </div>
     </div>
-
 </x-app-sidebar-layout>

@@ -3,43 +3,60 @@
         {{ __('Package Management') }}
     </x-slot>
 
-    <div class="py-7">
-        <div class="card-shell space-y-6">
-            <!-- Header with actions -->
-            <div class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center lg:max-xl:flex-wrap">
+    <x-slot name="subheader">
+        {{ __('Keep bulk actions and filtering behavior intact while smoothing the visual handoff from the cinematic package index.') }}
+    </x-slot>
+
+    @php
+        $latestStable = $stats['latest_stable'] ?? null;
+        $hasChannelFilter = filled(request('channel'));
+        $tableHeaders =
+            $isAdmin ?? false
+                ? ['', __('Version'), __('Channel'), __('Released'), __('Hash'), __('Actions')]
+                : [__('Version'), __('Channel'), __('Released'), __('Hash')];
+        $tableColspan = $isAdmin ?? false ? 6 : 4;
+    @endphp
+
+    <div class="space-y-8" data-page="packages-manage">
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Package statistics') }}">
+            <x-stat-card :title="__('Total Releases')" :value="$stats['total_releases'] ?? 0" icon="cube" iconColor="icon-blue" />
+            <x-stat-card :title="__('Stable Releases')" :value="$stats['stable_releases'] ?? 0" icon="success" iconColor="icon-green" />
+            <x-stat-card :title="__('Dev Releases')" :value="$stats['dev_releases'] ?? 0" icon="lightning" iconColor="icon-purple" />
+            <x-stat-card :title="__('Latest Stable')" :value="$latestStable?->version ?? __('None')" icon="cloud" iconColor="icon-yellow" />
+        </section>
+
+        <section class="card-shell space-y-6">
+            <div class="app-toolbar">
                 <div>
                     <p class="section-kicker">{{ __('Release Operations') }}</p>
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('Package Management') }}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Manage software packages and releases') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Package management') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('Preserve the same manage routes, bulk actions, and filters while aligning the surface language to the newer package list.') }}</p>
                 </div>
 
-                <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('packages.index') }}" class="btn btn-primary">
+                <div class="app-toolbar-actions">
+                    <a href="{{ route('packages.index') }}" class="btn btn-secondary btn-sm gap-2">
+                        <x-icon name="cube" class="h-4 w-4" />
                         {{ __('View Packages') }}
                     </a>
+
                     @if ($isAdmin ?? false)
-                        <a href="{{ route('packages.upload') }}" class="btn btn-primary">
+                        <a href="{{ route('packages.upload') }}" class="btn btn-primary btn-sm gap-2">
+                            <x-icon name="plus" class="h-4 w-4" />
                             {{ __('Add New Package') }}
                         </a>
+
                         <div class="relative" x-data="{ open: false }">
-                            <button x-on:click="open = !open"
-                                class="btn btn-primary flex items-center gap-2">
+                            <button x-on:click="open = !open" type="button" class="btn btn-primary btn-sm gap-2">
                                 <span>{{ __('Bulk Actions') }}</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
+                                <x-icon name="filter" class="h-4 w-4" />
                             </button>
-                            <div x-show="open" x-on:click.away="open = false"
-                                class="absolute right-0 mt-2 w-48 card-shell z-50"
-                                x-cloak>
+
+                            <div x-show="open" x-on:click.away="open = false" class="absolute right-0 mt-2 w-48 card-shell z-50" x-cloak>
                                 <div class="py-1">
-                                    <button onclick="bulkAction('delete')"
-                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <button onclick="bulkAction('delete')" class="w-full px-4 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
                                         {{ __('Delete Selected') }}
                                     </button>
-                                    <button onclick="bulkAction('export')"
-                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <button onclick="bulkAction('export')" class="w-full px-4 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
                                         {{ __('Export List') }}
                                     </button>
                                 </div>
@@ -49,130 +66,120 @@
                 </div>
             </div>
 
-            <!-- Statistics -->
-            <div class="card-shell-muted">
-                <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Package Statistics') }}</h4>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                        <div class="text-gray-600 dark:text-gray-300">{{ __('Total Releases:') }}</div>
-                        <div class="font-medium text-gray-900 dark:text-white">{{ $stats['total_releases'] ?? 0 }}</div>
-                    </div>
-                    <div>
-                        <div class="text-gray-600 dark:text-gray-300">{{ __('Stable Releases:') }}</div>
-                        <div class="font-medium text-gray-900 dark:text-white">{{ $stats['stable_releases'] ?? 0 }}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-gray-600 dark:text-gray-300">{{ __('Dev Releases:') }}</div>
-                        <div class="font-medium text-gray-900 dark:text-white">{{ $stats['dev_releases'] ?? 0 }}</div>
-                    </div>
-                    <div>
-                        <div class="text-gray-600 dark:text-gray-300">{{ __('Latest Stable:') }}</div>
-                        <div class="font-medium text-gray-900 dark:text-white">
-                            {{ $stats['latest_stable']?->version ?? __('None') }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Channel Filter -->
-            <div>
-                <form method="GET" action="{{ route('packages.manage') }}" class="flex items-end gap-4 lg:max-xl:flex-wrap">
-                    <div>
-                        <label for="channel"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Release Channel') }}</label>
-                        <select name="channel" id="channel" onchange="this.form.submit()" class="form-select">
+            <x-filter-box :action="route('packages.manage')" :title="__('Filter releases')">
+                <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
+                    <div class="space-y-2 md:col-span-5">
+                        <label for="channel" class="form-label">{{ __('Release Channel') }}</label>
+                        <select name="channel" id="channel" class="form-select" onchange="this.form.submit()">
                             <option value="">{{ __('All Channels') }}</option>
-                            <option value="stable" {{ request('channel') === 'stable' ? 'selected' : '' }}>{{ __('Stable') }}
-                            </option>
-                            <option value="dev" {{ request('channel') === 'dev' ? 'selected' : '' }}>{{ __('Development') }}
-                            </option>
+                            <option value="stable" {{ request('channel') === 'stable' ? 'selected' : '' }}>{{ __('Stable') }}</option>
+                            <option value="dev" {{ request('channel') === 'dev' ? 'selected' : '' }}>{{ __('Development') }}</option>
                         </select>
                     </div>
-                    @if (request('channel'))
-                        <a href="{{ route('packages.manage') }}" class="btn btn-secondary mt-auto">
-                            {{ __('Reset Filter') }}
-                        </a>
-                    @endif
-                </form>
-            </div>
 
-            <!-- Packages table -->
-            @php
-                $tableHeaders =
-                    $isAdmin ?? false
-                        ? ['', __('Version'), __('Channel'), __('Released'), __('Hash'), __('Actions')]
-                        : [__('Version'), __('Channel'), __('Released'), __('Hash')];
-                $tableColspan = $isAdmin ?? false ? 6 : 4;
-            @endphp
-            <x-table :headers="$tableHeaders" :emptyColspan="$tableColspan">
-                @forelse($releases as $release)
-                    <tr>
+                    <div class="space-y-2 md:col-span-7">
+                        <span class="form-label text-transparent">{{ __('Actions') }}</span>
+                        <div class="form-actions-cluster justify-start md:justify-end">
+                            <button type="submit" class="btn btn-primary btn-sm gap-2">
+                                <x-icon name="search" class="h-4 w-4" />
+                                {{ __('Apply Filter') }}
+                            </button>
+
+                            @if ($hasChannelFilter)
+                                <a href="{{ route('packages.manage') }}" class="btn btn-secondary btn-sm gap-2">
+                                    <x-icon name="reset" class="h-4 w-4" />
+                                    {{ __('Reset Filter') }}
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                @if ($hasChannelFilter)
+                    <div class="active-filters" data-active-filters>
+                        <div class="active-filters__header">
+                            <div class="active-filters__copy">
+                                <p class="active-filters__title">{{ __('Active Filters') }}</p>
+                                <p class="active-filters__subtitle">{{ __('Clear the current manage view without changing any staff-only package behavior.') }}</p>
+                            </div>
+                            <a href="{{ route('packages.manage') }}" class="active-filters__clear">
+                                {{ __('Clear All') }}
+                            </a>
+                        </div>
+
+                        <div class="active-filters__list">
+                            <x-filter-badge :label="__('Channel:').' '.(request('channel') === 'dev' ? __('Development') : __('Stable'))" color="green" :removeUrl="request()->fullUrlWithQuery(['channel' => null])" />
+                        </div>
+                    </div>
+                @endif
+            </x-filter-box>
+
+            <x-table :headers="$tableHeaders" :emptyColspan="$tableColspan" ariaLabel="{{ __('Managed packages table') }}">
+                @forelse ($releases as $release)
+                    <tr class="table-row">
                         @if ($isAdmin ?? false)
-                            <td class="px-4 py-2 whitespace-nowrap text-sm">
+                            <td class="table-cell whitespace-nowrap">
                                 <input type="checkbox" class="release-checkbox form-checkbox" value="{{ $release->id }}">
                             </td>
                         @endif
-                        <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+
+                        <td class="table-cell-primary whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                             {{ $release->version }}
                         </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                            <span
-                                class="px-2 py-0.5 rounded text-xs font-medium
-                            {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' }}">
-                                {{ ucfirst($release->release_channel) }}
-                            </span>
-                            @if ($release->version === ($stats['latest_stable']?->version ?? null))
-                                <span
-                                    class="ml-1 px-2 py-0.5 rounded text-xs font-medium border border-cool-200 dark:border-cool-700 text-cool-700 dark:text-cool-300 bg-cool-50/70 dark:bg-cool-800/70">
-                                    {{ __('Latest') }}
-                                </span>
-                            @endif
+
+                        <td class="table-cell whitespace-nowrap">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <x-status-badge :status="$release->release_channel === 'stable' ? 'active' : 'info'" :text="ucfirst($release->release_channel)" />
+
+                                @if ($release->version === ($latestStable?->version ?? null))
+                                    <span class="badge badge-info">{{ __('Latest') }}</span>
+                                @endif
+                            </div>
                         </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+
+                        <td class="table-cell whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                             {{ $release->created_at ? $release->created_at->format('Y-m-d H:i') : __('Unknown') }}
                         </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+
+                        <td class="table-cell whitespace-nowrap">
                             @if ($release->virus_detection_url)
-                                <span
-                                    class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                    {{ __('Available') }}
-                                </span>
+                                <x-status-badge status="verified" :text="__('Available')" />
                             @else
-                                <span
-                                    class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                                    {{ __('None') }}
-                                </span>
+                                <span class="badge badge-default">{{ __('None') }}</span>
                             @endif
                         </td>
+
                         @if ($isAdmin ?? false)
-                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('packages.show', $release) }}" class="text-cool-700 dark:text-cool-300 hover:underline">
-                                    {{ __('Details') }}
-                                </a>
-                                    <span class="mx-1 text-gray-400">{{ '|' }}</span>
-                                <form class="inline delete-form" method="POST" action="{{ route('packages.destroy', $release) }}" data-version="{{ $release->version }}"
-                                    onsubmit="return confirmDelete('{{ $release->version }}')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                        {{ __('Delete') }}
-                                    </button>
-                                </form>
+                            <td class="table-cell whitespace-nowrap text-right">
+                                <div class="table-actions table-actions--nowrap">
+                                    <a href="{{ route('packages.show', $release) }}" class="table-action table-action--primary">
+                                        {{ __('Details') }}
+                                    </a>
+
+                                    <form class="inline delete-form" method="POST" action="{{ route('packages.destroy', $release) }}" data-version="{{ $release->version }}" onsubmit="return confirmDelete('{{ $release->version }}')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="table-action table-action--danger">
+                                            {{ __('Delete') }}
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         @endif
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="{{ $tableColspan }}"
-                            class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                            {{ __('No packages found.') }}
+                    <tr class="table-row">
+                        <td colspan="{{ $tableColspan }}" class="table-empty">
+                            <div class="table-empty-state">
+                                <x-icon name="cube" class="table-empty-icon" />
+                                <p class="table-empty-title">{{ __('No packages found.') }}</p>
+                                <p class="table-empty-copy">{{ __('Try removing the current channel filter to surface more releases.') }}</p>
+                            </div>
                         </td>
                     </tr>
                 @endforelse
             </x-table>
 
-            <!-- Pagination -->
             <div>
                 <x-pagination :paginator="$releases" />
             </div>
@@ -183,7 +190,6 @@
                         return confirm(`Are you sure you want to delete package version ${version}? This action cannot be undone.`);
                     }
 
-                    // Select all functionality
                     document.addEventListener('DOMContentLoaded', function() {
                         const headerRow = document.querySelector('table thead tr');
                         if (headerRow && !document.getElementById('select-all')) {
@@ -214,7 +220,6 @@
                         }
                     });
 
-                    // Bulk actions
                     function bulkAction(action) {
                         const selectedCheckboxes = document.querySelectorAll('.release-checkbox:checked');
                         const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
@@ -225,29 +230,23 @@
                         }
 
                         if (action === 'delete') {
-                            if (confirm(
-                                    `{{ __('Are you sure you want to delete') }} ${selectedIds.length} {{ __('selected package(s)? This action cannot be undone.') }}`
-                                )) {
-                                // Create a form to submit the bulk delete
+                            if (confirm(`{{ __('Are you sure you want to delete') }} ${selectedIds.length} {{ __('selected package(s)? This action cannot be undone.') }}`)) {
                                 const form = document.createElement('form');
                                 form.method = 'POST';
                                 form.action = "{{ route('packages.bulk-delete') }}";
 
-                                // Add CSRF token
                                 const csrfInput = document.createElement('input');
                                 csrfInput.type = 'hidden';
                                 csrfInput.name = '_token';
                                 csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
                                 form.appendChild(csrfInput);
 
-                                // Add method override for DELETE
                                 const methodInput = document.createElement('input');
                                 methodInput.type = 'hidden';
                                 methodInput.name = '_method';
                                 methodInput.value = 'DELETE';
                                 form.appendChild(methodInput);
 
-                                // Add selected IDs
                                 selectedIds.forEach(id => {
                                     const idInput = document.createElement('input');
                                     idInput.type = 'hidden';
@@ -260,7 +259,6 @@
                                 form.submit();
                             }
                         } else if (action === 'export') {
-                            // Export selected packages to JSON
                             const exportData = Array.from(selectedCheckboxes).map(checkbox => {
                                 const row = checkbox.closest('tr');
                                 const cells = row.querySelectorAll('td');
@@ -290,7 +288,6 @@
                     }
                 </script>
             @endif
-        </div>
+        </section>
     </div>
-
 </x-app-sidebar-layout>

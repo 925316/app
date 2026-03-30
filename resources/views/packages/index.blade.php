@@ -3,245 +3,300 @@
         {{ __('Software Packages') }}
     </x-slot>
 
-    <div class="space-y-6" data-page="packages-index">
-            <!-- Statistics Cards -->
-            @php
-                $showDevStats = Auth::user()->hasPrivilege(6) || Auth::user()->hasPrivilege(7);
-                $gridCols = $showDevStats ? 'lg:grid-cols-4' : 'lg:grid-cols-3';
-            @endphp
-            <div class="grid grid-cols-1 md:grid-cols-2 {{ $gridCols }} gap-4 mb-6">
-                <x-stat-card :title="__('Total Releases')" :value="$stats['total_releases'] ?? 0" icon="cube" iconColor="icon-blue" />
-                <x-stat-card :title="__('Stable')" :value="$stats['stable_releases'] ?? 0" icon="success" iconColor="icon-green" />
-                @if ($showDevStats)
-                    <x-stat-card :title="__('Dev')" :value="$stats['dev_releases'] ?? 0" icon="lightning" iconColor="icon-purple" />
-                @endif
-                <x-stat-card :title="__('Latest Stable')" :value="$stats['latest_stable']?->version ?? __('None')" icon="cloud" iconColor="icon-yellow" />
+    <x-slot name="subheader">
+        {{ __('Review release channels, surface the latest stable build, and keep package actions unchanged.') }}
+    </x-slot>
+
+    @php
+        $showDevStats = Auth::user()->hasPrivilege(6) || Auth::user()->hasPrivilege(7);
+        $gridCols = $showDevStats ? 'xl:grid-cols-4' : 'xl:grid-cols-3';
+        $latestStable = $stats['latest_stable'] ?? null;
+        $hasChannelFilter = filled(request('channel'));
+    @endphp
+
+    <div class="space-y-8" data-page="packages-index">
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 {{ $gridCols }}" aria-label="{{ __('Package statistics') }}">
+            <x-stat-card :title="__('Total Releases')" :value="$stats['total_releases'] ?? 0" icon="cube" iconColor="icon-blue" />
+            <x-stat-card :title="__('Stable')" :value="$stats['stable_releases'] ?? 0" icon="success" iconColor="icon-green" />
+            @if ($showDevStats)
+                <x-stat-card :title="__('Dev')" :value="$stats['dev_releases'] ?? 0" icon="lightning" iconColor="icon-purple" />
+            @endif
+            <x-stat-card :title="__('Latest Stable')" :value="$latestStable?->version ?? __('None')" icon="cloud" iconColor="icon-yellow" />
+        </section>
+
+        <section class="card-shell space-y-6" data-latest-package-panel>
+            <div class="app-toolbar">
+                <div>
+                    <p class="section-kicker">{{ __('Release spotlight') }}</p>
+                    <h2 class="app-toolbar-title">{{ __('Latest stable release') }}</h2>
+                    <p class="app-toolbar-subtitle">{{ __('Keep the primary download path front and center while preserving the current routes and permissions.') }}</p>
+                </div>
             </div>
 
-            <!-- Latest Stable Release - For All Users -->
-            <div class="card-shell overflow-hidden mb-6">
-                <div class="p-6">
-                    <h3 class="card-heading text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">{{ __('Latest Stable Release') }}</h3>
-
-                    @if ($stats['latest_stable'] ?? null)
-                        <div class="space-y-4">
-                            <!-- Version Badge -->
-                            <div class="flex flex-wrap items-center gap-3">
-                                <span
-                                    class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm font-medium">
-                                    {{ __('Version') }} {{ $stats['latest_stable']->version }}
-                                </span>
-                                <span
-                                    class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium">
-                                    {{ __('Stable') }}
-                                </span>
-                                <span
-                                    class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-sm font-medium">
-                                    {{ __('Latest') }}
-                                </span>
-                            </div>
-
-                            <!-- Release Info -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Release Date') }}</h4>
-                                    <p class="text-gray-900 dark:text-gray-100">
-                                        {{ $stats['latest_stable']->created_at ? $stats['latest_stable']->created_at->format('Y-m-d H:i:s') : __('Unknown') }}
-                                    </p>
+            @if ($latestStable)
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(18rem,1fr)]">
+                    <div class="card-shell-muted space-y-5 p-6">
+                        <div class="flex flex-wrap items-start justify-between gap-4">
+                            <div class="space-y-3">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <x-status-badge status="active" :text="__('Stable')" />
+                                    <span class="badge badge-info">{{ __('Latest') }}</span>
                                 </div>
+
                                 <div>
-                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Security Verification') }}</h4>
-                                    <p class="text-gray-900 dark:text-gray-100">
-                                        @if ($stats['latest_stable']->virus_detection_url)
-                                            <span class="text-green-600 dark:text-green-400">
-                                                {{ __('✓ Verified') }}
-                                            </span>
-                                        @else
-                                            <span class="text-gray-500 dark:text-gray-400">
-                                                {{ __('Not available') }}
-                                            </span>
-                                        @endif
-                                    </p>
+                                    <p class="section-kicker">{{ __('Release version') }}</p>
+                                    <h3 class="card-heading text-2xl font-semibold">{{ __('Version') }} {{ $latestStable->version }}</h3>
                                 </div>
                             </div>
 
-                            <!-- Changelog -->
-                            @if ($stats['latest_stable']->changelog)
-                                <div class="mt-4">
-                                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">{{ __('Changelog') }}</h4>
-                                    <div
-                                        class="prose dark:prose-invert max-w-none text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                        {!! nl2br(e($stats['latest_stable']->changelog)) !!}
-                                    </div>
-                                </div>
-                            @endif
-
-                            <!-- Action Buttons -->
-                            <div class="flex flex-wrap gap-3 mt-6">
-                                <a href="{{ route('packages.show', $stats['latest_stable']) }}"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    {{ __('View Details') }}
-                                </a>
-                                @if ($canDownload ?? false)
-                                    <a href="{{ route('packages.download', ['release' => $stats['latest_stable']->id]) }}"
-                                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                            </path>
-                                        </svg>
-                                        {{ __('Download') }}
-                                    </a>
+                            <div class="card-shell-muted min-w-[14rem] space-y-2 self-start p-4">
+                                <p class="section-kicker">{{ __('Security verification') }}</p>
+                                @if ($latestStable->virus_detection_url)
+                                    <x-status-badge status="verified" :text="__('Verified')" />
+                                    <p class="app-shell-body-copy text-sm">{{ __('Virus detection details are available for this build.') }}</p>
+                                @else
+                                    <span class="badge badge-default">{{ __('Not available') }}</span>
+                                    <p class="app-shell-body-copy text-sm">{{ __('No external verification link was published for this release.') }}</p>
                                 @endif
                             </div>
                         </div>
-                    @else
-                        <div class="text-center py-8">
-                            <p class="text-gray-500 dark:text-gray-400">
-                                {{ __('No stable releases available yet.') }}
+
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div class="card-shell-muted space-y-2 p-4">
+                                <p class="section-kicker">{{ __('Released') }}</p>
+                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                                    {{ $latestStable->created_at ? $latestStable->created_at->format('Y-m-d H:i:s') : __('Unknown') }}
+                                </p>
+                                @if ($latestStable->created_at)
+                                    <p class="app-shell-body-copy text-sm">{{ $latestStable->created_at->diffForHumans() }}</p>
+                                @endif
+                            </div>
+
+                            <div class="card-shell-muted space-y-2 p-4">
+                                <p class="section-kicker">{{ __('Channel') }}</p>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <x-status-badge status="active" :text="ucfirst($latestStable->release_channel)" />
+                                    <span class="badge badge-stable">{{ __('Production ready') }}</span>
+                                </div>
+                                <p class="app-shell-body-copy text-sm">{{ __('This is the release currently surfaced as the latest stable build.') }}</p>
+                            </div>
+                        </div>
+
+                        @if ($latestStable->changelog)
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="section-kicker">{{ __('Release notes') }}</p>
+                                    <h4 class="card-heading text-base font-semibold text-gray-900 dark:text-white">{{ __('Changelog') }}</h4>
+                                </div>
+
+                                <div class="card-shell-muted p-4">
+                                    <div class="prose max-w-none text-sm text-gray-700 dark:prose-invert dark:text-gray-300">
+                                        {!! nl2br(e($latestStable->changelog)) !!}
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    <aside class="card-shell-muted flex flex-col justify-between gap-6 p-6">
+                        <div class="space-y-3">
+                            <p class="section-kicker">{{ __('Primary actions') }}</p>
+                            <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Inspect or download') }}</h3>
+                            <p class="app-shell-body-copy text-sm">
+                                {{ __('Use the same detail and download endpoints while presenting them through the shared button system.') }}
                             </p>
+                        </div>
+
+                        <div class="grid gap-3">
+                            <a href="{{ route('packages.show', $latestStable) }}" class="btn btn-primary btn-sm justify-center gap-2">
+                                <x-icon name="info" class="h-4 w-4" />
+                                {{ __('View Details') }}
+                            </a>
+
+                            @if ($canDownload ?? false)
+                                <a href="{{ route('packages.download', ['release' => $latestStable->id]) }}" class="btn btn-secondary btn-sm justify-center gap-2">
+                                    <x-icon name="cloud" class="h-4 w-4" />
+                                    {{ __('Download') }}
+                                </a>
+                            @endif
+                        </div>
+                    </aside>
+                </div>
+            @else
+                <div class="table-empty-state rounded-2xl border border-dashed border-cool-200/80 bg-cool-50/60 px-6 py-12 text-center dark:border-cool-700/80 dark:bg-cool-900/40">
+                    <x-icon name="cube" class="table-empty-icon" />
+                    <p class="table-empty-title">{{ __('No stable releases available yet.') }}</p>
+                    <p class="table-empty-copy">{{ __('Publish a stable build to populate this spotlight surface.') }}</p>
+                </div>
+            @endif
+        </section>
+
+        @if (Auth::user()->hasPrivilege(7))
+            <section class="card-shell space-y-6" data-packages-admin-panel>
+                <div class="app-toolbar">
+                    <div>
+                        <p class="section-kicker">{{ __('Release inventory') }}</p>
+                        <h2 class="app-toolbar-title">{{ __('All package releases') }}</h2>
+                        <p class="app-toolbar-subtitle">{{ __('Preserve the staff-only package list and channel filter while aligning it to the shared data-surface system.') }}</p>
+                    </div>
+
+                    @if ($isAdmin ?? false)
+                        <div class="app-toolbar-actions">
+                            <a href="{{ route('packages.upload') }}" class="btn btn-primary btn-sm gap-2">
+                                <x-icon name="plus" class="h-4 w-4" />
+                                {{ __('Add New Package') }}
+                            </a>
+                            <a href="{{ route('packages.manage') }}" class="btn btn-secondary btn-sm gap-2">
+                                {{ __('Manage Packages') }}
+                            </a>
                         </div>
                     @endif
                 </div>
-            </div>
 
-            @if (Auth::user()->hasPrivilege(7))
-                <div class="card-shell overflow-hidden">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">
-                        <!-- Header with actions -->
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                            <h3 class="card-heading text-lg font-medium text-gray-900 dark:text-white">{{ __('All Package Releases') }}</h3>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Admin package statistics') }}">
+                    <div class="card-shell-muted space-y-2 p-4">
+                        <p class="section-kicker">{{ __('Total releases') }}</p>
+                        <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $stats['total_releases'] ?? 0 }}</p>
+                    </div>
+                    <div class="card-shell-muted space-y-2 p-4">
+                        <p class="section-kicker">{{ __('Stable releases') }}</p>
+                        <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $stats['stable_releases'] ?? 0 }}</p>
+                    </div>
+                    <div class="card-shell-muted space-y-2 p-4">
+                        <p class="section-kicker">{{ __('Dev releases') }}</p>
+                        <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $stats['dev_releases'] ?? 0 }}</p>
+                    </div>
+                    <div class="card-shell-muted space-y-2 p-4">
+                        <p class="section-kicker">{{ __('Latest stable') }}</p>
+                        <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $latestStable?->version ?? __('None') }}</p>
+                    </div>
+                </div>
 
-                            @if ($isAdmin ?? false)
-                                <div class="flex flex-wrap gap-2">
-                                    <a href="{{ route('packages.upload') }}"
-                                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                                        {{ __('Add New Package') }}
-                                    </a>
-                                    <a href="{{ route('packages.manage') }}"
-                                        class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
-                                        {{ __('Manage Packages') }}
-                                    </a>
-                                </div>
-                            @endif
+                <x-filter-box :action="route('packages.index')" :title="__('Filter releases')">
+                    <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
+                        <div class="space-y-2 md:col-span-5">
+                            <label for="channel" class="form-label">{{ __('Release Channel') }}</label>
+                            <select name="channel" id="channel" class="form-select" onchange="this.form.submit()">
+                                <option value="">{{ __('All Channels') }}</option>
+                                <option value="stable" {{ request('channel') === 'stable' ? 'selected' : '' }}>
+                                    {{ __('Stable') }}
+                                </option>
+                                <option value="dev" {{ request('channel') === 'dev' ? 'selected' : '' }}>
+                                    {{ __('Development') }}
+                                </option>
+                            </select>
                         </div>
 
-                        <!-- Statistics -->
-                        <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <h4 class="font-medium mb-3 text-gray-800 dark:text-gray-200">{{ __('Package Statistics') }}</h4>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                <div>
-                                    <div class="text-gray-600 dark:text-gray-300">{{ __('Total Releases:') }}</div>
-                                    <div class="font-medium text-gray-900 dark:text-white">{{ $stats['total_releases'] ?? 0 }}</div>
-                                </div>
-                                <div>
-                                    <div class="text-gray-600 dark:text-gray-300">{{ __('Stable Releases:') }}</div>
-                                    <div class="font-medium text-gray-900 dark:text-white">{{ $stats['stable_releases'] ?? 0 }}</div>
-                                </div>
-                                <div>
-                                    <div class="text-gray-600 dark:text-gray-300">{{ __('Dev Releases:') }}</div>
-                                    <div class="font-medium text-gray-900 dark:text-white">{{ $stats['dev_releases'] ?? 0 }}</div>
-                                </div>
-                                <div>
-                                    <div class="text-gray-600 dark:text-gray-300">{{ __('Latest Stable:') }}</div>
-                                    <div class="font-medium text-gray-900 dark:text-white">{{ $stats['latest_stable']?->version ?? __('None') }}</div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="space-y-2 md:col-span-7">
+                            <span class="form-label text-transparent">{{ __('Actions') }}</span>
+                            <div class="form-actions-cluster justify-start md:justify-end">
+                                <button type="submit" class="btn btn-primary btn-sm gap-2">
+                                    <x-icon name="search" class="h-4 w-4" />
+                                    {{ __('Apply Filter') }}
+                                </button>
 
-                        <!-- Channel Filter -->
-                        <div class="mb-6">
-                            <form method="GET" action="{{ route('packages.index') }}"
-                                class="flex items-center gap-4">
-                                <div>
-                                    <label for="channel"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Release Channel') }}</label>
-                                    <select name="channel" id="channel" onchange="this.form.submit()"
-                                        class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                                        <option value="">{{ __('All Channels') }}</option>
-                                        <option value="stable"
-                                            {{ request('channel') === 'stable' ? 'selected' : '' }}>
-                                            {{ __('Stable') }}
-                                        </option>
-                                        <option value="dev" {{ request('channel') === 'dev' ? 'selected' : '' }}>
-                                            {{ __('Development') }}
-                                        </option>
-                                    </select>
-                                </div>
-                                @if (request('channel'))
-                                    <a href="{{ route('packages.index') }}"
-                                        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition mt-auto">
+                                @if ($hasChannelFilter)
+                                    <a href="{{ route('packages.index') }}" class="btn btn-secondary btn-sm gap-2">
+                                        <x-icon name="reset" class="h-4 w-4" />
                                         {{ __('Reset Filter') }}
                                     </a>
                                 @endif
-                            </form>
-                        </div>
-
-                        <!-- Packages table -->
-                        <x-table :headers="[__('Version'), __('Channel'), __('Released'), __('Hash'), __('Actions')]" :emptyColspan="5">
-                            @forelse($releases as $release)
-                                <tr>
-                                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        {{ $release->version }}
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                        <span class="px-2 py-0.5 rounded text-xs font-medium
-                                            {{ $release->release_channel === 'stable' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' }}">
-                                            {{ ucfirst($release->release_channel) }}
-                                        </span>
-                                        @if ($release->version === ($stats['latest_stable']?->version ?? null))
-                                            <span class="ml-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
-                                                {{ __('Latest') }}
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        {{ $release->created_at ? $release->created_at->format('Y-m-d H:i') : __('Unknown') }}
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        @if ($release->virus_detection_url)
-                                            <span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                {{ __('Available') }}
-                                            </span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                                                {{ __('None') }}
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{{ route('packages.show', $release) }}"
-                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                            {{ __('Details') }}
-                                        </a>
-                                        @if ($canDownload ?? false && $release->id)
-                                            <span class="mx-1 text-gray-400">{{ '|' }}</span>
-                                            <a href="{{ route('packages.download', ['release' => $release->id]) }}"
-                                                class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
-                                                {{ __('Download') }}
-                                            </a>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-4 py-2 text-center text-sm text-gray-500 dark:text-gray-300">
-                                        {{ __('No packages found.') }}
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </x-table>
-
-                        <!-- Pagination -->
-                        <div class="mt-4">
-                            <x-pagination :paginator="$releases" />
+                            </div>
                         </div>
                     </div>
+
+                    @if ($hasChannelFilter)
+                        <div class="active-filters" data-active-filters>
+                            <div class="active-filters__header">
+                                <div class="active-filters__copy">
+                                    <p class="active-filters__title">{{ __('Active Filters') }}</p>
+                                    <p class="active-filters__subtitle">{{ __('Clear the current channel view without changing staff-only access or pagination behavior.') }}</p>
+                                </div>
+                                <a href="{{ route('packages.index') }}" class="active-filters__clear">
+                                    {{ __('Clear All') }}
+                                </a>
+                            </div>
+
+                            <div class="active-filters__list">
+                                <x-filter-badge :label="__('Channel:').' '.(request('channel') === 'dev' ? __('Development') : __('Stable'))" color="green" :removeUrl="request()->fullUrlWithQuery(['channel' => null])" />
+                            </div>
+                        </div>
+                    @endif
+                </x-filter-box>
+
+                <x-table :headers="[__('Version'), __('Channel'), __('Released'), __('Hash'), __('Actions')]" :emptyColspan="5" ariaLabel="{{ __('Packages table') }}">
+                    @forelse ($releases as $release)
+                        <tr class="table-row">
+                            <td class="table-cell-primary whitespace-nowrap">
+                                <div class="table-stack table-stack-tight">
+                                    <div class="table-title text-sm">{{ $release->version }}</div>
+                                    <div class="table-meta">{{ __('Release ID:') }} {{ $release->id }}</div>
+                                </div>
+                            </td>
+
+                            <td class="table-cell whitespace-nowrap">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <x-status-badge :status="$release->release_channel === 'stable' ? 'active' : 'info'" :text="ucfirst($release->release_channel)" />
+
+                                    @if ($release->version === ($latestStable?->version ?? null))
+                                        <span class="badge badge-info">{{ __('Latest') }}</span>
+                                    @endif
+                                </div>
+                            </td>
+
+                            <td class="table-cell whitespace-nowrap">
+                                @if ($release->created_at)
+                                    <div class="table-stack table-stack-tight">
+                                        <div>{{ $release->created_at->format('Y-m-d H:i') }}</div>
+                                        <div class="table-meta">{{ $release->created_at->diffForHumans() }}</div>
+                                    </div>
+                                @else
+                                    <span class="table-meta">{{ __('Unknown') }}</span>
+                                @endif
+                            </td>
+
+                            <td class="table-cell whitespace-nowrap">
+                                @if ($release->virus_detection_url)
+                                    <div class="table-stack table-stack-tight">
+                                        <x-status-badge status="verified" :text="__('Available')" />
+                                        <div class="table-meta">{{ __('Verification link published') }}</div>
+                                    </div>
+                                @else
+                                    <span class="badge badge-default">{{ __('None') }}</span>
+                                @endif
+                            </td>
+
+                            <td class="table-cell whitespace-nowrap text-right">
+                                <div class="table-actions table-actions--nowrap">
+                                    <a href="{{ route('packages.show', $release) }}" class="table-action table-action--primary">
+                                        {{ __('Details') }}
+                                    </a>
+
+                                    @if ($canDownload ?? false && $release->id)
+                                        <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="table-action table-action--success">
+                                            {{ __('Download') }}
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr class="table-row">
+                            <td colspan="5" class="table-empty">
+                                <div class="table-empty-state">
+                                    <x-icon name="cube" class="table-empty-icon" />
+                                    <p class="table-empty-title">{{ __('No packages found.') }}</p>
+                                    <p class="table-empty-copy">{{ __('Try removing the current channel filter to surface more releases.') }}</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </x-table>
+
+                <div>
+                    <x-pagination :paginator="$releases" />
                 </div>
-            @endif
+            </section>
+        @endif
     </div>
 </x-app-sidebar-layout>
