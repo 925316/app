@@ -42,7 +42,7 @@
 
     <!-- Navigation Menu -->
     <nav class="sidebar-nav" aria-label="{{ __('Primary navigation') }}">
-        <div class="space-y-1.5 px-3">
+        <div class="sidebar-nav-panel space-y-1.5" data-sidebar-nav-panel>
             <!-- Dashboard -->
             <x-sidebar-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" :icon="'home'" @click="closeMobileSidebar()">
                 {{ __('Dashboard') }}
@@ -92,88 +92,90 @@
 
     <!-- User Profile Section -->
     <div class="sidebar-user" data-sidebar-account>
-        <div class="sidebar-account-panel" x-show="mobileSidebarOpen || $store.sidebar.open" x-transition>
-            <div class="sidebar-account-row" data-sidebar-profile-row>
-                <a href="{{ route('profile.edit') }}"
-                    class="sidebar-account-entry flex min-w-0 flex-1 items-center gap-3 px-1 py-1 text-sm font-medium transition-colors duration-150">
-                    <div class="user-avatar flex h-8 w-8 shrink-0 items-center justify-center text-sm font-semibold text-white">
-                        {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
-                    </div>
+        <div class="sidebar-account-surface" data-sidebar-utility-surface>
+            <div class="sidebar-account-panel" x-show="mobileSidebarOpen || $store.sidebar.open" x-transition>
+                <div class="sidebar-account-row" data-sidebar-profile-row>
+                    <a href="{{ route('profile.edit') }}"
+                        class="sidebar-account-entry flex min-w-0 flex-1 items-center gap-3 px-1 py-1 text-sm font-medium transition-colors duration-150">
+                        <div class="user-avatar flex h-8 w-8 shrink-0 items-center justify-center text-sm font-semibold text-white">
+                            {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                        </div>
 
-                    <div class="min-w-0 flex-1">
-                        <p class="sidebar-user-name truncate text-sm font-medium">
-                            {{ Auth::user()->username }}
-                        </p>
-                        <p class="sidebar-user-meta truncate text-xs">
-                            {{ Auth::user()->email }}
-                        </p>
-                    </div>
-                </a>
+                        <div class="min-w-0 flex-1">
+                            <p class="sidebar-user-name truncate text-sm font-medium">
+                                {{ Auth::user()->username }}
+                            </p>
+                            <p class="sidebar-user-meta truncate text-xs">
+                                {{ Auth::user()->email }}
+                            </p>
+                        </div>
+                    </a>
 
-                <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+                    <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+                        @csrf
+                        <button type="submit" class="sidebar-account-icon" aria-label="{{ __('Log out') }}">
+                            <x-icon name="logout" class="h-4 w-4" />
+                        </button>
+                    </form>
+                </div>
+
+                <x-dark-mode-toggle variant="sidebar-row" data-sidebar-theme-row />
+
+                @php
+                    $supportedLocales = (array) config('app.supported_locales', []);
+                    $currentLocale = app()->getLocale();
+                @endphp
+
+                <form method="POST" action="{{ route('profile.update-locale') }}" class="sidebar-account-language-form"
+                    x-data="{ localeMenuOpen: false }" @click.outside="localeMenuOpen = false" @keydown.escape.window="localeMenuOpen = false"
+                    data-sidebar-language-row>
                     @csrf
-                    <button type="submit" class="sidebar-account-icon" aria-label="{{ __('Log out') }}">
-                        <x-icon name="logout" class="h-4 w-4" />
-                    </button>
+                    @method('patch')
+
+                    <span id="sidebar-locale-label" class="sidebar-account-language-label">{{ __('Language') }}</span>
+
+                    <div class="sidebar-account-language-control">
+                        <button type="button" class="sidebar-account-language-trigger" data-sidebar-language-trigger aria-haspopup="listbox"
+                            :aria-expanded="localeMenuOpen.toString()" aria-labelledby="sidebar-locale-label"
+                            @click="localeMenuOpen = !localeMenuOpen">
+                            <span class="sidebar-account-language-current">
+                                {{ $supportedLocales[$currentLocale] ?? strtoupper($currentLocale) }}
+                            </span>
+                            <x-icon name="chevron-down" class="sidebar-account-language-trigger-icon" />
+                        </button>
+
+                        <input x-ref="localeInput" id="sidebar-locale-select" type="hidden" name="locale"
+                            value="{{ $currentLocale }}">
+                        <div class="sidebar-account-language-menu" data-sidebar-language-menu x-cloak x-show="localeMenuOpen"
+                            x-transition.opacity.origin.top.right>
+                            @if (count($supportedLocales) === 0)
+                                <button type="button" class="sidebar-account-language-option is-active" disabled>
+                                    <span>{{ strtoupper($currentLocale) }}</span>
+                                    <x-icon name="check" class="sidebar-account-language-option-icon" />
+                                </button>
+                            @endif
+                            @foreach ($supportedLocales as $value => $label)
+                                <button type="button"
+                                    class="sidebar-account-language-option {{ $currentLocale === $value ? 'is-active' : '' }}"
+                                    @click="$refs.localeInput.value = '{{ $value }}'; localeMenuOpen = false; $el.form.submit()">
+                                    <span>{{ $label }}</span>
+                                    @if ($currentLocale === $value)
+                                        <x-icon name="check" class="sidebar-account-language-option-icon" />
+                                    @endif
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
                 </form>
             </div>
 
-            <x-dark-mode-toggle variant="sidebar-row" data-sidebar-theme-row />
-
-            @php
-                $supportedLocales = (array) config('app.supported_locales', []);
-                $currentLocale = app()->getLocale();
-            @endphp
-
-            <form method="POST" action="{{ route('profile.update-locale') }}" class="sidebar-account-language-form"
-                x-data="{ localeMenuOpen: false }" @click.outside="localeMenuOpen = false" @keydown.escape.window="localeMenuOpen = false"
-                data-sidebar-language-row>
-                @csrf
-                @method('patch')
-
-                <span id="sidebar-locale-label" class="sidebar-account-language-label">{{ __('Language') }}</span>
-
-                <div class="sidebar-account-language-control">
-                    <button type="button" class="sidebar-account-language-trigger" data-sidebar-language-trigger aria-haspopup="listbox"
-                        :aria-expanded="localeMenuOpen.toString()" aria-labelledby="sidebar-locale-label"
-                        @click="localeMenuOpen = !localeMenuOpen">
-                        <span class="sidebar-account-language-current">
-                            {{ $supportedLocales[$currentLocale] ?? strtoupper($currentLocale) }}
-                        </span>
-                        <x-icon name="chevron-down" class="sidebar-account-language-trigger-icon" />
-                    </button>
-
-                    <input x-ref="localeInput" id="sidebar-locale-select" type="hidden" name="locale"
-                        value="{{ $currentLocale }}">
-                    <div class="sidebar-account-language-menu" data-sidebar-language-menu x-cloak x-show="localeMenuOpen"
-                        x-transition.opacity.origin.top.right>
-                        @if (count($supportedLocales) === 0)
-                            <button type="button" class="sidebar-account-language-option is-active" disabled>
-                                <span>{{ strtoupper($currentLocale) }}</span>
-                                <x-icon name="check" class="sidebar-account-language-option-icon" />
-                            </button>
-                        @endif
-                        @foreach ($supportedLocales as $value => $label)
-                            <button type="button"
-                                class="sidebar-account-language-option {{ $currentLocale === $value ? 'is-active' : '' }}"
-                                @click="$refs.localeInput.value = '{{ $value }}'; localeMenuOpen = false; $el.form.submit()">
-                                <span>{{ $label }}</span>
-                                @if ($currentLocale === $value)
-                                    <x-icon name="check" class="sidebar-account-language-option-icon" />
-                                @endif
-                            </button>
-                        @endforeach
-                    </div>
+            <a href="{{ route('profile.edit') }}" class="sidebar-account-collapsed mx-auto"
+                x-show="!mobileSidebarOpen && !$store.sidebar.open" x-transition aria-label="{{ __('Profile') }}">
+                <div class="user-avatar flex h-8 w-8 items-center justify-center text-sm font-semibold text-white"
+                    :class="{ 'h-6 w-6 text-xs': !$store.sidebar.open && !mobileSidebarOpen }">
+                    {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
                 </div>
-            </form>
+            </a>
         </div>
-
-        <a href="{{ route('profile.edit') }}" class="sidebar-account-collapsed mx-auto"
-            x-show="!mobileSidebarOpen && !$store.sidebar.open" x-transition aria-label="{{ __('Profile') }}">
-            <div class="user-avatar flex h-8 w-8 items-center justify-center text-sm font-semibold text-white"
-                :class="{ 'h-6 w-6 text-xs': !$store.sidebar.open && !mobileSidebarOpen }">
-                {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
-            </div>
-        </a>
     </div>
 </aside>

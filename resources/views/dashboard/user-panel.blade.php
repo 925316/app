@@ -17,7 +17,7 @@
                 </p>
             </div>
 
-            <div class="card-shell-muted flex items-center gap-3 self-start lg:self-auto">
+            <div class="card-shell-muted flex items-center gap-3 self-start lg:self-auto" data-dashboard-summary-chip>
                 <span class="card-icon-container icon-indigo h-11 w-11 shrink-0">
                     <x-icon name="document" class="h-6 w-6" />
                 </span>

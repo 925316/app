@@ -5,9 +5,60 @@
 [data-shell-theme='cinematic'] [data-dashboard-panels] .card-shell,
 [data-shell-theme='cinematic'] [data-dashboard-database] .card-shell,
 [data-shell-theme='cinematic'] [data-dashboard-summary] {
-    background: rgb(var(--shell-surface) / 0.96);
-    border-color: rgb(var(--shell-line));
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgb(var(--shell-line) / 0.08), transparent 18%),
+        linear-gradient(155deg, rgb(var(--shell-surface) / 0.97), rgb(var(--shell-surface-soft) / 0.88));
+    border-color: rgb(var(--shell-line) / 0.78);
     box-shadow: var(--shell-shadow-sm);
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-summary]::before,
+[data-shell-theme='cinematic'] [data-dashboard-card]::before,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] [data-license-state]::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto auto 0;
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, rgb(var(--shell-brand) / 0.55), rgb(var(--shell-accent) / 0.18), transparent 72%);
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-summary-chip],
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] [data-license-state] .card-shell-muted,
+[data-shell-theme='cinematic'] [data-dashboard-card] .card-shell-muted,
+[data-shell-theme='cinematic'] [data-dashboard-database] .card-shell-muted {
+    border-color: rgb(var(--shell-line) / 0.46);
+    background: linear-gradient(145deg, rgb(var(--shell-surface-panel) / 0.86), rgb(var(--shell-surface-panel-soft) / 0.72));
+    box-shadow: inset 0 1px 0 rgb(var(--shell-line) / 0.08);
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-stat-grid] .card-stat {
+    position: relative;
+    overflow: hidden;
+    border-color: rgb(var(--shell-line) / 0.7);
+    background:
+        linear-gradient(180deg, rgb(var(--shell-line) / 0.07), transparent 24%),
+        linear-gradient(155deg, rgb(var(--shell-surface) / 0.96), rgb(var(--shell-surface-soft) / 0.84));
+    box-shadow: var(--shell-shadow-sm);
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-stat-grid] .card-stat::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto auto 0;
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, rgb(var(--shell-glow) / 0.42), transparent 76%);
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-stat-grid] .stat-card-label {
+    color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-stat-grid] .stat-card-value {
+    color: rgb(var(--shell-ink));
 }
 
 [data-shell-theme='cinematic'] .dashboard-section-title {

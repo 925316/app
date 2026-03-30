@@ -1,6 +1,6 @@
 /* Sidebar Styles */ /* Extracted from sidebar.blade.php and app-sidebar.blade.php */ /* Sidebar container */
 .sidebar {
-    @apply bg-white/90 dark:bg-cool-900/80 backdrop-blur-sm border-r border-cool-200/50 dark:border-cool-700/50 shadow-sm h-screen fixed left-0 top-0 z-40 flex flex-col transition-all duration-300;
+    @apply bg-white/90 dark:bg-cool-900/80 backdrop-blur-sm border-r border-cool-200/50 dark:border-cool-700/50 shadow-sm h-screen fixed left-0 top-0 z-40 flex flex-col gap-3 overflow-hidden px-3 py-3 transition-all duration-300;
 } /* Sidebar expanded state */
 .sidebar-expanded {
     @apply w-64;
@@ -9,20 +9,30 @@
     @apply w-16;
 } /* Sidebar header */
 .sidebar-header {
-    @apply relative flex items-center justify-between h-16 px-4 border-b border-cool-200/50 dark:border-cool-700/50;
+    @apply relative flex items-center justify-between rounded-[1.5rem] border border-cool-200/60 bg-white/70 px-4 dark:border-cool-700/50 dark:bg-cool-900/50;
 } /* Sidebar logo container */
 .sidebar-logo {
     @apply flex items-center space-x-3;
 } /* Sidebar toggle button */
 .sidebar-toggle {
-    @apply absolute top-1/2 transform -translate-y-1/2 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10 transition-colors duration-150;
+    @apply absolute top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10 transition-colors duration-150;
 } /* Sidebar navigation */
 .sidebar-nav {
-    @apply flex-1 overflow-y-auto py-4;
+    @apply flex-1 overflow-y-auto py-0;
 } /* Sidebar user section */
+
+.sidebar-nav-panel {
+    @apply space-y-1.5 rounded-[1.5rem] border border-cool-200/60 bg-white/55 p-3 dark:border-cool-700/50 dark:bg-cool-900/35;
+}
+
 .sidebar-user {
-    @apply border-t border-cool-200/50 dark:border-cool-700/50 p-4;
+    @apply p-0;
 } /* User avatar */
+
+.sidebar-account-surface {
+    @apply rounded-[1.5rem] border border-cool-200/60 bg-white/60 p-3 dark:border-cool-700/50 dark:bg-cool-900/40;
+}
+
 .user-avatar {
     @apply h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm;
 } /* User avatar small (collapsed state) */
@@ -50,7 +60,7 @@
 }
 
 .sidebar-account-row {
-    @apply flex items-center justify-between gap-3;
+    @apply flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5;
 }
 
 .sidebar-account-entry {
@@ -58,7 +68,7 @@
 }
 
 .sidebar-account-icon {
-    @apply inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-500;
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-full border border-transparent transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-500;
 }
 
 .sidebar-account-label {
@@ -74,11 +84,11 @@
 }
 
 .sidebar-account-collapsed {
-    @apply inline-flex items-center justify-center;
+    @apply inline-flex min-h-[3.5rem] w-full items-center justify-center rounded-2xl;
 }
 
 .sidebar-account-language-form {
-    @apply flex items-center justify-between gap-3 px-1 py-1;
+    @apply flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5;
 }
 
 .sidebar-account-language-label {
@@ -166,7 +176,7 @@
     border-right: 1px solid rgb(var(--shell-line) / 0.5);
     background:
         radial-gradient(circle at 0% 0%, rgb(var(--shell-accent) / 0.12), transparent 32%),
-        linear-gradient(180deg, rgb(var(--shell-surface) / 0.92), rgb(var(--shell-surface-soft) / 0.82));
+        linear-gradient(180deg, rgb(var(--shell-surface-panel) / 0.78), rgb(var(--shell-surface-panel-soft) / 0.74) 58%, rgb(var(--shell-canvas) / 0.72));
     box-shadow: var(--shell-shadow-md);
     backdrop-filter: blur(22px);
 }
@@ -178,7 +188,15 @@
 
 [data-shell-theme='cinematic'] .sidebar-header {
     min-height: 4.25rem;
-    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.58), rgb(var(--shell-surface-soft) / 0.34));
+    background: linear-gradient(180deg, rgb(var(--shell-surface-panel) / 0.88), rgb(var(--shell-surface-panel-soft) / 0.72));
+    box-shadow: inset 0 1px 0 rgb(var(--shell-line) / 0.1);
+}
+
+[data-shell-theme='cinematic'] .sidebar-nav-panel,
+[data-shell-theme='cinematic'] .sidebar-account-surface {
+    border-color: rgb(var(--shell-line) / 0.42);
+    background: linear-gradient(180deg, rgb(var(--shell-surface-panel) / 0.78), rgb(var(--shell-surface-panel-soft) / 0.66));
+    box-shadow: inset 0 1px 0 rgb(var(--shell-line) / 0.08), var(--shell-shadow-sm);
 }
 
 [data-shell-theme='cinematic'] .sidebar-brand-mark {
@@ -199,7 +217,7 @@
 
 [data-shell-theme='cinematic'] .sidebar-toggle {
     border: 1px solid rgb(var(--shell-line) / 0.45);
-    background: rgb(var(--shell-surface) / 0.88);
+    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.94), rgb(var(--shell-surface-soft) / 0.82));
     color: rgb(var(--shell-muted));
     box-shadow: var(--shell-shadow-sm);
 }
@@ -237,7 +255,7 @@
 }
 
 [data-shell-theme='cinematic'] .sidebar-user {
-    background: rgb(var(--shell-surface) / 0.34);
+    background: transparent;
 }
 
 [data-shell-theme='cinematic'] .user-avatar {
@@ -258,6 +276,15 @@
 
 [data-shell-theme='cinematic'] .sidebar-account-entry:hover {
     background: rgb(var(--shell-surface) / 0.38);
+}
+
+[data-shell-theme='cinematic'] .sidebar-account-row,
+[data-shell-theme='cinematic'] [data-sidebar-theme-row],
+[data-shell-theme='cinematic'] .sidebar-account-language-form,
+[data-shell-theme='cinematic'] .sidebar-account-collapsed {
+    border: 1px solid rgb(var(--shell-line) / 0.4);
+    background: linear-gradient(145deg, rgb(var(--shell-surface) / 0.78), rgb(var(--shell-surface-soft) / 0.66));
+    box-shadow: inset 0 1px 0 rgb(var(--shell-line) / 0.08);
 }
 
 [data-shell-theme='cinematic'] .sidebar-account-icon {
@@ -284,6 +311,10 @@
 
 [data-shell-theme='cinematic'] .sidebar-account-toggle:hover {
     background: rgb(var(--shell-surface) / 0.38);
+}
+
+[data-shell-theme='cinematic'] .sidebar-account-toggle-copy {
+    flex: 1 1 auto;
 }
 
 [data-shell-theme='cinematic'] .sidebar-account-toggle:focus-visible {
@@ -320,7 +351,7 @@
 
 [data-shell-theme='cinematic'] .sidebar-account-language-menu {
     border-color: rgb(var(--shell-line) / 0.52);
-    background: rgb(var(--shell-surface-soft) / 0.96);
+    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.97), rgb(var(--shell-surface-soft) / 0.94));
     box-shadow: var(--shell-shadow-md);
 }
 

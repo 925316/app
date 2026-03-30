@@ -26,7 +26,7 @@
                 </p>
             </div>
 
-            <div class="card-shell-muted flex items-center gap-3 self-start lg:self-auto">
+            <div class="card-shell-muted flex items-center gap-3 self-start lg:self-auto" data-dashboard-summary-chip>
                 <span class="card-icon-container icon-indigo h-11 w-11 shrink-0">
                     <x-icon name="server" class="h-6 w-6" />
                 </span>
@@ -38,7 +38,7 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Dashboard statistics') }}">
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Dashboard statistics') }}" data-dashboard-stat-grid>
             <x-stat-card :title="__('Total Accounts')" :value="$stats['total_accounts'] ?? 0" icon="users" iconColor="icon-blue" />
             <x-stat-card :title="__('Active Licenses')" :value="$stats['active_licenses'] ?? 0" icon="success" iconColor="icon-green" />
             <x-stat-card :title="__('Suspended Accounts')" :value="$stats['suspended_accounts'] ?? 0" icon="warning" iconColor="icon-red" />

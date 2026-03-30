@@ -46,6 +46,8 @@ it('sidebar account section renders a bottom footer with profile row, logout ico
 
     expect($html)
         ->toContain('data-sidebar-account')
+        ->toContain('data-sidebar-nav-panel')
+        ->toContain('data-sidebar-utility-surface')
         ->toContain('data-sidebar-profile-row')
         ->toContain('data-sidebar-theme-row')
         ->toContain('data-sidebar-language-row')
@@ -88,6 +90,8 @@ it('admin sees the admin panel view', function () {
         ->get(route('dashboard'))
         ->assertSuccessful()
         ->assertViewIs('dashboard.admin-panel')
+        ->assertSee('data-dashboard-summary-chip', false)
+        ->assertSee('data-dashboard-stat-grid', false)
         ->assertSee('data-dashboard-database', false)
         ->assertViewHasAll(['stats', 'recentActivity', 'databaseStatus']);
 });
@@ -100,6 +104,7 @@ it('regular user sees the user panel view', function () {
         ->assertSuccessful()
         ->assertViewIs('dashboard.user-panel')
         ->assertSee('data-page="dashboard-user"', false)
+        ->assertSee('data-dashboard-summary-chip', false)
         ->assertSee('data-license-state="active"', false)
         ->assertViewHasAll(['userStats', 'activeLicense', 'boundDevices', 'usageTimeFormatted']);
 });
