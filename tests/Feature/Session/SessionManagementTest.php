@@ -15,7 +15,7 @@ it('admin can view sessions index', function () {
         ->get(route('sessions.index'))
         ->assertSuccessful()
         ->assertViewIs('sessions.index')
-        ->assertSee(__('Client Version'))
+        ->assertSee(__('Session'))
         ->assertViewHasAll(['sessions', 'statistics', 'statusOptions', 'currentFilters']);
 });
 
@@ -179,15 +179,21 @@ it('sessions index renders copy-friendly truncated cells for long device and ver
     $this->actingAs($this->admin)
         ->get(route('sessions.index'))
         ->assertSuccessful()
+        ->assertSee(__('Session'))
         ->assertSee('data-copy-value="26.3.30-build-with-a-very-long-suffix-for-ui-check"', false)
+        ->assertSee('data-copy-value="'.str_repeat('a', 64).'"', false)
         ->assertSee('onclick="copyTextValue(this)"', false)
-        ->assertSee('table-inline-copy table-truncate table-truncate-sm', false)
-        ->assertSee('table-title table-code table-truncate table-truncate-md text-sm', false);
+        ->assertSee('aria-label="Copy full device hash"', false)
+        ->assertSee('table-inline-copy max-w-full', false)
+        ->assertDontSee(__('IP Address'));
 });
 
-it('session detail page renders truncated copy button for full session token', function () {
+it('session detail page renders bounded copy buttons for full session token device hash and client version', function () {
     $account = Account::factory()->create();
-    $device = AccountDevice::factory()->create(['account_id' => $account->id]);
+    $device = AccountDevice::factory()->create([
+        'account_id' => $account->id,
+        'hwid_hash' => str_repeat('hash', 16),
+    ]);
     $longToken = str_repeat('tok', 30);
 
     $session = ClientSession::factory()->create([
@@ -201,7 +207,10 @@ it('session detail page renders truncated copy button for full session token', f
         ->get(route('sessions.show', $session))
         ->assertSuccessful()
         ->assertSee('data-copy-value="'.$longToken.'"', false)
+        ->assertSee('data-copy-value="'.$device->hwid_hash.'"', false)
         ->assertSee('onclick="copySessionField(this)"', false)
+        ->assertSee('table-inline-copy w-full max-w-full justify-start', false)
+        ->assertSee('aria-label="Copy full device hash"', false)
         ->assertSee('Copied');
 });
 

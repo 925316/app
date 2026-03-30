@@ -13,6 +13,12 @@
         $sessionTokenPreview = \Illuminate\Support\Str::limit($sessionToken, 28, '...');
         $sessionClientVersion = (string) ($session->client_version ?? __('Unknown'));
         $sessionClientVersionPreview = \Illuminate\Support\Str::limit($sessionClientVersion, 22, '...');
+        $sessionClientVersionMetric = \Illuminate\Support\Str::limit($sessionClientVersion, 18, '...');
+        $deviceHash = (string) ($session->device->hwid_hash ?? '');
+        $deviceHashPreview = $deviceHash !== ''
+            ? \Illuminate\Support\Str::limit($deviceHash, 28, '...')
+            : null;
+        $deviceDisplayName = (string) ($session->device->device_name ?? $session->device->hwid_hash ?? __('Unknown Device'));
     @endphp
 
     <div class="space-y-8" data-page="sessions-show">
@@ -20,7 +26,7 @@
             <x-stat-card :title="__('Status')" :value="$session->isActive() ? __('Active') : __('Expired')" icon="server" :iconColor="$session->isActive() ? 'icon-green' : 'icon-red'" />
             <x-stat-card :title="__('Last Heartbeat')" :value="$session->last_heartbeat_at ? $session->last_heartbeat_at->diffForHumans() : __('Never')" icon="success" iconColor="icon-blue" />
             <x-stat-card :title="__('Session Age')" :value="$session->age_in_minutes !== null ? number_format($session->age_in_minutes, 2).' '.__('min') : __('Unknown')" icon="document" iconColor="icon-purple" />
-            <x-stat-card :title="__('Client')" :value="$session->client_version ?? __('Unknown')" icon="desktop" iconColor="icon-orange" />
+            <x-stat-card :title="__('Client')" :value="$sessionClientVersionMetric" icon="desktop" iconColor="icon-orange" />
         </section>
 
         <section class="card-shell space-y-6">
@@ -62,14 +68,19 @@
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div class="card-shell-muted space-y-2 p-4 sm:col-span-2">
                             <p class="section-kicker">{{ __('Session token') }}</p>
-                            <button
-                                type="button"
-                                class="badge badge-default inline-flex max-w-full items-center truncate text-left transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
-                                title="{{ $sessionToken }}"
-                                data-copy-value="{{ $sessionToken }}"
-                                onclick="copySessionField(this)">
-                                {{ $sessionTokenPreview }}
-                            </button>
+                            <div class="min-w-0">
+                                <button
+                                    type="button"
+                                    class="badge badge-default table-inline-copy w-full max-w-full justify-start transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                    title="{{ $sessionToken }}"
+                                    aria-label="{{ __('Copy full session token') }}"
+                                    data-copy-value="{{ $sessionToken }}"
+                                    onclick="copySessionField(this)">
+                                    <span class="table-truncate font-mono text-xs sm:text-sm">
+                                        {{ $sessionTokenPreview }}
+                                    </span>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
@@ -79,14 +90,19 @@
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Client version') }}</p>
-                            <button
-                                type="button"
-                                class="badge badge-default inline-flex max-w-full items-center truncate text-left transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
-                                title="{{ $sessionClientVersion }}"
-                                data-copy-value="{{ $sessionClientVersion }}"
-                                onclick="copySessionField(this)">
-                                {{ $sessionClientVersionPreview }}
-                            </button>
+                            <div class="min-w-0">
+                                <button
+                                    type="button"
+                                    class="badge badge-default table-inline-copy w-full max-w-full justify-start transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                    title="{{ $sessionClientVersion }}"
+                                    aria-label="{{ __('Copy full client version') }}"
+                                    data-copy-value="{{ $sessionClientVersion }}"
+                                    onclick="copySessionField(this)">
+                                    <span class="table-truncate text-xs sm:text-sm">
+                                        {{ $sessionClientVersionPreview }}
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -158,8 +174,8 @@
                                 {{ $session->account->initials() }}
                             </div>
 
-                            <div class="table-stack">
-                                <div class="table-title text-base">{{ $session->account->username }}</div>
+                            <div class="table-stack min-w-0">
+                                <div class="table-title table-truncate text-base" title="{{ $session->account->username }}">{{ $session->account->username }}</div>
                                 <div class="table-meta break-all">{{ $session->account->email }}</div>
                             </div>
                         </div>
@@ -184,11 +200,23 @@
                                 <x-icon name="desktop" class="h-6 w-6" />
                             </span>
 
-                            <div class="table-stack gap-2">
-                                <div class="table-title text-base">{{ $session->device->device_name ?? $session->device->hwid_hash ?? __('Unknown Device') }}</div>
+                            <div class="table-stack min-w-0 gap-3">
+                                <div class="table-title break-words text-base" title="{{ $deviceDisplayName }}">{{ $deviceDisplayName }}</div>
                                 <div class="table-meta">{{ __('Device ID:') }} {{ $session->device->id }}</div>
-                                @if ($session->device->hwid_hash)
-                                    <div class="table-meta break-all">{{ $session->device->hwid_hash }}</div>
+                                @if ($deviceHashPreview)
+                                    <div class="min-w-0">
+                                        <button
+                                            type="button"
+                                            class="badge badge-default table-inline-copy w-full max-w-full justify-start transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                            title="{{ $deviceHash }}"
+                                            aria-label="{{ __('Copy full device hash') }}"
+                                            data-copy-value="{{ $deviceHash }}"
+                                            onclick="copySessionField(this)">
+                                            <span class="table-truncate font-mono text-xs sm:text-sm">
+                                                {{ $deviceHashPreview }}
+                                            </span>
+                                        </button>
+                                    </div>
                                 @endif
                                 @if ($session->device->bound_at)
                                     <div class="table-meta">{{ __('Bound since:') }} {{ $session->device->bound_at->format('Y-m-d H:i:s') }}</div>
