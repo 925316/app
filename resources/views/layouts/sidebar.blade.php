@@ -147,11 +147,10 @@
                         <input x-ref="localeInput" id="sidebar-locale-select" type="hidden" name="locale"
                             value="{{ $currentLocale }}">
                         <div class="sidebar-account-language-menu" data-sidebar-language-menu x-cloak x-show="localeMenuOpen"
-                            x-transition.opacity.origin.top.right>
+                            x-transition.opacity.origin.bottom.right>
                             @if (count($supportedLocales) === 0)
                                 <button type="button" class="sidebar-account-language-option is-active" disabled>
                                     <span>{{ strtoupper($currentLocale) }}</span>
-                                    <x-icon name="check" class="sidebar-account-language-option-icon" />
                                 </button>
                             @endif
                             @foreach ($supportedLocales as $value => $label)
@@ -159,9 +158,6 @@
                                     class="sidebar-account-language-option {{ $currentLocale === $value ? 'is-active' : '' }}"
                                     @click="$refs.localeInput.value = '{{ $value }}'; localeMenuOpen = false; $el.form.submit()">
                                     <span>{{ $label }}</span>
-                                    @if ($currentLocale === $value)
-                                        <x-icon name="check" class="sidebar-account-language-option-icon" />
-                                    @endif
                                 </button>
                             @endforeach
                         </div>

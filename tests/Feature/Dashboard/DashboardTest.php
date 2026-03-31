@@ -56,6 +56,7 @@ it('sidebar account section renders a bottom footer with profile row, logout ico
         ->toContain('x-ref="localeInput"')
         ->toContain('data-sidebar-language-trigger')
         ->toContain('data-sidebar-language-menu')
+        ->toContain('x-transition.opacity.origin.bottom.right')
         ->toContain('sidebar-account-icon')
         ->toContain('sidebar-locale-select')
         ->toContain('aria-label="Log out"')
@@ -64,6 +65,23 @@ it('sidebar account section renders a bottom footer with profile row, logout ico
         ->toContain('aria-pressed=')
         ->not->toContain('sidebar-utility-link sidebar-account-entry')
         ->not->toContain('>Log Out<');
+});
+
+it('sidebar language menu is positioned above the trigger to avoid bottom overflow', function () {
+    $account = createAdmin();
+
+    actingAs($account);
+
+    $html = view('layouts.sidebar')->render();
+
+    expect($html)
+        ->toContain('x-transition.opacity.origin.bottom.right');
+
+    $css = file_get_contents(resource_path('css/modules/sidebar.css'));
+
+    expect($css)
+        ->toContain('bottom: calc(100% + 0.5rem);')
+        ->not->toContain('top: calc(100% + 0.5rem);');
 });
 
 it('user with license can access dashboard', function () {

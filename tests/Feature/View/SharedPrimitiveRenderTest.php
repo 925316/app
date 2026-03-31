@@ -93,3 +93,30 @@ it('filter box can opt in to total summary when the page needs emphasis', functi
         ->toContain('Showing')
         ->toContain('42 total');
 });
+
+it('filter dropdown renders hidden input state and accessible listbox semantics for filter forms', function () {
+    $html = Blade::render('<x-filter-dropdown id="status" name="status" label="Status" value="active" :options="[\'\' => \'All Statuses\', \'active\' => \'Active\', \'suspended\' => \'Suspended\']" />');
+
+    expect($html)
+        ->toContain('type="hidden"')
+        ->toContain('name="status"')
+        ->toContain('aria-haspopup="listbox"')
+        ->toContain('role="listbox"')
+        ->toContain('aria-orientation="vertical"')
+        ->toContain('role="option"')
+        ->toContain('tabindex="-1"')
+        ->toContain('filter-dropdown-trigger')
+        ->toContain('filter-dropdown-option')
+        ->toContain('Active')
+        ->toContain('x-model="value"')
+        ->not->toContain('filter-dropdown-option-icon');
+});
+
+it('filter dropdown falls back to its field id when no explicit name is provided', function () {
+    $html = Blade::render('<x-filter-dropdown id="channel" label="Channel" value="stable" :options="[\'stable\' => \'Stable\', \'dev\' => \'Development\']" />');
+
+    expect($html)
+        ->toContain('name="channel"')
+        ->toContain('id="channel-')
+        ->toContain('-input"');
+});

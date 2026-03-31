@@ -41,18 +41,23 @@
                             :placeholder="__('Search by username, email, or license key...')" icon="search" />
                     </div>
 
-                    <div class="space-y-2 md:col-span-5 xl:col-span-3">
-                        <label for="sort" class="form-label">{{ __('Sort By') }}</label>
-                        <select name="sort" id="sort" class="form-select">
-                            <option value="created_at_desc" {{ $currentFilters['sort'] === 'created_at_desc' ? 'selected' : '' }}>{{ __('Created (Newest First)') }}</option>
-                            <option value="created_at_asc" {{ $currentFilters['sort'] === 'created_at_asc' ? 'selected' : '' }}>{{ __('Created (Oldest First)') }}</option>
-                            <option value="username_asc" {{ $currentFilters['sort'] === 'username_asc' ? 'selected' : '' }}>{{ __('Username (A-Z)') }}</option>
-                            <option value="username_desc" {{ $currentFilters['sort'] === 'username_desc' ? 'selected' : '' }}>{{ __('Username (Z-A)') }}</option>
-                            <option value="email_asc" {{ $currentFilters['sort'] === 'email_asc' ? 'selected' : '' }}>{{ __('Email (A-Z)') }}</option>
-                            <option value="email_desc" {{ $currentFilters['sort'] === 'email_desc' ? 'selected' : '' }}>{{ __('Email (Z-A)') }}</option>
-                            <option value="last_login_at_desc" {{ $currentFilters['sort'] === 'last_login_at_desc' ? 'selected' : '' }}>{{ __('Last Login (Recent First)') }}</option>
-                            <option value="last_login_at_asc" {{ $currentFilters['sort'] === 'last_login_at_asc' ? 'selected' : '' }}>{{ __('Last Login (Oldest First)') }}</option>
-                        </select>
+                    <div class="md:col-span-5 xl:col-span-3">
+                        <x-filter-dropdown
+                            id="sort"
+                            name="sort"
+                            :label="__('Sort By')"
+                            :value="$currentFilters['sort']"
+                            :options="[
+                                'created_at_desc' => __('Created (Newest First)'),
+                                'created_at_asc' => __('Created (Oldest First)'),
+                                'username_asc' => __('Username (A-Z)'),
+                                'username_desc' => __('Username (Z-A)'),
+                                'email_asc' => __('Email (A-Z)'),
+                                'email_desc' => __('Email (Z-A)'),
+                                'last_login_at_desc' => __('Last Login (Recent First)'),
+                                'last_login_at_asc' => __('Last Login (Oldest First)'),
+                            ]"
+                        />
                     </div>
 
                     <div class="space-y-2 md:col-span-12 xl:col-span-3 filter-box-actions">
@@ -71,39 +76,48 @@
                 </div>
 
                 <div class="form-divider grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    <div class="space-y-2">
-                        <label for="status" class="form-label">{{ __('Account Status') }}</label>
-                        <select name="status" id="status" class="form-select">
-                            <option value="">{{ __('All Statuses') }}</option>
-                            <option value="active" {{ $currentFilters['status'] === 'active' ? 'selected' : '' }}>{{ __('Active') }}</option>
-                            <option value="suspended" {{ $currentFilters['status'] === 'suspended' ? 'selected' : '' }}>{{ __('Suspended') }}</option>
-                            <option value="verified" {{ $currentFilters['status'] === 'verified' ? 'selected' : '' }}>{{ __('Verified') }}</option>
-                            <option value="unverified" {{ $currentFilters['status'] === 'unverified' ? 'selected' : '' }}>{{ __('Unverified') }}</option>
-                            <option value="2fa-enabled" {{ $currentFilters['status'] === '2fa-enabled' ? 'selected' : '' }}>{{ __('2FA Enabled') }}</option>
-                        </select>
+                    <div>
+                        <x-filter-dropdown
+                            id="status"
+                            name="status"
+                            :label="__('Account Status')"
+                            :value="$currentFilters['status']"
+                            :options="[
+                                '' => __('All Statuses'),
+                                'active' => __('Active'),
+                                'suspended' => __('Suspended'),
+                                'verified' => __('Verified'),
+                                'unverified' => __('Unverified'),
+                                '2fa-enabled' => __('2FA Enabled'),
+                            ]"
+                        />
                     </div>
 
-                    <div class="space-y-2">
-                        <label for="privilege" class="form-label">{{ __('License Privilege') }}</label>
-                        <select name="privilege" id="privilege" class="form-select">
-                            <option value="">{{ __('All Privileges') }}</option>
-                            @foreach ($privilegeOptions as $value => $label)
-                                @if ($value !== '')
-                                    <option value="{{ $value }}" {{ $currentFilters['privilege'] === (string) $value ? 'selected' : '' }}>
-                                        {{ $label }}
-                                    </option>
-                                @endif
-                            @endforeach
-                        </select>
+                    <div>
+                        <x-filter-dropdown
+                            id="privilege"
+                            name="privilege"
+                            :label="__('License Privilege')"
+                            :value="$currentFilters['privilege']"
+                            :options="['' => __('All Privileges')] + collect($privilegeOptions)
+                                ->reject(fn ($optionLabel, $optionValue) => (string) $optionValue === '')
+                                ->mapWithKeys(fn ($optionLabel, $optionValue) => [(string) $optionValue => $optionLabel])
+                                ->all()"
+                        />
                     </div>
 
-                    <div class="space-y-2">
-                        <label for="license_count" class="form-label">{{ __('License Count') }}</label>
-                        <select name="license_count" id="license_count" class="form-select">
-                            <option value="">{{ __('Any') }}</option>
-                            <option value="none" {{ $currentFilters['license_count'] === 'none' ? 'selected' : '' }}>{{ __('No Licenses') }}</option>
-                            <option value="has" {{ $currentFilters['license_count'] === 'has' ? 'selected' : '' }}>{{ __('Has Licenses') }}</option>
-                        </select>
+                    <div>
+                        <x-filter-dropdown
+                            id="license_count"
+                            name="license_count"
+                            :label="__('License Count')"
+                            :value="$currentFilters['license_count']"
+                            :options="[
+                                '' => __('Any'),
+                                'none' => __('No Licenses'),
+                                'has' => __('Has Licenses'),
+                            ]"
+                        />
                     </div>
                 </div>
 

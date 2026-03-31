@@ -68,13 +68,19 @@
 
             <x-filter-box :action="route('packages.manage')" :title="__('Filter releases')">
                 <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
-                    <div class="space-y-2 md:col-span-5">
-                        <label for="channel" class="form-label">{{ __('Release Channel') }}</label>
-                        <select name="channel" id="channel" class="form-select" onchange="this.form.submit()">
-                            <option value="">{{ __('All Channels') }}</option>
-                            <option value="stable" {{ request('channel') === 'stable' ? 'selected' : '' }}>{{ __('Stable') }}</option>
-                            <option value="dev" {{ request('channel') === 'dev' ? 'selected' : '' }}>{{ __('Development') }}</option>
-                        </select>
+                    <div class="md:col-span-5">
+                        <x-filter-dropdown
+                            id="channel"
+                            name="channel"
+                            :label="__('Release Channel')"
+                            :value="request('channel')"
+                            :submit-on-select="true"
+                            :options="[
+                                '' => __('All Channels'),
+                                'stable' => __('Stable'),
+                                'dev' => __('Development'),
+                            ]"
+                        />
                     </div>
 
                     <div class="space-y-2 md:col-span-7 filter-box-actions">

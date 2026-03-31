@@ -132,7 +132,7 @@
 
 .sidebar-account-language-menu {
     position: absolute;
-    top: calc(100% + 0.5rem);
+    bottom: calc(100% + 0.5rem);
     right: 0;
     z-index: 30;
     width: 100%;
@@ -161,10 +161,6 @@
 
 .sidebar-account-language-option:disabled {
     cursor: default;
-}
-
-.sidebar-account-language-option-icon {
-    @apply h-4 w-4 shrink-0;
 }
 
 /* Mobile sidebar overlay */

@@ -106,16 +106,16 @@
                                 :placeholder="__('Search by key or username...')" icon="search" />
                         </div>
 
-                        <div class="space-y-2 md:col-span-4 xl:col-span-3">
-                            <label for="status" class="form-label">{{ __('Status') }}</label>
-                            <select name="status" id="status" class="form-select">
-                                <option value="">{{ __('All Statuses') }}</option>
-                                @foreach ($statusOptions as $value => $label)
-                                    <option value="{{ $value }}" {{ request('status', '') === (string) $value ? 'selected' : '' }}>
-                                        {{ ucfirst($label) }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="md:col-span-4 xl:col-span-3">
+                            <x-filter-dropdown
+                                id="status"
+                                name="status"
+                                :label="__('Status')"
+                                :value="request('status', '')"
+                                :options="['' => __('All Statuses')] + collect($statusOptions)
+                                    ->mapWithKeys(fn ($optionLabel, $optionValue) => [(string) $optionValue => ucfirst($optionLabel)])
+                                    ->all()"
+                            />
                         </div>
 
                         <div class="space-y-2 md:col-span-12 xl:col-span-3 filter-box-actions">
@@ -134,16 +134,16 @@
                     </div>
 
                     <div class="form-divider grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        <div class="space-y-2 xl:max-w-sm">
-                            <label for="privilege" class="form-label">{{ __('Privilege') }}</label>
-                            <select name="privilege" id="privilege" class="form-select">
-                                <option value="">{{ __('All Privileges') }}</option>
-                                @foreach ($privilegeOptions as $value => $label)
-                                    <option value="{{ $value }}" {{ request('privilege', '') === (string) $value ? 'selected' : '' }}>
-                                        {{ ucfirst($label) }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="xl:max-w-sm">
+                            <x-filter-dropdown
+                                id="privilege"
+                                name="privilege"
+                                :label="__('Privilege')"
+                                :value="request('privilege', '')"
+                                :options="['' => __('All Privileges')] + collect($privilegeOptions)
+                                    ->mapWithKeys(fn ($optionLabel, $optionValue) => [(string) $optionValue => ucfirst($optionLabel)])
+                                    ->all()"
+                            />
                         </div>
                     </div>
 

@@ -72,25 +72,35 @@
                         <x-input-with-icon id="search" name="search" type="text" :value="request('search')" :placeholder="__('HWID, IP, Username, Email')" icon="search" />
                     </div>
 
-                    <div class="space-y-2 md:col-span-3 xl:col-span-2">
-                        <label for="status" class="form-label">{{ __('Status') }}</label>
-                        <select name="status" id="status" class="form-select">
-                            <option value="">{{ __('All') }}</option>
-                            <option value="bound" {{ request('status') === 'bound' ? 'selected' : '' }}>{{ __('Currently Bound') }}</option>
-                            <option value="unbound" {{ request('status') === 'unbound' ? 'selected' : '' }}>{{ __('Unbound') }}</option>
-                            <option value="never_bound" {{ request('status') === 'never_bound' ? 'selected' : '' }}>{{ __('Never Bound') }}</option>
-                        </select>
+                    <div class="md:col-span-3 xl:col-span-2">
+                        <x-filter-dropdown
+                            id="status"
+                            name="status"
+                            :label="__('Status')"
+                            :value="request('status')"
+                            :options="[
+                                '' => __('All'),
+                                'bound' => __('Currently Bound'),
+                                'unbound' => __('Unbound'),
+                                'never_bound' => __('Never Bound'),
+                            ]"
+                        />
                     </div>
 
-                    <div class="space-y-2 md:col-span-3 xl:col-span-2">
-                        <label for="date_range" class="form-label">{{ __('Date Range') }}</label>
-                        <select name="date_range" id="date_range" class="form-select">
-                            <option value="">{{ __('All Time') }}</option>
-                            <option value="24h" {{ request('date_range') === '24h' ? 'selected' : '' }}>{{ __('Last 24 Hours') }}</option>
-                            <option value="7d" {{ request('date_range') === '7d' ? 'selected' : '' }}>{{ __('Last 7 Days') }}</option>
-                            <option value="30d" {{ request('date_range') === '30d' ? 'selected' : '' }}>{{ __('Last 30 Days') }}</option>
-                            <option value="90d" {{ request('date_range') === '90d' ? 'selected' : '' }}>{{ __('Last 90 Days') }}</option>
-                        </select>
+                    <div class="md:col-span-3 xl:col-span-2">
+                        <x-filter-dropdown
+                            id="date_range"
+                            name="date_range"
+                            :label="__('Date Range')"
+                            :value="request('date_range')"
+                            :options="[
+                                '' => __('All Time'),
+                                '24h' => __('Last 24 Hours'),
+                                '7d' => __('Last 7 Days'),
+                                '30d' => __('Last 30 Days'),
+                                '90d' => __('Last 90 Days'),
+                            ]"
+                        />
                     </div>
 
                     <div class="space-y-2 md:col-span-12 xl:col-span-3 filter-box-actions">
@@ -120,13 +130,18 @@
                         <input type="number" name="min_reset_count" id="min_reset_count" value="{{ request('min_reset_count') }}" min="0" class="form-input w-full">
                     </div>
 
-                    <div class="space-y-2 md:col-span-4 xl:col-span-3">
-                        <label for="account_status" class="form-label">{{ __('Account Status') }}</label>
-                        <select name="account_status" id="account_status" class="form-select">
-                            <option value="">{{ __('All') }}</option>
-                            <option value="active" {{ request('account_status') === 'active' ? 'selected' : '' }}>{{ __('Active') }}</option>
-                            <option value="suspended" {{ request('account_status') === 'suspended' ? 'selected' : '' }}>{{ __('Suspended') }}</option>
-                        </select>
+                    <div class="md:col-span-4 xl:col-span-3">
+                        <x-filter-dropdown
+                            id="account_status"
+                            name="account_status"
+                            :label="__('Account Status')"
+                            :value="request('account_status')"
+                            :options="[
+                                '' => __('All'),
+                                'active' => __('Active'),
+                                'suspended' => __('Suspended'),
+                            ]"
+                        />
                     </div>
 
                     <div class="hidden xl:block xl:col-span-3"></div>

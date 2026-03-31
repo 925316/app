@@ -61,39 +61,40 @@
                         />
                     </div>
 
-                    <div class="space-y-2 lg:col-span-2">
-                        <label for="status" class="form-label">{{ __('Status') }}</label>
-                        <select name="status" id="status" class="form-select">
-                            @foreach ($statusOptions as $value => $label)
-                                <option value="{{ $value }}" {{ $currentFilters['status'] === $value ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div class="lg:col-span-2">
+                        <x-filter-dropdown
+                            id="status"
+                            name="status"
+                            :label="__('Status')"
+                            :value="$currentFilters['status']"
+                            :options="collect($statusOptions)->mapWithKeys(fn ($optionLabel, $optionValue) => [(string) $optionValue => $optionLabel])->all()"
+                        />
                     </div>
 
-                    <div class="space-y-2 lg:col-span-3">
-                        <label for="sort" class="form-label">{{ __('Sort By') }}</label>
-                        <select name="sort" id="sort" class="form-select">
-                            <option value="last_heartbeat_at" {{ $currentFilters['sort'] === 'last_heartbeat_at' ? 'selected' : '' }}>
-                                {{ __('Last Heartbeat') }}
-                            </option>
-                            <option value="created_at" {{ $currentFilters['sort'] === 'created_at' ? 'selected' : '' }}>
-                                {{ __('Created') }}
-                            </option>
-                        </select>
+                    <div class="lg:col-span-3">
+                        <x-filter-dropdown
+                            id="sort"
+                            name="sort"
+                            :label="__('Sort By')"
+                            :value="$currentFilters['sort']"
+                            :options="[
+                                'last_heartbeat_at' => __('Last Heartbeat'),
+                                'created_at' => __('Created'),
+                            ]"
+                        />
                     </div>
 
-                    <div class="space-y-2 lg:col-span-2">
-                        <label for="direction" class="form-label">{{ __('Direction') }}</label>
-                        <select name="direction" id="direction" class="form-select">
-                            <option value="desc" {{ $currentFilters['direction'] === 'desc' ? 'selected' : '' }}>
-                                {{ __('Desc') }}
-                            </option>
-                            <option value="asc" {{ $currentFilters['direction'] === 'asc' ? 'selected' : '' }}>
-                                {{ __('Asc') }}
-                            </option>
-                        </select>
+                    <div class="lg:col-span-2">
+                        <x-filter-dropdown
+                            id="direction"
+                            name="direction"
+                            :label="__('Direction')"
+                            :value="$currentFilters['direction']"
+                            :options="[
+                                'desc' => __('Desc'),
+                                'asc' => __('Asc'),
+                            ]"
+                        />
                     </div>
                 </div>
 

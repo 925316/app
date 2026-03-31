@@ -42,34 +42,34 @@
 
             <x-filter-box :action="route('logs.index')" :title="__('Filter logs')">
                 <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-2 xl:grid-cols-5">
-                    <div class="space-y-2">
-                        <label for="event_type" class="form-label">{{ __('Event Type') }}</label>
-                        <select name="event_type" id="event_type" class="form-select">
-                            <option value="">{{ __('All Types') }}</option>
-                            @foreach ($eventTypes as $type)
-                                <option value="{{ $type }}" {{ request('event_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
-                            @endforeach
-                        </select>
+                    <div>
+                        <x-filter-dropdown
+                            id="event_type"
+                            name="event_type"
+                            :label="__('Event Type')"
+                            :value="request('event_type')"
+                            :options="['' => __('All Types')] + collect($eventTypes)->mapWithKeys(fn ($type) => [$type => $type])->all()"
+                        />
                     </div>
 
-                    <div class="space-y-2">
-                        <label for="event_level" class="form-label">{{ __('Event Level') }}</label>
-                        <select name="event_level" id="event_level" class="form-select">
-                            <option value="">{{ __('All Levels') }}</option>
-                            @foreach ($eventLevels as $value => $label)
-                                <option value="{{ $value }}" {{ request('event_level') == $value ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
+                    <div>
+                        <x-filter-dropdown
+                            id="event_level"
+                            name="event_level"
+                            :label="__('Event Level')"
+                            :value="request('event_level')"
+                            :options="['' => __('All Levels')] + collect($eventLevels)->mapWithKeys(fn ($optionLabel, $optionValue) => [(string) $optionValue => $optionLabel])->all()"
+                        />
                     </div>
 
-                    <div class="space-y-2">
-                        <label for="account_id" class="form-label">{{ __('Account') }}</label>
-                        <select name="account_id" id="account_id" class="form-select">
-                            <option value="">{{ __('All Accounts') }}</option>
-                            @foreach ($accounts as $account)
-                                <option value="{{ $account->id }}" {{ (string) request('account_id') === (string) $account->id ? 'selected' : '' }}>{{ $account->username }}</option>
-                            @endforeach
-                        </select>
+                    <div>
+                        <x-filter-dropdown
+                            id="account_id"
+                            name="account_id"
+                            :label="__('Account')"
+                            :value="request('account_id')"
+                            :options="['' => __('All Accounts')] + $accounts->pluck('username', 'id')->mapWithKeys(fn ($optionLabel, $optionValue) => [(string) $optionValue => $optionLabel])->all()"
+                        />
                     </div>
 
                     <div class="space-y-2 xl:col-span-2">
