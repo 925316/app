@@ -95,9 +95,9 @@
                             <p class="section-kicker">{{ __('Account') }}</p>
                             <div class="min-w-0">
                                 @if ($log->account)
-                                    <a href="#" class="table-title table-truncate text-sm hover:underline" title="{{ $log->account->username }}">
+                                    <p class="table-title table-truncate text-sm" title="{{ $log->account->username }}">
                                         {{ $log->account->username }}
-                                    </a>
+                                    </p>
                                 @else
                                     <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('System') }}</p>
                                 @endif
@@ -108,9 +108,9 @@
                             <p class="section-kicker">{{ __('Actor') }}</p>
                             <div class="min-w-0">
                                 @if ($log->actor)
-                                    <a href="#" class="table-title table-truncate text-sm hover:underline" title="{{ $log->actor->username }}">
+                                    <p class="table-title table-truncate text-sm" title="{{ $log->actor->username }}">
                                         {{ $log->actor->username }}
-                                    </a>
+                                    </p>
                                 @else
                                     <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('System') }}</p>
                                 @endif

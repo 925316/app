@@ -114,20 +114,20 @@
                 @endif
             </x-filter-box>
 
-            <x-table :headers="$tableHeaders" :emptyColspan="$tableColspan" ariaLabel="{{ __('Managed packages table') }}">
+            <x-table :headers="$tableHeaders" :emptyColspan="$tableColspan" compact="true" ariaLabel="{{ __('Managed packages table') }}">
                 @forelse ($releases as $release)
                     <tr class="table-row">
                         @if ($isAdmin ?? false)
-                            <td class="table-cell whitespace-nowrap">
+                            <td class="table-cell">
                                 <input type="checkbox" class="release-checkbox form-checkbox" value="{{ $release->id }}">
                             </td>
                         @endif
 
-                        <td class="table-cell-primary whitespace-nowrap">
+                        <td class="table-cell-primary">
                             {{ $release->version }}
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             <div class="flex flex-wrap items-center gap-2">
                                 <x-status-badge :status="$release->release_channel === 'stable' ? 'active' : 'info'" :text="ucfirst($release->release_channel)" />
 
@@ -137,11 +137,11 @@
                             </div>
                         </td>
 
-                        <td class="table-cell whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                        <td class="table-cell text-sm text-gray-600 dark:text-gray-300">
                             {{ $release->created_at ? $release->created_at->format('Y-m-d H:i') : __('Unknown') }}
                         </td>
 
-                        <td class="table-cell whitespace-nowrap">
+                        <td class="table-cell">
                             @if ($release->virus_detection_url)
                                 <x-status-badge status="verified" :text="__('Available')" />
                             @else
@@ -150,19 +150,11 @@
                         </td>
 
                         @if ($isAdmin ?? false)
-                            <td class="table-cell whitespace-nowrap text-right">
+                            <td class="table-cell text-right">
                                 <div class="table-actions">
                                     <a href="{{ route('packages.show', $release) }}" class="table-action table-action--primary">
                                         {{ __('Details') }}
                                     </a>
-
-                                    <form class="inline delete-form" method="POST" action="{{ route('packages.destroy', $release) }}" data-version="{{ $release->version }}" onsubmit="return confirmDelete('{{ $release->version }}')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="table-action table-action--danger">
-                                            {{ __('Delete') }}
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         @endif
@@ -186,10 +178,6 @@
 
             @if ($isAdmin ?? false)
                 <script>
-                    function confirmDelete(version) {
-                        return confirm(`Are you sure you want to delete package version ${version}? This action cannot be undone.`);
-                    }
-
                     document.addEventListener('DOMContentLoaded', function() {
                         const headerRow = document.querySelector('table thead tr');
                         if (headerRow && !document.getElementById('select-all')) {

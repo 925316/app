@@ -224,17 +224,17 @@
                     @endif
                 </x-filter-box>
 
-                <x-table :headers="[__('Version'), __('Channel'), __('Released'), __('Hash'), __('Actions')]" :emptyColspan="5" ariaLabel="{{ __('Packages table') }}">
+                <x-table :headers="[__('Version'), __('Channel'), __('Released'), __('Hash'), __('Actions')]" :emptyColspan="5" compact="true" ariaLabel="{{ __('Packages table') }}">
                     @forelse ($releases as $release)
                         <tr class="table-row">
-                            <td class="table-cell-primary whitespace-nowrap">
+                            <td class="table-cell-primary">
                                 <div class="table-stack table-stack-tight">
                                     <div class="table-title text-sm">{{ $release->version }}</div>
                                     <div class="table-meta">{{ __('Release ID:') }} {{ $release->id }}</div>
                                 </div>
                             </td>
 
-                            <td class="table-cell whitespace-nowrap">
+                            <td class="table-cell">
                                 <div class="flex flex-wrap items-center gap-2">
                                     <x-status-badge :status="$release->release_channel === 'stable' ? 'active' : 'info'" :text="ucfirst($release->release_channel)" />
 
@@ -244,7 +244,7 @@
                                 </div>
                             </td>
 
-                            <td class="table-cell whitespace-nowrap">
+                            <td class="table-cell">
                                 @if ($release->created_at)
                                     <div class="table-stack table-stack-tight">
                                         <div>{{ $release->created_at->format('Y-m-d H:i') }}</div>
@@ -255,7 +255,7 @@
                                 @endif
                             </td>
 
-                            <td class="table-cell whitespace-nowrap">
+                            <td class="table-cell">
                                 @if ($release->virus_detection_url)
                                     <div class="table-stack table-stack-tight">
                                         <x-status-badge status="verified" :text="__('Available')" />
@@ -266,17 +266,11 @@
                                 @endif
                             </td>
 
-                            <td class="table-cell whitespace-nowrap text-right">
+                            <td class="table-cell text-right">
                                 <div class="table-actions">
                                     <a href="{{ route('packages.show', $release) }}" class="table-action table-action--primary">
                                         {{ __('Details') }}
                                     </a>
-
-                                    @if ($canDownload ?? false && $release->id)
-                                        <a href="{{ route('packages.download', ['release' => $release->id]) }}" class="table-action table-action--success">
-                                            {{ __('Download') }}
-                                        </a>
-                                    @endif
                                 </div>
                             </td>
                         </tr>

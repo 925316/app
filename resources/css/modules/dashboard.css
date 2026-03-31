@@ -84,23 +84,31 @@
 }
 
 /* sessions/logs pages — card inner text */
-[data-shell-theme='cinematic'] .card-shell .text-gray-900,
-[data-shell-theme='cinematic'] .card-shell .dark\:text-gray-100 {
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell .text-gray-900,
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell .dark\:text-gray-100,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell .text-gray-900,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell .dark\:text-gray-100 {
     color: rgb(var(--shell-ink));
 }
 
-[data-shell-theme='cinematic'] .card-shell .text-gray-600,
-[data-shell-theme='cinematic'] .card-shell .dark\:text-gray-300 {
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell .text-gray-600,
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell .dark\:text-gray-300,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell .text-gray-600,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell .dark\:text-gray-300 {
     color: rgb(var(--shell-muted));
 }
 
-[data-shell-theme='cinematic'] .card-shell .text-gray-700,
-[data-shell-theme='cinematic'] .card-shell .dark\:text-gray-200 {
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell .text-gray-700,
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell .dark\:text-gray-200,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell .text-gray-700,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell .dark\:text-gray-200 {
     color: rgb(var(--shell-ink) / 0.85);
 }
 
-[data-shell-theme='cinematic'] .card-shell-muted .text-gray-600,
-[data-shell-theme='cinematic'] .card-shell-muted .dark\:text-gray-300 {
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell-muted .text-gray-600,
+[data-shell-theme='cinematic'] [data-page='dashboard-admin'] .card-shell-muted .dark\:text-gray-300,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell-muted .text-gray-600,
+[data-shell-theme='cinematic'] [data-page='dashboard-user'] .card-shell-muted .dark\:text-gray-300 {
     color: rgb(var(--shell-muted));
 }
 
