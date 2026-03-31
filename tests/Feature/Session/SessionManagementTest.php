@@ -211,7 +211,9 @@ it('session detail page renders bounded copy buttons for full session token devi
         ->assertSee('onclick="copySessionField(this)"', false)
         ->assertSee('table-inline-copy w-full max-w-full justify-start', false)
         ->assertSee('aria-label="Copy full device hash"', false)
-        ->assertSee('Copied');
+        ->assertDontSee('function copySessionField', false)
+        ->assertDontSee('function copyTextValue', false)
+        ->assertDontSee('function copyDeviceValue', false);
 });
 
 // --- Destroy ---
