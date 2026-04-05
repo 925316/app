@@ -14,6 +14,30 @@
     box-shadow: var(--shell-shadow-sm);
 }
 
+[data-shell-theme='cinematic'] [data-dashboard-summary] {
+    gap: 1.5rem;
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-summary-chip] {
+    min-width: min(100%, 16rem);
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-section-title-group] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+[data-shell-theme='cinematic'] [data-dashboard-grid='metrics'] {
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    [data-shell-theme='cinematic'] [data-dashboard-grid='metrics'] {
+        gap: 1.25rem;
+    }
+}
+
 [data-shell-theme='cinematic'] [data-dashboard-summary]::before,
 [data-shell-theme='cinematic'] [data-dashboard-card]::before,
 [data-shell-theme='cinematic'] [data-page='dashboard-user'] [data-license-state]::before {
@@ -64,18 +88,23 @@
 [data-shell-theme='cinematic'] .dashboard-section-title {
     color: rgb(var(--shell-ink));
     letter-spacing: 0.01em;
+    line-height: 1.05;
+    text-wrap: balance;
 }
 
 [data-shell-theme='cinematic'] .dashboard-metric-label {
     color: rgb(var(--shell-muted));
+    line-height: 1.6;
 }
 
 [data-shell-theme='cinematic'] .dashboard-stat-number {
     color: rgb(var(--shell-ink));
+    letter-spacing: -0.03em;
 }
 
 [data-shell-theme='cinematic'] .dashboard-meta-text {
     color: rgb(var(--shell-muted));
+    line-height: 1.7;
 }
 
 /* Usage stat big numbers — override purple/indigo Tailwind colors in cinematic mode */

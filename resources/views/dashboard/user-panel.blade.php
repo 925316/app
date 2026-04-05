@@ -9,7 +9,7 @@
 
     <div class="space-y-8" data-page="dashboard-user">
         <section class="card-shell flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between" data-dashboard-summary>
-            <div class="space-y-2">
+            <div class="space-y-2" data-dashboard-section-title-group>
                 <p class="section-kicker">{{ __('Account overview') }}</p>
                 <h2 class="dashboard-section-title text-2xl font-semibold">{{ __('Your current access') }}</h2>
                 <p class="dashboard-meta-text max-w-2xl text-sm">
@@ -30,7 +30,7 @@
         </section>
 
         <section class="space-y-4" data-dashboard-section="license-status">
-            <div class="space-y-1">
+            <div class="space-y-1" data-dashboard-section-title-group>
                 <p class="section-kicker">{{ __('License') }}</p>
                 <h2 class="dashboard-section-title text-xl font-semibold">{{ __('License status') }}</h2>
             </div>

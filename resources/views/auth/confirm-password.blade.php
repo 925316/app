@@ -3,14 +3,14 @@
         <x-auth-header title="{{ __('Confirm Password') }}" :subtitle="__('Please confirm your password to continue')" />
 
         <x-auth-card>
-            <form method="POST" action="{{ route('password.confirm') }}" class="space-y-6" data-auth-form="confirm-password">
+            <form method="POST" action="{{ route('password.confirm') }}" class="form-stack" data-auth-form="confirm-password">
                 @csrf
 
                 <div class="card-shell-muted form-note text-sm">
                     {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
                 </div>
 
-                <div class="space-y-2">
+                <div class="form-field">
                     <x-input-label for="password" :value="__('Password')" class="form-label" />
                     <x-input-with-icon id="password" name="password" type="password" required autocomplete="current-password"
                         placeholder="••••••••" icon="lock" />

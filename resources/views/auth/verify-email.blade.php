@@ -3,7 +3,7 @@
         <x-auth-header title="{{ __('Verify Your Email') }}" :subtitle="__('Please verify your email address to get started')" />
 
         <x-auth-card>
-            <div class="space-y-6" data-auth-form="verify-email">
+            <div class="form-stack" data-auth-form="verify-email">
                 <div class="card-shell-muted form-note text-sm">
                     {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
                 </div>

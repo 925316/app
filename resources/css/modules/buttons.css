@@ -5,23 +5,27 @@
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
     border-radius: var(--radius-lg);
     color: rgb(var(--color-text-primary));
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    letter-spacing: 0.01em;
 }
 
 .btn-primary {
     color: rgb(255 255 255);
-    background-color: rgb(var(--color-text-primary));
+    background: linear-gradient(180deg, rgb(var(--color-text-primary)), rgb(31 41 55));
     @apply focus:ring-offset-0;
     @apply active:scale-[0.98];
+    box-shadow: var(--shadow-md);
 }
 
 .btn-primary:hover {
-    background-color: rgb(var(--color-text-secondary));
+    background: linear-gradient(180deg, rgb(31 41 55), rgb(var(--color-text-secondary)));
 }
 
 .btn-secondary {
     @apply border;
     color: rgb(var(--color-text-secondary));
-    background-color: rgb(var(--color-surface-card));
+    background: linear-gradient(180deg, rgb(var(--color-surface-card)), rgb(var(--color-surface-card-muted) / 0.86));
     border-color: rgb(var(--color-border-subtle));
     @apply active:scale-[0.98];
 }
@@ -34,7 +38,7 @@
 
 .btn-danger {
     color: rgb(255 255 255);
-    background-color: rgb(var(--color-danger));
+    background: linear-gradient(180deg, rgb(var(--color-danger)), rgb(185 28 28));
     @apply active:scale-[0.98];
 }
 
@@ -53,6 +57,8 @@
     @apply p-2 rounded-lg focus:ring-2;
     color: rgb(var(--color-text-secondary));
     @apply transition-all duration-150;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
 }
 
 .btn-icon:hover {
@@ -155,10 +161,11 @@
 }
 
 [data-shell-theme='cinematic'] .btn {
-    border-radius: 0.95rem;
+    border-radius: 1rem;
     border-color: rgb(var(--shell-line) / 0.46);
-    font-weight: 600;
-    letter-spacing: 0.01em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     box-shadow: var(--shell-shadow-sm);
     backdrop-filter: blur(16px);
 }
@@ -177,23 +184,23 @@
 [data-shell-theme='cinematic'] .btn-blue {
     color: rgb(var(--shell-ink));
     border-color: rgb(var(--shell-brand) / 0.34);
-    background: rgb(var(--shell-brand) / 0.14);
+    background: linear-gradient(180deg, rgb(var(--shell-brand) / 0.18), rgb(var(--shell-brand) / 0.12));
 }
 
 [data-shell-theme='cinematic'] .btn-primary:hover,
 [data-shell-theme='cinematic'] .btn-blue:hover {
     border-color: rgb(var(--shell-brand) / 0.52);
-    background: rgb(var(--shell-brand) / 0.2);
+    background: linear-gradient(180deg, rgb(var(--shell-brand) / 0.24), rgb(var(--shell-brand) / 0.16));
 }
 
 [data-shell-theme='cinematic'] .btn-secondary {
     color: rgb(var(--shell-ink));
     border-color: rgb(var(--shell-line) / 0.48);
-    background: rgb(var(--shell-surface) / 0.7);
+    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.78), rgb(var(--shell-surface-soft) / 0.68));
 }
 
 [data-shell-theme='cinematic'] .btn-secondary:hover {
-    background: rgb(var(--shell-surface-soft) / 0.84);
+    background: linear-gradient(180deg, rgb(var(--shell-surface-soft) / 0.88), rgb(var(--shell-surface-panel-soft) / 0.74));
     border-color: rgb(var(--shell-line-strong) / 0.52);
 }
 
@@ -204,7 +211,7 @@
 [data-shell-theme='cinematic'] .btn-danger {
     color: rgb(var(--shell-ink));
     border-color: rgb(var(--color-danger) / 0.34);
-    background: rgb(var(--color-danger) / 0.12);
+    background: linear-gradient(180deg, rgb(var(--color-danger) / 0.18), rgb(var(--color-danger) / 0.1));
 }
 
 [data-shell-theme='cinematic'] .btn-green,
@@ -218,23 +225,23 @@
 
 [data-shell-theme='cinematic'] .btn-green {
     border-color: rgb(var(--shell-accent) / 0.34);
-    background: rgb(var(--shell-accent) / 0.12);
+    background: linear-gradient(180deg, rgb(var(--shell-accent) / 0.18), rgb(var(--shell-accent) / 0.1));
 }
 
 [data-shell-theme='cinematic'] .btn-yellow {
     color: rgb(var(--shell-ink));
     border-color: rgb(var(--shell-glow) / 0.34);
-    background: rgb(var(--shell-glow) / 0.12);
+    background: linear-gradient(180deg, rgb(var(--shell-glow) / 0.18), rgb(var(--shell-glow) / 0.1));
 }
 
 [data-shell-theme='cinematic'] .btn-purple {
     border-color: rgb(var(--shell-line-strong) / 0.42);
-    background: rgb(var(--shell-line-strong) / 0.14);
+    background: linear-gradient(180deg, rgb(var(--shell-line-strong) / 0.18), rgb(var(--shell-line-strong) / 0.1));
 }
 
 [data-shell-theme='cinematic'] .btn-indigo {
     border-color: rgb(var(--shell-brand) / 0.3);
-    background: rgb(var(--shell-brand) / 0.1);
+    background: linear-gradient(180deg, rgb(var(--shell-brand) / 0.16), rgb(var(--shell-brand) / 0.08));
 }
 
 [data-shell-theme='cinematic'] .btn-danger:hover {

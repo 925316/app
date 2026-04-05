@@ -3,11 +3,11 @@
 input.form-input,
 select.form-select,
 .form-select {
-    height: 2.5rem;
-    min-height: 2.5rem;
-    padding-block: 0.375rem;
-    padding-inline: 0.9375rem;
-    border-radius: 0.95rem;
+    height: 2.75rem;
+    min-height: 2.75rem;
+    padding-block: 0.5rem;
+    padding-inline: 1rem;
+    border-radius: 1rem;
     line-height: 1rem;
 }
 
@@ -19,6 +19,7 @@ select.form-select,
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     color: rgb(var(--color-text-primary));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6);
 }
 
 .dark .form-input {
@@ -46,7 +47,7 @@ select.form-select,
 
 .input-icon-slot {
     @apply pointer-events-none absolute inset-y-0 left-0 flex items-center;
-    padding-inline-start: 0.9375rem;
+    padding-inline-start: 1rem;
 }
 
 .input-icon {
@@ -54,14 +55,16 @@ select.form-select,
     color: rgb(var(--color-text-muted));
 }
 
-.input-with-icon {
-    padding-inline-start: 2.875rem;
-    padding-inline-end: 0.9375rem;
+.form-input.input-with-icon,
+input.form-input.input-with-icon {
+    padding-inline-start: 3rem;
+    padding-inline-end: 1rem;
 }
 
 .form-label {
     @apply block text-sm font-medium mb-1.5;
     color: rgb(var(--color-text-secondary));
+    letter-spacing: 0.01em;
 }
 
 .form-error {
@@ -71,6 +74,12 @@ select.form-select,
 
 .form-group {
     @apply space-y-1.5;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
 }
 
 .form-checkbox {
@@ -89,6 +98,7 @@ select.form-select,
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     color: rgb(var(--color-text-primary));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6);
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
     background-position: right 0.875rem center;
@@ -117,6 +127,7 @@ select.form-select,
     border-color: rgb(var(--color-border-subtle));
     background-color: rgb(var(--color-surface-card));
     color: rgb(var(--color-text-primary));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6);
 }
 
 .dark .form-textarea {
@@ -135,6 +146,12 @@ select.form-select,
 
 .form-section {
     @apply space-y-6;
+}
+
+.form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
 }
 
 .form-help {
@@ -159,6 +176,8 @@ select.form-select,
     border: 1px solid rgb(var(--color-border-subtle) / 0.8);
     background: rgb(var(--color-surface-card-muted) / 0.82);
     box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-xl);
+    padding: 1rem 1.125rem;
 }
 
 .form-divider {
@@ -178,7 +197,9 @@ select.form-select,
     border-color: rgb(var(--shell-line) / 0.5);
     background: rgb(var(--shell-surface) / 0.84);
     color: rgb(var(--shell-ink));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4);
+    box-shadow:
+        inset 0 1px 0 rgb(var(--shell-panel-edge) / 0.28),
+        0 10px 24px rgb(var(--shell-canvas) / 0.08);
 }
 
 :root.dark [data-shell-theme='cinematic'] .form-input,
@@ -203,6 +224,10 @@ select.form-select,
 
 [data-shell-theme='cinematic'] .form-label {
     color: rgb(var(--shell-ink));
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 [data-shell-theme='cinematic'] .form-help {
@@ -219,6 +244,11 @@ select.form-select,
 
 [data-shell-theme='cinematic'] .form-note {
     color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] .form-panel {
+    border-color: rgb(var(--shell-line) / 0.36);
+    background: linear-gradient(160deg, rgb(var(--shell-surface) / 0.62), rgb(var(--shell-surface-soft) / 0.48));
 }
 
 [data-shell-theme='cinematic'] .form-link {

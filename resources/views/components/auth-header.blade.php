@@ -8,8 +8,10 @@
             <x-application-logo class="h-10 w-10" />
         @endif
     </div>
-    <h1 id="auth-panel-title" class="auth-header-title mt-6 text-3xl font-bold">{{ $title }}</h1>
-    @if ($subtitle)
-        <p class="auth-header-subtitle mt-2 text-sm">{{ $subtitle }}</p>
-    @endif
+    <div class="auth-header-copy">
+        <h1 id="auth-panel-title" class="auth-header-title text-3xl font-bold sm:text-[2.4rem]">{{ $title }}</h1>
+        @if ($subtitle)
+            <p class="auth-header-subtitle text-sm">{{ $subtitle }}</p>
+        @endif
+    </div>
 </div>

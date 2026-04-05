@@ -40,6 +40,101 @@
     padding-block: 2rem;
 }
 
+.app-shell-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.app-shell-page-lead {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.app-shell-page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.app-shell-page-dot {
+    height: 0.5rem;
+    width: 0.5rem;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background: rgb(var(--shell-brand));
+    box-shadow: 0 0 0 0.3rem rgb(var(--shell-brand) / 0.12);
+}
+
+.app-shell-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1rem 1.125rem;
+}
+
+@media (min-width: 640px) {
+    .app-shell-header-bar {
+        padding-inline: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .app-shell-header-bar {
+        padding-inline: 2rem;
+    }
+}
+
+.app-shell-header-main {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 0.875rem;
+}
+
+.app-shell-header-pivot {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.app-shell-header-rule {
+    height: 1px;
+    width: min(8rem, 32vw);
+    border-radius: 9999px;
+    background: linear-gradient(90deg, rgb(var(--shell-line-strong) / 0.72), transparent);
+}
+
+.app-shell-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.75rem;
+    border: 1px solid rgb(var(--shell-line) / 0.42);
+    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.22), transparent 16%, transparent 84%, rgb(var(--shell-surface-soft) / 0.18));
+    box-shadow: inset 0 1px 0 rgb(var(--shell-panel-edge) / 0.08);
+}
+
+.app-shell-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto auto 0;
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, rgb(var(--shell-brand) / 0.4), rgb(var(--shell-accent) / 0.14), transparent 72%);
+    pointer-events: none;
+}
+
+.app-shell-section-heading {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
 .app-toolbar {
     display: flex;
     flex-direction: column;
@@ -153,6 +248,7 @@
         linear-gradient(180deg, rgb(var(--shell-surface-panel) / 0.92), rgb(var(--shell-surface-panel-soft) / 0.82));
     box-shadow: var(--shell-shadow-sm);
     backdrop-filter: blur(20px) saturate(135%);
+    min-height: var(--layout-header-height);
 }
 
 [data-shell-theme='cinematic'] .app-shell-footer {
@@ -173,21 +269,26 @@
     letter-spacing: -0.02em;
     line-height: 0.92;
     color: rgb(var(--shell-ink));
+    text-wrap: balance;
 }
 
 [data-shell-theme='cinematic'] .app-shell-page-kicker {
     color: rgb(var(--shell-glow));
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
 }
 
 [data-shell-theme='cinematic'] [data-app-shell-header-copy] {
     display: flex;
     min-width: 0;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.55rem;
 }
 
 [data-shell-theme='cinematic'] .app-shell-page-meta {
     min-width: 0;
+    flex-wrap: wrap;
 }
 
 [data-shell-theme='cinematic'] .app-shell-page-meta-separator {
@@ -198,10 +299,17 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: 42rem;
 }
 
 [data-shell-theme='cinematic'] .app-shell-content-wrap {
-    padding-block: 2rem 2.5rem;
+    padding-block: 1.5rem 2.75rem;
+}
+
+@media (min-width: 768px) {
+    [data-shell-theme='cinematic'] .app-shell-content-wrap {
+        padding-block: 2rem 3rem;
+    }
 }
 
 [data-shell-theme='cinematic'] #app-main-content {
@@ -221,6 +329,7 @@
     background: rgb(var(--shell-surface) / 0.78);
     color: rgb(var(--shell-muted));
     box-shadow: var(--shell-shadow-sm);
+    border-radius: 1rem;
 }
 
 [data-shell-theme='cinematic'] .app-shell-mobile-toggle:hover {
@@ -228,8 +337,53 @@
     background: rgb(var(--shell-surface-soft) / 0.95);
 }
 
+[data-shell-theme='cinematic'] .app-shell-mobile-toggle:focus-visible {
+    outline: 2px solid rgb(var(--shell-focus) / 0.42);
+    outline-offset: 3px;
+}
+
 [data-shell-theme='cinematic'] .app-toolbar-actions {
     gap: 0.75rem;
+}
+
+[data-shell-theme='cinematic'] .app-shell-header-bar {
+    position: relative;
+}
+
+[data-shell-theme='cinematic'] .app-shell-header-main {
+    gap: 1rem;
+}
+
+[data-shell-theme='cinematic'] .app-shell-header-pivot {
+    padding-top: 0.15rem;
+}
+
+[data-shell-theme='cinematic'] .app-shell-page-eyebrow {
+    color: rgb(var(--shell-muted));
+}
+
+[data-shell-theme='cinematic'] .app-shell-page-subtitle,
+[data-shell-theme='cinematic'] .app-shell-page-eyebrow {
+    font-size: 0.8125rem;
+}
+
+[data-shell-theme='cinematic'] .app-shell-page-subtitle {
+    letter-spacing: 0.01em;
+}
+
+[data-shell-theme='cinematic'] .app-shell-stack {
+    gap: 1.75rem;
+}
+
+[data-shell-theme='cinematic'] .app-shell-frame {
+    background:
+        linear-gradient(180deg, rgb(var(--shell-surface) / 0.28), transparent 18%, transparent 82%, rgb(var(--shell-surface-soft) / 0.2)),
+        linear-gradient(160deg, rgb(var(--shell-surface-panel) / 0.24), rgb(var(--shell-surface-panel-soft) / 0.18));
+}
+
+[data-shell-theme='cinematic'] .app-shell-section-heading .section-kicker,
+[data-shell-theme='cinematic'] .app-shell-section-heading .app-shell-page-kicker {
+    align-self: flex-start;
 }
 
 .topnav-shell {
@@ -438,7 +592,7 @@
     min-height: 100vh;
     align-items: center;
     justify-content: center;
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.25rem;
 }
 
 .guest-shell::before,
@@ -468,7 +622,115 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 32rem;
+    max-width: var(--layout-auth-max);
+}
+
+.guest-shell__frame > * {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-shell-stack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.auth-shell-stack::before {
+    content: '';
+    position: absolute;
+    inset: 4.75rem 1rem 1rem;
+    border-radius: 2rem;
+    border: 1px solid rgb(var(--shell-line) / 0.24);
+    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.1), transparent 34%, rgb(var(--shell-surface-soft) / 0.12));
+    pointer-events: none;
+}
+
+.auth-card-shell-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.auth-card-shell-footer {
+    border-top: 1px solid rgb(var(--shell-line) / 0.28);
+    padding-top: 1.5rem;
+}
+
+.auth-header-shell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding-inline: 1.25rem;
+}
+
+.auth-header-shell::after {
+    content: '';
+    width: 7rem;
+    height: 1px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, transparent, rgb(var(--shell-line-strong) / 0.82), transparent);
+}
+
+.auth-header-mark {
+    position: relative;
+    border-radius: 1.5rem;
+    border: 1px solid rgb(var(--shell-line) / 0.4);
+    background: linear-gradient(160deg, rgb(var(--shell-surface) / 0.92), rgb(var(--shell-surface-soft) / 0.8));
+    box-shadow: var(--shell-shadow-md);
+}
+
+.auth-header-mark::before {
+    content: '';
+    position: absolute;
+    inset: -0.625rem;
+    border-radius: inherit;
+    border: 1px solid rgb(var(--shell-line) / 0.18);
+    pointer-events: none;
+}
+
+.auth-header-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.auth-header-title {
+    text-wrap: balance;
+}
+
+.auth-header-subtitle {
+    max-width: 30rem;
+    line-height: 1.7;
+}
+
+[data-shell-theme='cinematic'] .guest-shell {
+    padding-block: 2.5rem;
+}
+
+@media (min-width: 768px) {
+    [data-shell-theme='cinematic'] .guest-shell {
+        padding-block: 3.5rem;
+    }
+}
+
+[data-shell-theme='cinematic'] .auth-shell-stack {
+    gap: 1.75rem;
+}
+
+[data-shell-theme='cinematic'] .auth-header-shell {
+    padding-top: 0.25rem;
+}
+
+[data-shell-theme='cinematic'] .auth-header-mark {
+    color: rgb(var(--shell-ink));
+}
+
+[data-shell-theme='cinematic'] .auth-card-shell-footer {
+    border-color: rgb(var(--shell-line) / 0.3);
 }
 
 @media (prefers-reduced-motion: reduce) {

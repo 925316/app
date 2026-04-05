@@ -49,7 +49,7 @@ test('input with icon forwards caller attributes to the input while preserving b
         ->toContain('maxlength="32"')
         ->toContain('aria-describedby="email-help"')
         ->toContain('data-track="email"')
-        ->toContain('class="form-input input-with-icon block w-full py-3 pl-10 pr-3 ring-2"')
+        ->toContain('class="form-input input-with-icon block w-full ring-2"')
         ->toContain('disabled')
         ->toContain('readonly')
         ->toContain('required')

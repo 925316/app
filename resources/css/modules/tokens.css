@@ -27,11 +27,12 @@
     --shadow-md: 0 4px 12px 0 rgb(15 23 42 / 0.08);
     --shadow-lg: 0 12px 24px -8px rgb(15 23 42 / 0.15);
 
-    --layout-content-max: 80rem;
-    --layout-content-padding-x: 1rem;
-    --layout-header-height: 4.5rem;
+    --layout-content-max: 86rem;
+    --layout-content-padding-x: clamp(1rem, 1vw + 0.8rem, 1.75rem);
+    --layout-header-height: 5rem;
     --layout-sidebar-expanded: 16rem;
     --layout-sidebar-collapsed: 4rem;
+    --layout-auth-max: 36rem;
 }
 
 :root.dark {
@@ -73,8 +74,13 @@
     --shell-line: 194 176 191;
     --shell-line-strong: 166 148 170;
     --shell-brand: 198 93 66;
+    --shell-brand-soft: 229 169 146;
     --shell-accent: 31 136 162;
+    --shell-accent-soft: 159 213 222;
     --shell-glow: 150 108 47;
+    --shell-glow-soft: 224 197 156;
+    --shell-focus: 34 150 179;
+    --shell-panel-edge: 255 255 255;
     --shell-shadow-sm: 0 12px 30px rgb(74 46 45 / 0.08);
     --shell-shadow-md: 0 24px 64px rgb(74 46 45 / 0.14);
     --shell-shadow-lg: 0 36px 96px rgb(49 31 43 / 0.18);
@@ -98,8 +104,13 @@
     --shell-line: 97 82 138;
     --shell-line-strong: 125 110 167;
     --shell-brand: 255 112 73;
+    --shell-brand-soft: 255 181 155;
     --shell-accent: 92 223 255;
+    --shell-accent-soft: 176 239 255;
     --shell-glow: 255 221 133;
+    --shell-glow-soft: 255 236 178;
+    --shell-focus: 106 223 255;
+    --shell-panel-edge: 255 255 255;
     --shell-shadow-sm: 0 16px 36px rgb(0 0 0 / 0.24);
     --shell-shadow-md: 0 28px 72px rgb(0 0 0 / 0.32);
     --shell-shadow-lg: 0 40px 112px rgb(0 0 0 / 0.42);

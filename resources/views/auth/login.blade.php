@@ -3,17 +3,17 @@
         <x-auth-header title="{{ __('Welcome Back') }}" :subtitle="__('Sign in to your account to continue')" />
 
         <x-auth-card :showStatus="true">
-            <form method="POST" action="{{ route('login') }}" class="space-y-6" data-auth-form="login">
+            <form method="POST" action="{{ route('login') }}" class="form-stack" data-auth-form="login">
                 @csrf
 
-                <div class="space-y-2">
+                <div class="form-field">
                     <x-input-label for="email" :value="__('Email Address')" class="form-label" />
                     <x-input-with-icon id="email" name="email" type="email" :value="old('email')" required autofocus
                         autocomplete="username" :placeholder="__('Email address')" icon="mail" />
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
 
-                <div class="space-y-2">
+                <div class="form-field">
                     <x-input-label for="password" :value="__('Password')" class="form-label" />
                     <x-input-with-icon id="password" name="password" type="password" required
                         autocomplete="current-password" :placeholder="__('Password')" icon="lock" />
@@ -40,7 +40,7 @@
                 </x-primary-button>
             </form>
 
-            <div class="mt-6 text-center" data-auth-footer>
+            <div class="auth-card-shell-footer text-center" data-auth-footer>
                 <p class="form-note text-sm">
                     {{ __("Don't have an account?") }}
                     <a href="{{ route('register') }}" class="form-link font-medium">

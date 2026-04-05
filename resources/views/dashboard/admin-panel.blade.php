@@ -18,7 +18,7 @@
 
     <div class="space-y-8" data-page="dashboard-admin">
         <section class="card-shell flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between" data-dashboard-summary>
-            <div class="space-y-2">
+            <div class="space-y-2" data-dashboard-section-title-group>
                 <p class="section-kicker">{{ __('Operations snapshot') }}</p>
                 <h2 class="dashboard-section-title text-2xl font-semibold">{{ __('Administrative overview') }}</h2>
                 <p class="dashboard-meta-text max-w-2xl text-sm">
@@ -38,7 +38,7 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Dashboard statistics') }}" data-dashboard-stat-grid>
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Dashboard statistics') }}" data-dashboard-stat-grid data-dashboard-grid="metrics">
             <x-stat-card :title="__('Total Accounts')" :value="$stats['total_accounts'] ?? 0" icon="users" iconColor="icon-blue" />
             <x-stat-card :title="__('Active Licenses')" :value="$stats['active_licenses'] ?? 0" icon="success" iconColor="icon-green" />
             <x-stat-card :title="__('Suspended Accounts')" :value="$stats['suspended_accounts'] ?? 0" icon="warning" iconColor="icon-red" />
@@ -106,7 +106,7 @@
         </section>
 
         <section class="space-y-6" data-dashboard-database>
-            <div class="space-y-2">
+            <div class="space-y-2" data-dashboard-section-title-group>
                 <p class="section-kicker">{{ __('Infrastructure') }}</p>
                 <h2 class="dashboard-section-title text-xl font-semibold">{{ __('Database system status') }}</h2>
             </div>

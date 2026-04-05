@@ -31,11 +31,14 @@
 @endphp
 
 <a @if ($active ?? false) aria-current="page" @endif
-    {{ $attributes->merge(['class' => $classes, 'aria-label' => $accessibleLabel]) }}>
-    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        {!! $iconSvg !!}
-    </svg>
-    <span class="sidebar-link-label ml-3 truncate" x-show="mobileSidebarOpen || $store.sidebar.open">
+    {{ $attributes->merge(['class' => $classes, 'aria-label' => $accessibleLabel]) }}
+    :class="{ 'sidebar-link-collapsed': isDesktop && !$store.sidebar.open }">
+    <span class="sidebar-link-icon" aria-hidden="true">
+        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {!! $iconSvg !!}
+        </svg>
+    </span>
+    <span class="sidebar-link-label truncate" x-cloak x-show="isDesktop ? $store.sidebar.open : mobileSidebarOpen">
         {{ $slot }}
     </span>
 </a>

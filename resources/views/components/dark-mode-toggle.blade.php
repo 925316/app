@@ -20,10 +20,12 @@
         'topnav-utility-link p-2 rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-500 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900' => $variant === 'icon',
         'sidebar-account-toggle flex w-full items-center justify-between gap-3 rounded-2xl px-1 py-2.5 text-left transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2' => $variant === 'sidebar-row',
     ]) }}
+    x-bind:class="{ 'justify-center px-0': {{ $variant === 'sidebar-row' ? 'true' : 'false' }} && isDesktop && !$store.sidebar.open }"
     x-bind:aria-label="dark ? @js(__('Switch to light mode')) : @js(__('Switch to dark mode'))"
     x-bind:aria-pressed="dark ? 'true' : 'false'">
     @if ($variant === 'sidebar-row')
-        <span class="sidebar-account-toggle-copy flex items-center gap-3">
+        <span class="sidebar-account-toggle-copy flex items-center gap-3" x-cloak
+            x-show="isDesktop ? $store.sidebar.open : mobileSidebarOpen">
             <span class="sidebar-account-label text-sm font-medium">{{ $label }}</span>
         </span>
     @endif

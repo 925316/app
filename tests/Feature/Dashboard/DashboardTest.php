@@ -34,7 +34,28 @@ it('sidebar nav link keeps an accessible name when the visible label is toggled'
         ->toContain('aria-current="page"')
         ->toContain('aria-label="Dashboard"')
         ->toContain('aria-hidden="true"')
-        ->toContain('x-show="mobileSidebarOpen || $store.sidebar.open"');
+        ->toContain('x-show="isDesktop ? $store.sidebar.open : mobileSidebarOpen"')
+        ->toContain("'sidebar-link-collapsed': isDesktop && !\$store.sidebar.open");
+});
+
+it('sidebar layout reserves desktop space with shell offsets instead of calc width coupling', function () {
+    $account = createAdmin();
+
+    actingAs($account);
+
+    $html = Blade::render(<<<'BLADE'
+        <x-app-sidebar-layout>
+            <div>Dashboard content</div>
+        </x-app-sidebar-layout>
+    BLADE);
+
+    expect($html)
+        ->toContain("'lg:ml-64': \$store.sidebar.open")
+        ->toContain("'lg:ml-16': !\$store.sidebar.open")
+        ->not->toContain('lg:w-[calc(100%-16rem)]')
+        ->not->toContain('lg:w-[calc(100%-4rem)]')
+        ->not->toContain('lg:pl-64')
+        ->not->toContain('lg:pl-16');
 });
 
 it('sidebar account section renders a bottom footer with profile row, logout icon, and theme row', function () {
@@ -54,8 +75,14 @@ it('sidebar account section renders a bottom footer with profile row, logout ico
         ->toContain('action="'.route('profile.update-locale').'"')
         ->toContain('name="locale"')
         ->toContain('x-ref="localeInput"')
+        ->toContain('x-ref="localeTrigger"')
         ->toContain('data-sidebar-language-trigger')
         ->toContain('data-sidebar-language-menu')
+        ->toContain('role="listbox"')
+        ->toContain('role="option"')
+        ->toContain('aria-controls="sidebar-locale-menu"')
+        ->toContain('@keydown.down.prevent="openLocaleMenu()"')
+        ->toContain('@keydown.enter.prevent="selectLocale(')
         ->toContain('x-transition.opacity.origin.bottom.right')
         ->toContain('sidebar-account-icon')
         ->toContain('sidebar-locale-select')
@@ -63,8 +90,26 @@ it('sidebar account section renders a bottom footer with profile row, logout ico
         ->toContain('sidebar-account-collapsed')
         ->toContain('sidebar-account-toggle')
         ->toContain('aria-pressed=')
+        ->toContain('x-show="isDesktop ? $store.sidebar.open : mobileSidebarOpen"')
+        ->toContain('x-show="isDesktop && !$store.sidebar.open"')
         ->not->toContain('sidebar-utility-link sidebar-account-entry')
         ->not->toContain('>Log Out<');
+});
+
+it('mobile sidebar dialog exposes an accessible name', function () {
+    $account = createAdmin();
+
+    actingAs($account);
+
+    $html = Blade::render(<<<'BLADE'
+        <x-app-sidebar-layout>
+            <div>Dashboard content</div>
+        </x-app-sidebar-layout>
+    BLADE);
+
+    expect($html)
+        ->toContain('aria-label="'.__('Primary navigation').'"')
+        ->toContain('id="app-sidebar-title"');
 });
 
 it('sidebar language menu is positioned above the trigger to avoid bottom overflow', function () {

@@ -27,7 +27,9 @@
 
     <main id="guest-content" class="guest-shell" aria-label="{{ __('Guest content') }}">
         <div class="guest-shell__frame">
-            {{ $slot }}
+            <div class="auth-shell-stack">
+                {{ $slot }}
+            </div>
         </div>
     </main>
 </body>
