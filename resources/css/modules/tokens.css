@@ -36,24 +36,24 @@
 }
 
 :root.dark {
-    --color-surface-page: 3 9 18;
-    --color-surface-page-alt: 7 16 30;
-    --color-surface-card: 9 18 34;
-    --color-surface-card-muted: 14 28 48;
-    --color-surface-elevated: 8 19 36;
+    --color-surface-page: 8 11 17;
+    --color-surface-page-alt: 13 18 26;
+    --color-surface-card: 16 22 31;
+    --color-surface-card-muted: 22 28 39;
+    --color-surface-elevated: 18 24 34;
 
-    --color-text-primary: 241 245 249;
-    --color-text-secondary: 203 213 225;
-    --color-text-muted: 148 163 184;
-    --color-border-subtle: 38 58 82;
-    --color-border-strong: 63 88 116;
+    --color-text-primary: 236 239 244;
+    --color-text-secondary: 181 191 205;
+    --color-text-muted: 129 141 158;
+    --color-border-subtle: 54 64 78;
+    --color-border-strong: 76 89 106;
 
-    --color-brand: 103 186 229;
-    --color-brand-hover: 72 157 203;
-    --color-brand-soft: 19 57 87;
-    --color-success: 74 222 128;
-    --color-warning: 251 191 36;
-    --color-danger: 248 113 113;
+    --color-brand: 91 160 194;
+    --color-brand-hover: 76 140 172;
+    --color-brand-soft: 25 49 66;
+    --color-success: 97 185 133;
+    --color-warning: 206 163 91;
+    --color-danger: 212 108 108;
 }
 
 [data-shell-theme='cinematic'] {
@@ -87,31 +87,31 @@
 }
 
 :root.dark [data-shell-theme='cinematic'] {
-    --shell-canvas: 8 7 16;
-    --shell-canvas-alt: 17 14 29;
-    --shell-canvas-grid: 91 77 132;
-    --shell-canvas-grid-strong: 121 106 163;
-    --shell-surface: 22 18 37;
-    --shell-surface-soft: 31 27 49;
-    --shell-surface-strong: 38 33 58;
-    --shell-surface-rgb: 22 18 37;
-    --shell-surface-soft-rgb: 31 27 49;
-    --shell-surface-panel: 20 17 35;
-    --shell-surface-panel-soft: 29 25 47;
-    --shell-surface-panel-muted: 35 30 56;
-    --shell-ink: 245 243 239;
-    --shell-muted: 173 164 190;
-    --shell-line: 97 82 138;
-    --shell-line-strong: 125 110 167;
-    --shell-brand: 255 112 73;
-    --shell-brand-soft: 255 181 155;
-    --shell-accent: 92 223 255;
-    --shell-accent-soft: 176 239 255;
-    --shell-glow: 255 221 133;
-    --shell-glow-soft: 255 236 178;
-    --shell-focus: 106 223 255;
-    --shell-panel-edge: 255 255 255;
-    --shell-shadow-sm: 0 16px 36px rgb(0 0 0 / 0.24);
-    --shell-shadow-md: 0 28px 72px rgb(0 0 0 / 0.32);
-    --shell-shadow-lg: 0 40px 112px rgb(0 0 0 / 0.42);
+    --shell-canvas: 10 11 15;
+    --shell-canvas-alt: 18 20 27;
+    --shell-canvas-grid: 67 73 89;
+    --shell-canvas-grid-strong: 88 95 114;
+    --shell-surface: 22 24 31;
+    --shell-surface-soft: 28 31 40;
+    --shell-surface-strong: 36 39 49;
+    --shell-surface-rgb: 22 24 31;
+    --shell-surface-soft-rgb: 28 31 40;
+    --shell-surface-panel: 18 20 27;
+    --shell-surface-panel-soft: 24 27 35;
+    --shell-surface-panel-muted: 31 34 43;
+    --shell-ink: 234 232 227;
+    --shell-muted: 152 156 166;
+    --shell-line: 69 75 90;
+    --shell-line-strong: 95 102 119;
+    --shell-brand: 203 118 87;
+    --shell-brand-soft: 164 118 100;
+    --shell-accent: 103 156 176;
+    --shell-accent-soft: 141 181 194;
+    --shell-glow: 184 151 97;
+    --shell-glow-soft: 202 181 137;
+    --shell-focus: 114 164 184;
+    --shell-panel-edge: 214 219 229;
+    --shell-shadow-sm: 0 14px 30px rgb(0 0 0 / 0.2);
+    --shell-shadow-md: 0 24px 56px rgb(0 0 0 / 0.3);
+    --shell-shadow-lg: 0 34px 92px rgb(0 0 0 / 0.4);
 }

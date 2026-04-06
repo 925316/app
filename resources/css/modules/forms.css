@@ -249,6 +249,7 @@ input.form-input.input-with-icon {
 [data-shell-theme='cinematic'] .form-panel {
     border-color: rgb(var(--shell-line) / 0.36);
     background: linear-gradient(160deg, rgb(var(--shell-surface) / 0.62), rgb(var(--shell-surface-soft) / 0.48));
+    box-shadow: var(--shell-shadow-sm);
 }
 
 [data-shell-theme='cinematic'] .form-link {
@@ -259,12 +260,36 @@ input.form-input.input-with-icon {
     color: rgb(var(--shell-accent));
 }
 
-[data-shell-theme='cinematic'] .form-panel {
-    border-color: rgb(var(--shell-line) / 0.42);
-    background: rgb(var(--shell-surface-soft) / 0.72);
-    box-shadow: var(--shell-shadow-sm);
-}
-
 [data-shell-theme='cinematic'] .form-divider {
     border-color: rgb(var(--shell-line) / 0.34);
+}
+
+:root.dark [data-shell-theme='cinematic'] .form-input,
+:root.dark [data-shell-theme='cinematic'] .form-select,
+:root.dark [data-shell-theme='cinematic'] .form-textarea {
+    border-color: rgb(var(--shell-line) / 0.34);
+    background: rgb(var(--shell-surface) / 0.66);
+    color: rgb(var(--shell-ink));
+    box-shadow:
+        inset 0 1px 0 rgb(var(--shell-panel-edge) / 0.04),
+        0 8px 18px rgb(0 0 0 / 0.12);
+}
+
+:root.dark [data-shell-theme='cinematic'] .form-input:focus,
+:root.dark [data-shell-theme='cinematic'] .form-select:focus,
+:root.dark [data-shell-theme='cinematic'] .form-textarea:focus,
+:root.dark [data-shell-theme='cinematic'] .form-checkbox:focus {
+    --tw-ring-color: rgb(var(--shell-accent) / 0.18);
+    border-color: rgb(var(--shell-accent) / 0.42);
+    box-shadow: 0 0 0 1px rgb(var(--shell-accent) / 0.16);
+}
+
+:root.dark [data-shell-theme='cinematic'] .form-panel {
+    border-color: rgb(var(--shell-line) / 0.3);
+    background: linear-gradient(160deg, rgb(var(--shell-surface) / 0.52), rgb(var(--shell-surface-soft) / 0.44));
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.16);
+}
+
+:root.dark [data-shell-theme='cinematic'] .form-divider {
+    border-color: rgb(var(--shell-line) / 0.26);
 }

@@ -921,3 +921,120 @@
     border-color: rgb(var(--shell-line) / 0.46);
     box-shadow: var(--shell-shadow-sm);
 }
+
+:root.dark [data-shell-theme='cinematic'] .card,
+:root.dark [data-shell-theme='cinematic'] .card-form,
+:root.dark [data-shell-theme='cinematic'] .card-info,
+:root.dark [data-shell-theme='cinematic'] .card-stat,
+:root.dark [data-shell-theme='cinematic'] .card-shell,
+:root.dark [data-shell-theme='cinematic'] .card-glass,
+:root.dark [data-shell-theme='cinematic'] .card-shell-muted {
+    border-color: rgb(var(--shell-line) / 0.36);
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.2);
+}
+
+:root.dark [data-shell-theme='cinematic'] .card,
+:root.dark [data-shell-theme='cinematic'] .card-form,
+:root.dark [data-shell-theme='cinematic'] .card-info,
+:root.dark [data-shell-theme='cinematic'] .card-stat,
+:root.dark [data-shell-theme='cinematic'] .card-shell,
+:root.dark [data-shell-theme='cinematic'] .card-glass {
+    background: linear-gradient(160deg, rgb(var(--shell-surface-panel) / 0.92), rgb(var(--shell-surface-panel-soft) / 0.86));
+    backdrop-filter: blur(14px) saturate(106%);
+}
+
+:root.dark [data-shell-theme='cinematic'] .card-shell-muted {
+    background: linear-gradient(155deg, rgb(var(--shell-surface-panel-muted) / 0.82), rgb(var(--shell-surface-panel-soft) / 0.72));
+    backdrop-filter: blur(10px) saturate(104%);
+}
+
+:root.dark [data-shell-theme='cinematic'] .card::before,
+:root.dark [data-shell-theme='cinematic'] .card-form::before,
+:root.dark [data-shell-theme='cinematic'] .card-info::before,
+:root.dark [data-shell-theme='cinematic'] .card-stat::before,
+:root.dark [data-shell-theme='cinematic'] .card-shell::before,
+:root.dark [data-shell-theme='cinematic'] .card-glass::before,
+:root.dark [data-shell-theme='cinematic'] .card-shell-muted::before {
+    background: linear-gradient(180deg, rgb(var(--shell-panel-edge) / 0.06), transparent 20%, transparent 82%, rgb(255 255 255 / 0.01));
+    box-shadow: inset 0 1px 0 rgb(var(--shell-panel-edge) / 0.04);
+}
+
+:root.dark [data-shell-theme='cinematic'] .auth-card-shell::before {
+    background: linear-gradient(90deg, rgb(var(--shell-brand) / 0.7), rgb(var(--shell-glow) / 0.42), rgb(var(--shell-accent) / 0.42));
+}
+
+:root.dark [data-shell-theme='cinematic'] .card-icon-container {
+    background-image: linear-gradient(155deg, rgb(var(--shell-surface) / 0.82), rgb(var(--shell-surface-soft) / 0.72));
+    border-color: rgb(var(--shell-line) / 0.32);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.14);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-box-shell {
+    border-color: rgb(var(--shell-line) / 0.34);
+    background: linear-gradient(145deg, rgb(var(--shell-surface) / 0.84), rgb(var(--shell-surface-soft) / 0.74));
+    box-shadow: 0 14px 32px rgb(0 0 0 / 0.18);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-box-icon,
+:root.dark [data-shell-theme='cinematic'] .filter-box-summary,
+:root.dark [data-shell-theme='cinematic'] .filter-dropdown-trigger,
+:root.dark [data-shell-theme='cinematic'] .filter-badge {
+    border-color: rgb(var(--shell-line) / 0.32);
+    background: rgb(var(--shell-surface) / 0.66);
+    box-shadow: 0 8px 18px rgb(0 0 0 / 0.14);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-dropdown-trigger:hover,
+:root.dark [data-shell-theme='cinematic'] .filter-dropdown-option:hover {
+    background: rgb(var(--shell-surface-soft) / 0.46);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-dropdown-menu {
+    border-color: rgb(var(--shell-line) / 0.38);
+    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.94), rgb(var(--shell-surface-soft) / 0.9));
+    box-shadow: 0 18px 44px rgb(0 0 0 / 0.26);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-dropdown-option.is-active,
+:root.dark [data-shell-theme='cinematic'] .filter-badge--blue {
+    background: rgb(var(--shell-brand) / 0.12);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-badge--green {
+    background: rgb(var(--shell-accent) / 0.12);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-badge--orange,
+:root.dark [data-shell-theme='cinematic'] .filter-badge--yellow {
+    background: rgb(var(--shell-glow) / 0.12);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-badge--purple {
+    background: rgb(var(--shell-line-strong) / 0.12);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-badge--neutral {
+    background: rgb(var(--shell-surface-soft) / 0.68);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-badge:hover {
+    border-color: rgb(var(--shell-line-strong) / 0.4);
+}
+
+:root.dark [data-shell-theme='cinematic'] .filter-badge__remove:hover {
+    background: rgb(var(--shell-line-strong) / 0.12);
+}
+
+:root.dark [data-shell-theme='cinematic'] .active-filters {
+    border-color: rgb(var(--shell-line) / 0.28);
+    background: rgb(var(--shell-surface-soft) / 0.34);
+}
+
+:root.dark [data-shell-theme='cinematic'] .card-stat {
+    border-left-color: rgb(var(--shell-brand) / 0.48);
+}
+
+:root.dark [data-shell-theme='cinematic'] .error-card-icon {
+    border-color: rgb(var(--shell-line) / 0.34);
+    box-shadow: 0 8px 18px rgb(0 0 0 / 0.14);
+}
