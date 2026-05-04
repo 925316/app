@@ -340,16 +340,15 @@
 
 [data-shell-theme='cinematic'] .table-wrapper,
 [data-shell-theme='cinematic'] .table-responsive {
-    border-color: rgb(var(--shell-line) / 0.5);
-    background:
-        linear-gradient(180deg, rgb(var(--shell-surface) / 0.92), rgb(var(--shell-surface-soft) / 0.82));
+    border-color: rgb(var(--shell-line) / 0.3);
+    background: rgb(var(--shell-surface) / 0.7);
     box-shadow: var(--shell-shadow-sm);
 }
 
 [data-shell-theme='cinematic'] .table-toolbar,
 [data-shell-theme='cinematic'] .table-pagination {
-    border-color: rgb(var(--shell-line) / 0.34);
-    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.52), rgb(var(--shell-surface-soft) / 0.42));
+    border-color: rgb(var(--shell-line) / 0.25);
+    background: rgb(var(--shell-surface) / 0.5);
 }
 
 [data-shell-theme='cinematic'] .table-search-input {
@@ -358,11 +357,8 @@
 }
 
 [data-shell-theme='cinematic'] .table-header {
-    background:
-        linear-gradient(180deg, rgb(var(--shell-surface-soft) / 0.98), rgb(var(--shell-surface) / 0.82));
-    box-shadow:
-        inset 0 -1px 0 rgb(var(--shell-line) / 0.32),
-        inset 0 1px 0 rgb(255 255 255 / 0.14);
+    background: rgb(var(--shell-surface-soft) / 0.6);
+    box-shadow: inset 0 -1px 0 rgb(var(--shell-line) / 0.25);
 }
 
 [data-shell-theme='cinematic'] .table-header-cell {
@@ -408,10 +404,9 @@
 }
 
 [data-shell-theme='cinematic'] .table-avatar {
-    border-color: rgb(var(--shell-line) / 0.44);
-    background: linear-gradient(145deg, rgb(var(--shell-brand) / 0.22), rgb(var(--shell-accent) / 0.16));
+    border-color: rgb(var(--shell-line) / 0.3);
+    background: rgb(var(--shell-brand) / 0.15);
     color: rgb(var(--shell-ink));
-    box-shadow: var(--shell-shadow-sm);
 }
 
 [data-shell-theme='cinematic'] .data-table th[data-column] .sort-icon {
@@ -435,11 +430,9 @@
 }
 
 [data-shell-theme='cinematic'] .table-action {
-    border-color: rgb(var(--shell-line) / 0.4);
-    background: rgb(var(--shell-surface) / 0.84);
+    border-color: rgb(var(--shell-line) / 0.3);
+    background: rgb(var(--shell-surface) / 0.6);
     color: rgb(var(--shell-muted));
-    box-shadow: var(--shell-shadow-sm);
-    backdrop-filter: blur(10px);
 }
 
 [data-shell-theme='cinematic'] .table-action:hover {

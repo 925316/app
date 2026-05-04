@@ -583,10 +583,8 @@
 [data-shell-theme='cinematic'] .card-shell,
 [data-shell-theme='cinematic'] .card-glass,
 [data-shell-theme='cinematic'] .card-shell-muted {
-    position: relative;
-    isolation: isolate;
-    border-color: rgb(var(--shell-line) / 0.5);
-    box-shadow: var(--shell-shadow-md);
+    border-color: rgb(var(--shell-line) / 0.3);
+    box-shadow: var(--shell-shadow-sm);
 }
 
 [data-shell-theme='cinematic'] .card,
@@ -595,15 +593,11 @@
 [data-shell-theme='cinematic'] .card-stat,
 [data-shell-theme='cinematic'] .card-shell,
 [data-shell-theme='cinematic'] .card-glass {
-    background:
-        linear-gradient(160deg, rgb(var(--shell-surface-panel) / 0.95), rgb(var(--shell-surface-panel-soft) / 0.92));
-    backdrop-filter: blur(18px) saturate(120%);
+    background: rgb(var(--shell-surface-panel) / 0.8);
 }
 
 [data-shell-theme='cinematic'] .card-shell-muted {
-    background:
-        linear-gradient(155deg, rgb(var(--shell-surface-panel-muted) / 0.9), rgb(var(--shell-surface-panel-soft) / 0.78));
-    backdrop-filter: blur(14px) saturate(115%);
+    background: rgb(var(--shell-surface-panel-muted) / 0.7);
 }
 
 [data-shell-theme='cinematic'] .card::before,
@@ -612,18 +606,7 @@
 [data-shell-theme='cinematic'] .card-stat::before,
 [data-shell-theme='cinematic'] .card-shell::before,
 [data-shell-theme='cinematic'] .card-glass::before,
-[data-shell-theme='cinematic'] .card-shell-muted::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background:
-        linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 24%, transparent 76%, rgb(255 255 255 / 0.04));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
-    z-index: -1;
-}
-
+[data-shell-theme='cinematic'] .card-shell-muted::before,
 :root.dark [data-shell-theme='cinematic'] .card::before,
 :root.dark [data-shell-theme='cinematic'] .card-form::before,
 :root.dark [data-shell-theme='cinematic'] .card-info::before,
@@ -631,9 +614,7 @@
 :root.dark [data-shell-theme='cinematic'] .card-shell::before,
 :root.dark [data-shell-theme='cinematic'] .card-glass::before,
 :root.dark [data-shell-theme='cinematic'] .card-shell-muted::before {
-    background:
-        linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 24%, transparent 78%, rgb(255 255 255 / 0.02));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+    display: none;
 }
 
 [data-shell-theme='cinematic'] .section-kicker {
@@ -929,8 +910,8 @@
 :root.dark [data-shell-theme='cinematic'] .card-shell,
 :root.dark [data-shell-theme='cinematic'] .card-glass,
 :root.dark [data-shell-theme='cinematic'] .card-shell-muted {
-    border-color: rgb(var(--shell-line) / 0.36);
-    box-shadow: 0 18px 40px rgb(0 0 0 / 0.2);
+    border-color: rgb(var(--shell-line) / 0.25);
+    box-shadow: var(--shell-shadow-sm);
 }
 
 :root.dark [data-shell-theme='cinematic'] .card,
@@ -939,13 +920,11 @@
 :root.dark [data-shell-theme='cinematic'] .card-stat,
 :root.dark [data-shell-theme='cinematic'] .card-shell,
 :root.dark [data-shell-theme='cinematic'] .card-glass {
-    background: linear-gradient(160deg, rgb(var(--shell-surface-panel) / 0.92), rgb(var(--shell-surface-panel-soft) / 0.86));
-    backdrop-filter: blur(14px) saturate(106%);
+    background: rgb(var(--shell-surface-panel) / 0.75);
 }
 
 :root.dark [data-shell-theme='cinematic'] .card-shell-muted {
-    background: linear-gradient(155deg, rgb(var(--shell-surface-panel-muted) / 0.82), rgb(var(--shell-surface-panel-soft) / 0.72));
-    backdrop-filter: blur(10px) saturate(104%);
+    background: rgb(var(--shell-surface-panel-muted) / 0.65);
 }
 
 :root.dark [data-shell-theme='cinematic'] .card::before,
@@ -955,33 +934,30 @@
 :root.dark [data-shell-theme='cinematic'] .card-shell::before,
 :root.dark [data-shell-theme='cinematic'] .card-glass::before,
 :root.dark [data-shell-theme='cinematic'] .card-shell-muted::before {
-    background: linear-gradient(180deg, rgb(var(--shell-panel-edge) / 0.06), transparent 20%, transparent 82%, rgb(255 255 255 / 0.01));
-    box-shadow: inset 0 1px 0 rgb(var(--shell-panel-edge) / 0.04);
+    display: none;
 }
 
 :root.dark [data-shell-theme='cinematic'] .auth-card-shell::before {
-    background: linear-gradient(90deg, rgb(var(--shell-brand) / 0.7), rgb(var(--shell-glow) / 0.42), rgb(var(--shell-accent) / 0.42));
+    display: none;
 }
 
 :root.dark [data-shell-theme='cinematic'] .card-icon-container {
-    background-image: linear-gradient(155deg, rgb(var(--shell-surface) / 0.82), rgb(var(--shell-surface-soft) / 0.72));
-    border-color: rgb(var(--shell-line) / 0.32);
-    box-shadow: 0 8px 20px rgb(0 0 0 / 0.14);
+    background: rgb(var(--shell-surface) / 0.6);
+    border-color: rgb(var(--shell-line) / 0.25);
 }
 
 :root.dark [data-shell-theme='cinematic'] .filter-box-shell {
-    border-color: rgb(var(--shell-line) / 0.34);
-    background: linear-gradient(145deg, rgb(var(--shell-surface) / 0.84), rgb(var(--shell-surface-soft) / 0.74));
-    box-shadow: 0 14px 32px rgb(0 0 0 / 0.18);
+    border-color: rgb(var(--shell-line) / 0.25);
+    background: rgb(var(--shell-surface) / 0.7);
+    box-shadow: var(--shell-shadow-sm);
 }
 
 :root.dark [data-shell-theme='cinematic'] .filter-box-icon,
 :root.dark [data-shell-theme='cinematic'] .filter-box-summary,
 :root.dark [data-shell-theme='cinematic'] .filter-dropdown-trigger,
 :root.dark [data-shell-theme='cinematic'] .filter-badge {
-    border-color: rgb(var(--shell-line) / 0.32);
-    background: rgb(var(--shell-surface) / 0.66);
-    box-shadow: 0 8px 18px rgb(0 0 0 / 0.14);
+    border-color: rgb(var(--shell-line) / 0.25);
+    background: rgb(var(--shell-surface) / 0.55);
 }
 
 :root.dark [data-shell-theme='cinematic'] .filter-dropdown-trigger:hover,
@@ -990,9 +966,9 @@
 }
 
 :root.dark [data-shell-theme='cinematic'] .filter-dropdown-menu {
-    border-color: rgb(var(--shell-line) / 0.38);
-    background: linear-gradient(180deg, rgb(var(--shell-surface) / 0.94), rgb(var(--shell-surface-soft) / 0.9));
-    box-shadow: 0 18px 44px rgb(0 0 0 / 0.26);
+    border-color: rgb(var(--shell-line) / 0.3);
+    background: rgb(var(--shell-surface) / 0.85);
+    box-shadow: var(--shell-shadow-md);
 }
 
 :root.dark [data-shell-theme='cinematic'] .filter-dropdown-option.is-active,
