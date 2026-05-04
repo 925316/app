@@ -194,18 +194,16 @@ input.form-input.input-with-icon {
 [data-shell-theme='cinematic'] .form-input,
 [data-shell-theme='cinematic'] .form-select,
 [data-shell-theme='cinematic'] .form-textarea {
-    border-color: rgb(var(--shell-line) / 0.5);
-    background: rgb(var(--shell-surface) / 0.84);
+    border-color: rgb(var(--shell-line) / 0.35);
+    background: rgb(var(--shell-surface) / 0.7);
     color: rgb(var(--shell-ink));
-    box-shadow:
-        inset 0 1px 0 rgb(var(--shell-panel-edge) / 0.28),
-        0 10px 24px rgb(var(--shell-canvas) / 0.08);
 }
 
 :root.dark [data-shell-theme='cinematic'] .form-input,
 :root.dark [data-shell-theme='cinematic'] .form-select,
 :root.dark [data-shell-theme='cinematic'] .form-textarea {
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
+    border-color: rgb(var(--shell-line) / 0.3);
+    background: rgb(var(--shell-surface) / 0.6);
 }
 
 [data-shell-theme='cinematic'] .form-input::placeholder,
@@ -267,12 +265,9 @@ input.form-input.input-with-icon {
 :root.dark [data-shell-theme='cinematic'] .form-input,
 :root.dark [data-shell-theme='cinematic'] .form-select,
 :root.dark [data-shell-theme='cinematic'] .form-textarea {
-    border-color: rgb(var(--shell-line) / 0.34);
-    background: rgb(var(--shell-surface) / 0.66);
+    border-color: rgb(var(--shell-line) / 0.25);
+    background: rgb(var(--shell-surface) / 0.55);
     color: rgb(var(--shell-ink));
-    box-shadow:
-        inset 0 1px 0 rgb(var(--shell-panel-edge) / 0.04),
-        0 8px 18px rgb(0 0 0 / 0.12);
 }
 
 :root.dark [data-shell-theme='cinematic'] .form-input:focus,
@@ -285,9 +280,9 @@ input.form-input.input-with-icon {
 }
 
 :root.dark [data-shell-theme='cinematic'] .form-panel {
-    border-color: rgb(var(--shell-line) / 0.3);
-    background: linear-gradient(160deg, rgb(var(--shell-surface) / 0.52), rgb(var(--shell-surface-soft) / 0.44));
-    box-shadow: 0 12px 28px rgb(0 0 0 / 0.16);
+    border-color: rgb(var(--shell-line) / 0.25);
+    background: rgb(var(--shell-surface) / 0.5);
+    box-shadow: var(--shell-shadow-sm);
 }
 
 :root.dark [data-shell-theme='cinematic'] .form-divider {
