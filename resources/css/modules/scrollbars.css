@@ -1,40 +1,64 @@
+/* Global Scrollbar Styling */
+
 [data-shell-theme='cinematic'] {
     --scrollbar-track: var(--shell-surface-panel-soft);
     --scrollbar-thumb: var(--shell-line-strong);
     --scrollbar-thumb-hover: var(--shell-brand);
 }
 
-html.landing-page {
-    --scrollbar-track: var(--landing-surface-soft);
-    --scrollbar-thumb: var(--landing-line-strong);
-    --scrollbar-thumb-hover: var(--landing-brand);
+/* Define scrollbar variables on html for the main page scrollbar */
+html {
+    --scrollbar-track: 242 233 222;
+    --scrollbar-thumb: 166 148 170;
+    --scrollbar-thumb-hover: 198 93 66;
 }
 
-[data-shell-theme='cinematic'] #app-main-content,
+html.dark {
+    --scrollbar-track: 28 22 42;
+    --scrollbar-thumb: 85 70 110;
+    --scrollbar-thumb-hover: 255 128 86;
+}
+
 html.landing-page {
+    --scrollbar-track: 243 234 224;
+    --scrollbar-thumb: 175 156 181;
+    --scrollbar-thumb-hover: 211 92 62;
+}
+
+html.landing-page.dark {
+    --scrollbar-track: 44 34 61;
+    --scrollbar-thumb: 156 132 194;
+    --scrollbar-thumb-hover: 255 128 86;
+}
+
+/* Apply scrollbar styling to everything */
+html, body, * {
     scrollbar-width: thin;
-    scrollbar-color: rgb(var(--scrollbar-thumb)) rgb(var(--scrollbar-track));
+    scrollbar-color: rgb(var(--scrollbar-thumb, 100 100 120)) rgb(var(--scrollbar-track, 25 25 35));
 }
 
-[data-shell-theme='cinematic'] #app-main-content::-webkit-scrollbar,
-html.landing-page::-webkit-scrollbar {
-    width: 0.75rem;
-    height: 0.75rem;
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
 }
 
-[data-shell-theme='cinematic'] #app-main-content::-webkit-scrollbar-track,
-html.landing-page::-webkit-scrollbar-track {
-    background: rgb(var(--scrollbar-track));
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-[data-shell-theme='cinematic'] #app-main-content::-webkit-scrollbar-thumb,
-html.landing-page::-webkit-scrollbar-thumb {
-    border: 2px solid rgb(var(--scrollbar-track));
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
     border-radius: 9999px;
-    background: rgb(var(--scrollbar-thumb));
+    background: rgb(var(--scrollbar-thumb, 100 100 120) / 0.5);
 }
 
-[data-shell-theme='cinematic'] #app-main-content::-webkit-scrollbar-thumb:hover,
-html.landing-page::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--scrollbar-thumb-hover));
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--scrollbar-thumb-hover, 130 130 150) / 0.7);
 }
