@@ -191,36 +191,36 @@ input.form-input.input-with-icon {
     gap: 0.5rem;
 }
 
-[data-shell-theme='cinematic'] .form-input,
-[data-shell-theme='cinematic'] .form-select,
-[data-shell-theme='cinematic'] .form-textarea {
+[data-shell-theme='atelier'] .form-input,
+[data-shell-theme='atelier'] .form-select,
+[data-shell-theme='atelier'] .form-textarea {
     border-color: rgb(var(--shell-line) / 0.35);
     background: rgb(var(--shell-surface) / 0.7);
     color: rgb(var(--shell-ink));
 }
 
-:root.dark [data-shell-theme='cinematic'] .form-input,
-:root.dark [data-shell-theme='cinematic'] .form-select,
-:root.dark [data-shell-theme='cinematic'] .form-textarea {
+:root.dark [data-shell-theme='atelier'] .form-input,
+:root.dark [data-shell-theme='atelier'] .form-select,
+:root.dark [data-shell-theme='atelier'] .form-textarea {
     border-color: rgb(var(--shell-line) / 0.3);
     background: rgb(var(--shell-surface) / 0.6);
 }
 
-[data-shell-theme='cinematic'] .form-input::placeholder,
-[data-shell-theme='cinematic'] .form-textarea::placeholder {
+[data-shell-theme='atelier'] .form-input::placeholder,
+[data-shell-theme='atelier'] .form-textarea::placeholder {
     color: rgb(var(--shell-muted));
 }
 
-[data-shell-theme='cinematic'] .form-input:focus,
-[data-shell-theme='cinematic'] .form-select:focus,
-[data-shell-theme='cinematic'] .form-textarea:focus,
-[data-shell-theme='cinematic'] .form-checkbox:focus {
+[data-shell-theme='atelier'] .form-input:focus,
+[data-shell-theme='atelier'] .form-select:focus,
+[data-shell-theme='atelier'] .form-textarea:focus,
+[data-shell-theme='atelier'] .form-checkbox:focus {
     --tw-ring-color: rgb(var(--shell-accent) / 0.26);
     border-color: rgb(var(--shell-accent) / 0.55);
     box-shadow: 0 0 0 1px rgb(var(--shell-accent) / 0.22);
 }
 
-[data-shell-theme='cinematic'] .form-label {
+[data-shell-theme='atelier'] .form-label {
     color: rgb(var(--shell-ink));
     font-size: 0.8125rem;
     font-weight: 700;
@@ -228,63 +228,89 @@ input.form-input.input-with-icon {
     text-transform: uppercase;
 }
 
-[data-shell-theme='cinematic'] .form-help {
+[data-shell-theme='atelier'] .form-help {
     color: rgb(var(--shell-muted));
 }
 
-[data-shell-theme='cinematic'] .input-icon {
+[data-shell-theme='atelier'] .input-icon {
     color: rgb(var(--shell-muted));
 }
 
-[data-shell-theme='cinematic'] .form-select {
+[data-shell-theme='atelier'] .form-select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='rgb(132 149 177)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
 }
 
-[data-shell-theme='cinematic'] .form-note {
+[data-shell-theme='atelier'] .form-note {
     color: rgb(var(--shell-muted));
 }
 
-[data-shell-theme='cinematic'] .form-panel {
+[data-shell-theme='atelier'] .form-panel {
     border-color: rgb(var(--shell-line) / 0.36);
     background: linear-gradient(160deg, rgb(var(--shell-surface) / 0.62), rgb(var(--shell-surface-soft) / 0.48));
     box-shadow: var(--shell-shadow-sm);
 }
 
-[data-shell-theme='cinematic'] .form-link {
+[data-shell-theme='atelier'] .form-link {
     color: rgb(var(--shell-brand));
 }
 
-[data-shell-theme='cinematic'] .form-link:hover {
+[data-shell-theme='atelier'] .form-link:hover {
     color: rgb(var(--shell-accent));
 }
 
-[data-shell-theme='cinematic'] .form-divider {
+[data-shell-theme='atelier'] .form-divider {
     border-color: rgb(var(--shell-line) / 0.34);
 }
 
-:root.dark [data-shell-theme='cinematic'] .form-input,
-:root.dark [data-shell-theme='cinematic'] .form-select,
-:root.dark [data-shell-theme='cinematic'] .form-textarea {
+:root.dark [data-shell-theme='atelier'] .form-input,
+:root.dark [data-shell-theme='atelier'] .form-select,
+:root.dark [data-shell-theme='atelier'] .form-textarea {
     border-color: rgb(var(--shell-line) / 0.25);
     background: rgb(var(--shell-surface) / 0.55);
     color: rgb(var(--shell-ink));
 }
 
-:root.dark [data-shell-theme='cinematic'] .form-input:focus,
-:root.dark [data-shell-theme='cinematic'] .form-select:focus,
-:root.dark [data-shell-theme='cinematic'] .form-textarea:focus,
-:root.dark [data-shell-theme='cinematic'] .form-checkbox:focus {
+:root.dark [data-shell-theme='atelier'] .form-input:focus,
+:root.dark [data-shell-theme='atelier'] .form-select:focus,
+:root.dark [data-shell-theme='atelier'] .form-textarea:focus,
+:root.dark [data-shell-theme='atelier'] .form-checkbox:focus {
     --tw-ring-color: rgb(var(--shell-accent) / 0.18);
     border-color: rgb(var(--shell-accent) / 0.42);
     box-shadow: 0 0 0 1px rgb(var(--shell-accent) / 0.16);
 }
 
-:root.dark [data-shell-theme='cinematic'] .form-panel {
+:root.dark [data-shell-theme='atelier'] .form-panel {
     border-color: rgb(var(--shell-line) / 0.25);
     background: rgb(var(--shell-surface) / 0.5);
     box-shadow: var(--shell-shadow-sm);
 }
 
-:root.dark [data-shell-theme='cinematic'] .form-divider {
+:root.dark [data-shell-theme='atelier'] .form-divider {
     border-color: rgb(var(--shell-line) / 0.26);
+}
+
+/* Atelier redesign override layer */
+[data-shell-theme='atelier'] .form-input,
+[data-shell-theme='atelier'] .form-select,
+[data-shell-theme='atelier'] .form-textarea,
+[data-shell-theme='atelier'] .filter-dropdown-trigger {
+    border-radius: 0.65rem;
+    border-color: rgb(var(--shell-line-strong) / 0.36);
+    background:
+        linear-gradient(180deg, rgb(var(--shell-surface) / 0.9), rgb(var(--shell-surface-soft) / 0.72));
+    box-shadow: inset 0 1px 0 rgb(var(--shell-panel-edge) / 0.16);
+}
+
+[data-shell-theme='atelier'] .form-label {
+    color: rgb(var(--shell-brand));
+    letter-spacing: 0.16em;
+}
+
+[data-shell-theme='atelier'] .form-input:focus,
+[data-shell-theme='atelier'] .form-select:focus,
+[data-shell-theme='atelier'] .form-textarea:focus,
+[data-shell-theme='atelier'] .form-checkbox:focus {
+    --tw-ring-color: rgb(var(--shell-accent) / 0.34);
+    border-color: rgb(var(--shell-accent) / 0.68);
+    box-shadow: 0 0 0 1px rgb(var(--shell-accent) / 0.26), 0 0 0 5px rgb(var(--shell-accent) / 0.12);
 }

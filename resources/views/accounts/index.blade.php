@@ -9,15 +9,15 @@
         $hasFilters = $currentFilters['status'] || $currentFilters['privilege'] || $currentFilters['license_count'] || $currentFilters['search'] || $currentFilters['sort'] !== 'created_at_desc';
     @endphp
 
-    <div class="space-y-6" data-page="accounts-index">
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Account statistics') }}">
+    <div class="atelier-data-workbench" data-page="accounts-index" data-atelier-data-workbench>
+        <aside class="atelier-data-rail" aria-label="{{ __('Account statistics') }}" data-atelier-data-rail>
             <x-stat-card :title="__('Total Accounts')" :value="$statistics['total']" icon="users" iconColor="icon-blue" />
             <x-stat-card :title="__('Active Accounts')" :value="$statistics['active']" icon="success" iconColor="icon-green" />
             <x-stat-card :title="__('Suspended')" :value="$statistics['suspended']" icon="warning" iconColor="icon-red" />
             <x-stat-card :title="__('Verified')" :value="$statistics['verified']" icon="shield" iconColor="icon-purple" />
-        </section>
+        </aside>
 
-        <section class="card-shell space-y-6" data-accounts-panel>
+        <section class="card-shell atelier-data-plane" data-accounts-panel data-atelier-data-plane>
             <div class="app-toolbar" data-accounts-toolbar>
                 <div>
                     <p class="section-kicker">{{ __('Directory') }}</p>

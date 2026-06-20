@@ -19,10 +19,15 @@ it('admin can access dashboard', function () {
     actingAs($admin)
         ->get(route('dashboard'))
         ->assertSuccessful()
+        ->assertSee('data-shell-theme="atelier"', false)
+        ->assertSee('shell-atelier shell-atelier--sidebar', false)
         ->assertSee('data-app-shell-header-copy', false)
         ->assertSee('aria-label="Primary navigation"', false)
         ->assertSee('aria-label="Dashboard"', false)
         ->assertSee('data-page="dashboard-admin"', false)
+        ->assertSee('data-atelier-command-deck', false)
+        ->assertSee('data-atelier-spotlight', false)
+        ->assertSee('data-atelier-operations-matrix', false)
         ->assertSee('data-dashboard-summary', false)
         ->assertSee('id="app-main-content"', false);
 });
@@ -50,7 +55,7 @@ it('sidebar layout reserves desktop space with shell offsets instead of calc wid
     BLADE);
 
     expect($html)
-        ->toContain("'lg:ml-64': \$store.sidebar.open")
+        ->toContain("'lg:ml-72': \$store.sidebar.open")
         ->toContain("'lg:ml-16': !\$store.sidebar.open")
         ->not->toContain('lg:w-[calc(100%-16rem)]')
         ->not->toContain('lg:w-[calc(100%-4rem)]')
@@ -153,6 +158,7 @@ it('admin sees the admin panel view', function () {
         ->get(route('dashboard'))
         ->assertSuccessful()
         ->assertViewIs('dashboard.admin-panel')
+        ->assertSee('data-atelier-metric-rail', false)
         ->assertSee('data-dashboard-summary-chip', false)
         ->assertSee('data-dashboard-stat-grid', false)
         ->assertSee('data-dashboard-database', false)
@@ -167,8 +173,14 @@ it('regular user sees the user panel view', function () {
         ->assertSuccessful()
         ->assertViewIs('dashboard.user-panel')
         ->assertSee('data-page="dashboard-user"', false)
+        ->assertSee('data-atelier-command-deck', false)
+        ->assertSee('data-atelier-license-spotlight', false)
+        ->assertSee('data-atelier-operations-matrix', false)
         ->assertSee('data-dashboard-summary-chip', false)
+        ->assertSee('dashboard-stat-number text-3xl font-bold', false)
         ->assertSee('data-license-state="active"', false)
+        ->assertDontSee('text-purple-700', false)
+        ->assertDontSee('text-indigo-700', false)
         ->assertViewHasAll(['userStats', 'activeLicense', 'boundDevices', 'usageTimeFormatted']);
 });
 

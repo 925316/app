@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="subheader">
-        {{ __('Review your current binding, keep unbind behavior intact, and browse device history through the shared cinematic table system.') }}
+        {{ __('Review your current binding, keep unbind behavior intact, and browse device history through the shared atelier table system.') }}
     </x-slot>
 
     @php
@@ -54,7 +54,7 @@
                                     <div class="mt-2">
                                         <button
                                             type="button"
-                                            class="badge badge-default table-inline-copy max-w-full transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                            class="badge badge-default table-inline-copy max-w-full"
                                             title="{{ $currentDevice->hwid_hash }}"
                                             aria-label="{{ __('Copy full HWID') }}"
                                             data-copy-value="{{ $currentDevice->hwid_hash }}"
@@ -71,7 +71,7 @@
 
                             <div class="card-shell-muted min-w-[14rem] space-y-2 self-start p-4">
                                 <p class="section-kicker">{{ __('Bound since') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                                <p class="card-heading text-base font-semibold">
                                     {{ $currentDevice->bound_at ? $currentDevice->bound_at->format('Y-m-d H:i') : __('Unknown') }}
                                 </p>
                                 @if ($currentDevice->bound_at)
@@ -83,21 +83,21 @@
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('IP address') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                                <p class="card-heading text-base font-semibold">
                                     {{ $currentDevice->ip_address ?? __('Unknown') }}
                                 </p>
                             </div>
 
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('Region') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                                <p class="card-heading text-base font-semibold">
                                     {{ $currentDevice->country_code ?? __('Unknown') }}
                                 </p>
                             </div>
 
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('Last seen') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                                <p class="card-heading text-base font-semibold">
                                     {{ $currentDevice->last_seen_at ? $currentDevice->last_seen_at->format('Y-m-d H:i') : __('Unknown') }}
                                 </p>
                                 @if ($currentDevice->last_seen_at)
@@ -128,7 +128,7 @@
 
                                 <div>
                                     <p class="section-kicker">{{ __('Binding status') }}</p>
-                                    <h3 class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ __('No active device binding') }}</h3>
+                                    <h3 class="card-heading text-xl font-semibold">{{ __('No active device binding') }}</h3>
                                 </div>
 
                                 <p class="app-shell-body-copy text-sm">
@@ -142,7 +142,7 @@
                 <aside class="card-shell-muted flex flex-col justify-between gap-6 p-6">
                     <div class="space-y-3">
                         <p class="section-kicker">{{ __('Control surface') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Binding actions') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Binding actions') }}</h3>
                         <p class="app-shell-body-copy text-sm">
                             {{ $currentDevice
                                 ? __('Open device management to review the full binding details, reset availability, and the same unbind controls in one place.')
@@ -172,7 +172,7 @@
                                 <div class="table-stack table-stack-tight min-w-0">
                                     <button
                                         type="button"
-                                        class="badge badge-default table-inline-copy max-w-full transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                        class="badge badge-default table-inline-copy max-w-full"
                                         title="{{ $device->hwid_hash }}"
                                         aria-label="{{ __('Copy full HWID') }}"
                                         data-copy-value="{{ $device->hwid_hash }}"

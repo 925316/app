@@ -11,10 +11,25 @@ beforeEach(function () {
 // --- Index ---
 
 it('admin can view sessions index', function () {
+    $account = Account::factory()->create();
+    $device = AccountDevice::factory()->create([
+        'account_id' => $account->id,
+        'hwid_hash' => str_repeat('a', 64),
+    ]);
+
+    ClientSession::factory()->create([
+        'account_id' => $account->id,
+        'device_id' => $device->id,
+        'client_version' => '26.3.30-build-with-a-long-suffix',
+    ]);
+
     $this->actingAs($this->admin)
         ->get(route('sessions.index'))
         ->assertSuccessful()
         ->assertViewIs('sessions.index')
+        ->assertSee('data-page="sessions-index"', false)
+        ->assertSee('badge badge-default table-inline-copy max-w-full', false)
+        ->assertDontSee('hover:border-cool-400', false)
         ->assertSee(__('Session'))
         ->assertViewHasAll(['sessions', 'statistics', 'statusOptions', 'currentFilters']);
 });
@@ -160,6 +175,8 @@ it('admin can view session details', function () {
         ->get(route('sessions.show', $session))
         ->assertSuccessful()
         ->assertViewIs('sessions.show')
+        ->assertSee('data-page="sessions-show"', false)
+        ->assertSee('card-value text-sm font-semibold', false)
         ->assertViewHas('session');
 });
 
@@ -211,6 +228,7 @@ it('session detail page renders bounded copy buttons for full session token devi
         ->assertSee('onclick="copySessionField(this)"', false)
         ->assertSee('table-inline-copy w-full max-w-full justify-start', false)
         ->assertSee('aria-label="Copy full device hash"', false)
+        ->assertDontSee('hover:border-cool-400', false)
         ->assertDontSee('function copySessionField', false)
         ->assertDontSee('function copyTextValue', false)
         ->assertDontSee('function copyDeviceValue', false);

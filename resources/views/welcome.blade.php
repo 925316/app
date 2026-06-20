@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Laravel') }}</title>
     <meta name="description"
-        content="{{ __('Operational control for licenses, devices, package releases, and event logs in one cinematic command surface.') }}">
+        content="{{ __('Operational control for licenses, devices, package releases, and event logs in one atelier command surface.') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:500,600,700|ibm-plex-sans:400,500,600,700" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=fraunces:500,600,700|atkinson-hyperlegible:400,700" rel="stylesheet" />
 
     @include('components.theme-init-script')
 
@@ -149,7 +149,7 @@
                         {{ __('Operational control for licenses, devices, packages, and logs.') }}
                     </h1>
                     <p class="mt-6 max-w-2xl text-base leading-8 text-[rgb(var(--landing-muted))] sm:text-lg">
-                        {{ __('Monitor active licenses, bound devices, package releases, and event logs before small issues turn into operational failures. The landing page stays cinematic, but the hierarchy now points directly at the work this platform actually handles.') }}
+                        {{ __('Monitor active licenses, bound devices, package releases, and event logs before small issues turn into operational failures. The landing page stays atelier, but the hierarchy now points directly at the work this platform actually handles.') }}
                     </p>
 
                     <div class="mt-8 flex flex-wrap items-center gap-3">
@@ -157,14 +157,14 @@
                             <a href="{{ route('dashboard') }}"
                                 class="landing-focus-ring landing-action-primary inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold text-[rgb(var(--landing-ink))] transition duration-300 hover:-translate-y-0.5">
                                 {{ __('Open Dashboard') }}
-                                <span aria-hidden="true">→</span>
+                                <span aria-hidden="true">&rarr;</span>
                             </a>
                         @else
                             @if (Route::has('login'))
                                 <a href="{{ route('login') }}"
                                     class="landing-focus-ring landing-action-primary inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold text-[rgb(var(--landing-ink))] transition duration-300 hover:-translate-y-0.5">
                                     {{ __('Sign In') }}
-                                    <span aria-hidden="true">→</span>
+                                    <span aria-hidden="true">&rarr;</span>
                                 </a>
                             @endif
 
@@ -342,7 +342,7 @@
 
             <footer class="landing-fade-up mt-10 flex flex-col gap-4 border-t border-[rgb(var(--landing-line)/0.75)] pt-6 text-sm text-[rgb(var(--landing-muted))] sm:flex-row sm:items-center sm:justify-between lg:mt-12" style="animation-delay: 360ms;">
                 <p>&copy; {{ date('Y') }} {{ config('app.name') }}</p>
-                <p>{{ __('Public homepage · cinematic operational landing page') }}</p>
+                <p>{{ __('Public homepage · atelier operational landing page') }}</p>
             </footer>
         </main>
     </div>

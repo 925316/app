@@ -13,7 +13,12 @@ it('admin can view account details', function () {
 
     $this->actingAs($this->admin)
         ->get(route('accounts.show', $account))
-        ->assertSuccessful();
+        ->assertSuccessful()
+        ->assertViewIs('accounts.show')
+        ->assertSee('data-page="accounts-show"', false)
+        ->assertSee('card-value text-sm font-semibold', false)
+        ->assertSee('table-empty-state card-shell-muted', false)
+        ->assertDontSee('border-cool-200/80', false);
 });
 
 it('account detail preserves device admin controls after devices index handoff', function () {
@@ -39,7 +44,12 @@ it('account detail preserves device admin controls after devices index handoff',
 it('admin can view account create form', function () {
     $this->actingAs($this->admin)
         ->get(route('accounts.create'))
-        ->assertSuccessful();
+        ->assertSuccessful()
+        ->assertSee('form-label', false)
+        ->assertSee('form-note text-xs', false)
+        ->assertSee('form-divider flex justify-end gap-3', false)
+        ->assertDontSee('border-cool-200/70', false)
+        ->assertDontSee('text-gray-700 dark:text-gray-300', false);
 });
 
 it('admin can create a new account', function () {
@@ -143,7 +153,12 @@ it('admin can view account edit form', function () {
 
     $this->actingAs($this->admin)
         ->get(route('accounts.edit', $account))
-        ->assertSuccessful();
+        ->assertSuccessful()
+        ->assertSee('form-label', false)
+        ->assertSee('form-note text-xs', false)
+        ->assertSee('form-divider flex justify-end gap-3', false)
+        ->assertDontSee('border-cool-200/70', false)
+        ->assertDontSee('text-gray-700 dark:text-gray-300', false);
 });
 
 it('admin can update account username and email', function () {

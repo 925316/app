@@ -7,17 +7,17 @@
         {{ __('Stay on top of your license access, devices, and usage history.') }}
     </x-slot>
 
-    <div class="space-y-8" data-page="dashboard-user">
-        <section class="card-shell flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between" data-dashboard-summary>
-            <div class="space-y-2" data-dashboard-section-title-group>
+    <div class="atelier-command-deck" data-page="dashboard-user" data-atelier-command-deck>
+        <section class="atelier-spotlight" data-dashboard-summary data-atelier-spotlight>
+            <div class="card-shell atelier-spotlight__hero" data-dashboard-section-title-group>
                 <p class="section-kicker">{{ __('Account overview') }}</p>
-                <h2 class="dashboard-section-title text-2xl font-semibold">{{ __('Your current access') }}</h2>
-                <p class="dashboard-meta-text max-w-2xl text-sm">
+                <h2 class="dashboard-section-title text-3xl font-semibold sm:text-4xl">{{ __('Your current access') }}</h2>
+                <p class="dashboard-meta-text max-w-3xl text-sm">
                     {{ __('Review your active license posture, device readiness, and the usage signals that matter most.') }}
                 </p>
             </div>
 
-            <div class="card-shell-muted flex items-center gap-3 self-start lg:self-auto" data-dashboard-summary-chip>
+            <div class="card-shell-muted atelier-spotlight__stamp" data-dashboard-summary-chip>
                 <span class="card-icon-container icon-indigo h-11 w-11 shrink-0">
                     <x-icon name="document" class="h-6 w-6" />
                 </span>
@@ -29,14 +29,9 @@
             </div>
         </section>
 
-        <section class="space-y-4" data-dashboard-section="license-status">
-            <div class="space-y-1" data-dashboard-section-title-group>
-                <p class="section-kicker">{{ __('License') }}</p>
-                <h2 class="dashboard-section-title text-xl font-semibold">{{ __('License status') }}</h2>
-            </div>
-
+        <section class="atelier-license-spotlight" data-dashboard-section="license-status" data-atelier-license-spotlight>
             @if ($activeLicense)
-                <article class="card-shell space-y-6" data-license-state="active">
+                <article class="card-shell atelier-license-card" data-license-state="active">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div class="space-y-4">
                             <div class="flex flex-wrap gap-2">
@@ -64,12 +59,12 @@
                         </div>
                         <div class="card-shell-muted">
                             <p class="section-kicker">{{ __('Days remaining') }}</p>
-                            <p class="mt-2 text-lg font-semibold text-green-600 dark:text-green-300">{{ $activeLicense->daysUntilExpiry() }} {{ __('days') }}</p>
+                            <p class="dashboard-stat-number mt-2 text-lg font-semibold">{{ $activeLicense->daysUntilExpiry() }} {{ __('days') }}</p>
                         </div>
                     </div>
                 </article>
             @else
-                <article class="card-shell space-y-5" data-license-state="inactive">
+                <article class="card-shell atelier-license-card" data-license-state="inactive">
                     <div class="flex items-start gap-4">
                         <span class="card-icon-container icon-yellow h-12 w-12 shrink-0">
                             <x-icon name="warning" class="h-6 w-6" />
@@ -93,8 +88,8 @@
             @endif
         </section>
 
-        <section class="grid grid-cols-1 gap-6 xl:grid-cols-2" data-dashboard-details>
-            <article class="card-shell space-y-6" data-dashboard-card="device-status">
+        <section class="atelier-operations-matrix" data-dashboard-details data-atelier-operations-matrix>
+            <article class="card-shell atelier-panel-tall" data-dashboard-card="device-status">
                 <header class="flex items-start gap-4">
                     <span class="card-icon-container icon-blue shrink-0">
                         <x-icon name="desktop" class="h-6 w-6" />
@@ -153,7 +148,7 @@
                 @endif
             </article>
 
-            <article class="card-shell space-y-6" data-dashboard-card="usage-statistics">
+            <article class="card-shell atelier-panel-tall" data-dashboard-card="usage-statistics">
                 <header class="flex items-start gap-4">
                     <span class="card-icon-container icon-purple shrink-0">
                         <x-icon name="lightning" class="h-6 w-6" />
@@ -168,12 +163,12 @@
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="card-shell-muted space-y-2">
                         <p class="section-kicker">{{ __('Total usage time') }}</p>
-                        <p class="text-3xl font-bold text-purple-700 dark:text-purple-300">{{ $usageTimeFormatted }}</p>
+                        <p class="dashboard-stat-number text-3xl font-bold">{{ $usageTimeFormatted }}</p>
                     </div>
 
                     <div class="card-shell-muted space-y-2">
                         <p class="section-kicker">{{ __('Login count') }}</p>
-                        <p class="text-3xl font-bold text-indigo-700 dark:text-indigo-300">{{ $userStats['login_count'] ?? 0 }}</p>
+                        <p class="dashboard-stat-number text-3xl font-bold">{{ $userStats['login_count'] ?? 0 }}</p>
                     </div>
                 </div>
             </article>

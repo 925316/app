@@ -18,6 +18,9 @@ it('admin can view accounts index', function () {
         ->assertSee('role="search"', false)
         ->assertSee('aria-label="Accounts table"', false)
         ->assertSee('data-page="accounts-index"', false)
+        ->assertSee('data-atelier-data-workbench', false)
+        ->assertSee('data-atelier-data-rail', false)
+        ->assertSee('data-atelier-data-plane', false)
         ->assertSee('data-accounts-panel', false)
         ->assertViewIs('accounts.index')
         ->assertViewHasAll(['accounts', 'statistics', 'statusOptions', 'privilegeOptions', 'currentFilters']);
@@ -39,6 +42,8 @@ it('accounts index prefers a single view action in each row', function () {
     actingAs($admin)
         ->get(route('accounts.index'))
         ->assertSuccessful()
+        ->assertSee('data-atelier-table-stage', false)
+        ->assertSee('data-atelier-row-density="scan"', false)
         ->assertSee('table-action table-action--primary', false)
         ->assertSee('aria-label="Account row actions"', false)
         ->assertSee('class="flex justify-end" aria-label="Account row actions"', false)

@@ -159,7 +159,7 @@ class LicenseFactory extends Factory
                 'status' => LicenseStatus::SUSPENDED->value,
                 'created_at' => $createdAt,
                 'used_by' => $attributes['used_by'] ?? Account::factory(),
-                'activated_at' => $activatedAt,
+                'activated_at' => $activatedAtCarbon,
                 'suspended_at' => $suspendedAt,
                 'expires_at' => $expiresAt,
                 'updated_at' => $suspendedAt,

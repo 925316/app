@@ -2,8 +2,8 @@
     :data-collapsed-desktop="(isDesktop && !$store.sidebar.open).toString()"
     class="sidebar h-screen fixed inset-y-0 left-0 z-50 transform transition-all duration-300 lg:z-40"
     :class="isDesktop
-        ? 'translate-x-0 ' + ($store.sidebar.open ? 'w-64' : 'w-16')
-        : (mobileSidebarOpen ? 'translate-x-0 w-64' : 'w-64 -translate-x-full')"
+        ? 'translate-x-0 ' + ($store.sidebar.open ? 'w-72' : 'w-16')
+        : (mobileSidebarOpen ? 'translate-x-0 w-72' : 'w-72 -translate-x-full')"
     :role="(!isDesktop && mobileSidebarOpen) ? 'dialog' : null"
     :aria-modal="(!isDesktop && mobileSidebarOpen) ? 'true' : null"
     aria-label="{{ __('Primary navigation') }}"
@@ -17,7 +17,7 @@
                 <x-application-logo class="block h-8 w-auto fill-current" />
             </a>
             <div class="sidebar-brand-lockup">
-                <span class="sidebar-brand-kicker">{{ __('Control room') }}</span>
+                <span class="sidebar-brand-kicker">{{ __('Atelier OS') }}</span>
                 <span id="app-sidebar-title" class="sidebar-brand-text truncate text-lg font-semibold">
                     {{ config('app.name', 'Laravel') }}
                 </span>

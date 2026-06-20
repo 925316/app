@@ -63,6 +63,9 @@ it('user with license can access device manage page', function () {
         ->get(route('devices.manage'))
         ->assertSuccessful()
         ->assertViewIs('devices.manage')
+        ->assertSee('data-page="devices-manage"', false)
+        ->assertSee('form-note text-xs', false)
+        ->assertDontSee('text-gray-500 dark:text-gray-400', false)
         ->assertViewHasAll(['currentDevice', 'canResetHwid', 'hwidResetCount', 'hwidLastReset']);
 });
 

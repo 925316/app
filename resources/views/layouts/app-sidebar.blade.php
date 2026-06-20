@@ -10,7 +10,7 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:500,600,700|ibm-plex-sans:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=fraunces:500,600,700|atkinson-hyperlegible:400,700&display=swap" rel="stylesheet" />
 
     <!-- Early theme detection to prevent FOUC -->
     @include('components.theme-init-script')
@@ -39,9 +39,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="app-shell-page app-shell-grid shell-cinematic shell-cinematic--sidebar font-sans antialiased min-h-screen overflow-x-hidden transition-colors duration-300"
-    data-shell-theme="cinematic" data-shell-variant="sidebar">
-    <a href="#app-main-content" class="shell-cinematic__skip-link">
+<body class="app-shell-page app-shell-grid shell-atelier shell-atelier--sidebar font-sans antialiased min-h-screen overflow-x-hidden transition-colors duration-300"
+    data-shell-theme="atelier" data-shell-variant="sidebar">
+    <a href="#app-main-content" class="shell-atelier__skip-link">
         {{ __('Skip to main content') }}
     </a>
 
@@ -98,7 +98,7 @@
 
         <!-- Main Content Area -->
         <div class="app-shell-body relative z-0 ml-0 flex min-w-0 flex-1 flex-col transition-all duration-300"
-            :class="{ 'lg:ml-64': $store.sidebar.open, 'lg:ml-16': !$store.sidebar.open }"
+            :class="{ 'lg:ml-72': $store.sidebar.open, 'lg:ml-16': !$store.sidebar.open }"
             :inert="mobileSidebarOpen && !isDesktop" :aria-hidden="(mobileSidebarOpen && !isDesktop).toString()" x-cloak>
             <div class="app-shell-canvas" aria-hidden="true"></div>
 
@@ -120,9 +120,9 @@
                             <div class="min-w-0 app-shell-page-lead" data-app-shell-header-copy>
                                 <div class="app-shell-page-meta app-shell-page-eyebrow flex min-w-0 items-center gap-2.5">
                                     <span class="app-shell-page-dot" aria-hidden="true"></span>
-                                    <p class="app-shell-page-kicker shrink-0 text-xs font-semibold uppercase tracking-[0.2em]">{{ __('Command surface') }}</p>
+                                    <p class="app-shell-page-kicker shrink-0 text-xs font-semibold uppercase tracking-[0.2em]">{{ __('Atelier surface') }}</p>
                                 @isset($subheader)
-                                    <span class="app-shell-page-meta-separator" aria-hidden="true">•</span>
+                                    <span class="app-shell-page-meta-separator" aria-hidden="true">&middot;</span>
                                     <p class="app-shell-page-subtitle min-w-0 truncate text-sm">
                                         {{ $subheader }}
                                     </p>

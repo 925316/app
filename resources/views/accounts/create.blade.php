@@ -8,8 +8,8 @@
             <div class="app-toolbar mb-6">
                 <div>
                     <p class="section-kicker">{{ __('Account Provisioning') }}</p>
-                    <h2 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ __('Create New Account') }}</h2>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    <h2 class="app-toolbar-title">{{ __('Create New Account') }}</h2>
+                    <p class="app-toolbar-subtitle">
                         {{ __('Set up user credentials and optionally pre-verify email status for onboarding.') }}
                     </p>
                 </div>
@@ -21,50 +21,47 @@
 
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                    <label for="username"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Username') }}</label>
+                    <label for="username" class="form-label">{{ __('Username') }}</label>
                     <input type="text" name="username" id="username" value="{{ old('username') }}" required class="form-input">
                     @error('username')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="form-error">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Email Address') }}</label>
+                    <label for="email" class="form-label">{{ __('Email Address') }}</label>
                     <input type="email" name="email" id="email" value="{{ old('email') }}" required class="form-input">
                     @error('email')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="form-error">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="password"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Password') }}</label>
+                    <label for="password" class="form-label">{{ __('Password') }}</label>
                     <input type="password" name="password" id="password" required class="form-input">
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Password must contain at least one lowercase letter, one uppercase letter, and one number.') }}</p>
+                    <p class="form-note text-xs">{{ __('Password must contain at least one lowercase letter, one uppercase letter, and one number.') }}</p>
                     @error('password')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="form-error">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="password_confirmation"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Confirm Password') }}</label>
+                    <label for="password_confirmation" class="form-label">{{ __('Confirm Password') }}</label>
                     <input type="password" name="password_confirmation" id="password_confirmation" required class="form-input">
                 </div>
 
                 <div class="md:col-span-2 card-shell-muted">
                     <label class="flex items-center">
                         <input type="checkbox" name="email_verified" value="1" class="form-checkbox">
-                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('Mark email as verified') }}</span>
+                        <span class="form-note ml-2 text-sm">{{ __('Mark email as verified') }}</span>
                     </label>
-                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    <p class="form-note mt-2 text-xs">
                         {{ __('Use this only when migrating trusted users or manually approved accounts.') }}
                     </p>
                 </div>
             </div>
 
-                <div class="flex justify-end gap-3 border-t border-cool-200/70 pt-6 dark:border-cool-700/70">
+                <div class="form-divider flex justify-end gap-3">
                     <x-secondary-button tag="a" href="{{ route('accounts.index') }}">{{ __('Cancel') }}</x-secondary-button>
                     <x-primary-button type="submit">{{ __('Create Account') }}</x-primary-button>
                 </div>

@@ -13,6 +13,8 @@ test('login screen can be rendered', function () {
 
     $response->assertOk()
         ->assertSee('id="guest-content"', false)
+        ->assertSee('data-shell-theme="atelier"', false)
+        ->assertSee('shell-atelier shell-atelier--guest', false)
         ->assertSee('data-page="auth-login"', false)
         ->assertSee('data-auth-form="login"', false)
         ->assertSee('aria-labelledby="auth-panel-title"', false);

@@ -1,117 +1,117 @@
 :root {
-    --color-surface-page: 248 250 252;
-    --color-surface-page-alt: 241 245 249;
-    --color-surface-card: 255 255 255;
-    --color-surface-card-muted: 248 250 252;
-    --color-surface-elevated: 255 255 255;
+    --color-surface-page: 244 241 232;
+    --color-surface-page-alt: 226 232 223;
+    --color-surface-card: 255 252 242;
+    --color-surface-card-muted: 236 240 229;
+    --color-surface-elevated: 250 247 237;
 
-    --color-text-primary: 17 24 39;
-    --color-text-secondary: 75 85 99;
-    --color-text-muted: 107 114 128;
-    --color-border-subtle: 229 231 235;
-    --color-border-strong: 209 213 219;
+    --color-text-primary: 31 36 42;
+    --color-text-secondary: 76 85 93;
+    --color-text-muted: 108 117 125;
+    --color-border-subtle: 204 211 199;
+    --color-border-strong: 149 161 151;
 
-    --color-brand: 37 99 235;
-    --color-brand-hover: 29 78 216;
-    --color-brand-soft: 219 234 254;
-    --color-success: 22 163 74;
-    --color-warning: 217 119 6;
-    --color-danger: 220 38 38;
+    --color-brand: 26 79 188;
+    --color-brand-hover: 12 59 150;
+    --color-brand-soft: 214 226 255;
+    --color-success: 45 128 84;
+    --color-warning: 180 99 21;
+    --color-danger: 190 54 54;
 
-    --radius-sm: 0.375rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.625rem;
+    --radius-xl: 0.875rem;
 
-    --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
-    --shadow-md: 0 4px 12px 0 rgb(15 23 42 / 0.08);
-    --shadow-lg: 0 12px 24px -8px rgb(15 23 42 / 0.15);
+    --shadow-sm: 0 1px 0 rgb(31 36 42 / 0.08), 0 8px 18px rgb(31 36 42 / 0.05);
+    --shadow-md: 0 1px 0 rgb(31 36 42 / 0.1), 0 16px 32px rgb(31 36 42 / 0.08);
+    --shadow-lg: 0 1px 0 rgb(31 36 42 / 0.12), 0 30px 70px rgb(31 36 42 / 0.12);
 
-    --layout-content-max: 86rem;
-    --layout-content-padding-x: clamp(1rem, 1vw + 0.8rem, 1.75rem);
-    --layout-header-height: 5rem;
-    --layout-sidebar-expanded: 16rem;
-    --layout-sidebar-collapsed: 4rem;
-    --layout-auth-max: 36rem;
+    --layout-content-max: 90rem;
+    --layout-content-padding-x: clamp(1rem, 1.4vw + 0.75rem, 2rem);
+    --layout-header-height: 5.75rem;
+    --layout-sidebar-expanded: 17rem;
+    --layout-sidebar-collapsed: 4.5rem;
+    --layout-auth-max: 38rem;
 }
 
 :root.dark {
-    --color-surface-page: 10 8 18;
-    --color-surface-page-alt: 18 14 28;
-    --color-surface-card: 24 20 36;
-    --color-surface-card-muted: 32 26 48;
-    --color-surface-elevated: 28 22 42;
+    --color-surface-page: 7 13 21;
+    --color-surface-page-alt: 13 24 37;
+    --color-surface-card: 17 29 43;
+    --color-surface-card-muted: 22 38 55;
+    --color-surface-elevated: 19 33 49;
 
-    --color-text-primary: 245 240 235;
-    --color-text-secondary: 180 170 200;
-    --color-text-muted: 140 130 165;
-    --color-border-subtle: 60 48 80;
-    --color-border-strong: 85 70 110;
+    --color-text-primary: 238 244 235;
+    --color-text-secondary: 190 204 194;
+    --color-text-muted: 139 157 151;
+    --color-border-subtle: 47 68 79;
+    --color-border-strong: 82 111 120;
 
-    --color-brand: 255 128 86;
-    --color-brand-hover: 255 148 110;
-    --color-brand-soft: 50 30 22;
-    --color-success: 107 229 245;
-    --color-warning: 255 214 123;
-    --color-danger: 255 100 100;
+    --color-brand: 123 170 255;
+    --color-brand-hover: 160 193 255;
+    --color-brand-soft: 19 46 88;
+    --color-success: 137 229 171;
+    --color-warning: 255 185 104;
+    --color-danger: 255 123 123;
 }
 
-[data-shell-theme='cinematic'] {
-    --shell-canvas: 249 244 236;
-    --shell-canvas-alt: 236 228 216;
-    --shell-canvas-grid: 194 176 191;
-    --shell-canvas-grid-strong: 166 148 170;
-    --shell-surface: 255 250 244;
-    --shell-surface-soft: 244 235 224;
-    --shell-surface-strong: 235 225 214;
-    --shell-surface-rgb: 255 250 244;
-    --shell-surface-soft-rgb: 244 235 224;
-    --shell-surface-panel: 251 246 239;
-    --shell-surface-panel-soft: 242 233 222;
-    --shell-surface-panel-muted: 239 230 218;
-    --shell-ink: 53 42 57;
-    --shell-muted: 112 98 121;
-    --shell-line: 194 176 191;
-    --shell-line-strong: 166 148 170;
-    --shell-brand: 198 93 66;
-    --shell-brand-soft: 229 169 146;
-    --shell-accent: 31 136 162;
-    --shell-accent-soft: 159 213 222;
-    --shell-glow: 150 108 47;
-    --shell-glow-soft: 224 197 156;
-    --shell-focus: 34 150 179;
-    --shell-panel-edge: 255 255 255;
-    --shell-shadow-sm: 0 2px 8px rgb(74 46 45 / 0.06);
-    --shell-shadow-md: 0 4px 16px rgb(74 46 45 / 0.1);
-    --shell-shadow-lg: 0 8px 32px rgb(49 31 43 / 0.14);
+[data-shell-theme='atelier'] {
+    --shell-canvas: 242 239 229;
+    --shell-canvas-alt: 223 229 220;
+    --shell-canvas-grid: 138 151 143;
+    --shell-canvas-grid-strong: 67 82 92;
+    --shell-surface: 255 252 242;
+    --shell-surface-soft: 232 238 226;
+    --shell-surface-strong: 213 222 210;
+    --shell-surface-rgb: 255 252 242;
+    --shell-surface-soft-rgb: 232 238 226;
+    --shell-surface-panel: 249 247 237;
+    --shell-surface-panel-soft: 232 238 226;
+    --shell-surface-panel-muted: 219 227 216;
+    --shell-ink: 28 34 40;
+    --shell-muted: 83 96 103;
+    --shell-line: 163 174 164;
+    --shell-line-strong: 70 85 94;
+    --shell-brand: 20 81 190;
+    --shell-brand-soft: 154 184 255;
+    --shell-accent: 156 205 73;
+    --shell-accent-soft: 205 238 151;
+    --shell-glow: 206 91 45;
+    --shell-glow-soft: 240 165 107;
+    --shell-focus: 20 81 190;
+    --shell-panel-edge: 255 255 247;
+    --shell-shadow-sm: 0 1px 0 rgb(28 34 40 / 0.1), 0 12px 28px rgb(28 34 40 / 0.08);
+    --shell-shadow-md: 0 1px 0 rgb(28 34 40 / 0.12), 0 22px 44px rgb(28 34 40 / 0.12);
+    --shell-shadow-lg: 0 1px 0 rgb(28 34 40 / 0.14), 0 34px 86px rgb(28 34 40 / 0.16);
 }
 
-:root.dark [data-shell-theme='cinematic'] {
-    --shell-canvas: 10 8 18;
-    --shell-canvas-alt: 18 14 28;
-    --shell-canvas-grid: 55 45 75;
-    --shell-canvas-grid-strong: 85 70 110;
-    --shell-surface: 24 20 36;
-    --shell-surface-soft: 32 26 48;
-    --shell-surface-strong: 42 34 60;
-    --shell-surface-rgb: 24 20 36;
-    --shell-surface-soft-rgb: 32 26 48;
-    --shell-surface-panel: 20 16 30;
-    --shell-surface-panel-soft: 28 22 42;
-    --shell-surface-panel-muted: 36 28 52;
-    --shell-ink: 245 240 235;
-    --shell-muted: 180 170 200;
-    --shell-line: 60 48 80;
-    --shell-line-strong: 85 70 110;
-    --shell-brand: 255 128 86;
-    --shell-brand-soft: 255 160 130;
-    --shell-accent: 107 229 245;
-    --shell-accent-soft: 140 235 250;
-    --shell-glow: 255 214 123;
-    --shell-glow-soft: 255 225 160;
-    --shell-focus: 107 229 245;
-    --shell-panel-edge: 200 190 220;
-    --shell-shadow-sm: 0 2px 8px rgb(0 0 0 / 0.15);
-    --shell-shadow-md: 0 4px 16px rgb(0 0 0 / 0.2);
-    --shell-shadow-lg: 0 8px 32px rgb(0 0 0 / 0.25);
+:root.dark [data-shell-theme='atelier'] {
+    --shell-canvas: 7 13 21;
+    --shell-canvas-alt: 12 27 42;
+    --shell-canvas-grid: 40 67 78;
+    --shell-canvas-grid-strong: 83 118 126;
+    --shell-surface: 16 28 42;
+    --shell-surface-soft: 22 39 55;
+    --shell-surface-strong: 31 54 70;
+    --shell-surface-rgb: 16 28 42;
+    --shell-surface-soft-rgb: 22 39 55;
+    --shell-surface-panel: 12 23 36;
+    --shell-surface-panel-soft: 19 35 51;
+    --shell-surface-panel-muted: 27 48 64;
+    --shell-ink: 240 247 236;
+    --shell-muted: 166 188 182;
+    --shell-line: 50 75 86;
+    --shell-line-strong: 104 137 143;
+    --shell-brand: 123 170 255;
+    --shell-brand-soft: 160 193 255;
+    --shell-accent: 198 245 104;
+    --shell-accent-soft: 219 255 143;
+    --shell-glow: 255 151 94;
+    --shell-glow-soft: 255 192 143;
+    --shell-focus: 198 245 104;
+    --shell-panel-edge: 210 237 224;
+    --shell-shadow-sm: 0 1px 0 rgb(255 255 255 / 0.05), 0 16px 34px rgb(0 0 0 / 0.24);
+    --shell-shadow-md: 0 1px 0 rgb(255 255 255 / 0.06), 0 24px 54px rgb(0 0 0 / 0.32);
+    --shell-shadow-lg: 0 1px 0 rgb(255 255 255 / 0.08), 0 36px 90px rgb(0 0 0 / 0.44);
 }

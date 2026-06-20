@@ -5,7 +5,7 @@
     </x-slot>
 
     <x-slot name="subheader">
-        {{ __('Carry the cinematic account directory system into the detail view without changing account actions, modal workflows, or related records.') }}
+        {{ __('Carry the atelier account directory system into the detail view without changing account actions, modal workflows, or related records.') }}
     </x-slot>
 
     @php
@@ -56,7 +56,7 @@
                 <div>
                     <p class="section-kicker">{{ __('Overview') }}</p>
                     <h2 class="app-toolbar-title">{{ __('Account overview') }}</h2>
-                    <p class="app-toolbar-subtitle">{{ __('Keep the same account facts, but present them in the shared cinematic detail language.') }}</p>
+                    <p class="app-toolbar-subtitle">{{ __('Keep the same account facts, but present them in the shared atelier detail language.') }}</p>
                 </div>
             </div>
 
@@ -64,18 +64,18 @@
                 <div class="card-shell-muted space-y-4 p-6">
                     <div>
                         <p class="section-kicker">{{ __('Identity') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Account information') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Account information') }}</h3>
                     </div>
 
                     <div class="grid gap-4">
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Username') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->username }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $account->username }}</p>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Email') }}</p>
-                            <p class="break-all text-sm font-semibold text-gray-900 dark:text-white">{{ $account->email }}</p>
+                            <p class="card-value break-all text-sm font-semibold">{{ $account->email }}</p>
                             <x-status-badge :status="$account->email_verified_at ? 'verified' : 'unverified'" :text="$account->email_verified_at ? __('Verified') : __('Unverified')" />
                         </div>
 
@@ -92,13 +92,13 @@
                 <div class="card-shell-muted space-y-4 p-6">
                     <div>
                         <p class="section-kicker">{{ __('Access') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Login information') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Login information') }}</h3>
                     </div>
 
                     <div class="grid gap-4">
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Last login') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->last_login_at ? $account->last_login_at->diffForHumans() : __('Never') }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $account->last_login_at ? $account->last_login_at->diffForHumans() : __('Never') }}</p>
                             @if ($account->last_login_at)
                                 <p class="app-shell-body-copy text-sm">{{ $account->last_login_at->format('Y-m-d H:i:s') }}</p>
                             @endif
@@ -106,12 +106,12 @@
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Last IP address') }}</p>
-                            <p class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $account->last_ip_address ?? __('N/A') }}</p>
+                            <p class="card-value font-mono text-sm font-semibold">{{ $account->last_ip_address ?? __('N/A') }}</p>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Registered') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $account->created_at->format('Y-m-d H:i:s') }}</p>
                             <p class="app-shell-body-copy text-sm">{{ $account->created_at->diffForHumans() }}</p>
                         </div>
                     </div>
@@ -120,23 +120,23 @@
                 <div class="card-shell-muted space-y-4 p-6">
                     <div>
                         <p class="section-kicker">{{ __('Devices') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Device information') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Device information') }}</h3>
                     </div>
 
                     <div class="grid gap-4">
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Total devices') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->devices_count }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $account->devices_count }}</p>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Bound devices') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $boundDevicesCount }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $boundDevicesCount }}</p>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('HWID resets') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $account->hwid_reset_count }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $account->hwid_reset_count }}</p>
                             @if ($account->hwid_last_reset_at)
                                 <p class="app-shell-body-copy text-sm">{{ __('Last reset:') }} {{ $account->hwid_last_reset_at->diffForHumans() }}</p>
                             @endif
@@ -338,12 +338,12 @@
                 <div>
                     <p class="section-kicker">{{ __('Recent Activity') }}</p>
                     <h2 class="app-toolbar-title">{{ __('Account event stream') }}</h2>
-                    <p class="app-toolbar-subtitle">{{ __('Preserve the existing activity payloads while presenting them as cinematic event cards.') }}</p>
+                    <p class="app-toolbar-subtitle">{{ __('Preserve the existing activity payloads while presenting them as atelier event cards.') }}</p>
                 </div>
             </div>
 
             @if ($account->eventLogs->isEmpty())
-                <div class="table-empty-state rounded-2xl border border-dashed border-cool-200/80 bg-cool-50/60 px-6 py-12 text-center dark:border-cool-700/80 dark:bg-cool-900/40">
+                <div class="table-empty-state card-shell-muted px-6 py-12 text-center">
                     <x-icon name="document" class="table-empty-icon" />
                     <p class="table-empty-title">{{ __('No activity found for this account.') }}</p>
                     <p class="table-empty-copy">{{ __('Recent account events will appear here once they are recorded.') }}</p>
@@ -370,7 +370,7 @@
                             </div>
 
                             <div class="card-shell-muted p-4">
-                                <pre class="overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs text-gray-700 dark:text-gray-300">{{ json_encode($log->details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
+                                <pre class="table-code app-shell-body-copy overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs">{{ json_encode($log->details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
                             </div>
                         </div>
                     @endforeach
@@ -435,7 +435,7 @@
 
                 <div class="modal-body space-y-4">
                     <p class="card-modal-copy text-sm">{{ __('This will unbind all devices and reset the HWID for this account.') }}</p>
-                    <p class="text-sm font-medium text-red-600 dark:text-red-400">{{ __('Warning: This action cannot be undone.') }}</p>
+                    <p class="card-modal-copy text-sm font-medium">{{ __('Warning: This action cannot be undone.') }}</p>
                 </div>
 
                 <div class="modal-footer">

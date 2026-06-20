@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="subheader">
-        {{ __('Filter the device inventory, preserve export and admin actions, and align the remaining device admin surface with the shared cinematic system.') }}
+        {{ __('Filter the device inventory, preserve export and admin actions, and align the remaining device admin surface with the shared atelier system.') }}
     </x-slot>
 
     @php
@@ -225,7 +225,7 @@
                                 <div class="table-stack table-stack-tight min-w-0">
                                     <button
                                         type="button"
-                                        class="badge badge-default table-inline-copy max-w-full transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                        class="badge badge-default table-inline-copy max-w-full"
                                         title="{{ $device->hwid_hash }}"
                                         aria-label="{{ __('Copy full HWID') }}"
                                         data-copy-value="{{ $device->hwid_hash }}"

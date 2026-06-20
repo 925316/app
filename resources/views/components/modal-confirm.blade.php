@@ -11,19 +11,12 @@
     'cancelText' => 'Cancel',
 ]) @php
     $titleId = $id ? $id.'-title' : 'modal-confirm-title';
-    $iconBgColor = match ($iconColor) {
-        'red' => 'bg-red-100 dark:bg-red-900',
-        'yellow' => 'bg-yellow-100 dark:bg-yellow-900',
-        'blue' => 'bg-blue-100 dark:bg-blue-900',
-        'green' => 'bg-green-100 dark:bg-green-900',
-        default => 'bg-gray-100 dark:bg-gray-700',
-    };
-    $iconTextColor = match ($iconColor) {
-        'red' => 'text-red-600 dark:text-red-400',
-        'yellow' => 'text-yellow-600 dark:text-yellow-400',
-        'blue' => 'text-blue-600 dark:text-blue-400',
-        'green' => 'text-green-600 dark:text-green-400',
-        default => 'text-gray-600 dark:text-gray-400',
+    $iconToneClass = match ($iconColor) {
+        'red' => 'icon-red',
+        'yellow' => 'icon-yellow',
+        'blue' => 'icon-blue',
+        'green' => 'icon-green',
+        default => 'icon-gray',
     };
     $confirmButtonColor = match ($confirmColor) {
         'red' => 'btn btn-danger',
@@ -39,8 +32,8 @@
         role="dialog" aria-modal="true" aria-labelledby="{{ $titleId }}">
         <div class="mt-3">
             @if ($icon || $iconName)
-                <div class="flex items-center justify-center mx-auto h-12 w-12 rounded-full {{ $iconBgColor }}">
-                    <div class="h-6 w-6 {{ $iconTextColor }}">
+                <div class="card-icon-container {{ $iconToneClass }} mx-auto h-12 w-12 rounded-full">
+                    <div class="h-6 w-6">
                         @if ($iconName)
                             <x-icon :name="$iconName" class="w-6 h-6" />
                         @else

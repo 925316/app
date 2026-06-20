@@ -60,7 +60,7 @@
     @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300;
 }
 
-[data-shell-theme='cinematic'] .badge {
+[data-shell-theme='atelier'] .badge {
     border: 1px solid rgb(var(--shell-line) / 0.4);
     border-radius: 9999px;
     padding-inline: 0.625rem;
@@ -69,47 +69,47 @@
     letter-spacing: 0.02em;
 }
 
-[data-shell-theme='cinematic'] .badge-success,
-[data-shell-theme='cinematic'] .badge-active,
-[data-shell-theme='cinematic'] .badge-verified,
-[data-shell-theme='cinematic'] .badge-bound,
-[data-shell-theme='cinematic'] .badge-stable {
+[data-shell-theme='atelier'] .badge-success,
+[data-shell-theme='atelier'] .badge-active,
+[data-shell-theme='atelier'] .badge-verified,
+[data-shell-theme='atelier'] .badge-bound,
+[data-shell-theme='atelier'] .badge-stable {
     background: rgb(var(--shell-accent) / 0.16);
     color: rgb(var(--shell-accent));
 }
 
-[data-shell-theme='cinematic'] .badge-danger,
-[data-shell-theme='cinematic'] .badge-error,
-[data-shell-theme='cinematic'] .badge-inactive,
-[data-shell-theme='cinematic'] .badge-suspended,
-[data-shell-theme='cinematic'] .badge-expired,
-[data-shell-theme='cinematic'] .badge-tester,
-[data-shell-theme='cinematic'] .badge-staff {
+[data-shell-theme='atelier'] .badge-danger,
+[data-shell-theme='atelier'] .badge-error,
+[data-shell-theme='atelier'] .badge-inactive,
+[data-shell-theme='atelier'] .badge-suspended,
+[data-shell-theme='atelier'] .badge-expired,
+[data-shell-theme='atelier'] .badge-tester,
+[data-shell-theme='atelier'] .badge-staff {
     background: rgb(var(--shell-brand) / 0.16);
     color: rgb(var(--shell-brand));
 }
 
-[data-shell-theme='cinematic'] .badge-warning,
-[data-shell-theme='cinematic'] .badge-pending,
-[data-shell-theme='cinematic'] .badge-unverified,
-[data-shell-theme='cinematic'] .badge-ultimate {
+[data-shell-theme='atelier'] .badge-warning,
+[data-shell-theme='atelier'] .badge-pending,
+[data-shell-theme='atelier'] .badge-unverified,
+[data-shell-theme='atelier'] .badge-ultimate {
     background: rgb(var(--shell-glow) / 0.16);
     color: rgb(var(--shell-glow));
 }
 
-[data-shell-theme='cinematic'] .badge-info,
-[data-shell-theme='cinematic'] .badge-standard,
-[data-shell-theme='cinematic'] .badge-latest,
-[data-shell-theme='cinematic'] .badge-premium,
-[data-shell-theme='cinematic'] .badge-upgrade,
-[data-shell-theme='cinematic'] .badge-dev,
-[data-shell-theme='cinematic'] .badge-development {
+[data-shell-theme='atelier'] .badge-info,
+[data-shell-theme='atelier'] .badge-standard,
+[data-shell-theme='atelier'] .badge-latest,
+[data-shell-theme='atelier'] .badge-premium,
+[data-shell-theme='atelier'] .badge-upgrade,
+[data-shell-theme='atelier'] .badge-dev,
+[data-shell-theme='atelier'] .badge-development {
     background: rgb(var(--shell-line-strong) / 0.18);
     color: rgb(var(--shell-ink));
 }
 
-[data-shell-theme='cinematic'] .badge-historical,
-[data-shell-theme='cinematic'] .badge-default {
+[data-shell-theme='atelier'] .badge-historical,
+[data-shell-theme='atelier'] .badge-default {
     background: rgb(var(--shell-surface-soft) / 0.86);
     color: rgb(var(--shell-muted));
 }

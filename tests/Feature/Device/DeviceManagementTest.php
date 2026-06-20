@@ -12,11 +12,19 @@ beforeEach(function () {
 });
 
 it('admin can access device management page', function () {
+    AccountDevice::factory()->create([
+        'account_id' => $this->regularUser->id,
+        'hwid_hash' => str_repeat('a', 64),
+    ]);
+
     $response = $this->actingAs($this->admin)
         ->get(route('devices.index'));
 
     $response->assertSuccessful();
     $response->assertViewIs('devices.admin-index');
+    $response->assertSee('data-page="devices-admin-index"', false);
+    $response->assertSee('badge badge-default table-inline-copy max-w-full', false);
+    $response->assertDontSee('hover:border-cool-400', false);
 });
 
 it('non-admin cannot access device management page', function () {

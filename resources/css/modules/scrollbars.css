@@ -1,6 +1,6 @@
 /* Global Scrollbar Styling */
 
-[data-shell-theme='cinematic'] {
+[data-shell-theme='atelier'] {
     --scrollbar-track: var(--shell-surface-panel-soft);
     --scrollbar-thumb: var(--shell-line-strong);
     --scrollbar-thumb-hover: var(--shell-brand);

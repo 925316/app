@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="subheader">
-        {{ __('Keep bulk actions and filtering behavior intact while smoothing the visual handoff from the cinematic package index.') }}
+        {{ __('Keep bulk actions and filtering behavior intact while smoothing the visual handoff from the atelier package index.') }}
     </x-slot>
 
     @php
@@ -51,12 +51,12 @@
                                 <x-icon name="filter" class="h-4 w-4" />
                             </button>
 
-                            <div x-show="open" x-on:click.away="open = false" class="absolute right-0 mt-2 w-48 card-shell z-50" x-cloak>
+                            <div x-show="open" x-on:click.away="open = false" class="card-shell-muted absolute right-0 z-50 mt-2 w-48 p-1" x-cloak>
                                 <div class="py-1">
-                                    <button onclick="bulkAction('delete')" class="w-full px-4 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                                    <button onclick="bulkAction('delete')" class="filter-dropdown-option">
                                         {{ __('Delete Selected') }}
                                     </button>
-                                    <button onclick="bulkAction('export')" class="w-full px-4 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                                    <button onclick="bulkAction('export')" class="filter-dropdown-option">
                                         {{ __('Export List') }}
                                     </button>
                                 </div>
@@ -143,7 +143,7 @@
                             </div>
                         </td>
 
-                        <td class="table-cell text-sm text-gray-600 dark:text-gray-300">
+                        <td class="table-cell">
                             {{ $release->created_at ? $release->created_at->format('Y-m-d H:i') : __('Unknown') }}
                         </td>
 

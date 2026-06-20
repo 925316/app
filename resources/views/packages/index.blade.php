@@ -64,7 +64,7 @@
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('Released') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                                <p class="card-heading text-base font-semibold">
                                     {{ $latestStable->created_at ? $latestStable->created_at->format('Y-m-d H:i:s') : __('Unknown') }}
                                 </p>
                                 @if ($latestStable->created_at)
@@ -86,11 +86,11 @@
                             <div class="space-y-3">
                                 <div>
                                     <p class="section-kicker">{{ __('Release notes') }}</p>
-                                    <h4 class="card-heading text-base font-semibold text-gray-900 dark:text-white">{{ __('Changelog') }}</h4>
+                                    <h4 class="card-heading text-base font-semibold">{{ __('Changelog') }}</h4>
                                 </div>
 
                                 <div class="card-shell-muted p-4">
-                                    <div class="prose max-w-none text-sm text-gray-700 dark:prose-invert dark:text-gray-300">
+                                    <div class="app-shell-body-copy max-w-none text-sm leading-6">
                                         {!! nl2br(e($latestStable->changelog)) !!}
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@
                     <aside class="card-shell-muted flex flex-col justify-between gap-6 p-6">
                         <div class="space-y-3">
                             <p class="section-kicker">{{ __('Primary actions') }}</p>
-                            <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Inspect or download') }}</h3>
+                            <h3 class="card-heading text-lg font-semibold">{{ __('Inspect or download') }}</h3>
                             <p class="app-shell-body-copy text-sm">
                                 {{ __('Use the same detail and download endpoints while presenting them through the shared button system.') }}
                             </p>
@@ -156,19 +156,19 @@
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Admin package statistics') }}">
                     <div class="card-shell-muted space-y-2 p-4">
                         <p class="section-kicker">{{ __('Total releases') }}</p>
-                        <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $stats['total_releases'] ?? 0 }}</p>
+                        <p class="card-heading text-xl font-semibold">{{ $stats['total_releases'] ?? 0 }}</p>
                     </div>
                     <div class="card-shell-muted space-y-2 p-4">
                         <p class="section-kicker">{{ __('Stable releases') }}</p>
-                        <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $stats['stable_releases'] ?? 0 }}</p>
+                        <p class="card-heading text-xl font-semibold">{{ $stats['stable_releases'] ?? 0 }}</p>
                     </div>
                     <div class="card-shell-muted space-y-2 p-4">
                         <p class="section-kicker">{{ __('Dev releases') }}</p>
-                        <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $stats['dev_releases'] ?? 0 }}</p>
+                        <p class="card-heading text-xl font-semibold">{{ $stats['dev_releases'] ?? 0 }}</p>
                     </div>
                     <div class="card-shell-muted space-y-2 p-4">
                         <p class="section-kicker">{{ __('Latest stable') }}</p>
-                        <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $latestStable?->version ?? __('None') }}</p>
+                        <p class="card-heading text-xl font-semibold">{{ $latestStable?->version ?? __('None') }}</p>
                     </div>
                 </div>
 

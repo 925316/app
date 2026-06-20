@@ -19,9 +19,12 @@ it('renders copy-friendly truncated hwid affordances on the user device history 
     actingAs($user)
         ->get(route('devices.index'))
         ->assertSuccessful()
+        ->assertSee('data-page="devices-index"', false)
         ->assertSee('data-device-hwid-copy="true"', false)
         ->assertSee('data-copy-value="'.$hwidHash.'"', false)
         ->assertSee('title="'.$hwidHash.'"', false)
+        ->assertSee('badge badge-default table-inline-copy max-w-full', false)
+        ->assertDontSee('hover:border-cool-400', false)
         ->assertSee('Device', false)
         ->assertSee('Activity', false);
 });

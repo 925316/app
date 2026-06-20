@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="subheader">
-        {{ __('Review release metadata, keep download and admin actions intact, and continue the cinematic package handoff.') }}
+        {{ __('Review release metadata, keep download and admin actions intact, and continue the atelier package handoff.') }}
     </x-slot>
 
     @php
@@ -49,14 +49,14 @@
                     <div class="card-shell-muted space-y-5 p-6">
                         <div>
                             <p class="section-kicker">{{ __('Release details') }}</p>
-                            <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Metadata and delivery') }}</h3>
-                            <p class="app-shell-body-copy text-sm">{{ __('Keep the same release facts, but present them as stronger cinematic detail surfaces.') }}</p>
+                            <h3 class="card-heading text-lg font-semibold">{{ __('Metadata and delivery') }}</h3>
+                            <p class="app-shell-body-copy text-sm">{{ __('Keep the same release facts, but present them as stronger atelier detail surfaces.') }}</p>
                         </div>
 
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('Version') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">{{ $release->version }}</p>
+                                <p class="card-heading text-base font-semibold">{{ $release->version }}</p>
                                 <p class="app-shell-body-copy text-sm">{{ __('Release ID:') }} {{ $release->id }}</p>
                             </div>
 
@@ -74,7 +74,7 @@
 
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('Released at') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                                <p class="card-heading text-base font-semibold">
                                     {{ $release->created_at ? $release->created_at->format('Y-m-d H:i:s') : __('Unknown') }}
                                 </p>
                                 @if ($release->created_at)
@@ -84,7 +84,7 @@
 
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('Distribution') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">{{ __('Remote package file') }}</p>
+                                <p class="card-heading text-base font-semibold">{{ __('Remote package file') }}</p>
                                 <p class="app-shell-body-copy text-sm">{{ __('File size and checksum are unchanged and remain unavailable for this remote source.') }}</p>
                             </div>
                         </div>
@@ -93,12 +93,12 @@
                     <div class="card-shell-muted space-y-5 p-6">
                         <div>
                             <p class="section-kicker">{{ __('Download source') }}</p>
-                            <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Package file location') }}</h3>
+                            <h3 class="card-heading text-lg font-semibold">{{ __('Package file location') }}</h3>
                         </div>
 
                         <div class="card-shell-muted p-4">
                             <p class="section-kicker">{{ __('Remote URL') }}</p>
-                            <p class="mt-2 break-all text-sm text-gray-700 dark:text-gray-300">{{ $release->download_url }}</p>
+                            <p class="app-shell-body-copy mt-2 break-all text-sm">{{ $release->download_url }}</p>
                         </div>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
                     <div class="space-y-5">
                         <div>
                             <p class="section-kicker">{{ __('Primary actions') }}</p>
-                            <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Download and maintenance') }}</h3>
+                            <h3 class="card-heading text-lg font-semibold">{{ __('Download and maintenance') }}</h3>
                             <p class="app-shell-body-copy text-sm">{{ __('All routes, permissions, and update semantics stay exactly as they are.') }}</p>
                         </div>
 
@@ -185,12 +185,12 @@
 
             @if ($release->changelog)
                 <div class="card-shell-muted p-6">
-                    <div class="prose max-w-none text-sm text-gray-700 dark:prose-invert dark:text-gray-300">
+                    <div class="app-shell-body-copy max-w-none text-sm leading-6">
                         {!! nl2br(e($release->changelog)) !!}
                     </div>
                 </div>
             @else
-                <div class="table-empty-state rounded-2xl border border-dashed border-cool-200/80 bg-cool-50/60 px-6 py-12 text-center dark:border-cool-700/80 dark:bg-cool-900/40">
+                <div class="table-empty-state card-shell-muted px-6 py-12 text-center">
                     <x-icon name="document" class="table-empty-icon" />
                     <p class="table-empty-title">{{ __('No changelog has been published yet.') }}</p>
                     <p class="table-empty-copy">{{ __('Use the existing update action to add release notes for this package.') }}</p>
@@ -214,20 +214,20 @@
                             <div class="flex flex-wrap items-start justify-between gap-3">
                                 <div>
                                     <p class="section-kicker">{{ __('Verification endpoint') }}</p>
-                                    <h3 class="card-heading text-base font-semibold text-gray-900 dark:text-white">{{ __('Published scan link') }}</h3>
+                                    <h3 class="card-heading text-base font-semibold">{{ __('Published scan link') }}</h3>
                                 </div>
 
                                 <x-status-badge status="verified" :text="__('Available')" />
                             </div>
 
-                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="block break-all text-sm text-cool-700 transition hover:text-cool-900 hover:underline dark:text-cool-300 dark:hover:text-cool-100">
+                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="table-link block break-all text-sm">
                                 {{ $url }}
                             </a>
                         </div>
                     @endforeach
                 </div>
             @else
-                <div class="table-empty-state rounded-2xl border border-dashed border-cool-200/80 bg-cool-50/60 px-6 py-12 text-center dark:border-cool-700/80 dark:bg-cool-900/40">
+                <div class="table-empty-state card-shell-muted px-6 py-12 text-center">
                     <x-icon name="shield" class="table-empty-icon" />
                     <p class="table-empty-title">{{ __('No verification links available.') }}</p>
                     <p class="table-empty-copy">{{ __('This release does not currently include external virus detection URLs.') }}</p>

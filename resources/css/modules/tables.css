@@ -338,133 +338,233 @@
     @apply opacity-100;
 }
 
-[data-shell-theme='cinematic'] .table-wrapper,
-[data-shell-theme='cinematic'] .table-responsive {
+[data-shell-theme='atelier'] .table-wrapper,
+[data-shell-theme='atelier'] .table-responsive {
     border-color: rgb(var(--shell-line) / 0.3);
     background: rgb(var(--shell-surface) / 0.7);
     box-shadow: var(--shell-shadow-sm);
 }
 
-[data-shell-theme='cinematic'] .table-toolbar,
-[data-shell-theme='cinematic'] .table-pagination {
+[data-shell-theme='atelier'] .table-toolbar,
+[data-shell-theme='atelier'] .table-pagination {
     border-color: rgb(var(--shell-line) / 0.25);
     background: rgb(var(--shell-surface) / 0.5);
 }
 
-[data-shell-theme='cinematic'] .table-search-input {
+[data-shell-theme='atelier'] .table-search-input {
     background: rgb(var(--shell-surface) / 0.92);
     min-height: 2.75rem;
 }
 
-[data-shell-theme='cinematic'] .table-header {
+[data-shell-theme='atelier'] .table-header {
     background: rgb(var(--shell-surface-soft) / 0.6);
     box-shadow: inset 0 -1px 0 rgb(var(--shell-line) / 0.25);
 }
 
-[data-shell-theme='cinematic'] .table-header-cell {
+[data-shell-theme='atelier'] .table-header-cell {
     color: rgb(var(--shell-muted));
     letter-spacing: 0.12em;
     padding-top: 0.9rem;
     padding-bottom: 0.9rem;
 }
 
-[data-shell-theme='cinematic'] .table-body {
+[data-shell-theme='atelier'] .table-body {
     border-color: rgb(var(--shell-line) / 0.28);
     background: transparent;
 }
 
-[data-shell-theme='cinematic'] .table-row {
+[data-shell-theme='atelier'] .table-row {
     border-color: rgb(var(--shell-line) / 0.24);
 }
 
-[data-shell-theme='cinematic'] .table-row:hover,
-[data-shell-theme='cinematic'] .data-table.with-hover tbody tr:hover,
-[data-shell-theme='cinematic'] .data-table.striped tbody tr:nth-child(even) {
+[data-shell-theme='atelier'] .table-row:hover,
+[data-shell-theme='atelier'] .data-table.with-hover tbody tr:hover,
+[data-shell-theme='atelier'] .data-table.striped tbody tr:nth-child(even) {
     background: rgb(var(--shell-surface-soft) / 0.56);
 }
 
-[data-shell-theme='cinematic'] .table-cell,
-[data-shell-theme='cinematic'] .table-cell-primary,
-[data-shell-theme='cinematic'] .table-cell-secondary {
+[data-shell-theme='atelier'] .table-cell,
+[data-shell-theme='atelier'] .table-cell-primary,
+[data-shell-theme='atelier'] .table-cell-secondary {
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
 
-[data-shell-theme='cinematic'] .table-cell,
-[data-shell-theme='cinematic'] .table-cell-secondary,
-[data-shell-theme='cinematic'] .table-empty,
-[data-shell-theme='cinematic'] .table-meta,
-[data-shell-theme='cinematic'] .table-empty-copy {
+[data-shell-theme='atelier'] .table-cell,
+[data-shell-theme='atelier'] .table-cell-secondary,
+[data-shell-theme='atelier'] .table-empty,
+[data-shell-theme='atelier'] .table-meta,
+[data-shell-theme='atelier'] .table-empty-copy {
     color: rgb(var(--shell-muted));
 }
 
-[data-shell-theme='cinematic'] .table-cell-primary,
-[data-shell-theme='cinematic'] .table-title {
+[data-shell-theme='atelier'] .table-cell-primary,
+[data-shell-theme='atelier'] .table-title {
     color: rgb(var(--shell-ink));
 }
 
-[data-shell-theme='cinematic'] .table-avatar {
+[data-shell-theme='atelier'] .table-avatar {
     border-color: rgb(var(--shell-line) / 0.3);
     background: rgb(var(--shell-brand) / 0.15);
     color: rgb(var(--shell-ink));
 }
 
-[data-shell-theme='cinematic'] .data-table th[data-column] .sort-icon {
+[data-shell-theme='atelier'] .data-table th[data-column] .sort-icon {
     color: rgb(var(--shell-line-strong));
 }
 
-[data-shell-theme='cinematic'] .data-table th[data-column] .sort-icon.is-active-sort {
+[data-shell-theme='atelier'] .data-table th[data-column] .sort-icon.is-active-sort {
     color: rgb(var(--shell-brand));
 }
 
-[data-shell-theme='cinematic'] .table-link {
+[data-shell-theme='atelier'] .table-link {
     color: rgb(var(--shell-brand));
 }
 
-[data-shell-theme='cinematic'] .table-link:hover {
+[data-shell-theme='atelier'] .table-link:hover {
     color: rgb(var(--shell-accent));
 }
 
-[data-shell-theme='cinematic'] .table-link-muted {
+[data-shell-theme='atelier'] .table-link-muted {
     color: rgb(var(--shell-muted));
 }
 
-[data-shell-theme='cinematic'] .table-action {
+[data-shell-theme='atelier'] .table-action {
     border-color: rgb(var(--shell-line) / 0.3);
     background: rgb(var(--shell-surface) / 0.6);
     color: rgb(var(--shell-muted));
 }
 
-[data-shell-theme='cinematic'] .table-action:hover {
+[data-shell-theme='atelier'] .table-action:hover {
     border-color: rgb(var(--shell-line-strong) / 0.54);
     background: rgb(var(--shell-surface-soft) / 0.92);
     color: rgb(var(--shell-ink));
 }
 
-[data-shell-theme='cinematic'] .table-action:focus-visible {
+[data-shell-theme='atelier'] .table-action:focus-visible {
     outline-color: rgb(var(--shell-accent) / 0.42);
 }
 
-[data-shell-theme='cinematic'] .table-action--primary {
+[data-shell-theme='atelier'] .table-action--primary {
     color: rgb(var(--shell-brand));
 }
 
-[data-shell-theme='cinematic'] .table-action--success {
+[data-shell-theme='atelier'] .table-action--success {
     color: rgb(var(--shell-accent));
 }
 
-[data-shell-theme='cinematic'] .table-action--danger {
+[data-shell-theme='atelier'] .table-action--danger {
     color: rgb(var(--shell-brand));
 }
 
-[data-shell-theme='cinematic'] .table-actions--nowrap .table-action {
+[data-shell-theme='atelier'] .table-actions--nowrap .table-action {
     white-space: nowrap;
 }
 
-[data-shell-theme='cinematic'] .table-empty-icon {
+[data-shell-theme='atelier'] .table-empty-icon {
     color: rgb(var(--shell-line-strong) / 0.72);
 }
 
-[data-shell-theme='cinematic'] .table-empty-title {
+[data-shell-theme='atelier'] .table-empty-title {
     color: rgb(var(--shell-ink));
+}
+
+/* Atelier redesign override layer */
+[data-shell-theme='atelier'] .table-wrapper,
+[data-shell-theme='atelier'] .table-responsive {
+    border-radius: 0.85rem;
+    border-color: rgb(var(--shell-line-strong) / 0.42);
+    background:
+        linear-gradient(to right, rgb(var(--shell-line) / 0.1) 1px, transparent 1px),
+        linear-gradient(180deg, rgb(var(--shell-surface-panel) / 0.94), rgb(var(--shell-surface-panel-soft) / 0.76));
+    background-size: 22px 22px, auto;
+}
+
+[data-shell-theme='atelier'] .table-header {
+    background: linear-gradient(90deg, rgb(var(--shell-brand) / 0.16), rgb(var(--shell-surface-soft) / 0.76));
+    box-shadow: inset 0 -2px 0 rgb(var(--shell-line-strong) / 0.34);
+}
+
+[data-shell-theme='atelier'] .table-header-cell {
+    color: rgb(var(--shell-ink));
+    letter-spacing: 0.16em;
+}
+
+[data-shell-theme='atelier'] .table-row:hover,
+[data-shell-theme='atelier'] .data-table.with-hover tbody tr:hover,
+[data-shell-theme='atelier'] .data-table.striped tbody tr:nth-child(even) {
+    background: rgb(var(--shell-accent) / 0.12);
+}
+
+[data-shell-theme='atelier'] .table-action {
+    border-radius: 0.65rem;
+    border-color: rgb(var(--shell-line-strong) / 0.34);
+}
+
+/* Structural atelier data workbench redesign */
+[data-shell-theme='atelier'] .atelier-data-workbench {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+}
+
+@media (min-width: 1180px) {
+    [data-shell-theme='atelier'] .atelier-data-workbench {
+        grid-template-columns: minmax(13rem, 16rem) minmax(0, 1fr);
+    }
+}
+
+[data-shell-theme='atelier'] .atelier-data-rail {
+    display: grid;
+    gap: 0.75rem;
+}
+
+@media (min-width: 640px) and (max-width: 1179px) {
+    [data-shell-theme='atelier'] .atelier-data-rail {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+[data-shell-theme='atelier'] .atelier-data-plane {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: clamp(1rem, 1.7vw, 1.5rem);
+}
+
+[data-shell-theme='atelier'] .atelier-filter-console {
+    margin-bottom: 0;
+}
+
+[data-shell-theme='atelier'] .atelier-filter-console__header {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+[data-shell-theme='atelier'] .atelier-filter-console__body {
+    display: grid;
+    gap: 1rem;
+}
+
+[data-shell-theme='atelier'] .atelier-table-stage {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+[data-shell-theme='atelier'] .atelier-table-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto auto 0;
+    height: 0.25rem;
+    width: 100%;
+    background: linear-gradient(90deg, rgb(var(--shell-brand)), rgb(var(--shell-accent)), rgb(var(--shell-glow)));
+    pointer-events: none;
+    z-index: 1;
+}
+
+[data-shell-theme='atelier'] .atelier-table-stage__scroll {
+    border-top: 0.25rem solid transparent;
 }

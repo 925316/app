@@ -15,17 +15,17 @@
             : __('Activate a key, review your assigned licenses, and keep the same ownership and activation semantics.');
     @endphp
 
-    <div class="space-y-8" data-page="licenses-index">
+    <div class="atelier-data-workbench" data-page="licenses-index" data-atelier-data-workbench>
         @if (Auth::user()->hasPrivilege(7))
-            <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('License statistics') }}">
+            <aside class="atelier-data-rail" aria-label="{{ __('License statistics') }}" data-atelier-data-rail>
                 <x-stat-card :title="__('Total Licenses')" :value="$statistics['total']" icon="document" iconColor="icon-blue" />
                 <x-stat-card :title="__('Active')" :value="$statistics['active']" icon="success" iconColor="icon-green" />
                 <x-stat-card :title="__('Expired')" :value="$statistics['expired']" icon="error" iconColor="icon-red" />
                 <x-stat-card :title="__('Unassigned')" :value="$statistics['unassigned']" icon="warning" iconColor="icon-yellow" />
-            </section>
+            </aside>
         @endif
 
-        <section class="card-shell space-y-6" data-licenses-panel>
+        <section class="card-shell atelier-data-plane" data-licenses-panel data-atelier-data-plane>
             <div class="app-toolbar" data-licenses-toolbar>
                 <div>
                     <p class="section-kicker">{{ $isAdmin ?? false ? __('Directory') : __('Activation') }}</p>

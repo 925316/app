@@ -2,6 +2,21 @@
 
 use Illuminate\Support\Facades\Blade;
 
+it('shared css exposes the atelier redesign instead of the previous cinematic theme', function () {
+    $tokens = file_get_contents(resource_path('css/modules/tokens.css'));
+    $shell = file_get_contents(resource_path('css/modules/shell.css'));
+
+    expect($tokens)
+        ->toContain("[data-shell-theme='atelier']")
+        ->not->toContain("[data-shell-theme='cinematic']");
+
+    expect($shell)
+        ->toContain('.shell-atelier__skip-link')
+        ->toContain('font-family: \'Fraunces\', serif')
+        ->not->toContain('.shell-cinematic__skip-link')
+        ->not->toContain("[data-shell-theme='cinematic']");
+});
+
 it('sidebar nav links expose an accessible label for icon-first navigation states', function () {
     $html = Blade::render('<x-sidebar-nav-link :href="\'#\'" :active="false" icon="home">Dashboard</x-sidebar-nav-link>');
 
@@ -69,11 +84,14 @@ it('auth header renders the logo without the old framed badge classes by default
 });
 
 it('modal confirm defaults blue actions to the shared primary button style', function () {
-    $html = Blade::render('<x-modal-confirm id="confirm-demo" title="Confirm action" confirm-text="Continue" />');
+    $html = Blade::render('<x-modal-confirm id="confirm-demo" title="Confirm action" confirm-text="Continue" icon-name="warning" />');
 
     expect($html)
         ->toContain('class="btn btn-primary"')
-        ->not->toContain('class="btn btn-blue"');
+        ->toContain('card-icon-container')
+        ->not->toContain('class="btn btn-blue"')
+        ->not->toContain('bg-gray-100 dark:bg-gray-700')
+        ->not->toContain('text-gray-600 dark:text-gray-400');
 });
 
 it('filter box hides total summary by default even when a count is provided', function () {
@@ -81,6 +99,8 @@ it('filter box hides total summary by default even when a count is provided', fu
 
     expect($html)
         ->toContain('data-filter-box')
+        ->toContain('data-atelier-filter-console')
+        ->toContain('atelier-filter-console__body')
         ->not->toContain('filter-box-summary')
         ->not->toContain('Showing');
 });
@@ -92,6 +112,15 @@ it('filter box can opt in to total summary when the page needs emphasis', functi
         ->toContain('filter-box-summary')
         ->toContain('Showing')
         ->toContain('42 total');
+});
+
+it('data table renders the atelier table stage structure for dense data pages', function () {
+    $html = Blade::render('<x-data-table :headers="[\'Name\', \'Status\']"><tr><td>Demo</td><td>Active</td></tr></x-data-table>');
+
+    expect($html)
+        ->toContain('data-atelier-table-stage')
+        ->toContain('data-atelier-row-density="scan"')
+        ->toContain('atelier-table-stage__scroll');
 });
 
 it('filter dropdown renders hidden input state and accessible listbox semantics for filter forms', function () {

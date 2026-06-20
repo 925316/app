@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="subheader">
-        {{ __('Inspect a single heartbeat session with the same cinematic framing used on the management index while preserving copy and termination behavior.') }}
+        {{ __('Inspect a single heartbeat session with the same atelier framing used on the management index while preserving copy and termination behavior.') }}
     </x-slot>
 
     @php
@@ -62,7 +62,7 @@
                 <div class="card-shell-muted space-y-5 p-6">
                     <div>
                         <p class="section-kicker">{{ __('Identifiers') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Session basics') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Session basics') }}</h3>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -71,7 +71,7 @@
                             <div class="min-w-0">
                                 <button
                                     type="button"
-                                    class="badge badge-default table-inline-copy w-full max-w-full justify-start transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                    class="badge badge-default table-inline-copy w-full max-w-full justify-start"
                                     title="{{ $sessionToken }}"
                                     aria-label="{{ __('Copy full session token') }}"
                                     data-copy-value="{{ $sessionToken }}"
@@ -85,7 +85,7 @@
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('IP address') }}</p>
-                            <p class="font-mono text-sm text-gray-900 dark:text-white">{{ $session->ip_address ?? __('N/A') }}</p>
+                            <p class="card-value font-mono text-sm">{{ $session->ip_address ?? __('N/A') }}</p>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
@@ -93,7 +93,7 @@
                             <div class="min-w-0">
                                 <button
                                     type="button"
-                                    class="badge badge-default table-inline-copy w-full max-w-full justify-start transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                    class="badge badge-default table-inline-copy w-full max-w-full justify-start"
                                     title="{{ $sessionClientVersion }}"
                                     aria-label="{{ __('Copy full client version') }}"
                                     data-copy-value="{{ $sessionClientVersion }}"
@@ -110,13 +110,13 @@
                 <div class="card-shell-muted space-y-5 p-6">
                     <div>
                         <p class="section-kicker">{{ __('Timing') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Heartbeat timeline') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Heartbeat timeline') }}</h3>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Created at') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $session->created_at ? $session->created_at->format('Y-m-d H:i:s') : __('Unknown') }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $session->created_at ? $session->created_at->format('Y-m-d H:i:s') : __('Unknown') }}</p>
                             @if ($session->created_at)
                                 <p class="app-shell-body-copy text-sm">{{ $session->created_at->diffForHumans() }}</p>
                             @endif
@@ -124,7 +124,7 @@
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Last updated') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $session->updated_at ? $session->updated_at->format('Y-m-d H:i:s') : __('Unknown') }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $session->updated_at ? $session->updated_at->format('Y-m-d H:i:s') : __('Unknown') }}</p>
                             @if ($session->updated_at)
                                 <p class="app-shell-body-copy text-sm">{{ $session->updated_at->diffForHumans() }}</p>
                             @endif
@@ -133,16 +133,16 @@
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Last heartbeat') }}</p>
                             @if ($session->last_heartbeat_at)
-                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $session->last_heartbeat_at->format('Y-m-d H:i:s') }}</p>
+                                <p class="card-value text-sm font-semibold">{{ $session->last_heartbeat_at->format('Y-m-d H:i:s') }}</p>
                                 <p class="app-shell-body-copy text-sm">{{ $session->last_heartbeat_at->diffForHumans() }}</p>
                             @else
-                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Never') }}</p>
+                                <p class="card-value text-sm font-semibold">{{ __('Never') }}</p>
                             @endif
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Since last heartbeat') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            <p class="card-value text-sm font-semibold">
                                 {{ $session->time_since_last_heartbeat !== null ? number_format($session->time_since_last_heartbeat, 2).' '.__('minutes') : __('Never') }}
                             </p>
                         </div>
@@ -156,7 +156,7 @@
                 <div class="flex flex-wrap items-start justify-between gap-4">
                     <div>
                         <p class="section-kicker">{{ __('Relationship') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Related account') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Related account') }}</h3>
                     </div>
 
                     @if ($session->account)
@@ -190,7 +190,7 @@
             <div class="card-shell-muted space-y-5 p-6">
                 <div>
                     <p class="section-kicker">{{ __('Relationship') }}</p>
-                    <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Related device') }}</h3>
+                    <h3 class="card-heading text-lg font-semibold">{{ __('Related device') }}</h3>
                 </div>
 
                 @if ($session->device)
@@ -207,7 +207,7 @@
                                     <div class="min-w-0">
                                         <button
                                             type="button"
-                                            class="badge badge-default table-inline-copy w-full max-w-full justify-start transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                            class="badge badge-default table-inline-copy w-full max-w-full justify-start"
                                             title="{{ $deviceHash }}"
                                             aria-label="{{ __('Copy full device hash') }}"
                                             data-copy-value="{{ $deviceHash }}"

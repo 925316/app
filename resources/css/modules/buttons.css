@@ -160,111 +160,115 @@
     background-color: rgb(67 56 202);
 }
 
-[data-shell-theme='cinematic'] .btn {
-    border-radius: 1rem;
-    border-color: rgb(var(--shell-line) / 0.46);
+[data-shell-theme='atelier'] .btn {
+    border-radius: 0.72rem;
+    border-color: rgb(var(--shell-line-strong) / 0.38);
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     box-shadow: var(--shell-shadow-sm);
     backdrop-filter: blur(16px);
 }
 
-[data-shell-theme='cinematic'] .btn-sm {
+[data-shell-theme='atelier'] .btn-sm {
     min-height: 2.5rem;
     letter-spacing: 0.03em;
 }
 
-[data-shell-theme='cinematic'] .btn:focus-visible {
+[data-shell-theme='atelier'] .btn:focus-visible {
     --tw-ring-color: rgb(var(--shell-accent) / 0.28);
     --tw-ring-offset-color: rgb(var(--shell-surface));
 }
 
-[data-shell-theme='cinematic'] .btn-primary,
-[data-shell-theme='cinematic'] .btn-blue {
-    color: rgb(var(--shell-ink));
-    border-color: rgb(var(--shell-brand) / 0.34);
-    background: linear-gradient(180deg, rgb(var(--shell-brand) / 0.18), rgb(var(--shell-brand) / 0.12));
+[data-shell-theme='atelier'] .btn-primary,
+[data-shell-theme='atelier'] .btn-blue {
+    color: rgb(255 255 247);
+    border-color: rgb(var(--shell-brand) / 0.78);
+    background:
+        linear-gradient(180deg, rgb(var(--shell-brand)), rgb(9 51 133)),
+        linear-gradient(to right, rgb(255 255 255 / 0.18) 1px, transparent 1px);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.18) inset, 0 16px 30px rgb(var(--shell-brand) / 0.22);
 }
 
-[data-shell-theme='cinematic'] .btn-primary:hover,
-[data-shell-theme='cinematic'] .btn-blue:hover {
+[data-shell-theme='atelier'] .btn-primary:hover,
+[data-shell-theme='atelier'] .btn-blue:hover {
+    border-color: rgb(var(--shell-accent) / 0.65);
+    background: linear-gradient(180deg, rgb(28 96 218), rgb(var(--shell-brand)));
+}
+
+[data-shell-theme='atelier'] .btn-secondary {
+    color: rgb(var(--shell-ink));
+    border-color: rgb(var(--shell-line-strong) / 0.42);
+    background:
+        linear-gradient(180deg, rgb(var(--shell-surface) / 0.92), rgb(var(--shell-surface-soft) / 0.78));
+}
+
+[data-shell-theme='atelier'] .btn-secondary:hover {
+    background: rgb(var(--shell-surface-soft) / 0.95);
     border-color: rgb(var(--shell-brand) / 0.52);
-    background: linear-gradient(180deg, rgb(var(--shell-brand) / 0.24), rgb(var(--shell-brand) / 0.16));
 }
 
-[data-shell-theme='cinematic'] .btn-secondary {
-    color: rgb(var(--shell-ink));
-    border-color: rgb(var(--shell-line) / 0.35);
-    background: rgb(var(--shell-surface) / 0.6);
-}
-
-[data-shell-theme='cinematic'] .btn-secondary:hover {
-    background: rgb(var(--shell-surface-soft) / 0.75);
-    border-color: rgb(var(--shell-line-strong) / 0.4);
-}
-
-[data-shell-theme='cinematic'] .btn-secondary:focus-visible {
+[data-shell-theme='atelier'] .btn-secondary:focus-visible {
     --tw-ring-color: rgb(var(--shell-accent) / 0.24);
 }
 
-[data-shell-theme='cinematic'] .btn-danger {
+[data-shell-theme='atelier'] .btn-danger {
     color: rgb(var(--shell-ink));
     border-color: rgb(var(--color-danger) / 0.3);
     background: rgb(var(--color-danger) / 0.15);
 }
 
-[data-shell-theme='cinematic'] .btn-green,
-[data-shell-theme='cinematic'] .btn-yellow,
-[data-shell-theme='cinematic'] .btn-purple,
-[data-shell-theme='cinematic'] .btn-indigo {
+[data-shell-theme='atelier'] .btn-green,
+[data-shell-theme='atelier'] .btn-yellow,
+[data-shell-theme='atelier'] .btn-purple,
+[data-shell-theme='atelier'] .btn-indigo {
     color: rgb(var(--shell-ink));
     border-color: rgb(var(--shell-line) / 0.42);
     box-shadow: var(--shell-shadow-sm);
 }
 
-[data-shell-theme='cinematic'] .btn-green {
+[data-shell-theme='atelier'] .btn-green {
     border-color: rgb(var(--shell-accent) / 0.3);
     background: rgb(var(--shell-accent) / 0.15);
 }
 
-[data-shell-theme='cinematic'] .btn-yellow {
+[data-shell-theme='atelier'] .btn-yellow {
     color: rgb(var(--shell-ink));
     border-color: rgb(var(--shell-glow) / 0.3);
     background: rgb(var(--shell-glow) / 0.15);
 }
 
-[data-shell-theme='cinematic'] .btn-purple {
+[data-shell-theme='atelier'] .btn-purple {
     border-color: rgb(var(--shell-line-strong) / 0.35);
     background: rgb(var(--shell-line-strong) / 0.15);
 }
 
-[data-shell-theme='cinematic'] .btn-indigo {
+[data-shell-theme='atelier'] .btn-indigo {
     border-color: rgb(var(--shell-brand) / 0.25);
     background: rgb(var(--shell-brand) / 0.12);
 }
 
-[data-shell-theme='cinematic'] .btn-danger:hover {
+[data-shell-theme='atelier'] .btn-danger:hover {
     border-color: rgb(var(--color-danger) / 0.48);
     background: rgb(var(--color-danger) / 0.18);
 }
 
-[data-shell-theme='cinematic'] .btn-green:hover {
+[data-shell-theme='atelier'] .btn-green:hover {
     border-color: rgb(var(--shell-accent) / 0.48);
     background: rgb(var(--shell-accent) / 0.18);
 }
 
-[data-shell-theme='cinematic'] .btn-yellow:hover {
+[data-shell-theme='atelier'] .btn-yellow:hover {
     border-color: rgb(var(--shell-glow) / 0.48);
     background: rgb(var(--shell-glow) / 0.18);
 }
 
-[data-shell-theme='cinematic'] .btn-purple:hover {
+[data-shell-theme='atelier'] .btn-purple:hover {
     border-color: rgb(var(--shell-line-strong) / 0.56);
     background: rgb(var(--shell-line-strong) / 0.2);
 }
 
-[data-shell-theme='cinematic'] .btn-indigo:hover {
+[data-shell-theme='atelier'] .btn-indigo:hover {
     border-color: rgb(var(--shell-brand) / 0.46);
     background: rgb(var(--shell-brand) / 0.16);
 }

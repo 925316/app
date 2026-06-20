@@ -16,17 +16,24 @@
         $connectionUsage = min($databaseStatus['connections']['usage_percent'] ?? 0, 100);
     @endphp
 
-    <div class="space-y-8" data-page="dashboard-admin">
-        <section class="card-shell flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between" data-dashboard-summary>
-            <div class="space-y-2" data-dashboard-section-title-group>
+    <div class="atelier-command-deck" data-page="dashboard-admin" data-atelier-command-deck>
+        <section class="atelier-spotlight" data-dashboard-summary data-atelier-spotlight>
+            <div class="card-shell atelier-spotlight__hero" data-dashboard-section-title-group>
                 <p class="section-kicker">{{ __('Operations snapshot') }}</p>
-                <h2 class="dashboard-section-title text-2xl font-semibold">{{ __('Administrative overview') }}</h2>
-                <p class="dashboard-meta-text max-w-2xl text-sm">
+                <h2 class="dashboard-section-title text-3xl font-semibold sm:text-4xl">{{ __('Administrative overview') }}</h2>
+                <p class="dashboard-meta-text max-w-3xl text-sm">
                     {{ __('Track account health, recent platform activity, and core service status without changing any existing data contracts.') }}
                 </p>
             </div>
 
-            <div class="card-shell-muted flex items-center gap-3 self-start lg:self-auto" data-dashboard-summary-chip>
+            <div class="atelier-metric-rail" aria-label="{{ __('Dashboard statistics') }}" data-dashboard-stat-grid data-dashboard-grid="metrics" data-atelier-metric-rail>
+                <x-stat-card :title="__('Total Accounts')" :value="$stats['total_accounts'] ?? 0" icon="users" iconColor="icon-blue" />
+                <x-stat-card :title="__('Active Licenses')" :value="$stats['active_licenses'] ?? 0" icon="success" iconColor="icon-green" />
+                <x-stat-card :title="__('Suspended Accounts')" :value="$stats['suspended_accounts'] ?? 0" icon="warning" iconColor="icon-red" />
+                <x-stat-card :title="__('Expired Licenses')" :value="$stats['expired_licenses'] ?? 0" icon="error" iconColor="icon-yellow" />
+            </div>
+
+            <div class="card-shell-muted atelier-spotlight__stamp" data-dashboard-summary-chip>
                 <span class="card-icon-container icon-indigo h-11 w-11 shrink-0">
                     <x-icon name="server" class="h-6 w-6" />
                 </span>
@@ -38,15 +45,8 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="{{ __('Dashboard statistics') }}" data-dashboard-stat-grid data-dashboard-grid="metrics">
-            <x-stat-card :title="__('Total Accounts')" :value="$stats['total_accounts'] ?? 0" icon="users" iconColor="icon-blue" />
-            <x-stat-card :title="__('Active Licenses')" :value="$stats['active_licenses'] ?? 0" icon="success" iconColor="icon-green" />
-            <x-stat-card :title="__('Suspended Accounts')" :value="$stats['suspended_accounts'] ?? 0" icon="warning" iconColor="icon-red" />
-            <x-stat-card :title="__('Expired Licenses')" :value="$stats['expired_licenses'] ?? 0" icon="error" iconColor="icon-yellow" />
-        </section>
-
-        <section class="grid grid-cols-1 gap-6 xl:grid-cols-2" data-dashboard-panels>
-            <article class="card-shell space-y-6" data-dashboard-card="recent-activity">
+        <section class="atelier-operations-matrix" data-dashboard-panels data-atelier-operations-matrix>
+            <article class="card-shell atelier-panel-tall" data-dashboard-card="recent-activity">
                 <header class="flex items-start gap-4">
                     <span class="card-icon-container icon-blue shrink-0">
                         <x-icon name="lightning" class="h-6 w-6" />
@@ -74,7 +74,7 @@
                 </dl>
             </article>
 
-            <article class="card-shell space-y-6" data-dashboard-card="system-health">
+            <article class="card-shell atelier-panel-tall" data-dashboard-card="system-health">
                 <header class="flex items-start gap-4">
                     <span class="card-icon-container icon-purple shrink-0">
                         <x-icon name="shield" class="h-6 w-6" />
@@ -105,14 +105,14 @@
             </article>
         </section>
 
-        <section class="space-y-6" data-dashboard-database>
-            <div class="space-y-2" data-dashboard-section-title-group>
+        <section class="atelier-database-map" data-dashboard-database>
+            <div class="card-shell atelier-database-map__intro" data-dashboard-section-title-group>
                 <p class="section-kicker">{{ __('Infrastructure') }}</p>
                 <h2 class="dashboard-section-title text-xl font-semibold">{{ __('Database system status') }}</h2>
             </div>
 
             @if (isset($databaseStatus['error']))
-                <div class="card-shell border-red-200/70 text-red-700 dark:border-red-800 dark:text-red-300" data-dashboard-error>
+                <div class="card-shell" data-dashboard-error>
                     <div class="flex items-start gap-3">
                         <span class="card-icon-container icon-red h-11 w-11 shrink-0">
                             <x-icon name="error" class="h-6 w-6" />
@@ -126,8 +126,8 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                <article class="card-shell space-y-6" data-dashboard-card="database-info">
+            <div class="atelier-operations-matrix atelier-operations-matrix--dense">
+                <article class="card-shell atelier-panel-tall" data-dashboard-card="database-info">
                     <header class="flex items-start gap-4">
                         <span class="card-icon-container icon-blue shrink-0">
                             <x-icon name="server" class="h-6 w-6" />
@@ -148,7 +148,7 @@
                     </dl>
                 </article>
 
-                <article class="card-shell space-y-6" data-dashboard-card="connection-pool">
+                <article class="card-shell atelier-panel-tall" data-dashboard-card="connection-pool">
                     <header class="flex items-start gap-4">
                         <span class="card-icon-container icon-purple shrink-0">
                             <x-icon name="lightning" class="h-6 w-6" />
@@ -179,7 +179,7 @@
                     </div>
                 </article>
 
-                <article class="card-shell space-y-6" data-dashboard-card="queue-jobs">
+                <article class="card-shell atelier-panel-tall" data-dashboard-card="queue-jobs">
                     <header class="flex items-start gap-4">
                         <span class="card-icon-container icon-orange shrink-0">
                             <x-icon name="document" class="h-6 w-6" />
@@ -197,7 +197,7 @@
                     </dl>
                 </article>
 
-                <article class="card-shell space-y-6" data-dashboard-card="system-status">
+                <article class="card-shell atelier-panel-tall" data-dashboard-card="system-status">
                     <header class="flex items-start gap-4">
                         <span class="card-icon-container icon-green shrink-0">
                             <x-icon name="success" class="h-6 w-6" />

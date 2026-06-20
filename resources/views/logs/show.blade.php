@@ -49,13 +49,13 @@
                 <div class="card-shell-muted space-y-5 p-6">
                     <div>
                         <p class="section-kicker">{{ __('Overview') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Event basics') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Event basics') }}</h3>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div class="card-shell-muted space-y-2 p-4 sm:col-span-2">
                             <p class="section-kicker">{{ __('Event type') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $log->event_type }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $log->event_type }}</p>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
@@ -67,18 +67,18 @@
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('IP address') }}</p>
-                            <p class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $log->ip_address }}</p>
+                            <p class="card-value font-mono text-sm font-semibold">{{ $log->ip_address }}</p>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Logged at') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $log->created_at->format('Y-m-d H:i:s') }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $log->created_at->format('Y-m-d H:i:s') }}</p>
                             <p class="app-shell-body-copy text-sm">{{ $log->created_at->diffForHumans() }}</p>
                         </div>
 
                         <div class="card-shell-muted space-y-2 p-4">
                             <p class="section-kicker">{{ __('Last updated') }}</p>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $log->updated_at->format('Y-m-d H:i:s') }}</p>
+                            <p class="card-value text-sm font-semibold">{{ $log->updated_at->format('Y-m-d H:i:s') }}</p>
                             <p class="app-shell-body-copy text-sm">{{ $log->updated_at->diffForHumans() }}</p>
                         </div>
                     </div>
@@ -87,7 +87,7 @@
                 <div class="card-shell-muted space-y-5 p-6">
                     <div>
                         <p class="section-kicker">{{ __('Relationships') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('Related entities') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('Related entities') }}</h3>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4">
@@ -99,7 +99,7 @@
                                         {{ $log->account->username }}
                                     </p>
                                 @else
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('System') }}</p>
+                                    <p class="card-value text-sm font-semibold">{{ __('System') }}</p>
                                 @endif
                             </div>
                         </div>
@@ -112,7 +112,7 @@
                                         {{ $log->actor->username }}
                                     </p>
                                 @else
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('System') }}</p>
+                                    <p class="card-value text-sm font-semibold">{{ __('System') }}</p>
                                 @endif
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                                         {{ $log->license->key }}
                                     </a>
                                 @else
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('N/A') }}</p>
+                                    <p class="card-value text-sm font-semibold">{{ __('N/A') }}</p>
                                 @endif
                             </div>
                         </div>
@@ -145,7 +145,7 @@
                 </div>
 
                 <div class="card-shell-muted p-5">
-                    <pre class="table-code overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs text-gray-700 dark:text-gray-300">{{ $logDetailsJson }}</pre>
+                    <pre class="table-code app-shell-body-copy overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs">{{ $logDetailsJson }}</pre>
                 </div>
             </section>
         @endif
@@ -160,7 +160,7 @@
             </div>
 
             <div class="card-shell-muted p-5">
-                <pre class="table-code overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs text-gray-700 dark:text-gray-300">{{ $logRawJson }}</pre>
+                <pre class="table-code app-shell-body-copy overflow-x-auto whitespace-pre-wrap break-all bg-transparent text-xs">{{ $logRawJson }}</pre>
             </div>
         </section>
     </div>

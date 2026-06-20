@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="subheader">
-        {{ __('Keep binding, unbinding, and HWID reset behavior intact while moving the controls into the shared cinematic form system.') }}
+        {{ __('Keep binding, unbinding, and HWID reset behavior intact while moving the controls into the shared atelier form system.') }}
     </x-slot>
 
     @php
@@ -44,7 +44,7 @@
 
                                 <div>
                                     <p class="section-kicker">{{ __('Currently bound device') }}</p>
-                                    <h3 class="card-heading text-2xl font-semibold text-gray-900 dark:text-white">
+                                    <h3 class="card-heading text-2xl font-semibold">
                                         <span title="{{ $currentDevice->hwid_hash }}" class="cursor-help font-mono break-all">
                                             {{ $currentDeviceShortHwid }}
                                         </span>
@@ -54,7 +54,7 @@
 
                             <div class="card-shell-muted min-w-[14rem] space-y-2 self-start p-4">
                                 <p class="section-kicker">{{ __('Bound at') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                                <p class="card-heading text-base font-semibold">
                                     {{ $currentDevice->bound_at ? $currentDevice->bound_at->format('Y-m-d H:i') : __('Unknown') }}
                                 </p>
                                 @if ($currentDevice->bound_at)
@@ -66,12 +66,12 @@
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('IP address') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">{{ $currentDevice->ip_address ?? __('Unknown') }}</p>
+                                <p class="card-heading text-base font-semibold">{{ $currentDevice->ip_address ?? __('Unknown') }}</p>
                             </div>
 
                             <div class="card-shell-muted space-y-2 p-4">
                                 <p class="section-kicker">{{ __('Country') }}</p>
-                                <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">{{ $currentDevice->country_code ?? __('Unknown') }}</p>
+                                <p class="card-heading text-base font-semibold">{{ $currentDevice->country_code ?? __('Unknown') }}</p>
                             </div>
                         </div>
 
@@ -97,7 +97,7 @@
 
                                 <div>
                                     <p class="section-kicker">{{ __('Binding status') }}</p>
-                                    <h3 class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ __('No device currently attached') }}</h3>
+                                    <h3 class="card-heading text-xl font-semibold">{{ __('No device currently attached') }}</h3>
                                 </div>
 
                                 <p class="app-shell-body-copy text-sm">
@@ -111,7 +111,7 @@
                 <aside class="card-shell-muted flex flex-col justify-between gap-6 p-6">
                     <div class="space-y-3">
                         <p class="section-kicker">{{ __('Binding policy') }}</p>
-                        <h3 class="card-heading text-lg font-semibold text-gray-900 dark:text-white">{{ __('One device at a time') }}</h3>
+                        <h3 class="card-heading text-lg font-semibold">{{ __('One device at a time') }}</h3>
                         <p class="app-shell-body-copy text-sm">
                             {{ __('This account can only keep one active binding at a time. Unbind or reset the current HWID before attaching replacement hardware.') }}
                         </p>
@@ -145,7 +145,7 @@
                             <label for="hwid" class="form-label">{{ __('HWID') }}</label>
                             <input type="text" name="hwid" id="hwid" value="{{ old('hwid') }}" class="form-input w-full" placeholder="{{ __('Enter your device HWID string') }}">
                             <x-input-error :messages="$errors->get('hwid')" />
-                            <p class="form-note text-xs text-gray-500 dark:text-gray-400">
+                            <p class="form-note text-xs">
                                 {{ __('Your raw HWID string will be hashed on the server side and stored as an irreversible SHA-256 hash.') }}
                             </p>
                         </div>
@@ -189,12 +189,12 @@
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div class="card-shell-muted space-y-2 p-4">
                     <p class="section-kicker">{{ __('HWID reset count') }}</p>
-                    <p class="card-heading text-xl font-semibold text-gray-900 dark:text-white">{{ $hwidResetCount }}</p>
+                    <p class="card-heading text-xl font-semibold">{{ $hwidResetCount }}</p>
                 </div>
 
                 <div class="card-shell-muted space-y-2 p-4">
                     <p class="section-kicker">{{ __('Last HWID reset') }}</p>
-                    <p class="card-heading text-base font-semibold text-gray-900 dark:text-white">
+                    <p class="card-heading text-base font-semibold">
                         {{ $hwidLastReset ? $hwidLastReset->format('Y-m-d H:i') : __('Never') }}
                     </p>
                     @if ($hwidLastReset)
@@ -232,7 +232,7 @@
                 @else
                     <div class="space-y-3">
                         <x-status-badge status="warning" :text="__('Cooldown active')" />
-                        <p class="app-shell-body-copy text-sm text-yellow-700 dark:text-yellow-300">
+                        <p class="app-shell-body-copy text-sm">
                             {{ __('You can only reset HWID every 72 hours. Please wait until') }}
                             {{ $hwidLastReset ? $hwidLastReset->addHours(72)->format('Y-m-d H:i') : __('your first reset') }}.
                         </p>

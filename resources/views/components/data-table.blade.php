@@ -6,8 +6,8 @@
     'ariaLabel' => __('Data table'),
 ])
 
-<div class="table-wrapper" data-table-shell>
-    <div class="table-scroll">
+<div class="table-wrapper atelier-table-stage" data-table-shell data-atelier-table-stage data-atelier-row-density="scan">
+    <div class="table-scroll atelier-table-stage__scroll">
         <table class="data-table compact with-hover" aria-label="{{ $ariaLabel }}">
         <thead class="table-header">
             <tr>

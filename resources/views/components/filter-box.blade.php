@@ -13,13 +13,13 @@
     $shouldShowTotal = filter_var($showTotal, FILTER_VALIDATE_BOOLEAN) && $totalCount !== null;
 @endphp
 
-<section class="filter-box-shell mb-6" aria-labelledby="{{ $headingId }}" data-filter-box>
+<section class="filter-box-shell atelier-filter-console mb-6" aria-labelledby="{{ $headingId }}" data-filter-box data-atelier-filter-console>
     <form method="{{ $method }}" action="{{ $action }}"
         class="filter-box-form"
         role="search" aria-labelledby="{{ $headingId }}"
         @if ($cleanForm) data-clean-form="true" @endif
         @if ($defaultValues) data-default-values="{{ $defaultValues }}" @endif>
-        <div class="filter-box-header">
+        <div class="filter-box-header atelier-filter-console__header">
             <div class="filter-box-heading">
                 <h2 id="{{ $headingId }}" class="filter-box-title text-lg font-semibold">
                     <span class="filter-box-icon" aria-hidden="true">
@@ -36,7 +36,7 @@
             @endif
         </div>
 
-        <div class="filter-box-body">
+        <div class="filter-box-body atelier-filter-console__body">
             {{ $slot }}
         </div>
     </form>

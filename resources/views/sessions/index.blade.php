@@ -210,7 +210,7 @@
                                 @if ($session->device && $deviceHashPreview)
                                     <button
                                         type="button"
-                                        class="badge badge-default table-inline-copy max-w-full transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                        class="badge badge-default table-inline-copy max-w-full"
                                         title="{{ $deviceHash }}"
                                         aria-label="{{ __('Copy full device hash') }}"
                                         data-copy-value="{{ $deviceHash }}"
@@ -238,7 +238,7 @@
 
                                 <button
                                     type="button"
-                                    class="badge badge-default table-inline-copy max-w-full transition hover:border-cool-400 hover:text-cool-800 dark:hover:border-cool-500 dark:hover:text-cool-100"
+                                    class="badge badge-default table-inline-copy max-w-full"
                                     title="{{ $clientVersion }}"
                                     aria-label="{{ __('Copy full client version') }}"
                                     data-copy-value="{{ $clientVersion }}"

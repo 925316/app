@@ -14,9 +14,18 @@ beforeEach(function () {
 // --- Package Index ---
 
 it('user with license can view package list', function () {
+    PackageRelease::factory()->create([
+        'version' => '1.0.0',
+        'release_channel' => 'stable',
+        'changelog' => 'Initial release notes',
+    ]);
+
     $this->actingAs($this->userWithLicense)
         ->get(route('packages.index'))
         ->assertSuccessful()
+        ->assertSee('data-page="packages-index"', false)
+        ->assertSee('app-shell-body-copy max-w-none text-sm leading-6', false)
+        ->assertDontSee('text-gray-700 dark:prose-invert dark:text-gray-300', false)
         ->assertViewIs('packages.index');
 });
 
@@ -78,13 +87,23 @@ it('package list uses numeric version ordering instead of lexicographic order', 
 // --- Package Show ---
 
 it('user with license can view package details', function () {
-    $release = PackageRelease::factory()->create(['version' => '1.0.0', 'release_channel' => 'stable']);
+    $release = PackageRelease::factory()->create([
+        'version' => '1.0.0',
+        'release_channel' => 'stable',
+        'changelog' => null,
+        'virus_detection_url' => null,
+    ]);
 
     $this->actingAs($this->userWithLicense)
         ->get(route('packages.show', $release))
         ->assertSuccessful()
         ->assertViewIs('packages.show')
-        ->assertViewHasAll(['release', 'canDownload', 'isAdmin']);
+        ->assertViewHasAll(['release', 'canDownload', 'isAdmin'])
+        ->assertSee('data-page="packages-show"', false)
+        ->assertSee('app-shell-body-copy mt-2 break-all text-sm', false)
+        ->assertSee('table-empty-state card-shell-muted', false)
+        ->assertDontSee('border-cool-200/80', false)
+        ->assertDontSee('text-cool-700', false);
 });
 
 it('package show returns not found for missing release model', function () {
@@ -150,7 +169,12 @@ it('user without license cannot download a package', function () {
 it('admin can view package upload form', function () {
     $this->actingAs($this->admin)
         ->get(route('packages.upload'))
-        ->assertSuccessful();
+        ->assertSuccessful()
+        ->assertSee('form-label', false)
+        ->assertSee('form-note text-xs', false)
+        ->assertSee('form-divider flex justify-end gap-3', false)
+        ->assertDontSee('border-cool-200/70', false)
+        ->assertDontSee('text-gray-700 dark:text-gray-300', false);
 });
 
 it('guest is redirected from package admin pages', function () {
@@ -344,7 +368,11 @@ it('admin can view package manage page', function () {
     $this->actingAs($this->admin)
         ->get(route('packages.manage'))
         ->assertSuccessful()
-        ->assertViewIs('packages.manage');
+        ->assertViewIs('packages.manage')
+        ->assertSee('data-page="packages-manage"', false)
+        ->assertSee('filter-dropdown-option', false)
+        ->assertSee('card-shell-muted absolute right-0', false)
+        ->assertDontSee('hover:bg-gray-100', false);
 });
 
 it('non-admin cannot access package manage page', function () {
