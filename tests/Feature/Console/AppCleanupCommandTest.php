@@ -23,7 +23,11 @@ it('reports cleanup counts without deleting records in dry run mode', function (
 it('deletes only stale cleanup targets', function () {
     $oldLog = EventLog::factory()->create(['created_at' => now()->subDays(120)]);
     $recentLog = EventLog::factory()->create(['created_at' => now()->subDays(2)]);
-    $staleSession = ClientSession::factory()->expired(2000)->create();
+    $staleSession = ClientSession::factory()->create([
+        'created_at' => now()->subDays(2),
+        'last_heartbeat_at' => now()->subMinutes(2000),
+        'updated_at' => now()->subMinutes(2000),
+    ]);
     $activeSession = ClientSession::factory()->active()->create();
     $oldRetiredKey = ApiSigningKey::factory()->retired(400)->create();
     $activeKey = ApiSigningKey::factory()->active()->create();
