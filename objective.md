@@ -386,18 +386,19 @@ From `CryptoService`, `ClientLicenseController`, `ClientPackageController`, and 
 - Signing algorithm identifier is `RSA-2048-SHA256`.
 - Signing uses `openssl_sign(..., OPENSSL_ALGO_SHA256)` and base64-encodes the signature.
 - Canonicalization recursively sorts associative-array keys and JSON-encodes without escaped Unicode or slashes.
-- Success responses sign only the `data` payload.
-- Error responses sign `null` because `data` is `null`.
+- Successful responses sign the `data` value only.
+- Signed controller error responses sign `data`, which is `null` on that path.
+- Validation error responses sign `data`, which is `null` on that path.
+- Current responses do not emit `meta.signature.covers`.
 
 ### Verified security limitation
 
-- The current signature does **not** cover top-level fields such as `code`, `error_code`, or `message`.
-- Therefore, if client behavior depends on those fields, signature verification alone does not protect them from tampering.
+- Unsigned envelope fields such as `code`, `error_code`, `message`, and signature metadata are not integrity-protected by the current signature behavior.
+- Clients should not treat top-level envelope fields outside `data` as signed unless a future protocol hardening change explicitly signs them.
 
 ### Recommended hardening
 
-- If the client makes decisions based on `error_code`, `code`, or `message`, the signed material should cover the entire response envelope or another explicitly defined canonical structure that includes every decision-relevant field.
-- External API guidance supports separating HTTP status from machine-readable business codes, but it also requires that any client-trusted signed content have an explicit and complete signature scope.
+- External API guidance supports separating HTTP status from machine-readable business codes. A future protocol hardening task should add an explicit signature scope before clients treat the full envelope as trusted signed content.
 
 ## 7.4 Canonical JSON Rule
 
@@ -557,7 +558,7 @@ This test coverage is strong enough to justify documenting the current API contr
 2. Login request validation does not mark `email` and `password` as required, even though the controller treats missing credentials as `AUTH_REQUIRED`.
 3. `version` is optional on check, activate, and unbind request validators in the current implementation.
 4. The project has often described a stronger one-online-session rule than the code currently enforces.
-5. The current response signature covers only `data`, not the full response envelope.
+5. Current response signing protects successful `data` payloads, while signed controller errors and validation errors sign `null` through `data`; no current response emits `meta.signature.covers`.
 
 These are important because the document should not claim stronger guarantees than the implementation actually provides.
 
@@ -565,7 +566,7 @@ These are important because the document should not claim stronger guarantees th
 
 These are not claims about current behavior. They are the most reasonable next steps given the verified code and external API/security guidance.
 
-1. **Tighten signature scope** so every field trusted by the client is covered by the signature.
+1. **Future protocol hardening**: define and emit an explicit signature scope, then update client-side validation to verify exactly that scope.
 2. **Clarify the contract around body `code`**. Keep it only as a mirror of HTTP status, or eventually remove it if backward compatibility allows.
 3. **Strengthen the database guarantee** for the one-active-device rule if that rule is business-critical.
 4. **Align validator rules with controller behavior** for login and update-check fields so validation and runtime behavior tell the same story.
@@ -579,7 +580,7 @@ The current codebase already implements a coherent license-management backend wi
 - a usable license state model,
 - application-level bound-device enforcement backed by transactional checks,
 - nonce and timestamp protection for state-changing or authenticated POST routes,
-- signed API responses whose current signature scope covers payload `data`,
+- signed API responses that currently protect successful `data` payloads and sign `null` for signed controller-error and validation-error paths,
 - and strong feature-test coverage for the current API surface.
 
 The main work for documentation is not inventing a new system. It is documenting the existing system honestly, separating verified behavior from future hardening, and avoiding claims that the current code does not yet fully guarantee.
