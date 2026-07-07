@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ApiErrorCode;
+use App\Http\Controllers\Concerns\ApiResponse;
 use App\Http\Requests\ClientUpdateCheckRequest;
 use App\Models\ClientSession;
 use App\Services\CryptoService;
@@ -12,7 +13,7 @@ use Throwable;
 
 class ClientPackageController extends Controller
 {
-    private const SIGNING_ALGORITHM = 'RSA-2048-SHA256';
+    use ApiResponse;
 
     public function __construct(private readonly CryptoService $cryptoService) {}
 
@@ -21,27 +22,18 @@ class ClientPackageController extends Controller
         try {
             $validated = $request->validated();
             $sessionToken = $validated['session_token'] ?? null;
-            $releaseChannel = $validated['release_channel'] ?? 'stable';
-            $currentVersion = $validated['current_version'] ?? null;
-
-            if (! is_string($releaseChannel)) {
-                return $this->errorResponse(422, ApiErrorCode::INVALID_CHANNEL, 'Release channel is invalid.', true);
-            }
-
-            if (! is_string($sessionToken) || $sessionToken === '' || mb_strlen($sessionToken) > 128) {
+            if (! is_string($sessionToken) || $sessionToken === '') {
                 return $this->errorResponse(401, ApiErrorCode::AUTH_REQUIRED, 'Authentication required.', true);
             }
 
-            if ($currentVersion !== null && (! is_string($currentVersion) || mb_strlen($currentVersion) > 50)) {
-                return $this->errorResponse(422, ApiErrorCode::INVALID_VERSION, 'Current version format is invalid.', true);
+            $releaseChannel = $validated['release_channel'] ?? 'stable';
+            if (! is_string($releaseChannel) || ! in_array($releaseChannel, ['stable', 'dev'], true)) {
+                return $this->errorResponse(422, ApiErrorCode::INVALID_CHANNEL, 'Invalid release channel.', true);
             }
 
-            if ($currentVersion !== null && ! PackageService::isValidSemanticVersion($currentVersion)) {
-                return $this->errorResponse(422, ApiErrorCode::INVALID_VERSION, 'Current version format is invalid.', true);
-            }
-
-            if (mb_strlen($releaseChannel) > 20 || ! in_array($releaseChannel, ['stable', 'dev'], true)) {
-                return $this->errorResponse(422, ApiErrorCode::INVALID_CHANNEL, 'Release channel is invalid.', true);
+            $currentVersion = $validated['current_version'] ?? null;
+            if ($currentVersion !== null && $currentVersion !== '' && ! PackageService::isValidSemanticVersion($currentVersion)) {
+                return $this->errorResponse(422, ApiErrorCode::INVALID_VERSION, 'Invalid version format.', true);
             }
 
             $session = ClientSession::query()
@@ -101,52 +93,5 @@ class ClientPackageController extends Controller
 
             return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.', true);
         }
-    }
-
-    private function errorResponse(int $httpCode, ApiErrorCode $errorCode, string $message, bool $signResponse = false): JsonResponse
-    {
-        $payload = [
-            'code' => $httpCode,
-            'error_code' => $errorCode->value,
-            'message' => $message,
-            'data' => null,
-        ];
-
-        if ($signResponse) {
-            $payload['signature'] = $this->cryptoService->signData($payload['data']);
-            $payload['meta'] = [
-                'signature' => [
-                    'algorithm' => self::SIGNING_ALGORITHM,
-                    'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
-                ],
-            ];
-        }
-
-        return response()->json($payload, $httpCode);
-    }
-
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    private function successResponse(array $data, bool $signResponse = false): JsonResponse
-    {
-        $payload = [
-            'code' => 200,
-            'error_code' => null,
-            'message' => 'OK',
-            'data' => $data,
-        ];
-
-        if ($signResponse) {
-            $payload['signature'] = $this->cryptoService->signData($data);
-            $payload['meta'] = [
-                'signature' => [
-                    'algorithm' => self::SIGNING_ALGORITHM,
-                    'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
-                ],
-            ];
-        }
-
-        return response()->json($payload, 200);
     }
 }

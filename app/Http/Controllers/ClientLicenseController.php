@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ApiErrorCode;
 use App\Enums\LicenseStatus;
+use App\Http\Controllers\Concerns\ApiResponse;
 use App\Http\Requests\ClientActivateRequest;
 use App\Http\Requests\ClientHeartbeatRequest;
 use App\Http\Requests\ClientLoginRequest;
@@ -25,7 +26,7 @@ use Throwable;
 
 class ClientLicenseController extends Controller
 {
-    private const SIGNING_ALGORITHM = 'RSA-2048-SHA256';
+    use ApiResponse;
 
     public function __construct(
         private readonly NonceGuardService $nonceGuardService,
@@ -267,8 +268,6 @@ class ClientLicenseController extends Controller
                 'plan_level' => (int) ($license->privilege?->value ?? 0),
                 'username' => (string) ($session->account?->username ?? ''),
             ];
-
-            $signature = $this->cryptoService->signData($data);
 
             $session->forceFill([
                 'last_heartbeat_at' => $currentTime,
@@ -516,53 +515,6 @@ class ClientLicenseController extends Controller
 
             return $this->errorResponse(500, ApiErrorCode::SERVER_ERROR, 'Internal server error.', true);
         }
-    }
-
-    private function errorResponse(int $httpCode, ApiErrorCode $errorCode, string $message, bool $signResponse = false): JsonResponse
-    {
-        $payload = [
-            'code' => $httpCode,
-            'error_code' => $errorCode->value,
-            'message' => $message,
-            'data' => null,
-        ];
-
-        if ($signResponse) {
-            $payload['signature'] = $this->cryptoService->signData($payload['data']);
-            $payload['meta'] = [
-                'signature' => [
-                    'algorithm' => self::SIGNING_ALGORITHM,
-                    'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
-                ],
-            ];
-        }
-
-        return response()->json($payload, $httpCode);
-    }
-
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    private function successResponse(array $data, bool $signResponse = false): JsonResponse
-    {
-        $payload = [
-            'code' => 200,
-            'error_code' => null,
-            'message' => 'OK',
-            'data' => $data,
-        ];
-
-        if ($signResponse) {
-            $payload['signature'] = $this->cryptoService->signData($data);
-            $payload['meta'] = [
-                'signature' => [
-                    'algorithm' => self::SIGNING_ALGORITHM,
-                    'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
-                ],
-            ];
-        }
-
-        return response()->json($payload, 200);
     }
 
     private function enforceRateLimit(ClientLoginRequest $request, string $scope, int $maxAttempts, int $decaySeconds): ?JsonResponse

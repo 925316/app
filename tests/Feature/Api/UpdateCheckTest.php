@@ -65,7 +65,7 @@ it('returns latest stable release payload with contract shape', function () {
         'virus_detection_url' => 'https://example.com/scan/1.3.0',
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable');
 
     $response->assertSuccessful()
         ->assertJsonPath('code', 200)
@@ -120,7 +120,7 @@ it('returns auth required when session token is missing', function () {
 });
 
 it('returns auth required when session token does not exist', function () {
-    $response = getJson('/api/update/check?session_token=unknown-session-token');
+    $response = getJson('/api/update/check?session_token=unknown-session-token&release_channel=stable');
 
     $response->assertUnauthorized()
         ->assertJsonPath('error_code', 'AUTH_REQUIRED')
@@ -141,7 +141,7 @@ it('returns auth required when update check session account is missing', functio
 
     $account->delete();
 
-    $response = getJson('/api/update/check?session_token=update-check-orphan-account-session');
+    $response = getJson('/api/update/check?session_token=update-check-orphan-account-session&release_channel=stable');
 
     $response->assertUnauthorized()
         ->assertJsonPath('error_code', 'AUTH_REQUIRED')
@@ -174,7 +174,7 @@ it('returns auth required when update check session device is missing', function
 
     $device->delete();
 
-    $response = getJson('/api/update/check?session_token=update-check-missing-device-session');
+    $response = getJson('/api/update/check?session_token=update-check-missing-device-session&release_channel=stable');
 
     $response->assertUnauthorized()
         ->assertJsonPath('error_code', 'AUTH_REQUIRED')
@@ -203,7 +203,7 @@ it('returns auth required when update check device is never bound', function () 
         'device_id' => $device->id,
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-never-bound-session');
+    $response = getJson('/api/update/check?session_token=update-check-never-bound-session&release_channel=stable');
 
     $response->assertUnauthorized()
         ->assertJsonPath('error_code', 'AUTH_REQUIRED')
@@ -227,7 +227,7 @@ it('returns license ineffective when account does not have effective privilege',
         'release_channel' => 'stable',
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-no-license');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-no-license&release_channel=stable');
 
     $response->assertForbidden()
         ->assertJsonPath('error_code', 'LICENSE_INEFFECTIVE')
@@ -258,7 +258,7 @@ it('returns update decision fields when current_version is provided and update i
         'download_url' => 'https://example.com/download/2.0.0.zip',
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001&current_version=1.9.9');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable&current_version=1.9.9');
 
     $response->assertSuccessful()
         ->assertJsonPath('data.current_version', '1.9.9')
@@ -277,7 +277,7 @@ it('returns update decision fields when current_version is provided and already 
         'download_url' => 'https://example.com/download/3.0.0.zip',
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001&current_version=3.0.0');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable&current_version=3.0.0');
 
     $response->assertSuccessful()
         ->assertJsonPath('data.current_version', '3.0.0')
@@ -294,7 +294,7 @@ it('returns invalid version when current_version is malformed', function () {
         'release_channel' => 'stable',
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001&current_version=bad-version');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable&current_version=bad-version');
 
     $response->assertUnprocessable()
         ->assertJsonPath('error_code', 'INVALID_VERSION')
@@ -310,7 +310,7 @@ it('trims current_version before semantic validation and comparison', function (
         'download_url' => 'https://example.com/download/2.0.0.zip',
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001&current_version=%201.9.9%20');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable&current_version=%201.9.9%20');
 
     $response->assertSuccessful()
         ->assertJsonPath('data.current_version', '1.9.9')
@@ -322,7 +322,7 @@ it('returns invalid version when current_version exceeds max length', function (
     seedUpdateCheckContext();
 
     $longVersion = str_repeat('1', 51);
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001&current_version='.$longVersion);
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable&current_version='.$longVersion);
 
     $response->assertUnprocessable()
         ->assertJsonPath('error_code', 'INVALID_VERSION')
@@ -403,7 +403,7 @@ it('rejects update check after device is unbound in web flow', function () {
         ->post(route('devices.unbind'))
         ->assertRedirect(route('devices.manage'));
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable');
 
     $response->assertUnauthorized()
         ->assertJsonPath('error_code', 'AUTH_REQUIRED')
@@ -420,7 +420,7 @@ it('returns package not found when latest release has non-https download url', f
         'virus_detection_url' => 'https://example.com/scan/5.0.0',
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable');
 
     $response->assertNotFound()
         ->assertJsonPath('error_code', 'PACKAGE_NOT_FOUND')
@@ -437,7 +437,7 @@ it('returns package not found when latest release has unsafe virus detection url
         'virus_detection_url' => 'https://localhost/scan/5.1.0',
     ]);
 
-    $response = getJson('/api/update/check?session_token=update-check-session-token-001');
+    $response = getJson('/api/update/check?session_token=update-check-session-token-001&release_channel=stable');
 
     $response->assertNotFound()
         ->assertJsonPath('error_code', 'PACKAGE_NOT_FOUND')
