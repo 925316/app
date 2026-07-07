@@ -58,7 +58,7 @@ it('never bound device stats and filter include only devices that were never bou
     $boundWithoutOnlineHeartbeat = AccountDevice::factory()->create([
         'account_id' => $this->regularUser->id,
         'bound_at' => now()->subDays(6),
-        'unbound_at' => null,
+        'unbound_at' => now()->subDays(1),
         'last_seen_at' => now()->subDays(45),
     ]);
 
@@ -196,8 +196,8 @@ it('admin unbind only invalidates sessions for targeted device', function () {
     $otherDevice = AccountDevice::factory()->create([
         'account_id' => $this->regularUser->id,
         'hwid_hash' => str_repeat('2', 64),
-        'bound_at' => now(),
-        'unbound_at' => null,
+        'bound_at' => now()->subDays(10),
+        'unbound_at' => now()->subDays(5),
     ]);
 
     $targetSession = ClientSession::factory()->create([

@@ -19,20 +19,7 @@ beforeEach(function () {
         LicenseSeeder::class,
     ]);
 
-    Account::query()->orderBy('id')->each(function (Account $account): void {
-        $createdAt = $account->created_at ?? now()->subDays(90);
-        $base = $createdAt->copy()->addMinutes($account->id * 5 + 10);
-
-        AccountDevice::query()->create([
-            'account_id' => $account->id,
-            'hwid_hash' => hash('sha256', 'seed-device-'.$account->id),
-            'ip_address' => '192.168.10.'.($account->id % 200 + 20),
-            'first_seen_at' => $base,
-            'last_seen_at' => $base->copy()->addDays(20),
-            'bound_at' => $base->copy()->addDays(1),
-            'unbound_at' => null,
-        ]);
-    });
+    // AccountSeeder already creates one active device per account;
 
     seed([
         EventLogSeeder::class,
