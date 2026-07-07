@@ -195,7 +195,7 @@ From `DeviceController`, `AccountDevice`, API controllers, and tests:
 ### Verified limitation in current implementation
 
 - The code strongly enforces one active bound device through request validation and transactional checks.
-- The database migration does **not** provide a robust portable hard guarantee of one active device per account. The current unique index on `(account_id, bound_at, unbound_at)` is not the same thing as a true partial uniqueness rule for "one active binding".
+- Migration `2026_01_10_000017` provides a MySQL-specific hard guarantee using a virtual generated column `is_active_binding` with a unique index on `(account_id, is_active_binding)`. This constraint is not portable to all database engines.
 
 ### Project rule
 
@@ -204,7 +204,7 @@ From `DeviceController`, `AccountDevice`, API controllers, and tests:
 
 ### Recommended hardening
 
-- If this rule is critical, strengthen the database-level guarantee with a real strategy appropriate to the deployed database engine instead of relying only on controller logic.
+- If portability to other database engines is needed, consider an application-level alternative strategy for databases that do not support virtual generated columns with unique indexes.
 
 ## 5.6 Session Rules
 
@@ -256,19 +256,14 @@ The POST endpoints consistently use:
 From `ClientLoginRequest` and `ClientLicenseController@login`:
 
 - Validator rules:
-  - `email`: nullable string email
-  - `password`: nullable string
+  - `email`: required string email
+  - `password`: required string
   - `hwid`: required string
   - `nonce`: required string
   - `timestamp`: required integer
   - `version`: required string
   - `country_code`: optional two-character string
-- Controller-level rules then require email and password to be non-empty for actual login.
-
-### Important implementation note
-
-- The request validator does **not** mark `email` and `password` as required, even though the controller rejects empty credentials with `AUTH_REQUIRED`.
-- This is a verified implementation detail and should be documented honestly instead of pretending the validator itself enforces required credentials.
+- The controller additionally rejects empty credentials with `AUTH_REQUIRED`.
 
 ### `POST /api/license/check`
 
@@ -399,6 +394,24 @@ From `CryptoService`, `ClientLicenseController`, `ClientPackageController`, and 
 ### Recommended hardening
 
 - External API guidance supports separating HTTP status from machine-readable business codes. A future protocol hardening task should add an explicit signature scope before clients treat the full envelope as trusted signed content.
+
+### error_code to HTTP Status Mapping
+
+| error_code | HTTP Status |
+|---|---|
+| AUTH_REQUIRED | 401 |
+| NONCE_REPLAY | 409 |
+| TIMESTAMP_OUT_OF_WINDOW | 422 |
+| DEVICE_MISMATCH | 422 |
+| DEVICE_NOT_BOUND | 409 |
+| LICENSE_INVALID | 422 |
+| LICENSE_INEFFECTIVE | 403 |
+| INVALID_CHANNEL | 422 |
+| INVALID_VERSION | 422 |
+| PACKAGE_NOT_FOUND | 404 |
+| RATE_LIMITED | 429 |
+| VALIDATION_FAILED | 422 |
+| SERVER_ERROR | 500 |
 
 ## 7.4 Canonical JSON Rule
 
@@ -555,7 +568,7 @@ This test coverage is strong enough to justify documenting the current API contr
 ### Verified from code review
 
 1. There is no standalone heartbeat endpoint. Heartbeat is implemented by `POST /api/license/check`.
-2. Login request validation does not mark `email` and `password` as required, even though the controller treats missing credentials as `AUTH_REQUIRED`.
+2. Login request validation marks `email` and `password` as required in the current implementation.
 3. `version` is optional on check, activate, and unbind request validators in the current implementation.
 4. The project has often described a stronger one-online-session rule than the code currently enforces.
 5. Current response signing protects successful `data` payloads, while signed controller errors and validation errors sign `null` through `data`; no current response emits `meta.signature.covers`.
@@ -568,9 +581,12 @@ These are not claims about current behavior. They are the most reasonable next s
 
 1. **Future protocol hardening**: define and emit an explicit signature scope, then update client-side validation to verify exactly that scope.
 2. **Clarify the contract around body `code`**. Keep it only as a mirror of HTTP status, or eventually remove it if backward compatibility allows.
-3. **Strengthen the database guarantee** for the one-active-device rule if that rule is business-critical.
-4. **Align validator rules with controller behavior** for login and update-check fields so validation and runtime behavior tell the same story.
+3. **Evaluate database portability** for the one-active-device rule if migration to non-MySQL engines is planned, since the current guarantee uses MySQL-specific virtual generated columns.
+4. **Align validator rules with controller behavior** for update-check fields so validation and runtime behavior tell the same story.
 5. **Keep `error_code` stable** as the business-level machine code that clients use for branching.
+6. **Add session cleanup scheduled task** to prevent indefinite session accumulation for accounts that stop sending heartbeats.
+7. **Consider Redis fallback atomicity** for `NonceGuardService` when Redis is unavailable, since cache-based fallback may not provide the same atomicity guarantees.
+8. **Monitor `LicenseObserver` recursion risk** in the `updated()` event handler, since status changes triggered within the observer could re-enter the observer.
 
 ## 14. Summary
 
