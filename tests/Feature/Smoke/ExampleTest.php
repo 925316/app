@@ -9,6 +9,12 @@ test('guest homepage renders the marketing experience with theme toggle support'
     get('/')
         ->assertOk()
         ->assertSeeText('Operational control for licenses, devices, packages, and logs.')
+        ->assertSeeText('Laravel-backed license administration for licenses, devices, package releases, sessions, and audit visibility.')
+        ->assertSeeText('Client-supplied HWID is stored server-side as a SHA-256 hash for binding and recovery workflows.')
+        ->assertSeeText('Stable and dev packages stay visible through authenticated update checks and signed release decisions.')
+        ->assertSeeText('Heartbeat-driven sessions and audit trails stay visible so operators can explain device and license activity.')
+        ->assertSeeText('Current response verification uses the returned signature and meta.signature metadata to verify the server\'s current signed payload.')
+        ->assertSeeText('Developer guide: CPP_CLIENT_VERIFICATION.md in the repository root')
         ->assertSeeText('Sign In')
         ->assertSeeText('Create Account')
         ->assertSeeText('Signal Board')
@@ -24,6 +30,7 @@ test('guest homepage renders the marketing experience with theme toggle support'
         ->assertSee('x-data="landingSignalBoard({', false)
         ->assertSee('landing-toggle-shell', false)
         ->assertSee('landing-rainbow-bar', false)
+        ->assertDontSee('href="CPP_CLIENT_VERIFICATION.md"', false)
         ->assertDontSee('document.addEventListener(\'alpine:init\'', false);
 });
 

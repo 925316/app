@@ -26,19 +26,19 @@
     $heroHighlights = [
         [
             'title' => __('License Policy'),
-            'description' => __('Suspend, extend, upgrade, and audit entitlements without leaving the command flow.'),
+            'description' => __('Laravel-backed license administration for licenses, devices, package releases, sessions, and audit visibility.'),
         ],
         [
             'title' => __('Device Recovery'),
-            'description' => __('Reset hardware identity safely, monitor bindings, and spot unusual session patterns fast.'),
+            'description' => __('Client-supplied HWID is stored server-side as a SHA-256 hash for binding and recovery workflows.'),
         ],
         [
             'title' => __('Release Channels'),
-            'description' => __('Promote stable and dev package releases with tighter rollout visibility.'),
+            'description' => __('Stable and dev packages stay visible through authenticated update checks and signed release decisions.'),
         ],
         [
             'title' => __('Event Visibility'),
-            'description' => __('Trace warnings, errors, and actor activity before a support queue turns into a fire.'),
+            'description' => __('Heartbeat-driven sessions and audit trails stay visible so operators can explain device and license activity.'),
         ],
     ];
 
@@ -110,6 +110,42 @@
             'span' => 'sm:col-span-2',
             'showProgress' => true,
             'meta' => __('11 customer groups synchronized · 37 policy changes propagated in the last 24 hours'),
+        ],
+    ];
+
+    $trustProtocolCards = [
+        [
+            'label' => __('Verification Posture'),
+            'title' => __('Current signed payload verification'),
+            'description' => __('Current response verification uses the returned signature and meta.signature metadata to verify the server\'s current signed payload.'),
+            'meta' => __('Success responses sign data. Current signed controller and validation error paths sign null.'),
+        ],
+        [
+            'label' => __('Repository Guide'),
+            'title' => __('C++ client verification notes stay with the codebase'),
+            'description' => __('Developer guide: CPP_CLIENT_VERIFICATION.md in the repository root'),
+            'meta' => __('Visible here for discovery without exposing a public Markdown route or file download link.'),
+        ],
+    ];
+
+    $verificationNotes = [
+        __('POST login, heartbeat, activation, and unbind flows use nonce and timestamp checks where the current requests and controllers implement them.'),
+        __('Authenticated update checks stay focused on stable and dev release channels so rollout decisions remain explicit and reviewable.'),
+        __('Treat envelope metadata as transport context unless the current signed payload contract explicitly includes it in future approved protocol work.'),
+    ];
+
+    $workflowTracks = [
+        [
+            'label' => __('Admin Workflow'),
+            'title' => __('Operators keep licenses, devices, sessions, and logs in one working scene.'),
+            'description' => __('Admins can inspect license state, device recovery history, session visibility, package releases, and audit trails from the Laravel web application without splitting the story across separate tools.'),
+            'meta' => __('License actions · Device recovery · Session visibility · Audit logs'),
+        ],
+        [
+            'label' => __('Signed-In Workflow'),
+            'title' => __('Authenticated teams move from review to action without a dead handoff.'),
+            'description' => __('Signed-in operators can move from account review into entitlement action, release checks, and operational follow-up while the public homepage continues to frame the truthful product surface for guests.'),
+            'meta' => __('Account review · Entitlement changes · Release follow-up'),
         ],
     ];
 @endphp
@@ -340,7 +376,56 @@
                 </div>
             </section>
 
-            <footer class="landing-fade-up mt-10 flex flex-col gap-4 border-t border-[rgb(var(--landing-line)/0.75)] pt-6 text-sm text-[rgb(var(--landing-muted))] sm:flex-row sm:items-center sm:justify-between lg:mt-12" style="animation-delay: 360ms;">
+            <section id="trust" class="landing-section-anchor landing-fade-up mt-10 lg:mt-12" style="animation-delay: 340ms;"
+                aria-labelledby="trust-heading">
+                <div class="grid gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
+                    <div class="landing-panel rounded-[2rem] p-6 sm:p-7">
+                        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--landing-glow))]">{{ __('Client Trust Protocol') }}</p>
+                        <h2 id="trust-heading" class="landing-display mt-3 text-4xl font-semibold leading-tight sm:text-5xl">{{ __('Truthful verification copy, repository-root guidance, and no hidden protocol promises.') }}</h2>
+                        <p class="mt-4 text-sm leading-7 text-[rgb(var(--landing-muted))] sm:text-base">{{ __('Atelier OS exposes the current verification contract as it exists today: signed payload verification, observable release decisions, and visible guidance for teams integrating a native client against the present API shape.') }}</p>
+                        <ul class="mt-6 grid gap-3 text-sm leading-6 text-[rgb(var(--landing-ink))]">
+                            @foreach ($verificationNotes as $note)
+                                <li class="landing-panel-soft rounded-2xl px-4 py-3">{{ $note }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+
+                    <div class="grid gap-3">
+                        @foreach ($trustProtocolCards as $card)
+                            <article class="landing-panel-soft rounded-[1.8rem] p-5 sm:p-6">
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-glow))]">{{ $card['label'] }}</p>
+                                <h3 class="landing-display mt-3 text-3xl font-semibold leading-tight">{{ $card['title'] }}</h3>
+                                <p class="mt-3 text-sm leading-7 text-[rgb(var(--landing-ink))] sm:text-base">{{ $card['description'] }}</p>
+                                <p class="mt-4 text-xs uppercase tracking-[0.14em] text-[rgb(var(--landing-muted))]">{{ $card['meta'] }}</p>
+                            </article>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+
+            <section id="workflow" class="landing-section-anchor landing-fade-up mt-10 lg:mt-12" style="animation-delay: 360ms;"
+                aria-labelledby="workflow-heading">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div class="max-w-2xl">
+                        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--landing-glow))]">{{ __('Admin and User Workflows') }}</p>
+                        <h2 id="workflow-heading" class="landing-display mt-3 text-4xl font-semibold leading-tight sm:text-5xl">{{ __('Guest story in front, authenticated action behind it.') }}</h2>
+                    </div>
+                    <p class="max-w-xl text-sm leading-7 text-[rgb(var(--landing-muted))] sm:text-right">{{ __('The public homepage stays guest-readable while the authenticated product keeps operational actions within reach for admins and signed-in teams.') }}</p>
+                </div>
+
+                <div class="mt-6 grid gap-3 lg:grid-cols-2">
+                    @foreach ($workflowTracks as $track)
+                        <article class="landing-panel rounded-[1.9rem] p-6">
+                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--landing-glow))]">{{ $track['label'] }}</p>
+                            <h3 class="landing-display mt-3 text-3xl font-semibold leading-tight">{{ $track['title'] }}</h3>
+                            <p class="mt-3 text-sm leading-7 text-[rgb(var(--landing-muted))] sm:text-base">{{ $track['description'] }}</p>
+                            <p class="mt-4 text-xs uppercase tracking-[0.14em] text-[rgb(var(--landing-ink))]">{{ $track['meta'] }}</p>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+
+            <footer class="landing-fade-up mt-10 flex flex-col gap-4 border-t border-[rgb(var(--landing-line)/0.75)] pt-6 text-sm text-[rgb(var(--landing-muted))] sm:flex-row sm:items-center sm:justify-between lg:mt-12" style="animation-delay: 390ms;">
                 <p>&copy; {{ date('Y') }} {{ config('app.name') }}</p>
                 <p>{{ __('Public homepage · atelier operational landing page') }}</p>
             </footer>
