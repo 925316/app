@@ -4,6 +4,10 @@ it('requires the cpp client verification guide to exist at the repository root',
     expect(base_path('CPP_CLIENT_VERIFICATION.md'))->toBeFile();
 });
 
+it('requires the cpp verification example program to exist', function () {
+    expect(base_path('examples/cpp/client_verification_example.cpp'))->toBeFile();
+});
+
 it('requires the cpp client verification guide to document the current client verification contract', function () {
     $guide = file_get_contents(base_path('CPP_CLIENT_VERIFICATION.md'));
 
@@ -23,7 +27,8 @@ it('requires the cpp client verification guide to document the current client ve
         ->toContain('Nonce and Timestamp Behavior')
         ->toContain('Update Check Query Behavior')
         ->toContain('Limitations')
-        ->toContain('This repository does not ship an official C++ SDK');
+        ->toContain('This repository does not ship an official C++ SDK')
+        ->toContain('examples/cpp/client_verification_example.cpp');
 
     expect($guide)
         ->toContain('POST /api/account/login')
@@ -61,6 +66,16 @@ it('requires the cpp client verification guide to document the current client ve
         ->toContain('base64')
         ->toContain('openssl_sign')
         ->toContain('OPENSSL_ALGO_SHA256');
+
+    $example = file_get_contents(base_path('examples/cpp/client_verification_example.cpp'));
+
+    expect($example)
+        ->toContain('EVP_DigestVerifyInit')
+        ->toContain('EVP_DigestVerifyFinal')
+        ->toContain('canonicalizeObject')
+        ->toContain('POST /api/license/check')
+        ->toContain('extract data + signature')
+        ->not->toContain('meta.signature.covers');
 
     expect($guide)
         ->toContain('Nonce replay')

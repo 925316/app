@@ -4,6 +4,8 @@ This guide explains how a C++ client can call the current Atelier OS API and ver
 
 This repository does not ship an official C++ SDK.
 
+The repository includes one minimal C++ example program at `examples/cpp/client_verification_example.cpp`. It is a reference example for canonicalizing the current `data` payload and verifying the returned `signature`; it is not a maintained SDK or build system.
+
 ## Endpoint Contract
 
 The current client-facing endpoints are:
@@ -130,6 +132,8 @@ The keys are sorted by key before signing.
 
 The server signs with `openssl_sign`.
 
+See `examples/cpp/client_verification_example.cpp` for a minimal OpenSSL EVP verification example. Replace the placeholder API signature and public key with values from your environment before testing it.
+
 ## RSA-SHA256
 
 The signing algorithm is RSA with SHA-256, implemented as `OPENSSL_ALGO_SHA256` in PHP and described in the response metadata as `RSA-2048-SHA256`.
@@ -242,6 +246,7 @@ The normalized server-side values become `session_token=token123`, `release_chan
 
 - This guide documents the current server contract only.
 - This repository does not ship an official C++ SDK.
+- The file `examples/cpp/client_verification_example.cpp` is a minimal verification example, not a complete client application.
 - Do not assume every top-level response field is signed.
 - Do not treat unsigned envelope fields as integrity-protected.
 - If you need a stronger contract, add a separate protocol-hardening task instead of assuming it already exists.
