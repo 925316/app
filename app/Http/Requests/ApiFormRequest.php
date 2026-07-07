@@ -16,6 +16,7 @@ class ApiFormRequest extends FormRequest
      */
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator): void
     {
+        $cryptoService = app(\App\Services\CryptoService::class);
         $errors = $validator->errors()->toArray();
         $firstMessage = $validator->errors()->first() ?? 'Invalid request.';
 
@@ -26,11 +27,11 @@ class ApiFormRequest extends FormRequest
             'data' => null,
         ];
 
-        $payload['signature'] = app(\App\Services\CryptoService::class)->signData($payload['data']);
+        $payload['signature'] = $cryptoService->signData($payload['data']);
         $payload['meta'] = [
             'signature' => [
-                'algorithm' => 'RSA-2048-SHA256',
-                'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
+                'algorithm' => $cryptoService->algorithm(),
+                'key_id' => $cryptoService->keyId(),
             ],
         ];
 

@@ -6,6 +6,8 @@ use RuntimeException;
 
 class CryptoService
 {
+    public function __construct(private readonly ?ApiSigningKeyService $apiSigningKeyService = null) {}
+
     public function canonicalize(mixed $payload): string
     {
         $normalized = $this->normalizeForCanonicalJson($payload);
@@ -21,13 +23,13 @@ class CryptoService
 
     public function signData(mixed $data): string
     {
-        $privateKeyPath = config('services.api_signing.private_key_path');
+        $privateKeyPath = $this->signingKeyService()->privateKeyPath();
 
         if (! is_string($privateKeyPath) || $privateKeyPath === '') {
             throw new RuntimeException('API signing private key path is not configured.');
         }
 
-        $resolvedPath = str_starts_with($privateKeyPath, DIRECTORY_SEPARATOR)
+        $resolvedPath = $this->isAbsolutePath($privateKeyPath)
             ? $privateKeyPath
             : base_path($privateKeyPath);
 
@@ -60,6 +62,16 @@ class CryptoService
         return base64_encode($signature);
     }
 
+    public function keyId(): string
+    {
+        return $this->signingKeyService()->keyId();
+    }
+
+    public function algorithm(): string
+    {
+        return $this->signingKeyService()->algorithm();
+    }
+
     private function normalizeForCanonicalJson(mixed $value): mixed
     {
         if (is_array($value)) {
@@ -83,5 +95,22 @@ class CryptoService
     private function isAssociativeArray(array $value): bool
     {
         return array_keys($value) !== range(0, count($value) - 1);
+    }
+
+    private function signingKeyService(): ApiSigningKeyService
+    {
+        return $this->apiSigningKeyService ?? app(ApiSigningKeyService::class);
+    }
+
+    private function isAbsolutePath(string $path): bool
+    {
+        if (str_starts_with($path, '/') || str_starts_with($path, '\\')) {
+            return true;
+        }
+
+        return strlen($path) >= 3
+            && ctype_alpha($path[0])
+            && $path[1] === ':'
+            && in_array($path[2], ['\\', '/'], true);
     }
 }

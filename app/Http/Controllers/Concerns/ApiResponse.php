@@ -7,8 +7,6 @@ use Illuminate\Http\JsonResponse;
 
 trait ApiResponse
 {
-    private const SIGNING_ALGORITHM = 'RSA-2048-SHA256';
-
     protected function errorResponse(int $httpCode, ApiErrorCode $errorCode, string $message, bool $signResponse = false): JsonResponse
     {
         $payload = [
@@ -22,8 +20,8 @@ trait ApiResponse
             $payload['signature'] = $this->cryptoService->signData($payload['data']);
             $payload['meta'] = [
                 'signature' => [
-                    'algorithm' => self::SIGNING_ALGORITHM,
-                    'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
+                    'algorithm' => $this->cryptoService->algorithm(),
+                    'key_id' => $this->cryptoService->keyId(),
                 ],
             ];
         }
@@ -47,8 +45,8 @@ trait ApiResponse
             $payload['signature'] = $this->cryptoService->signData($data);
             $payload['meta'] = [
                 'signature' => [
-                    'algorithm' => self::SIGNING_ALGORITHM,
-                    'key_id' => (string) config('services.api_signing.key_id', 'main-2026-01'),
+                    'algorithm' => $this->cryptoService->algorithm(),
+                    'key_id' => $this->cryptoService->keyId(),
                 ],
             ];
         }

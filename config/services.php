@@ -37,6 +37,8 @@ return [
 
     'api_signing' => [
         'private_key_path' => env('API_SIGNING_PRIVATE_KEY_PATH', 'storage/app/keys/api_private.pem'),
+        'key_directory' => env('API_SIGNING_KEY_DIRECTORY', 'storage/app/keys'),
+        'openssl_config_path' => env('API_SIGNING_OPENSSL_CONFIG_PATH', 'config/openssl.cnf'),
         'key_id' => env('API_SIGNING_KEY_ID', 'main-2026-01'),
         'algorithm' => env('API_SIGNING_ALGORITHM', 'RSA-2048-SHA256'),
     ],
