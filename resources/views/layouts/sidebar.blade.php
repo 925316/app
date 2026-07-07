@@ -96,6 +96,12 @@
                     {{ __('Logs') }}
                 </x-sidebar-nav-link>
             @endif
+
+            @if (Auth::user()->hasPrivilege(7))
+                <x-sidebar-nav-link :href="route('api-signing-keys.index')" :active="request()->routeIs('api-signing-keys.*')" :icon="'shield'" @click="closeMobileSidebar()">
+                    {{ __('Signing Keys') }}
+                </x-sidebar-nav-link>
+            @endif
         </div>
     </nav>
 

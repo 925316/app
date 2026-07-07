@@ -19,6 +19,17 @@ it('blocks unauthenticated users from admin routes', function () {
     $this->post(route('logs.clear'), ['days' => 30])
         ->assertRedirect(route('login'));
 
+    $signingKey = \App\Models\ApiSigningKey::factory()->create();
+
+    $this->get(route('api-signing-keys.index'))
+        ->assertRedirect(route('login'));
+
+    $this->post(route('api-signing-keys.rotate'), ['confirm_rotation' => 1])
+        ->assertRedirect(route('login'));
+
+    $this->post(route('api-signing-keys.activate', $signingKey))
+        ->assertRedirect(route('login'));
+
     $log = \App\Models\EventLog::factory()->create();
 
     $this->get(route('logs.index'))
@@ -61,6 +72,7 @@ it('blocks non-admin users from account management', function () {
     ]);
     $log = \App\Models\EventLog::factory()->create();
     $account = Account::factory()->create();
+    $signingKey = \App\Models\ApiSigningKey::factory()->create();
 
     $this->actingAs($user)->get(route('accounts.index'))->assertForbidden();
     $this->actingAs($user)->get(route('accounts.create'))->assertForbidden();
@@ -87,6 +99,9 @@ it('blocks non-admin users from account management', function () {
     $this->actingAs($user)->get(route('logs.index'))->assertForbidden();
     $this->actingAs($user)->post(route('logs.clear'), ['days' => 30])->assertForbidden();
     $this->actingAs($user)->get(route('logs.show', $log))->assertForbidden();
+    $this->actingAs($user)->get(route('api-signing-keys.index'))->assertForbidden();
+    $this->actingAs($user)->post(route('api-signing-keys.rotate'), ['confirm_rotation' => 1])->assertForbidden();
+    $this->actingAs($user)->post(route('api-signing-keys.activate', $signingKey))->assertForbidden();
 });
 
 it('allows admin users to access account management', function () {
@@ -105,6 +120,12 @@ it('allows admin users to access log management', function () {
     $admin = createAdmin();
 
     $this->actingAs($admin)->get(route('logs.index'))->assertSuccessful();
+});
+
+it('allows admin users to access signing key management', function () {
+    $admin = createAdmin();
+
+    $this->actingAs($admin)->get(route('api-signing-keys.index'))->assertSuccessful();
 });
 
 it('blocks non-admin users from admin device operations', function () {

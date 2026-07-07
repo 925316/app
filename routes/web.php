@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ApiSigningKeyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\LicenseController;
@@ -30,6 +31,11 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     // Logs
     Route::resource('logs', LogController::class)->only(['index', 'show']);
     Route::post('/logs/clear', [LogController::class, 'clear'])->name('logs.clear');
+
+    // API signing keys
+    Route::get('/api-signing-keys', [ApiSigningKeyController::class, 'index'])->name('api-signing-keys.index');
+    Route::post('/api-signing-keys/rotate', [ApiSigningKeyController::class, 'rotate'])->name('api-signing-keys.rotate');
+    Route::post('/api-signing-keys/{apiSigningKey}/activate', [ApiSigningKeyController::class, 'activate'])->name('api-signing-keys.activate');
 
     // Admin device operations
     Route::get('/devices/export', [DeviceController::class, 'export'])->name('devices.export');
